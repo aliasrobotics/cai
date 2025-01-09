@@ -348,15 +348,9 @@ from cai.repl import run_demo_loop
 run_demo_loop(agent, stream=True)
 ```
 
-# Core Contributors
+# Acknowledgements
 
-- Ilan Bigio - [ibigio](https://github.com/ibigio)
-- James Hills - [jhills20](https://github.com/jhills20)
-- Shyamal Anadkat - [shyamal-anadkat](https://github.com/shyamal-anadkat)
-- Charu Jaiswal - [charuj](https://github.com/charuj)
-- Colin Jarvis - [colin-openai](https://github.com/colin-openai)
-- Katia Gil Guzman - [katia-openai](https://github.com/katia-openai)
-
+CAI is developed by [Alias Robotics](https://aliasrobotics.com) and funded as part of the project XXXXX. The original agentic principles are inspired from OpenAI's [swarm](https://github.com/openai/swarm) library.
 
 # Plan of development
 - [x] Dev container
