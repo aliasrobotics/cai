@@ -360,8 +360,8 @@ run_demo_loop(agent, stream=True)
 
 
 # Plan of development
-- [ ] Dev container
-- [ ] pre-commit hooks
+- [x] Dev container
+- [x] pre-commit hooks
 - [ ] A first example with agents - picoctf_static_flag
 - [ ] Tracing
 - [ ] Graph/flow and other abstractions

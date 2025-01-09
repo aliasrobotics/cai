@@ -11,7 +11,8 @@ DEFAULT_RESPONSE_CONTENT = "sample response content"
 def mock_openai_client():
     m = MockOpenAIClient()
     m.set_response(
-        create_mock_response({"role": "assistant", "content": DEFAULT_RESPONSE_CONTENT})
+        create_mock_response(
+            {"role": "assistant", "content": DEFAULT_RESPONSE_CONTENT})
     )
     return m
 
@@ -49,7 +50,8 @@ def test_tool_call(mock_openai_client: MockOpenAIClient):
             create_mock_response(
                 message={"role": "assistant", "content": ""},
                 function_calls=[
-                    {"name": "get_weather", "args": {"location": expected_location}}
+                    {"name": "get_weather",
+                     "args": {"location": expected_location}}
                 ],
             ),
             create_mock_response(
@@ -88,7 +90,8 @@ def test_execute_tools_false(mock_openai_client: MockOpenAIClient):
             create_mock_response(
                 message={"role": "assistant", "content": ""},
                 function_calls=[
-                    {"name": "get_weather", "args": {"location": expected_location}}
+                    {"name": "get_weather",
+                     "args": {"location": expected_location}}
                 ],
             ),
             create_mock_response(

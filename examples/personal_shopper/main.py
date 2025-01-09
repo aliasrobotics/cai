@@ -23,9 +23,11 @@ def refund_item(user_id, item_id):
     result = cursor.fetchone()
     if result:
         amount = result[0]
-        print(f"Refunding ${amount} to user ID {user_id} for item ID {item_id}.")
+        print(
+            f"Refunding ${amount} to user ID {user_id} for item ID {item_id}.")
     else:
-        print(f"No purchase found for user ID {user_id} and item ID {item_id}.")
+        print(
+            f"No purchase found for user ID {user_id} and item ID {item_id}.")
     print("Refund initiated")
 
 

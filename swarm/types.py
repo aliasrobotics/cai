@@ -1,17 +1,25 @@
-from openai.types.chat import ChatCompletionMessage
-from openai.types.chat.chat_completion_message_tool_call import (
+"""
+This module contains type definitions for the Swarm library.
+"""
+
+from typing import List, Callable, Union, Optional
+from openai.types.chat import ChatCompletionMessage  # noqa: F401, E501  # pylint: disable=import-error, unused-import
+from openai.types.chat.chat_completion_message_tool_call import (  # noqa: F401, E501  # pylint: disable=import-error, unused-import
     ChatCompletionMessageToolCall,
     Function,
 )
-from typing import List, Callable, Union, Optional
 
 # Third-party imports
-from pydantic import BaseModel
+from pydantic import BaseModel  # pylint: disable=import-error
 
 AgentFunction = Callable[[], Union[str, "Agent", dict]]
 
 
-class Agent(BaseModel):
+class Agent(BaseModel):  # pylint: disable=too-few-public-methods
+    """
+    Represents an agent in the Swarm.
+    """
+
     name: str = "Agent"
     # model: str = "gpt-4o"
     model: str = "qwen2.5:14b"
@@ -21,13 +29,17 @@ class Agent(BaseModel):
     parallel_tool_calls: bool = True
 
 
-class Response(BaseModel):
+class Response(BaseModel):  # pylint: disable=too-few-public-methods
+    """
+    Represents a response from the Swarm.
+    """
+
     messages: List = []
     agent: Optional[Agent] = None
     context_variables: dict = {}
 
 
-class Result(BaseModel):
+class Result(BaseModel):  # pylint: disable=too-few-public-methods
     """
     Encapsulates the possible return values for an agent function.
 

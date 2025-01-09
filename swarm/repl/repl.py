@@ -1,9 +1,16 @@
+"""
+This module provides a REPL interface for testing and
+interacting with Swarm agents.
+"""
+
 import json
+from swarm import Swarm  # pylint: disable=import-error
 
-from swarm import Swarm
 
-
-def process_and_print_streaming_response(response):
+def process_and_print_streaming_response(response):  # pylint: disable=inconsistent-return-statements  # noqa: E501
+    """
+    Process and print streaming responses from Swarm.
+    """
     content = ""
     last_sender = ""
 
@@ -35,6 +42,9 @@ def process_and_print_streaming_response(response):
 
 
 def pretty_print_messages(messages) -> None:
+    """
+    Pretty print messages from Swarm.
+    """
     for message in messages:
         if message["role"] != "assistant":
             continue
@@ -60,6 +70,9 @@ def pretty_print_messages(messages) -> None:
 def run_demo_loop(
     starting_agent, context_variables=None, stream=False, debug=False
 ) -> None:
+    """
+    Run the demo loop for Swarm.
+    """
     client = Swarm()
     print("Starting Swarm CLI 🐝")
 

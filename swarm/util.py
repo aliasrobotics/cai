@@ -1,8 +1,15 @@
+"""
+This module contains utility functions for the Swarm library.
+"""
+
 import inspect
 from datetime import datetime
 
 
 def debug_print(debug: bool, *args: str) -> None:
+    """
+    Print debug messages if debug mode is enabled.
+    """
     if not debug:
         return
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -11,6 +18,9 @@ def debug_print(debug: bool, *args: str) -> None:
 
 
 def merge_fields(target, source):
+    """
+    Merge fields from source into target.
+    """
     for key, value in source.items():
         if isinstance(value, str):
             target[key] += value
@@ -19,6 +29,9 @@ def merge_fields(target, source):
 
 
 def merge_chunk(final_response: dict, delta: dict) -> None:
+    """
+    Merge fields from delta into final_response.
+    """
     delta.pop("role", None)
     merge_fields(final_response, delta)
 
@@ -55,7 +68,7 @@ def function_to_json(func) -> dict:
     except ValueError as e:
         raise ValueError(
             f"Failed to get signature for function {func.__name__}: {str(e)}"
-        )
+        ) from e
 
     parameters = {}
     for param in signature.parameters.values():
@@ -63,14 +76,14 @@ def function_to_json(func) -> dict:
             param_type = type_map.get(param.annotation, "string")
         except KeyError as e:
             raise KeyError(
-                f"Unknown type annotation {param.annotation} for parameter {param.name}: {str(e)}"
-            )
+                f"Unknown type annotation {param.annotation} for parameter {param.name}: {str(e)}"  # noqa: E501 # pylint: disable=C0301
+            ) from e
         parameters[param.name] = {"type": param_type}
 
     required = [
         param.name
         for param in signature.parameters.values()
-        if param.default == inspect._empty
+        if param.default == inspect._empty  # pylint: disable=protected-access
     ]
 
     return {

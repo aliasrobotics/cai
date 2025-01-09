@@ -31,7 +31,8 @@ for x in article_list:
 
 for i, x in enumerate(articles):
     try:
-        embedding = client.embeddings.create(model=EMBEDDING_MODEL, input=x["text"])
+        embedding = client.embeddings.create(
+            model=EMBEDDING_MODEL, input=x["text"])
         articles[i].update({"embedding": embedding.data[0].embedding})
     except Exception as e:
         print(x["title"])
@@ -48,7 +49,8 @@ vector_size
 article_df = pd.DataFrame(articles)
 article_df.head()
 
-# Delete the collection if it exists, so we can rewrite it changes to articles were made
+# Delete the collection if it exists, so we can rewrite it changes to
+# articles were made
 if qdrant.get_collection(collection_name=collection_name):
     qdrant.delete_collection(collection_name=collection_name)
 

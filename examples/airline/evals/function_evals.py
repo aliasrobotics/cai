@@ -10,7 +10,7 @@ n = 5
 
 if __name__ == "__main__":
     # Run triage_agent evals
-    with open(triage_test_cases, "r") as file:
+    with open(triage_test_cases) as file:
         triage_test_cases = json.load(file)
     run_function_evals(
         triage_agent,
@@ -20,7 +20,7 @@ if __name__ == "__main__":
     )
 
     # Run flight modification evals
-    with open(flight_modification_cases, "r") as file:
+    with open(flight_modification_cases) as file:
         flight_modification_cases = json.load(file)
     run_function_evals(
         flight_modification,

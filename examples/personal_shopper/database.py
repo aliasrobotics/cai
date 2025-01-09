@@ -140,7 +140,8 @@ def preview_table(table_name):
     conn = sqlite3.connect("application.db")  # Replace with your database name
     cursor = conn.cursor()
 
-    cursor.execute(f"SELECT * FROM {table_name} LIMIT 5;")  # Limit to first 5 rows
+    # Limit to first 5 rows
+    cursor.execute(f"SELECT * FROM {table_name} LIMIT 5;")
 
     rows = cursor.fetchall()
 

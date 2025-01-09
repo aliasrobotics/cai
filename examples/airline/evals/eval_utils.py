@@ -77,7 +77,7 @@ def run_function_evals(agent, test_cases, n=1, eval_path=None):
 
     if eval_path:
         try:
-            with open(eval_path, "r") as file:
+            with open(eval_path) as file:
                 existing_data = json.load(file)
         except FileNotFoundError:
             existing_data = []

@@ -5,7 +5,8 @@ from src.swarm.engines.assistants_engine import AssistantsEngine
 from src.swarm.engines.local_engine import LocalEngine
 from configs.general import Colors, tasks_path
 
-# This class represents the main control unit for deploying and managing tasks within the swarm system.
+# This class represents the main control unit for deploying and managing
+# tasks within the swarm system.
 
 
 class Swarm:
@@ -33,7 +34,7 @@ class Swarm:
 
     def load_tasks(self):
         self.tasks = []
-        with open(tasks_path, 'r') as file:
+        with open(tasks_path) as file:
             tasks_data = json.load(file)
             for task_json in tasks_data:
                 task = Task(description=task_json['description'],

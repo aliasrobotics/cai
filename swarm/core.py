@@ -1,11 +1,22 @@
+"""
+Core module for the Swarm library.
+
+This module contains the main Swarm class which handles chat completions,
+tool calls, and agent interactions. It provides both synchronous and
+streaming interfaces for running conversations with AI agents.
+
+Imports are organized into standard library, third-party packages,
+and local modules.
+"""
+
 # Standard library imports
 import copy
 import json
 from collections import defaultdict
-from typing import List, Callable, Union
+from typing import List
 
 # Package/library imports
-from openai import OpenAI
+from openai import OpenAI  # pylint: disable=import-error
 
 
 # Local imports
@@ -24,13 +35,17 @@ __CTX_VARS_NAME__ = "context_variables"
 
 
 class Swarm:
-    def __init__(self, client=None, base_url="http://localhost:8000/v1", api_key="alias"):
+    """
+    Main class for the Swarm library.
+    """
+
+    def __init__(self, client=None,
+                 base_url="http://localhost:8000/v1", api_key="alias"):
         if not client:
-            # client = OpenAI()
             client = OpenAI(base_url=base_url, api_key=api_key)
         self.client = client
 
-    def get_chat_completion(
+    def get_chat_completion(  # pylint: disable=too-many-arguments
         self,
         agent: Agent,
         history: List,
@@ -39,6 +54,10 @@ class Swarm:
         stream: bool,
         debug: bool,
     ) -> ChatCompletionMessage:
+        """
+        Get a chat completion for the given agent, history,
+        and context variables.
+        """
         context_variables = defaultdict(str, context_variables)
         instructions = (
             agent.instructions(context_variables)
@@ -71,6 +90,9 @@ class Swarm:
         return self.client.chat.completions.create(**create_params)
 
     def handle_function_result(self, result, debug) -> Result:
+        """
+        Handle the result of a function call.
+        """
         match result:
             case Result() as result:
                 return result
@@ -84,9 +106,9 @@ class Swarm:
                 try:
                     return Result(value=str(result))
                 except Exception as e:
-                    error_message = f"Failed to cast response to string: {result}. Make sure agent functions return a string or Result object. Error: {str(e)}"
+                    error_message = f"Failed to cast response to string: {result}. Make sure agent functions return a string or Result object. Error: {str(e)}"  # noqa: E501 # pylint: disable=C0301
                     debug_print(debug, error_message)
-                    raise TypeError(error_message)
+                    raise TypeError(error_message) from e
 
     def handle_tool_calls(
         self,
@@ -95,6 +117,9 @@ class Swarm:
         context_variables: dict,
         debug: bool,
     ) -> Response:
+        """
+        Handle the tool calls for the given agent.
+        """
         function_map = {f.__name__: f for f in functions}
         partial_response = Response(
             messages=[], agent=None, context_variables={})
@@ -138,7 +163,7 @@ class Swarm:
 
         return partial_response
 
-    def run_and_stream(
+    def run_and_stream(  # pylint: disable=too-many-arguments,too-many-locals,dangerous-default-value  # noqa: E501
         self,
         agent: Agent,
         messages: List,
@@ -148,6 +173,9 @@ class Swarm:
         max_turns: int = float("inf"),
         execute_tools: bool = True,
     ):
+        """
+        Run the swarm and stream the results.
+        """
         active_agent = agent
         context_variables = copy.deepcopy(context_variables)
         history = copy.deepcopy(messages)
@@ -209,11 +237,12 @@ class Swarm:
                     name=tool_call["function"]["name"],
                 )
                 tool_call_object = ChatCompletionMessageToolCall(
-                    id=tool_call["id"], function=function, type=tool_call["type"]
+                    id=tool_call["id"], function=function, type=tool_call["type"]  # noqa: E501
                 )
                 tool_calls.append(tool_call_object)
 
-            # handle function calls, updating context_variables, and switching agents
+            # handle function calls, updating context_variables, and switching
+            # agents
             partial_response = self.handle_tool_calls(
                 tool_calls, active_agent.functions, context_variables, debug
             )
@@ -230,7 +259,7 @@ class Swarm:
             )
         }
 
-    def run(
+    def run(  # pylint: disable=too-many-arguments,dangerous-default-value
         self,
         agent: Agent,
         messages: List,
@@ -241,6 +270,9 @@ class Swarm:
         max_turns: int = float("inf"),
         execute_tools: bool = True,
     ) -> Response:
+        """
+        Run the swarm and return the final response.
+        """
         if stream:
             return self.run_and_stream(
                 agent=agent,
@@ -278,9 +310,11 @@ class Swarm:
                 debug_print(debug, "Ending turn.")
                 break
 
-            # handle function calls, updating context_variables, and switching agents
+            # handle function calls, updating context_variables, and switching
+            # agents
             partial_response = self.handle_tool_calls(
-                message.tool_calls, active_agent.functions, context_variables, debug
+                message.tool_calls, active_agent.functions,
+                context_variables, debug
             )
             history.extend(partial_response.messages)
             context_variables.update(partial_response.context_variables)
