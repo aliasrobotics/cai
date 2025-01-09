@@ -39,8 +39,10 @@ class CAI:
     Main class for the CAI library.
     """
 
-    def __init__(self, client=None,
-                 base_url="http://localhost:8000/v1", api_key="alias"):
+    def __init__(self,
+                 client=None,
+                 base_url="http://host.docker.internal:8000/v1",
+                 api_key="alias"):
         if not client:
             client = OpenAI(base_url=base_url, api_key=api_key)
         self.client = client
