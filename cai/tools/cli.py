@@ -1,5 +1,10 @@
+"""
+Here are the CLI tools for executing commands, they should usually return
+with run_command, but you can be creative
+"""
 
 from .common import run_command
+
 
 def list_dir(path: str, args: str, ctf=None) -> str:
     """
@@ -14,6 +19,7 @@ def list_dir(path: str, args: str, ctf=None) -> str:
     """
     command = f'ls {path} {args}'
     return run_command(command, ctf=ctf)
+
 
 def cat_file(args: str, file_path: str, ctf=None) -> str:
     """
