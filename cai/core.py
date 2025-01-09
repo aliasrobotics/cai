@@ -14,7 +14,7 @@ import copy
 import json
 from collections import defaultdict
 from typing import List
-
+import os
 # Package/library imports
 from openai import OpenAI  # pylint: disable=import-error
 
@@ -31,7 +31,6 @@ from .types import (
     Result,
 )
 
-from .tools.common import run_command
 __CTX_VARS_NAME__ = "context_variables"
 
 
@@ -150,9 +149,11 @@ class CAI:
             func = function_map[name]
             # pass context_variables to agent functions
             if __CTX_VARS_NAME__ in func.__code__.co_varnames:
-                args[__CTX_VARS_NAME__] = context_variables 
+                args[__CTX_VARS_NAME__] = context_variables
             if self.ctf:
                 args["ctf"] = self.ctf
+            else:
+                os.environ["CTF_IN_DOCKER"] = "false"
             raw_result = function_map[name](**args)
 
             result: Result = self.handle_function_result(raw_result, debug)
