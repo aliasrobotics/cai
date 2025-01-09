@@ -31,6 +31,7 @@ from .types import (
     Result,
 )
 
+from .tools.common import run_command
 __CTX_VARS_NAME__ = "context_variables"
 
 
@@ -42,10 +43,12 @@ class CAI:
     def __init__(self,
                  client=None,
                  base_url="http://host.docker.internal:8000/v1",
-                 api_key="alias"):
+                 api_key="alias",
+                 ctf=None):
         if not client:
             client = OpenAI(base_url=base_url, api_key=api_key)
         self.client = client
+        self.ctf = ctf
 
     def get_chat_completion(  # pylint: disable=too-many-arguments
         self,
@@ -147,7 +150,9 @@ class CAI:
             func = function_map[name]
             # pass context_variables to agent functions
             if __CTX_VARS_NAME__ in func.__code__.co_varnames:
-                args[__CTX_VARS_NAME__] = context_variables
+                args[__CTX_VARS_NAME__] = context_variables 
+            if self.ctf:
+                args["ctf"] = self.ctf
             raw_result = function_map[name](**args)
 
             result: Result = self.handle_function_result(raw_result, debug)

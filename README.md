@@ -355,7 +355,8 @@ CAI is developed by [Alias Robotics](https://aliasrobotics.com) and funded as pa
 # Plan of development
 - [x] Dev container
 - [x] pre-commit hooks
-- [ ] A first example with agents - picoctf_static_flag
+- [x] A first example with agents - picoctf_static_flag
+  - [ ] ...
 - [ ] CI
 - [ ] Tracing
 - [ ] Graph/flow and other abstractions
