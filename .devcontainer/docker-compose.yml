@@ -1,0 +1,77 @@
+version: '3'
+
+#################
+# SERVICES
+#################
+services:
+  # Developer environment
+  devenv:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      # Mount the root folder that contains .git
+      - ..:/workspace:cached
+      # Mount Docker socket to enable Docker-in-Docker
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: /bin/sh -c "while sleep 10; do :; done"
+    networks:
+      exploitflownet:
+        ipv4_address: 192.168.2.5
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    privileged: true
+
+  # # Vulnhub vulnerable machine (Hackable II) SUGGESTION: Comment this and use PentestPerf
+  # hackableii:
+  #   image: vmayoral/vulnhub:hackableii
+  #   command: |
+  #     /bin/bash -c "
+  #       rm -rf /var/lock && \
+  #       mkdir -p /var/lock && \
+  #       chmod 755 /var/lock && \
+  #       /etc/init.d/apache2 start && \
+  #       /etc/init.d/ssh start && \
+  #       /etc/init.d/runproftpd.sh && \
+  #       /etc/init.d/php7.0-fpm start && \
+  #       while sleep 1; do :; done
+  #     "
+  #   networks:
+  #     exploitflownet:
+  #       ipv4_address: 192.168.2.11
+  #   mac_address: 08:00:27:85:55:86
+
+  # # Vulnhub vulnerable machine (Bob) SUGGESTION: Comment this and use PentestPerf
+  # bob:
+  #   image: vmayoral/vulnhub:bob
+  #   command: |
+  #     /bin/bash -c "rm -r /var/lock; mkdir -p /var/lock; chmod 755 /var/lock; /etc/init.d/apache2 start; /etc/init.d/ssh start; while sleep 10; do :; done"
+  #   ports: # map port in the container to the host systems
+  #     - "8080:80"
+  #   networks:
+  #     exploitflownet:
+  #       ipv4_address: 192.168.2.12
+  #   mac_address: 08:00:27:cb:07:d4
+
+  # Qdrant vector database
+  qdrant:
+    image: qdrant/qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - ./qdrant_storage:/qdrant/storage:z
+    networks:
+      exploitflownet:
+        ipv4_address: 192.168.2.13
+
+#################
+# NETWORKS
+#################
+networks:
+  exploitflownet:
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.2.0/24
