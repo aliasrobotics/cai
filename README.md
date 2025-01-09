@@ -1,26 +1,28 @@
-![CAI Logo](assets/logo.png)
+# Cybersecurity AI (`CAI`)
 
-# CAI (experimental, educational)
-
-An educational framework exploring ergonomic, lightweight multi-agent orchestration.
+A lightweight, ergonomic framework for building Bug Bounty-level grade Cybersecurity AIs (CAIs).
 
 > [!WARNING]
-> CAI is currently an experimental sample framework intended to explore ergonomic interfaces for multi-agent systems. It is not intended to be used in production, and therefore has no official support. (This also means we will not be reviewing PRs or issues!)
+> CAI is currently under development.
 >
-> The primary goal of CAI is to showcase the handoff & routines patterns explored in the [Orchestrating Agents: Handoffs & Routines](https://cookbook.openai.com/examples/orchestrating_agents) cookbook. It is not meant as a standalone library, and is primarily for educational purposes.
+> Access to this library and the use of information, materials (or portions thereof), is not intended, and is prohibited, where such access or use violates applicable laws or regulations. By no means the authors encourage or promote the unauthorized tampering with running systems. This can cause serious human harm and material damages.
+>
+> By no means the authors of CAI encourage or promote the unauthorized tampering with compute systems. Please don't use the source code in here to favour cybercrime. Pentest for good instead.
+
+
+## Why CAI?
+The cybersecurity landscape is undergoing a dramatic transformation as AI becomes increasingly integrated into security operations. Industry experts predict that by 2028, AI-powered security testing tools will outnumber human pentesters. This shift represents a fundamental change in how we approach cybersecurity challenges. *AI is not just another tool - it's becoming essential for addressing complex security vulnerabilities and staying ahead of sophisticated threats. As organizations face more advanced cyber attacks, AI-enhanced security testing will be crucial for maintaining robust defenses.*
+
+We believe that democratizing access to advanced cybersecurity AI tools is vital for the entire security community. That's why we're releasing Cybersecurity AI (`CAI`) as an open source framework. Our goal is to empower security researchers, ethical hackers, and organizations to build and deploy powerful AI-driven security tools. By making these capabilities openly available, we aim to level the playing field and ensure that cutting-edge security AI technology isn't limited to well-funded private companies or state actors.
+
+Bug Bounty programs have become a cornerstone of modern cybersecurity, providing a crucial mechanism for organizations to identify and fix vulnerabilities in their systems before they can be exploited. These programs have proven highly effective at securing both public and private infrastructure, with researchers discovering critical vulnerabilities that might have otherwise gone unnoticed. CAI is specifically designed to enhance these efforts by providing a lightweight, ergonomic framework for building specialized AI agents that can assist in various aspects of Bug Bounty hunting - from initial reconnaissance to vulnerability validation and reporting. Our framework aims to augment human expertise with AI capabilities, helping researchers work more efficiently and thoroughly in their quest to make digital systems more secure.
 
 ## Install
 
 Requires Python 3.10+
 
 ```shell
-pip install git+ssh://git@github.com/openai/cai.git
-```
-
-or
-
-```shell
-pip install git+https://github.com/openai/cai.git
+pip install git+https://gitlab.com/aliasrobotics/alias_research/cai.git
 ```
 
 ## Usage
@@ -99,9 +101,6 @@ Check out `/examples` for inspiration! Learn more about each one in its README.
 - [`support_bot`](examples/support_bot): A customer service bot which includes a user interface agent and a help center agent with several tools
 - [`personal_shopper`](examples/personal_shopper): A personal shopping agent that can help with making sales and refunding orders
 
-# Documentation
-
-![CAI Diagram](assets/swarm_diagram.png)
 
 ## Running CAI
 
@@ -363,6 +362,7 @@ run_demo_loop(agent, stream=True)
 - [x] Dev container
 - [x] pre-commit hooks
 - [ ] A first example with agents - picoctf_static_flag
+- [ ] CI
 - [ ] Tracing
 - [ ] Graph/flow and other abstractions
 - [ ] Plan/router
