@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.241.1/containers/python-3
 {
-	"name": "exploitflow_devenv",
+	"name": "cai_devenv",
 
 	// "build": {
 	// 	"dockerfile": "Dockerfile",
@@ -65,16 +65,16 @@
 	// "postCreateCommand": "pip3 install --user -r requirements.txt",  // doing it instead in
 																		// the dockerfile to cache
 																		// requirements in container
-	// Install exploitflow via "pip3 install -e ."
+	// Install cai via "pip3 install -e ."
 
 	// // Quadrant gen setup
 	"postCreateCommand": "pip3 install -e /workspace/",
 
 	// MSF setup, and RAG setup
 	"postStartCommand": [
-		"nohup", "msfrpcd", "-P", "exploitflow", "&",
+		"nohup", "msfrpcd", "-P", "cai", "&",
 		"&&",
-		"python3", "exploitflow/ins/rag/agent_helper.py"
+		"python3", "cai/ins/rag/agent_helper.py"
 	],
 	// // Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	// "remoteUser": "vscode"

@@ -124,7 +124,7 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
-# brought over from ExploitFlow
+# brought over from cai
 *.egg-info/
 __pycache__
 .DS_Store
@@ -137,11 +137,11 @@ snapshots
 qdrant-web-ui
 tests/metasploit_function_calls.json
 other/playground/7_datascraper/pdfs
-exploitflow/ins/rag/vectordb/msf/module_metadata.json
-exploitflow/ins/rag/vectordb/msf/function_calls.json
+cai/ins/rag/vectordb/msf/module_metadata.json
+cai/ins/rag/vectordb/msf/function_calls.json
 pentestperf
 /build/
 .history/
-exploitflow.png
-exploitflow.dot
-exploitflow*.png
+cai.png
+cai.dot
+cai*.png

@@ -16,7 +16,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     command: /bin/sh -c "while sleep 10; do :; done"
     networks:
-      exploitflownet:
+      cainet:
         ipv4_address: 192.168.2.5
     cap_add:
       - NET_ADMIN
@@ -38,7 +38,7 @@ services:
   #       while sleep 1; do :; done
   #     "
   #   networks:
-  #     exploitflownet:
+  #     cainet:
   #       ipv4_address: 192.168.2.11
   #   mac_address: 08:00:27:85:55:86
 
@@ -50,7 +50,7 @@ services:
   #   ports: # map port in the container to the host systems
   #     - "8080:80"
   #   networks:
-  #     exploitflownet:
+  #     cainet:
   #       ipv4_address: 192.168.2.12
   #   mac_address: 08:00:27:cb:07:d4
 
@@ -63,14 +63,14 @@ services:
     volumes:
       - ./qdrant_storage:/qdrant/storage:z
     networks:
-      exploitflownet:
+      cainet:
         ipv4_address: 192.168.2.13
 
 #################
 # NETWORKS
 #################
 networks:
-  exploitflownet:
+  cainet:
     ipam:
       driver: default
       config:
