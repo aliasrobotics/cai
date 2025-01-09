@@ -1,7 +1,7 @@
 # Airline customer service
 
-This example demonstrates a multi-agent setup for handling different customer service requests in an airline context using the Swarm framework. The agents can triage requests, handle flight modifications, cancellations, and lost baggage cases.
-This example uses the helper function `run_demo_loop`, which allows us to create an interactive Swarm session.
+This example demonstrates a multi-agent setup for handling different customer service requests in an airline context using the CAI framework. The agents can triage requests, handle flight modifications, cancellations, and lost baggage cases.
+This example uses the helper function `run_demo_loop`, which allows us to create an interactive CAI session.
 
 ## Agents
 
@@ -13,7 +13,7 @@ This example uses the helper function `run_demo_loop`, which allows us to create
 
 ## Setup
 
-Once you have installed dependencies and Swarm, run the example using:
+Once you have installed dependencies and CAI, run the example using:
 
 ```shell
 python3 main.py

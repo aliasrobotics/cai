@@ -1,6 +1,6 @@
-from swarm import Swarm, Agent
+from cai import CAI, Agent
 
-client = Swarm()
+client = CAI()
 
 english_agent = Agent(
     model="qwen2.5:14b",

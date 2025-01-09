@@ -1,5 +1,5 @@
 import pytest
-from swarm import Swarm, Agent
+from cai import CAI, Agent
 from tests.mock_client import MockOpenAIClient, create_mock_response
 from unittest.mock import Mock
 import json
@@ -20,7 +20,7 @@ def mock_openai_client():
 def test_run_with_simple_message(mock_openai_client: MockOpenAIClient):
     agent = Agent()
     # set up client and run
-    client = Swarm(client=mock_openai_client)
+    client = CAI(client=mock_openai_client)
     messages = [{"role": "user", "content": "Hello, how are you?"}]
     response = client.run(agent=agent, messages=messages)
 
@@ -61,7 +61,7 @@ def test_tool_call(mock_openai_client: MockOpenAIClient):
     )
 
     # set up client and run
-    client = Swarm(client=mock_openai_client)
+    client = CAI(client=mock_openai_client)
     response = client.run(agent=agent, messages=messages)
 
     get_weather_mock.assert_called_once_with(location=expected_location)
@@ -101,7 +101,7 @@ def test_execute_tools_false(mock_openai_client: MockOpenAIClient):
     )
 
     # set up client and run
-    client = Swarm(client=mock_openai_client)
+    client = CAI(client=mock_openai_client)
     response = client.run(agent=agent, messages=messages, execute_tools=False)
     print(response)
 
@@ -139,7 +139,7 @@ def test_handoff(mock_openai_client: MockOpenAIClient):
     )
 
     # set up client and run
-    client = Swarm(client=mock_openai_client)
+    client = CAI(client=mock_openai_client)
     messages = [{"role": "user", "content": "I want to talk to agent 2"}]
     response = client.run(agent=agent1, messages=messages)
 

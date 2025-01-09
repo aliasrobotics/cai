@@ -1,5 +1,5 @@
 """
-This module contains utility functions for the Swarm library.
+This module contains utility functions for the CAI library.
 """
 
 import inspect

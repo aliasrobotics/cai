@@ -4,7 +4,7 @@ This example is a weather agent demonstrating function calling with a single age
 
 ## Setup
 
-To run the weather agent Swarm:
+To run the weather agent CAI:
 
 1. Run
 

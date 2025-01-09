@@ -1,34 +1,34 @@
-![Swarm Logo](assets/logo.png)
+![CAI Logo](assets/logo.png)
 
-# Swarm (experimental, educational)
+# CAI (experimental, educational)
 
 An educational framework exploring ergonomic, lightweight multi-agent orchestration.
 
 > [!WARNING]
-> Swarm is currently an experimental sample framework intended to explore ergonomic interfaces for multi-agent systems. It is not intended to be used in production, and therefore has no official support. (This also means we will not be reviewing PRs or issues!)
+> CAI is currently an experimental sample framework intended to explore ergonomic interfaces for multi-agent systems. It is not intended to be used in production, and therefore has no official support. (This also means we will not be reviewing PRs or issues!)
 >
-> The primary goal of Swarm is to showcase the handoff & routines patterns explored in the [Orchestrating Agents: Handoffs & Routines](https://cookbook.openai.com/examples/orchestrating_agents) cookbook. It is not meant as a standalone library, and is primarily for educational purposes.
+> The primary goal of CAI is to showcase the handoff & routines patterns explored in the [Orchestrating Agents: Handoffs & Routines](https://cookbook.openai.com/examples/orchestrating_agents) cookbook. It is not meant as a standalone library, and is primarily for educational purposes.
 
 ## Install
 
 Requires Python 3.10+
 
 ```shell
-pip install git+ssh://git@github.com/openai/swarm.git
+pip install git+ssh://git@github.com/openai/cai.git
 ```
 
 or
 
 ```shell
-pip install git+https://github.com/openai/swarm.git
+pip install git+https://github.com/openai/cai.git
 ```
 
 ## Usage
 
 ```python
-from swarm import Swarm, Agent
+from cai import CAI, Agent
 
-client = Swarm()
+client = CAI()
 
 def transfer_to_agent_b():
     return agent_b
@@ -64,7 +64,7 @@ What can I assist?
 - [Overview](#overview)
 - [Examples](#examples)
 - [Documentation](#documentation)
-  - [Running Swarm](#running-swarm)
+  - [Running CAI](#running-cai)
   - [Agents](#agents)
   - [Functions](#functions)
   - [Streaming](#streaming)
@@ -73,20 +73,20 @@ What can I assist?
 
 # Overview
 
-Swarm focuses on making agent **coordination** and **execution** lightweight, highly controllable, and easily testable.
+CAI focuses on making agent **coordination** and **execution** lightweight, highly controllable, and easily testable.
 
 It accomplishes this through two primitive abstractions: `Agent`s and **handoffs**. An `Agent` encompasses `instructions` and `tools`, and can at any point choose to hand off a conversation to another `Agent`.
 
 These primitives are powerful enough to express rich dynamics between tools and networks of agents, allowing you to build scalable, real-world solutions while avoiding a steep learning curve.
 
 > [!NOTE]
-> Swarm Agents are not related to Assistants in the Assistants API. They are named similarly for convenience, but are otherwise completely unrelated. Swarm is entirely powered by the Chat Completions API and is hence stateless between calls.
+> CAI Agents are not related to Assistants in the Assistants API. They are named similarly for convenience, but are otherwise completely unrelated. CAI is entirely powered by the Chat Completions API and is hence stateless between calls.
 
-## Why Swarm
+## Why CAI
 
-Swarm explores patterns that are lightweight, scalable, and highly customizable by design. Approaches similar to Swarm are best suited for situations dealing with a large number of independent capabilities and instructions that are difficult to encode into a single prompt.
+CAI explores patterns that are lightweight, scalable, and highly customizable by design. Approaches similar to CAI are best suited for situations dealing with a large number of independent capabilities and instructions that are difficult to encode into a single prompt.
 
-The Assistants API is a great option for developers looking for fully-hosted threads and built in memory management and retrieval. However, Swarm is an educational resource for developers curious to learn about multi-agent orchestration. Swarm runs (almost) entirely on the client and, much like the Chat Completions API, does not store state between calls.
+The Assistants API is a great option for developers looking for fully-hosted threads and built in memory management and retrieval. However, CAI is an educational resource for developers curious to learn about multi-agent orchestration. CAI runs (almost) entirely on the client and, much like the Chat Completions API, does not store state between calls.
 
 # Examples
 
@@ -101,23 +101,23 @@ Check out `/examples` for inspiration! Learn more about each one in its README.
 
 # Documentation
 
-![Swarm Diagram](assets/swarm_diagram.png)
+![CAI Diagram](assets/swarm_diagram.png)
 
-## Running Swarm
+## Running CAI
 
-Start by instantiating a Swarm client (which internally just instantiates an `OpenAI` client).
+Start by instantiating a CAI client (which internally just instantiates an `OpenAI` client).
 
 ```python
-from swarm import Swarm
+from cai import CAI
 
-client = Swarm()
+client = CAI()
 ```
 
 ### `client.run()`
 
-Swarm's `run()` function is analogous to the `chat.completions.create()` function in the Chat Completions API – it takes `messages` and returns `messages` and saves no state between calls. Importantly, however, it also handles Agent function execution, hand-offs, context variable references, and can take multiple turns before returning to the user.
+CAI's `run()` function is analogous to the `chat.completions.create()` function in the Chat Completions API – it takes `messages` and returns `messages` and saves no state between calls. Importantly, however, it also handles Agent function execution, hand-offs, context variable references, and can take multiple turns before returning to the user.
 
-At its core, Swarm's `client.run()` implements the following loop:
+At its core, CAI's `client.run()` implements the following loop:
 
 1. Get a completion from the current Agent
 2. Execute tool calls and append results
@@ -138,7 +138,7 @@ At its core, Swarm's `client.run()` implements the following loop:
 | **stream**            | `bool`  | If `True`, enables streaming responses                                                                                                                 | `False`        |
 | **debug**             | `bool`  | If `True`, enables debug logging                                                                                                                       | `False`        |
 
-Once `client.run()` is finished (after potentially multiple calls to agents and tools) it will return a `Response` containing all the relevant updated state. Specifically, the new `messages`, the last `Agent` to be called, and the most up-to-date `context_variables`. You can pass these values (plus new user messages) in to your next execution of `client.run()` to continue the interaction where it left off – much like `chat.completions.create()`. (The `run_demo_loop` function implements an example of a full execution loop in `/swarm/repl/repl.py`.)
+Once `client.run()` is finished (after potentially multiple calls to agents and tools) it will return a `Response` containing all the relevant updated state. Specifically, the new `messages`, the last `Agent` to be called, and the most up-to-date `context_variables`. You can pass these values (plus new user messages) in to your next execution of `client.run()` to continue the interaction where it left off – much like `chat.completions.create()`. (The `run_demo_loop` function implements an example of a full execution loop in `/cai/repl/repl.py`.)
 
 #### `Response` Fields
 
@@ -198,7 +198,7 @@ Hi John, how can I assist you today?
 
 ## Functions
 
-- Swarm `Agent`s can call python functions directly.
+- CAI `Agent`s can call python functions directly.
 - Function should usually return a `str` (values will be attempted to be cast as a `str`).
 - If a function returns an `Agent`, execution will be transferred to that `Agent`.
 - If a function defines a `context_variables` parameter, it will be populated by the `context_variables` passed into `client.run()`.
@@ -282,7 +282,7 @@ Sales Agent
 
 ### Function Schemas
 
-Swarm automatically converts functions into a JSON Schema that is passed into Chat Completions `tools`.
+CAI automatically converts functions into a JSON Schema that is passed into Chat Completions `tools`.
 
 - Docstrings are turned into the function `description`.
 - Parameters without default values are set to `required`.
@@ -328,7 +328,7 @@ for chunk in stream:
    print(chunk)
 ```
 
-Uses the same events as [Chat Completions API streaming](https://platform.openai.com/docs/api-reference/streaming). See `process_and_print_streaming_response` in `/swarm/repl/repl.py` as an example.
+Uses the same events as [Chat Completions API streaming](https://platform.openai.com/docs/api-reference/streaming). See `process_and_print_streaming_response` in `/cai/repl/repl.py` as an example.
 
 Two new event types have been added:
 
@@ -337,14 +337,14 @@ Two new event types have been added:
 
 # Evaluations
 
-Evaluations are crucial to any project, and we encourage developers to bring their own eval suites to test the performance of their swarms. For reference, we have some examples for how to eval swarm in the `airline`, `weather_agent` and `triage_agent` quickstart examples. See the READMEs for more details.
+Evaluations are crucial to any project, and we encourage developers to bring their own eval suites to test the performance of their swarms. For reference, we have some examples for how to eval cai in the `airline`, `weather_agent` and `triage_agent` quickstart examples. See the READMEs for more details.
 
 # Utils
 
-Use the `run_demo_loop` to test out your swarm! This will run a REPL on your command line. Supports streaming.
+Use the `run_demo_loop` to test out your cai! This will run a REPL on your command line. Supports streaming.
 
 ```python
-from swarm.repl import run_demo_loop
+from cai.repl import run_demo_loop
 ...
 run_demo_loop(agent, stream=True)
 ```

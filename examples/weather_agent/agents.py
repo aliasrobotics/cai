@@ -1,6 +1,6 @@
 import json
 
-from swarm import Agent
+from cai import Agent
 
 
 def get_weather(location, time="now"):

@@ -1,4 +1,4 @@
-from swarm.repl import run_demo_loop
+from cai.repl import run_demo_loop
 from agents import weather_agent
 
 if __name__ == "__main__":

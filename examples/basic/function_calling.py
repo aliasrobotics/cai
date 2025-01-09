@@ -1,6 +1,6 @@
-from swarm import Swarm, Agent
+from cai import CAI, Agent
 
-client = Swarm()
+client = CAI()
 
 
 def get_weather(location) -> str:

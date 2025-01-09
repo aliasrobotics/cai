@@ -1,8 +1,8 @@
-from swarm import Swarm
+from cai import CAI
 from agents import weather_agent
 import pytest
 
-client = Swarm()
+client = CAI()
 
 
 def run_and_get_tool_calls(agent, query):

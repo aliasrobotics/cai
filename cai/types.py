@@ -1,5 +1,5 @@
 """
-This module contains type definitions for the Swarm library.
+This module contains type definitions for the CAI library.
 """
 
 from typing import List, Callable, Union, Optional
@@ -17,7 +17,7 @@ AgentFunction = Callable[[], Union[str, "Agent", dict]]
 
 class Agent(BaseModel):  # pylint: disable=too-few-public-methods
     """
-    Represents an agent in the Swarm.
+    Represents an agent in the CAI.
     """
 
     name: str = "Agent"
@@ -31,7 +31,7 @@ class Agent(BaseModel):  # pylint: disable=too-few-public-methods
 
 class Response(BaseModel):  # pylint: disable=too-few-public-methods
     """
-    Represents a response from the Swarm.
+    Represents a response from the CAI.
     """
 
     messages: List = []

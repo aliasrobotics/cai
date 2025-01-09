@@ -3,7 +3,7 @@ from data.routines.baggage.policies import *
 from data.routines.flight_modification.policies import *
 from data.routines.prompts import STARTER_PROMPT
 
-from swarm import Agent
+from cai import Agent
 
 
 def transfer_to_flight_modification():

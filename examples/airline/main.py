@@ -1,5 +1,5 @@
 from configs.agents import *
-from swarm.repl import run_demo_loop
+from cai.repl import run_demo_loop
 
 context_variables = {
     "customer_context": """Here is what you know about the customer's details:

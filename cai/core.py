@@ -1,7 +1,7 @@
 """
-Core module for the Swarm library.
+Core module for the CAI library.
 
-This module contains the main Swarm class which handles chat completions,
+This module contains the main CAI class which handles chat completions,
 tool calls, and agent interactions. It provides both synchronous and
 streaming interfaces for running conversations with AI agents.
 
@@ -34,9 +34,9 @@ from .types import (
 __CTX_VARS_NAME__ = "context_variables"
 
 
-class Swarm:
+class CAI:
     """
-    Main class for the Swarm library.
+    Main class for the CAI library.
     """
 
     def __init__(self, client=None,
@@ -174,7 +174,7 @@ class Swarm:
         execute_tools: bool = True,
     ):
         """
-        Run the swarm and stream the results.
+        Run the cai and stream the results.
         """
         active_agent = agent
         context_variables = copy.deepcopy(context_variables)
@@ -271,7 +271,7 @@ class Swarm:
         execute_tools: bool = True,
     ) -> Response:
         """
-        Run the swarm and return the final response.
+        Run the cai and return the final response.
         """
         if stream:
             return self.run_and_stream(

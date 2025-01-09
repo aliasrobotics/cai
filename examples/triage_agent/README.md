@@ -1,11 +1,11 @@
 # Triage agent
 
-This example is a Swarm containing a triage agent, which takes in user inputs and chooses whether to respond directly, or triage the request
+This example is a CAI containing a triage agent, which takes in user inputs and chooses whether to respond directly, or triage the request
 to a sales or refunds agent.
 
 ## Setup
 
-To run the triage agent Swarm:
+To run the triage agent CAI:
 
 1. Run
 

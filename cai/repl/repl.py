@@ -1,15 +1,15 @@
 """
 This module provides a REPL interface for testing and
-interacting with Swarm agents.
+interacting with CAI agents.
 """
 
 import json
-from swarm import Swarm  # pylint: disable=import-error
+from cai import CAI  # pylint: disable=import-error
 
 
 def process_and_print_streaming_response(response):  # pylint: disable=inconsistent-return-statements  # noqa: E501
     """
-    Process and print streaming responses from Swarm.
+    Process and print streaming responses from CAI.
     """
     content = ""
     last_sender = ""
@@ -43,7 +43,7 @@ def process_and_print_streaming_response(response):  # pylint: disable=inconsist
 
 def pretty_print_messages(messages) -> None:
     """
-    Pretty print messages from Swarm.
+    Pretty print messages from CAI.
     """
     for message in messages:
         if message["role"] != "assistant":
@@ -71,10 +71,10 @@ def run_demo_loop(
     starting_agent, context_variables=None, stream=False, debug=False
 ) -> None:
     """
-    Run the demo loop for Swarm.
+    Run the demo loop for CAI.
     """
-    client = Swarm()
-    print("Starting Swarm CLI 🐝")
+    client = CAI()
+    print("Starting CAI CLI 🐝")
 
     messages = []
     agent = starting_agent

@@ -1,6 +1,6 @@
-# Swarm basic
+# CAI basic
 
-This folder contains basic examples demonstrating core Swarm capabilities. These examples show the simplest implementations of Swarm, with one input message, and a corresponding output. The `simple_loop_no_helpers` has a while loop to demonstrate how to create an interactive Swarm session.
+This folder contains basic examples demonstrating core CAI capabilities. These examples show the simplest implementations of CAI, with one input message, and a corresponding output. The `simple_loop_no_helpers` has a while loop to demonstrate how to create an interactive CAI session.
 
 ### Examples
 
