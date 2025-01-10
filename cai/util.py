@@ -86,11 +86,11 @@ def format_value(value: Any, prev_value: Any = None) -> str:  # pylint: disable=
         return f"{color}{str(value)}{COLORS['reset']}"
 
 
-def format_chat_completion(msg) -> str:
+def format_chat_completion(msg, prev_msg=None) -> str:  # pylint: disable=unused-argument # noqa: E501
     """
     Format a ChatCompletionMessage object with proper indentation and colors.
     """
-    # Convert message to dict and handle OpenAI types
+    # Convert messages to dict and handle OpenAI types
     try:
         msg_dict = json.loads(msg.model_dump_json())
     except AttributeError:
@@ -99,31 +99,63 @@ def format_chat_completion(msg) -> str:
     # Clean up the dictionary
     msg_dict = {k: v for k, v in msg_dict.items() if v is not None}
 
+    def process_line(line, depth=0):
+        """Process each line with proper coloring
+        and handle nested structures"""
+        if ':' in line:  # pylint: disable=too-many-nested-blocks
+            key, value = line.split(':', 1)
+            key = key.strip(' "')
+            value = value.strip()
+
+            # Handle nested structures
+            if value in ['{', '[']:  # pylint: disable=no-else-return
+                return f"{COLORS['arg_key']}{key}{COLORS['reset']}: {value}"
+            elif value in ['}', ']']:
+                return value
+            else:
+                # Special handling for function arguments
+                if key == "arguments":
+                    try:
+                        args_dict = json.loads(
+                            value.strip('"')
+                            if value.startswith('"') else value)
+                        args_lines = json.dumps(
+                            args_dict, indent=2).split('\n')
+                        colored_args = []
+                        for args_line in args_lines:
+                            if ':' in args_line:
+                                args_key, args_val = args_line.split(':', 1)
+                                colored_args.append(
+                                    f"{' ' * (depth * 2)}{COLORS['arg_key']}{
+                                        args_key.strip()}{COLORS['reset']}: "
+                                    f"{COLORS['arg_value']}{args_val.strip()}{
+                                        COLORS['reset']}"
+                                )
+                            else:
+                                colored_args.append(
+                                    f"{' ' * (depth * 2)}{args_line}")
+                        return f"{COLORS['arg_key']}{key}{
+                            COLORS['reset']}: " + '\n'.join(colored_args)
+                    except json.JSONDecodeError:
+                        pass
+
+                return f"{COLORS['arg_key']}{key}{COLORS['reset']}: {
+                    COLORS['arg_value']}{value}{COLORS['reset']}"
+        return line
+
     # Format with json.dumps for consistent indentation
     formatted_json = json.dumps(msg_dict, indent=2)
 
-    # Color the different parts
+    # Process each line
     colored_lines = []
     for line in formatted_json.split('\n'):
-        if ':' in line:
-            key, value = line.split(':', 1)
-            # Handle nested structures
-            if value.strip() in ['{', '[', '}', ']']:
-                colored_lines.append(f"{COLORS['arg_key']}{key}{
-                                     COLORS['reset']}:{value}")
-            else:
-                colored_lines.append(
-                    f"{COLORS['arg_key']}{key}{COLORS['reset']}: "
-                    f"{COLORS['arg_value']}{value.strip()}{COLORS['reset']}"
-                )
-        else:
-            colored_lines.append(line)
+        colored_lines.append(process_line(line))
 
     return f"\n  {COLORS['object']}ChatCompletionMessage{
         COLORS['reset']}(\n    " + '\n    '.join(colored_lines) + "\n  )"
 
 
-def debug_print(debug: bool, intro: str, *args: Any) -> None:
+def debug_print(debug: bool, intro: str, *args: Any) -> None:  # pylint: disable=too-many-locals # noqa: E501
     """
     Print debug messages if debug mode is enabled with color-coded components.
     """
@@ -140,17 +172,48 @@ def debug_print(debug: bool, intro: str, *args: Any) -> None:
     msg_key = intro
     prev_args = _message_history.get(msg_key)
 
-    # Format args with history awareness
-    formatted_args = []
-    for i, arg in enumerate(args):
-        prev_arg = prev_args[i] if prev_args and i < len(prev_args) else None
-        formatted_args.append(format_value(arg, prev_arg))
+    # Special handling for tool call processing messages
+    if "Processing tool call" in intro:
+        if len(args) >= 2:
+            tool_name, _, tool_args = args
+            message = (
+                f"{header} {
+                    COLORS['intro']}Processing tool call:{
+                    COLORS['reset']} "
+                f"{COLORS['tool']}{tool_name}{COLORS['reset']} "
+                f"{COLORS['intro']}with arguments{COLORS['reset']} "
+                f"{format_value(tool_args)}"
+            )
+        else:
+            message = f"{header} {COLORS['intro']}{intro}{COLORS['reset']}"
+    # Special handling for "Received completion" messages
+    elif "Received completion" in intro:
+        message = f"{header} {COLORS['intro']}{intro}{COLORS['reset']}"
+        if args:
+            prev_msg = prev_args[0] if prev_args else None
+            message += format_chat_completion(args[0], prev_msg)
+    else:
+        # Regular debug message handling
+        formatted_intro = f"{COLORS['intro']}{intro}{COLORS['reset']}"
+        formatted_args = []
+        for i, arg in enumerate(args):
+            prev_arg = prev_args[i] if prev_args and i < len(
+                prev_args) else None
+            if isinstance(arg, str) and arg.startswith(
+                    ('get_', 'list_', 'process_', 'handle_')):
+                formatted_args.append(f"{COLORS['function']}{
+                                      arg}{COLORS['reset']}")
+            elif hasattr(arg, '__class__'):
+                formatted_args.append(format_value(arg, prev_arg))
+            else:
+                formatted_args.append(format_value(arg, prev_arg))
+
+        message = f"{header} {formatted_intro} {
+            ' '.join(map(str, formatted_args))}"
 
     # Update history
     _message_history[msg_key] = args
 
-    message = f"{header} {COLORS['intro']}{intro}{
-        COLORS['reset']} {' '.join(map(str, formatted_args))}"
     print(message)
 
 
