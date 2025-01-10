@@ -12,53 +12,78 @@ COLORS = {
     'timestamp': '\033[38;5;75m',    # Light blue
     'bracket': '\033[38;5;247m',     # Light gray
     'intro': '\033[38;5;141m',       # Light purple
-    'object': '\033[38;5;215m',     # Light orange
-    'arg_key': '\033[38;5;228m',    # Light yellow
-    'arg_value': '\033[38;5;180m',  # Light tan
-    'function': '\033[38;5;219m',   # Pink
-    'tool': '\033[38;5;147m',       # Soft purple
+    'object': '\033[38;5;215m',      # Light orange
+    'arg_key': '\033[38;5;147m',     # Soft purple
+    'arg_value': '\033[38;5;180m',   # Light tan
+    'function': '\033[38;5;219m',    # Pink
+    'tool': '\033[38;5;147m',        # Soft purple
+    # Darker variants
+    'timestamp_old': '\033[38;5;67m',  # Darker blue
+    'intro_old': '\033[38;5;97m',     # Darker purple
+    'object_old': '\033[38;5;172m',   # Darker orange
+    'arg_key_old': '\033[38;5;103m',   # Darker soft purple
+    'arg_value_old': '\033[38;5;137m',  # Darker tan
+    'function_old': '\033[38;5;176m',  # Darker pink
+    'tool_old': '\033[38;5;103m',     # Darker soft purple
     'reset': '\033[0m'
 }
 
+# Global cache for message history
+_message_history = {}
 
-def format_value(value: Any) -> str:
+
+def format_value(value: Any, prev_value: Any = None) -> str:  # pylint: disable=too-many-locals # noqa: E501
     """
     Format a value for debug printing with appropriate colors.
+    Compare with previous value to determine if content is new.
     """
-    # Handle ChatCompletionMessage objects
-    if hasattr(
-            value, '__class__') and 'ChatCompletionMessage' in value.__class__.__name__:  # noqa: E501 # pylint: disable=C0301
-        return format_chat_completion(value)
+    def get_color(key: str, current, previous) -> str:
+        """Determine if we should use the normal or darker color variant"""
+        if previous is not None and str(current) == str(previous):
+            return COLORS.get(f'{key}_old', COLORS[key])
+        return COLORS[key]
 
     # Handle lists
-    if isinstance(value, list):  # pylint: disable=R1705
+    if isinstance(value, list):  # pylint: disable=no-else-return
         items = []
-        for item in value:
+        prev_items = prev_value if isinstance(prev_value, list) else []
+
+        for i, item in enumerate(value):
+            prev_item = prev_items[i] if i < len(prev_items) else None
             if isinstance(item, dict):
                 # Format dictionary items in the list
-                dict_items = [
-                    f"\n    {
-                        COLORS['arg_key']}{k}{
-                        COLORS['reset']}: {
-                        format_value(v)}"
-                    for k, v in item.items()
-                ]
+                dict_items = []
+                for k, v in item.items():
+                    prev_v = prev_item.get(k) if prev_item and isinstance(
+                        prev_item, dict) else None
+                    color_key = get_color(
+                        'arg_key', k, k if prev_item else None)
+                    formatted_value = format_value(v, prev_v)
+                    dict_items.append(
+                        f"\n    {color_key}{k}{
+                            COLORS['reset']}: {formatted_value}")
                 items.append("{" + ",".join(dict_items) + "\n  }")
             else:
-                items.append(format_value(item))
+                items.append(format_value(item, prev_item))
         return f"[\n  {','.join(items)}\n]"
 
     # Handle dictionaries
     elif isinstance(value, dict):
-        formatted_items = [
-            f"{COLORS['arg_key']}{k}{COLORS['reset']}: {format_value(v)}"
-            for k, v in value.items()
-        ]
+        formatted_items = []
+        for k, v in value.items():
+            prev_v = prev_value.get(k) if prev_value and isinstance(
+                prev_value, dict) else None
+            color_key = get_color('arg_key', k, k if prev_value else None)
+            formatted_value = format_value(v, prev_v)
+            formatted_items.append(
+                f"{color_key}{k}{
+                    COLORS['reset']}: {formatted_value}")
         return "{ " + ", ".join(formatted_items) + " }"
 
     # Handle basic types
     else:
-        return f"{COLORS['arg_value']}{str(value)}{COLORS['reset']}"
+        color = get_color('arg_value', value, prev_value)
+        return f"{color}{str(value)}{COLORS['reset']}"
 
 
 def format_chat_completion(msg) -> str:
@@ -105,40 +130,27 @@ def debug_print(debug: bool, intro: str, *args: Any) -> None:
     if not debug:
         return
 
+    global _message_history  # pylint: disable=global-variable-not-assigned
+
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     header = f"{COLORS['bracket']}[{COLORS['timestamp']}{
         timestamp}{COLORS['bracket']}]{COLORS['reset']}"
 
-    # Special handling for tool call processing messages
-    if "Processing tool call" in intro:
-        if len(args) >= 2:
-            tool_name, _, tool_args = args
-            message = (
-                f"{header} {
-                    COLORS['intro']}Processing tool call:{
-                    COLORS['reset']} "
-                f"{COLORS['tool']}{tool_name}{COLORS['reset']} "
-                f"{COLORS['intro']}with arguments{COLORS['reset']} "
-                f"{format_value(tool_args)}"
-            )
-        else:
-            message = f"{header} {COLORS['intro']}{intro}{COLORS['reset']}"
-    else:
-        formatted_intro = f"{COLORS['intro']}{intro}{COLORS['reset']}"
-        formatted_args = []
-        for arg in args:
-            if isinstance(arg, str) and arg.startswith(
-                    ('get_', 'list_', 'process_', 'handle_')):
-                formatted_args.append(f"{COLORS['function']}{
-                                      arg}{COLORS['reset']}")
-            elif hasattr(arg, '__class__'):
-                formatted_args.append(format_value(arg))
-            else:
-                formatted_args.append(format_value(arg))
+    # Generate a unique key for this message based on the intro
+    msg_key = intro
+    prev_args = _message_history.get(msg_key)
 
-        message = f"{header} {formatted_intro} {
-            ' '.join(map(str, formatted_args))}"
+    # Format args with history awareness
+    formatted_args = []
+    for i, arg in enumerate(args):
+        prev_arg = prev_args[i] if prev_args and i < len(prev_args) else None
+        formatted_args.append(format_value(arg, prev_arg))
 
+    # Update history
+    _message_history[msg_key] = args
+
+    message = f"{header} {COLORS['intro']}{intro}{
+        COLORS['reset']} {' '.join(map(str, formatted_args))}"
     print(message)
 
 
