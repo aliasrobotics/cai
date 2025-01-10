@@ -3,10 +3,10 @@ Here are the CLI tools for executing commands, they should usually return
 with run_command, but you can be creative
 """
 
-from .common import run_command
+from cai.tools.common import run_command  # pylint: disable=E0401
 
 
-def list_dir(path: str, args: str, ctf=None) -> str:
+def list_dir(path: str, args: str = "", ctf=None) -> str:
     """
     List the contents of a directory.
     by def .
@@ -21,7 +21,7 @@ def list_dir(path: str, args: str, ctf=None) -> str:
     return run_command(command, ctf=ctf)
 
 
-def cat_file(args: str, file_path: str, ctf=None) -> str:
+def cat_file(file_path: str, args: str = "", ctf=None) -> str:
     """
     Display the contents of a file.
 
