@@ -377,8 +377,8 @@ CAI is developed by [Alias Robotics](https://aliasrobotics.com) and funded as pa
   - [x] re-organize tools
      - [ ] add tests -> Fill up all empty files or remove them
   - [x] add tests
+     - [ ] review agent tests and use pytest utilities (parametrize, etc)
 - [ ] CI
-
 - [ ] Tracing
 - [ ] Graph/flow and other abstractions
 - [ ] Plan/router

@@ -1,0 +1,48 @@
+#
+# TEMPLATE:
+# The following pieces create containers on the go
+# to facilitate reproduction of jobs.
+#
+.base_attacker_container: &base_attacker_container
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    # - echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY;
+    - |
+      for i in $(seq 1 5); do
+        echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY_IMAGE && break || sleep 10
+
+        echo "Retrying docker login ($i/5)..."
+      done
+    - apk add --no-cache docker-compose
+  script:
+    - cat .devcontainer/Dockerfile > Dockerfile_base
+    # Build the image
+    - docker build -t $CI_REGISTRY_IMAGE:$TAGGING -f Dockerfile_base .
+    - docker push $CI_REGISTRY_IMAGE:$TAGGING
+
+#
+# JOB:
+# A job to create the base container image for the attacker
+# in x86_64.
+#
+# NOTE: Enable only if base container needs to be rebuilt.
+# this will typically be the case whenever we change
+# .devcontainer/Dockerfile
+#
+🚧 base_attacker_container:
+  variables:
+    TAGGING: latest
+  <<: *base_attacker_container
+  tags:  # local runners won't have the right configuration
+    - p40
+    - x86
+  rules:
+      - if: '$CI_COMMIT_BRANCH'
+        changes:
+          - .devcontainer/Dockerfile
+          - ci/build/**/*
+        when: on_success
+      - when: never

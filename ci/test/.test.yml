@@ -1,0 +1,29 @@
+
+.use_base_container: &use_base_container
+  stage: test
+  image: "${CI_REGISTRY_IMAGE}:latest"
+  services:
+    - name: docker:dind
+
+.run_test: &run_test
+  <<: *use_base_container
+  script:
+    - pip3 install -e .
+    - pytest $TEST_PATH -s
+  tags:
+    - p40
+    - x86
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      when: on_success
+
+🏗️ tools reconnaissance/filesystem:
+  <<: *run_test
+  variables:
+    TEST_PATH: tests/tools/reconnaissance/test_filesystem.py
+
+
+# 🏗️ tools test_list_dir:
+#   <<: *run_test
+#   variables:
+#     TEST_PATH: tests/tests/tools/reconnaissance/filesystem/list_dir.py
