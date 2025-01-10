@@ -155,11 +155,19 @@ def format_chat_completion(msg, prev_msg=None) -> str:  # pylint: disable=unused
         COLORS['reset']}(\n    " + '\n    '.join(colored_lines) + "\n  )"
 
 
-def debug_print(debug: bool, intro: str, *args: Any) -> None:  # pylint: disable=too-many-locals # noqa: E501
+def debug_print(debug: bool, intro: str, *args: Any, brief: bool = False) -> None:  # pylint: disable=too-many-locals # noqa: E501
     """
     Print debug messages if debug mode is enabled with color-coded components.
+    If brief is True, prints a simplified timestamp and message format.
     """
     if not debug:
+        return
+
+    if brief:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        message = " ".join(map(str, [intro] + list(args)))
+        print(f"\033[97m[\033[90m{
+              timestamp}\033[97m]\033[90m {message}\033[0m")
         return
 
     global _message_history  # pylint: disable=global-variable-not-assigned

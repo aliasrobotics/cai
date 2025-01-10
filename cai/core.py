@@ -47,6 +47,7 @@ class CAI:
             client = OpenAI(base_url=base_url, api_key=api_key)
         self.client = client
         self.ctf = ctf
+        self.brief = False
 
     def get_chat_completion(  # pylint: disable=too-many-arguments
         self,
@@ -68,7 +69,11 @@ class CAI:
             else agent.instructions
         )
         messages = [{"role": "system", "content": instructions}] + history
-        debug_print(debug, "Getting chat completion for...:", messages)
+        debug_print(
+            debug,
+            "Getting chat completion for...:",
+            messages,
+            brief=self.brief)
 
         tools = [function_to_json(f) for f in agent.functions]
         # hide context_variables from model
@@ -116,7 +121,7 @@ class CAI:
                     return Result(value=str(result))
                 except Exception as e:
                     error_message = f"Failed to cast response to string: {result}. Make sure agent functions return a string or Result object. Error: {str(e)}"  # noqa: E501 # pylint: disable=C0301
-                    debug_print(debug, error_message)
+                    debug_print(debug, error_message, brief=self.brief)
                     raise TypeError(error_message) from e
 
     def handle_tool_calls(
@@ -167,7 +172,10 @@ class CAI:
             name = tool_call.function.name
             # handle missing tool case, skip to next tool
             if name not in function_map:
-                debug_print(debug, f"Tool {name} not found in function map.")
+                debug_print(
+                    debug,
+                    f"Tool {name} not found in function map.",
+                    brief=self.brief)
                 partial_response.messages.append(
                     {
                         "role": "tool",
@@ -183,7 +191,8 @@ class CAI:
                 "Processing tool call",
                 name,
                 "with arguments",
-                args)
+                args,
+                brief=self.brief)
 
             func = function_map[name]
             # pass context_variables to agent functions
@@ -270,11 +279,15 @@ class CAI:
                 message.get("tool_calls", {}).values())
             if not message["tool_calls"]:
                 message["tool_calls"] = None
-            debug_print(debug, "Received completion:", message)
+            debug_print(
+                debug,
+                "Received completion:",
+                message,
+                brief=self.brief)
             history.append(message)
 
             if not message["tool_calls"] or not execute_tools:
-                debug_print(debug, "Ending turn.")
+                debug_print(debug, "Ending turn.", brief=self.brief)
                 break
 
             # convert tool_calls to objects
@@ -307,7 +320,7 @@ class CAI:
             )
         }
 
-    def run(  # pylint: disable=too-many-arguments,dangerous-default-value
+    def run(  # pylint: disable=too-many-arguments,dangerous-default-value, too-many-locals # noqa: E501
         self,
         agent: Agent,
         messages: List,
@@ -317,10 +330,12 @@ class CAI:
         debug: bool = False,
         max_turns: int = float("inf"),
         execute_tools: bool = True,
+        brief: bool = False,
     ) -> Response:
         """
         Run the cai and return the final response.
         """
+        self.brief = brief
         if stream:
             return self.run_and_stream(
                 agent=agent,
@@ -348,14 +363,18 @@ class CAI:
                 debug=debug,
             )
             message = completion.choices[0].message
-            debug_print(debug, "Received completion:", message)
+            debug_print(
+                debug,
+                "Received completion:",
+                message,
+                brief=self.brief)
             message.sender = active_agent.name
             history.append(
                 json.loads(message.model_dump_json())
             )  # to avoid OpenAI types (?)
 
             if not message.tool_calls or not execute_tools:
-                debug_print(debug, "Ending turn.")
+                debug_print(debug, "Ending turn.", brief=self.brief)
                 break
 
             # handle function calls, updating context_variables, and switching

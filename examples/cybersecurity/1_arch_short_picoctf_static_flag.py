@@ -41,7 +41,11 @@ messages = [{
 }]
 
 # 5. Run the swarm
-response = client.run(agent=ctf_agent, messages=messages, debug=True)
+response = client.run(
+    agent=ctf_agent,
+    messages=messages,
+    debug=True,
+    brief=False)
 print(response.messages[-1]["content"])
 
 ctf.stop_ctf()
