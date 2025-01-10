@@ -39,10 +39,10 @@
   tags:  # local runners won't have the right configuration
     - p40
     - x86
-  rules:
-      - if: '$CI_COMMIT_BRANCH'
-        changes:
-          - .devcontainer/Dockerfile
-          - ci/build/**/*
-        when: on_success
-      - when: never
+  # rules:
+  #     - if: '$CI_COMMIT_BRANCH'
+  #       changes:
+  #         - .devcontainer/Dockerfile
+  #         - ci/build/**/*
+  #       when: on_success
+  #     - when: never
