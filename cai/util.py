@@ -65,65 +65,37 @@ def format_chat_completion(msg) -> str:
     """
     Format a ChatCompletionMessage object with proper indentation and colors.
     """
-    parts = []
-    parts.append(
-        f"\n  {
-            COLORS['object']}ChatCompletionMessage{
-            COLORS['reset']}(")
+    # Convert message to dict and handle OpenAI types
+    try:
+        msg_dict = json.loads(msg.model_dump_json())
+    except AttributeError:
+        msg_dict = msg.__dict__
 
-    # Format standard attributes
-    if hasattr(msg, 'content'):
-        parts.append(
-            f"\n    {
-                COLORS['arg_key']}content{
-                COLORS['reset']}: {
-                COLORS['arg_value']}{
-                    msg.content}{
-                        COLORS['reset']}")
-    if hasattr(msg, 'role'):
-        parts.append(
-            f"\n    {
-                COLORS['arg_key']}role{
-                COLORS['reset']}: {
-                COLORS['arg_value']}{
-                    msg.role}{
-                        COLORS['reset']}")
+    # Clean up the dictionary
+    msg_dict = {k: v for k, v in msg_dict.items() if v is not None}
 
-    # Format tool calls if present
-    if hasattr(msg, 'tool_calls') and msg.tool_calls:
-        tool_calls_str = []
-        for tool in msg.tool_calls:
-            tool_str = (
-                f"\n      {COLORS['object']}ToolCall{COLORS['reset']}("
-                f"\n        {
-                    COLORS['arg_key']}id{
-                    COLORS['reset']}: {
-                    COLORS['arg_value']}{
-                    tool.id}{
-                    COLORS['reset']}"
-                f"\n        {
-                    COLORS['arg_key']}name{
-                    COLORS['reset']}: {
-                    COLORS['arg_value']}{
-                    tool.function.name}{
-                    COLORS['reset']}"
-                f"\n        {
-                    COLORS['arg_key']}arguments{
-                    COLORS['reset']}: {
-                    format_value(
-                        json.loads(
-                            tool.function.arguments))}"
-                f"\n      )"
-            )
-            tool_calls_str.append(tool_str)
-        parts.append(
-            f"\n    {
-                COLORS['arg_key']}tool_calls{
-                COLORS['reset']}: [{
-                ','.join(tool_calls_str)}\n    ]")
+    # Format with json.dumps for consistent indentation
+    formatted_json = json.dumps(msg_dict, indent=2)
 
-    parts.append("\n  )")
-    return "".join(parts)
+    # Color the different parts
+    colored_lines = []
+    for line in formatted_json.split('\n'):
+        if ':' in line:
+            key, value = line.split(':', 1)
+            # Handle nested structures
+            if value.strip() in ['{', '[', '}', ']']:
+                colored_lines.append(f"{COLORS['arg_key']}{key}{
+                                     COLORS['reset']}:{value}")
+            else:
+                colored_lines.append(
+                    f"{COLORS['arg_key']}{key}{COLORS['reset']}: "
+                    f"{COLORS['arg_value']}{value.strip()}{COLORS['reset']}"
+                )
+        else:
+            colored_lines.append(line)
+
+    return f"\n  {COLORS['object']}ChatCompletionMessage{
+        COLORS['reset']}(\n    " + '\n    '.join(colored_lines) + "\n  )"
 
 
 def debug_print(debug: bool, intro: str, *args: Any) -> None:
