@@ -33,3 +33,12 @@ def cat_file(file_path: str, args: str = "", ctf=None) -> str:
     """
     command = f'cat {args} {file_path} '
     return run_command(command, ctf=ctf)
+
+#FileSearchTool
+#ListDirTool
+#TextSearchTool
+#FileAnalysisTool
+#StringExtractionTool
+#ReadFileTool
+#FilePermissionsTool
+#FileCompressionTool
