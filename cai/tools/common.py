@@ -1,11 +1,8 @@
-"""Basic utilities for executing commands inside and outside virtual
-containers. It's important to note that for proper functioning, the
-CTF_IN_DOCKER environment variable must be configured, and commands can
-only be executed through CTF instances with pentestperf within the code.
-See examples/cybersecurity/1_arch_short_picoctf_static_flag.py for an
-example."""
+"""
+Basic utilities for executing commands inside or outside of virtual
+containers.
+"""
 
-import os
 import subprocess  # nosec B404
 from wasabi import color  # pylint: disable=import-error
 
@@ -47,8 +44,8 @@ def _run_attacker_machine(command, stdout=True):
 def run_command(command, ctf=None, stdout=True):
     """
     Run command either in CTF container or
-    on local attacker machine based on CTF_IN_DOCKER flag
+    on the local attacker machine
     """
-    if os.getenv("CTF_IN_DOCKER", "false").lower() == "true" and ctf:
+    if ctf:
         return _run_ctf(ctf, command, stdout)
     return _run_attacker_machine(command, stdout)

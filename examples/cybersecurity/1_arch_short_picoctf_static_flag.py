@@ -9,7 +9,6 @@ from wasabi import color
 import os
 
 # 2. Init the CTF environment
-os.environ["CTF_IN_DOCKER"] = "true"
 ctf = ptt.ctf(
     "picoctf_static_flag",
     subnet="192.168.9.0/24",

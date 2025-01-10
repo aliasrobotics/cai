@@ -361,7 +361,3 @@ CAI is developed by [Alias Robotics](https://aliasrobotics.com) and funded as pa
 - [ ] Tracing
 - [ ] Graph/flow and other abstractions
 - [ ] Plan/router
-
-### ENV Vars
-
-CTF_IN_DOCKER="True"
