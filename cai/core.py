@@ -14,7 +14,6 @@ import copy
 import json
 from collections import defaultdict
 from typing import List
-
 # Package/library imports
 from openai import OpenAI  # pylint: disable=import-error
 
@@ -36,14 +35,18 @@ __CTX_VARS_NAME__ = "context_variables"
 
 class CAI:
     """
-    Main class for the CAI library.
+    Cybersecurity AI (CAI) object
     """
 
-    def __init__(self, client=None,
-                 base_url="http://localhost:8000/v1", api_key="alias"):
+    def __init__(self,
+                 client=None,
+                 base_url="http://host.docker.internal:8000/v1",
+                 api_key="alias",
+                 ctf=None):
         if not client:
             client = OpenAI(base_url=base_url, api_key=api_key)
         self.client = client
+        self.ctf = ctf
 
     def get_chat_completion(  # pylint: disable=too-many-arguments
         self,
@@ -91,7 +94,13 @@ class CAI:
 
     def handle_function_result(self, result, debug) -> Result:
         """
-        Handle the result of a function call.
+        Handle the result of a function call by
+        converting it into a standardized Result type.
+
+        The Result type encapsulates the possible
+        return values (Result, Agent, or context variables)
+        that functions can produce into a consistent
+        format for the framework to process.
         """
         match result:
             case Result() as result:
@@ -118,7 +127,37 @@ class CAI:
         debug: bool,
     ) -> Response:
         """
-        Handle the tool calls for the given agent.
+        Execute and handle tool calls made by the AI agent.
+
+        Processes a list of tool calls by:
+        1. Looking up each function in the provided function map
+        2. Handling missing tools gracefully by skipping them
+        3. Parsing and validating function arguments
+        4. Executing functions with provided arguments and context
+        5. Processing results into standardized Response format
+        6. Accumulating results from multiple tool calls
+
+        Args:
+            tool_calls (List[ChatCompletionMessageToolCall]): Tool
+                calls requested by AI agent
+            functions (List[AgentFunction]): Available functions
+                that can be called
+            context_variables (dict): Context variables to pass
+                to functions
+            debug (bool): Flag to enable debug logging
+
+        Returns:
+            Response: Object containing:
+                messages (List): Tool call results
+                agent (Optional[Agent]): Updated agent
+                    if returned by a function
+                context_variables (dict): Updated context variables
+
+        Note:
+            Results from multiple tool calls are accumulated
+                into a single Response.
+            Context variables are updated iteratively as
+                functions are called.
         """
         function_map = {f.__name__: f for f in functions}
         partial_response = Response(
@@ -140,12 +179,18 @@ class CAI:
                 continue
             args = json.loads(tool_call.function.arguments)
             debug_print(
-                debug, f"Processing tool call: {name} with arguments {args}")
+                debug,
+                "Processing tool call",
+                name,
+                "with arguments",
+                args)
 
             func = function_map[name]
             # pass context_variables to agent functions
             if __CTX_VARS_NAME__ in func.__code__.co_varnames:
                 args[__CTX_VARS_NAME__] = context_variables
+            if self.ctf:
+                args["ctf"] = self.ctf
             raw_result = function_map[name](**args)
 
             result: Result = self.handle_function_result(raw_result, debug)
@@ -175,6 +220,9 @@ class CAI:
     ):
         """
         Run the cai and stream the results.
+
+        The key difference from run() is that this streams results
+        incrementally, while run() returns everything at once.
         """
         active_agent = agent
         context_variables = copy.deepcopy(context_variables)
