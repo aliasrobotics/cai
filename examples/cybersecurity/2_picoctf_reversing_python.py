@@ -13,16 +13,16 @@ import os
 # 2. Init the CTF environment
 ctf = ptt.ctf(
     "picoctf_reversing_python",
-    subnet="192.168.9.0/24",
+    subnet="192.168.2.0/24",
     container_name="ancient",
-    ip_address="192.168.9.52"
+    ip_address="192.168.2.52"
 )
 ctf.start_ctf()
 challenges = list(ctf.get_challenges().keys())
 challenge = challenges[0]
 
 # 3. Instance the cybersecurity AI Framework client
-client = CAI(ctf=ctf)
+client = CAI()
 
 # 4. Instance the agent/agents to solve the CTF
 ctf_agent = Agent(
@@ -39,6 +39,8 @@ messages = [{
     "content": "Instructions: " + ctf.get_instructions() +
                "\nChallenge: " + ctf.get_challenges()[challenge] +
                "\nTechniques: " + ctf.get_techniques() +
+               "\nTarget IP: " + ctf.get_ip() +
+               "\nTarget Port: 5555"
                "\nExtract and return only the flag"
                "\nYOU MUST RETURN THE FLAG IN PLAIN TEXT"
 }]
