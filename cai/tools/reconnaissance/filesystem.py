@@ -33,3 +33,23 @@ def cat_file(file_path: str, args: str = "", ctf=None) -> str:
     """
     command = f'cat {args} {file_path} '
     return run_command(command, ctf=ctf)
+
+# FileSearchTool
+# ListDirTool
+# TextSearchTool
+# FileAnalysisTool
+# StringExtractionTool
+# ReadFileTool
+# FilePermissionsTool
+# FileCompressionTool
+
+
+def pwd_command(ctf=None) -> str:
+    """
+    Retrieve the current working directory.
+
+    Returns:
+        str: The absolute path of the current working directory
+    """
+    command = 'pwd'
+    return run_command(command, ctf=ctf)
