@@ -1,8 +1,11 @@
-from cai.tools.common import run_command
 """
-Here are the netcat tools.
+ Here are the tools for netcat command
 """
-def netcat(args: str, host: str, port: int, data: str = '', ctf=None) -> str:
+from cai.tools.common import run_command   # pylint: disable=import-error
+
+
+def netcat(host: str, port: int, data: str = '',
+           args: str = '', ctf=None) -> str:
     """
     A simple netcat tool to connect to a specified host and port.
     Args:
