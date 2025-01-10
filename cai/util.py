@@ -4,17 +4,170 @@ This module contains utility functions for the CAI library.
 
 import inspect
 from datetime import datetime
+from typing import Any
+import json
+
+# ANSI color codes in a nice, readable palette
+COLORS = {
+    'timestamp': '\033[38;5;75m',    # Light blue
+    'bracket': '\033[38;5;247m',     # Light gray
+    'intro': '\033[38;5;141m',       # Light purple
+    'object': '\033[38;5;215m',     # Light orange
+    'arg_key': '\033[38;5;228m',    # Light yellow
+    'arg_value': '\033[38;5;180m',  # Light tan
+    'function': '\033[38;5;219m',   # Pink
+    'tool': '\033[38;5;147m',       # Soft purple
+    'reset': '\033[0m'
+}
 
 
-def debug_print(debug: bool, *args: str) -> None:
+def format_value(value: Any) -> str:
     """
-    Print debug messages if debug mode is enabled.
+    Format a value for debug printing with appropriate colors.
+    """
+    # Handle ChatCompletionMessage objects
+    if hasattr(
+            value, '__class__') and 'ChatCompletionMessage' in value.__class__.__name__:  # noqa: E501 # pylint: disable=C0301
+        return format_chat_completion(value)
+
+    # Handle lists
+    if isinstance(value, list):  # pylint: disable=R1705
+        items = []
+        for item in value:
+            if isinstance(item, dict):
+                # Format dictionary items in the list
+                dict_items = [
+                    f"\n    {
+                        COLORS['arg_key']}{k}{
+                        COLORS['reset']}: {
+                        format_value(v)}"
+                    for k, v in item.items()
+                ]
+                items.append("{" + ",".join(dict_items) + "\n  }")
+            else:
+                items.append(format_value(item))
+        return f"[\n  {','.join(items)}\n]"
+
+    # Handle dictionaries
+    elif isinstance(value, dict):
+        formatted_items = [
+            f"{COLORS['arg_key']}{k}{COLORS['reset']}: {format_value(v)}"
+            for k, v in value.items()
+        ]
+        return "{ " + ", ".join(formatted_items) + " }"
+
+    # Handle basic types
+    else:
+        return f"{COLORS['arg_value']}{str(value)}{COLORS['reset']}"
+
+
+def format_chat_completion(msg) -> str:
+    """
+    Format a ChatCompletionMessage object with proper indentation and colors.
+    """
+    parts = []
+    parts.append(
+        f"\n  {
+            COLORS['object']}ChatCompletionMessage{
+            COLORS['reset']}(")
+
+    # Format standard attributes
+    if hasattr(msg, 'content'):
+        parts.append(
+            f"\n    {
+                COLORS['arg_key']}content{
+                COLORS['reset']}: {
+                COLORS['arg_value']}{
+                    msg.content}{
+                        COLORS['reset']}")
+    if hasattr(msg, 'role'):
+        parts.append(
+            f"\n    {
+                COLORS['arg_key']}role{
+                COLORS['reset']}: {
+                COLORS['arg_value']}{
+                    msg.role}{
+                        COLORS['reset']}")
+
+    # Format tool calls if present
+    if hasattr(msg, 'tool_calls') and msg.tool_calls:
+        tool_calls_str = []
+        for tool in msg.tool_calls:
+            tool_str = (
+                f"\n      {COLORS['object']}ToolCall{COLORS['reset']}("
+                f"\n        {
+                    COLORS['arg_key']}id{
+                    COLORS['reset']}: {
+                    COLORS['arg_value']}{
+                    tool.id}{
+                    COLORS['reset']}"
+                f"\n        {
+                    COLORS['arg_key']}name{
+                    COLORS['reset']}: {
+                    COLORS['arg_value']}{
+                    tool.function.name}{
+                    COLORS['reset']}"
+                f"\n        {
+                    COLORS['arg_key']}arguments{
+                    COLORS['reset']}: {
+                    format_value(
+                        json.loads(
+                            tool.function.arguments))}"
+                f"\n      )"
+            )
+            tool_calls_str.append(tool_str)
+        parts.append(
+            f"\n    {
+                COLORS['arg_key']}tool_calls{
+                COLORS['reset']}: [{
+                ','.join(tool_calls_str)}\n    ]")
+
+    parts.append("\n  )")
+    return "".join(parts)
+
+
+def debug_print(debug: bool, intro: str, *args: Any) -> None:
+    """
+    Print debug messages if debug mode is enabled with color-coded components.
     """
     if not debug:
         return
+
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    message = " ".join(map(str, args))
-    print(f"\033[97m[\033[90m{timestamp}\033[97m]\033[90m {message}\033[0m")
+    header = f"{COLORS['bracket']}[{COLORS['timestamp']}{
+        timestamp}{COLORS['bracket']}]{COLORS['reset']}"
+
+    # Special handling for tool call processing messages
+    if "Processing tool call" in intro:
+        if len(args) >= 2:
+            tool_name, _, tool_args = args
+            message = (
+                f"{header} {
+                    COLORS['intro']}Processing tool call:{
+                    COLORS['reset']} "
+                f"{COLORS['tool']}{tool_name}{COLORS['reset']} "
+                f"{COLORS['intro']}with arguments{COLORS['reset']} "
+                f"{format_value(tool_args)}"
+            )
+        else:
+            message = f"{header} {COLORS['intro']}{intro}{COLORS['reset']}"
+    else:
+        formatted_intro = f"{COLORS['intro']}{intro}{COLORS['reset']}"
+        formatted_args = []
+        for arg in args:
+            if isinstance(arg, str) and arg.startswith(
+                    ('get_', 'list_', 'process_', 'handle_')):
+                formatted_args.append(f"{COLORS['function']}{
+                                      arg}{COLORS['reset']}")
+            elif hasattr(arg, '__class__'):
+                formatted_args.append(format_value(arg))
+            else:
+                formatted_args.append(format_value(arg))
+
+        message = f"{header} {formatted_intro} {
+            ' '.join(map(str, formatted_args))}"
+
+    print(message)
 
 
 def merge_fields(target, source):
