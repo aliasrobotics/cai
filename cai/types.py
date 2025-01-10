@@ -31,7 +31,10 @@ class Agent(BaseModel):  # pylint: disable=too-few-public-methods
 
 class Response(BaseModel):  # pylint: disable=too-few-public-methods
     """
-    Represents a response from the CAI.
+    Represents a response back to the user from the CAI.
+
+    NOTE: This happens within the run() chain, after "Ending turn"
+    in the CAI.
     """
 
     messages: List = []
