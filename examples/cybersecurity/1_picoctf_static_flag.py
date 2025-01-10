@@ -4,9 +4,11 @@ from wasabi import color
 
 client = CAI()
 
+
 def run_ctf(ctf, command, stdout=True):
     try:
-        # Ensure the command is executed in a shell that supports command chaining
+        # Ensure the command is executed in a shell that supports command
+        # chaining
         output = ctf.get_shell(command)
         # exploit_logger.log_ok()
 
@@ -18,7 +20,8 @@ def run_ctf(ctf, command, stdout=True):
         # exploit_logger.log_error(str(e))
         return f"Error executing CTF command: {str(e)}"
 
-def list_dir(path: str, args: str) -> str:
+
+def list_dir(path: str, args: str = "") -> str:
     """
     List the contents of a directory.
 
@@ -32,6 +35,7 @@ def list_dir(path: str, args: str) -> str:
     global ctf
     command = f'ls {path} {args}'
     return run_ctf(ctf, command)
+
 
 def cat_file(args: str, file_path: str) -> str:
     """
@@ -57,6 +61,7 @@ def cat_file(args: str, file_path: str) -> str:
 #      else:
 #         return "Flag Not Found: " + flag
 
+
 listing_agent = Agent(
     model="qwen2.5:14b",
     name="A file listing tool",
@@ -79,11 +84,11 @@ listing_agent = Agent(
 
 # PentestPerf setup for "picoctf_static_flag"
 ctf = ptt.ctf(
-        "picoctf_static_flag",
-        subnet="192.168.9.0/24",
-        container_name="ancient",
-        ip_address="192.168.9.52",
-    )
+    "picoctf_static_flag",
+    subnet="192.168.9.0/24",
+    container_name="ancient",
+    ip_address="192.168.9.52",
+)
 ctf.start_ctf()
 flag = ctf.get_flag()
 
@@ -95,14 +100,14 @@ listing_agent.functions.append(cat_file)
 challenges = list(ctf.get_challenges().keys())
 challenge = challenges[0]
 
-messages = [{"role": "user", "content": "Instructions: " + ctf.get_instructions() 
-    + "\nChallenge: " + ctf.get_challenges()[challenge]
-    + "\nTechniques: " + ctf.get_techniques()
-    + "\nExtract and return only the flag"}]
+messages = [{"role": "user", "content": "Instructions: " + ctf.get_instructions()
+             + "\nChallenge: " + ctf.get_challenges()[challenge]
+             + "\nTechniques: " + ctf.get_techniques()
+             + "\nExtract and return only the flag"}]
 response = client.run(agent=listing_agent, messages=messages, debug=True)
 print(response.messages[-1]["content"])
 
-#if ctf.check_flag(response.messages[-1]["content"], ctf.get_challenges()[challenge]):
-#    print(color(f"Flag found: {response.messages[-1]['content']}", fg="green"))    
+# if ctf.check_flag(response.messages[-1]["content"], ctf.get_challenges()[challenge]):
+#    print(color(f"Flag found: {response.messages[-1]['content']}", fg="green"))
 
 ctf.stop_ctf()
