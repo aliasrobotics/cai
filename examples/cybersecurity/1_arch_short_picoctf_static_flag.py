@@ -40,12 +40,12 @@ messages = [{
                "\nExtract and return only the flag"
 }]
 
-# 5. Run the swarm
+# 5. Run the CAI
 response = client.run(
     agent=ctf_agent,
     messages=messages,
     debug=True,
-    brief=False)
+    brief=True)
 print(response.messages[-1]["content"])
 
 ctf.stop_ctf()

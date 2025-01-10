@@ -32,7 +32,7 @@ COLORS = {
 _message_history = {}
 
 
-def format_value(value: Any, prev_value: Any = None) -> str:  # pylint: disable=too-many-locals # noqa: E501
+def format_value(value: Any, prev_value: Any = None, brief: bool = False) -> str:  # pylint: disable=too-many-locals # noqa: E501
     """
     Format a value for debug printing with appropriate colors.
     Compare with previous value to determine if content is new.
@@ -58,13 +58,21 @@ def format_value(value: Any, prev_value: Any = None) -> str:  # pylint: disable=
                         prev_item, dict) else None
                     color_key = get_color(
                         'arg_key', k, k if prev_item else None)
-                    formatted_value = format_value(v, prev_v)
-                    dict_items.append(
-                        f"\n    {color_key}{k}{
-                            COLORS['reset']}: {formatted_value}")
-                items.append("{" + ",".join(dict_items) + "\n  }")
+                    formatted_value = format_value(v, prev_v, brief)
+                    if brief:
+                        dict_items.append(
+                            f"{color_key}{k}{
+                                COLORS['reset']}: {formatted_value}")
+                    else:
+                        dict_items.append(
+                            f"\n    {color_key}{k}{
+                                COLORS['reset']}: {formatted_value}")
+                items.append(
+                    "{" + (" " if brief else ",").join(dict_items) + "}")
             else:
-                items.append(format_value(item, prev_item))
+                items.append(format_value(item, prev_item, brief))
+        if brief:
+            return f"[{' '.join(items)}]"
         return f"[\n  {','.join(items)}\n]"
 
     # Handle dictionaries
@@ -74,11 +82,11 @@ def format_value(value: Any, prev_value: Any = None) -> str:  # pylint: disable=
             prev_v = prev_value.get(k) if prev_value and isinstance(
                 prev_value, dict) else None
             color_key = get_color('arg_key', k, k if prev_value else None)
-            formatted_value = format_value(v, prev_v)
+            formatted_value = format_value(v, prev_v, brief)
             formatted_items.append(
                 f"{color_key}{k}{
                     COLORS['reset']}: {formatted_value}")
-        return "{ " + ", ".join(formatted_items) + " }"
+        return "{ " + (" " if brief else ", ").join(formatted_items) + " }"
 
     # Handle basic types
     else:
@@ -155,7 +163,7 @@ def format_chat_completion(msg, prev_msg=None) -> str:  # pylint: disable=unused
         COLORS['reset']}(\n    " + '\n    '.join(colored_lines) + "\n  )"
 
 
-def debug_print(debug: bool, intro: str, *args: Any, brief: bool = False) -> None:  # pylint: disable=too-many-locals # noqa: E501
+def debug_print(debug: bool, intro: str, *args: Any, brief: bool = False, colours: bool = True) -> None:  # pylint: disable=too-many-locals,line-too-long,too-many-branches # noqa: E501
     """
     Print debug messages if debug mode is enabled with color-coded components.
     If brief is True, prints a simplified timestamp and message format.
@@ -165,9 +173,27 @@ def debug_print(debug: bool, intro: str, *args: Any, brief: bool = False) -> Non
 
     if brief:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        message = " ".join(map(str, [intro] + list(args)))
-        print(f"\033[97m[\033[90m{
-              timestamp}\033[97m]\033[90m {message}\033[0m")
+        if colours:
+            # Format args with colors even in brief mode
+            formatted_args = []
+            for arg in args:
+                if isinstance(arg, str) and arg.startswith(
+                        ('get_', 'list_', 'process_', 'handle_')):
+                    formatted_args.append(f"{COLORS['function']}{
+                        arg}{COLORS['reset']}")
+                elif hasattr(arg, '__class__'):
+                    formatted_args.append(format_value(arg, None, brief=True))
+                else:
+                    formatted_args.append(format_value(arg, None, brief=True))
+
+            colored_intro = f"{COLORS['intro']}{intro}{COLORS['reset']}"
+            message = " ".join([colored_intro] + formatted_args)
+            print(f"{COLORS['bracket']}[{COLORS['timestamp']}{timestamp}{
+                COLORS['bracket']}]{COLORS['reset']} {message}")
+        else:
+            message = " ".join(map(str, [intro] + list(args)))
+            print(f"\033[97m[\033[90m{
+                timestamp}\033[97m]\033[90m {message}\033[0m")
         return
 
     global _message_history  # pylint: disable=global-variable-not-assigned
