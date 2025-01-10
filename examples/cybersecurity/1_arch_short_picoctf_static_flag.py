@@ -3,7 +3,7 @@ This is a short example of how we can solve ctf scenarios programmatically. With
 """
 # 1. Instance CAI, pentestperf and tools
 from cai import CAI, Agent
-from cai.tools.cli import list_dir, cat_file
+from cai.tools.reconnaissance.filesystem import list_dir, cat_file
 import pentestperf as ptt
 from wasabi import color
 import os
