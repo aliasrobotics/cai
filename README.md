@@ -17,6 +17,8 @@ We believe that democratizing access to advanced cybersecurity AI tools is vital
 
 Bug Bounty programs have become a cornerstone of modern cybersecurity, providing a crucial mechanism for organizations to identify and fix vulnerabilities in their systems before they can be exploited. These programs have proven highly effective at securing both public and private infrastructure, with researchers discovering critical vulnerabilities that might have otherwise gone unnoticed. CAI is specifically designed to enhance these efforts by providing a lightweight, ergonomic framework for building specialized AI agents that can assist in various aspects of Bug Bounty hunting - from initial reconnaissance to vulnerability validation and reporting. Our framework aims to augment human expertise with AI capabilities, helping researchers work more efficiently and thoroughly in their quest to make digital systems more secure.
 
+
+
 ## Install
 
 Requires Python 3.10+
@@ -60,6 +62,21 @@ Hope glimmers brightly,
 New paths converge gracefully,
 What can I assist?
 ```
+
+### How are tools organized?
+
+Tools are grouped in 6 major categories inspired by the security kill chain [^3]:
+
+1. Reconnaissance and weaponization - *reconnaissance*  (crypto, listing, etc)
+2. Exploitation - *exploitation*
+3. Privilege escalation - *escalation*
+4. Lateral movement - *lateral*
+5. Data exfiltration - *exfiltration*
+6. Command and control - *control*
+
+[^3]: Kamhoua, C. A., Leslie, N. O., & Weisman, M. J. (2018). Game theoretic modeling of advanced persistent threat in internet of things. Journal of Cyber Security and Information Systems.
+
+
 
 ## Table of Contents
 
@@ -357,6 +374,7 @@ CAI is developed by [Alias Robotics](https://aliasrobotics.com) and funded as pa
 - [x] pre-commit hooks
 - [x] A first example with agents - picoctf_static_flag
   - [ ] polish aesthetics (coloring with alpha past content, brief/summarized)
+  - [ ] re-organize tools
   - [ ] add tests
 - [ ] CI
 - [ ] Tracing

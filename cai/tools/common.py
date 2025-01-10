@@ -1,6 +1,6 @@
 """
-Basic utilities for executing commands inside or outside of virtual
-containers.
+Basic utilities for executing tools
+inside or outside of virtual containers.
 """
 
 import subprocess  # nosec B404
@@ -23,7 +23,7 @@ def _run_ctf(ctf, command, stdout=True):
         return f"Error executing CTF command: {str(e)}"
 
 
-def _run_attacker_machine(command, stdout=True):
+def _run_local(command, stdout=True):
     try:
         # nosec B602 - shell=True is required for command chaining
         result = subprocess.run(
@@ -48,4 +48,4 @@ def run_command(command, ctf=None, stdout=True):
     """
     if ctf:
         return _run_ctf(ctf, command, stdout)
-    return _run_attacker_machine(command, stdout)
+    return _run_local(command, stdout)

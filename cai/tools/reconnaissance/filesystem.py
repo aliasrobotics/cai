@@ -1,6 +1,5 @@
 """
-Here are the CLI tools for executing commands, they should usually return
-with run_command, but you can be creative
+Here are the CLI tools for executing commands.
 """
 
 from cai.tools.common import run_command  # pylint: disable=E0401
