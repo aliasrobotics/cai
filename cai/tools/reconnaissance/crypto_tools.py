@@ -1,8 +1,7 @@
-# """
-# Here are crypto tools
-# """
-# # import base64
-# from cai.tools.common import run_command
+"""
+ Here are crypto tools
+"""
+import base64
 # # URLDecodeTool
 # # HexDumpTool
 # # Base64DecodeTool
@@ -25,22 +24,22 @@
 #     return run_command(ctf, command)
 
 
-# def decode64(input_data: str) -> str:
-#     """
-#     Decode a base64-encoded string.
+def decode64(input_data: str) -> str:
+    """
+    Decode a base64-encoded string.
 
-#     Args:
-#         input_data: The base64-encoded string to decode
-#         args: Additional arguments (not used in this function)
+    Args:
+        input_data: The base64-encoded string to decode
+        args: Additional arguments (not used in this function)
 
-#     Returns:
-#         str: The decoded string
-#     """
+    Returns:
+        str: The decoded string
+    """
 
-#     try:
-#         decoded_bytes = base64.b64decode(input_data)
-#         decoded_str = decoded_bytes.decode('utf-8')
-#         return decoded_str
-#     except UnicodeDecodeError as e:
-#         print(f"Error decoding bytes to string: {e}")
-#         return f"Error decoding bytes to string: {str(e)}"
+    try:
+        decoded_bytes = base64.b64decode(input_data)
+        decoded_str = decoded_bytes.decode('utf-8')
+        return decoded_str
+    except UnicodeDecodeError as e:
+        print(f"Error decoding bytes to string: {e}")
+        return f"Error decoding bytes to string: {str(e)}"
