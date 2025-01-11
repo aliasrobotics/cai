@@ -41,9 +41,6 @@ class CAI:
 
     def __init__(self,
                  ctf=None):
-        if not client:
-            client = OpenAI(base_url=base_url, api_key=api_key)
-        self.client = client
         self.ctf = ctf
         self.brief = False
 
