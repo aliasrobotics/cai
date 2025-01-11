@@ -40,9 +40,6 @@ class CAI:
     """
 
     def __init__(self,
-                 client=None,
-                 base_url="http://host.docker.internal:8000/v1",
-                 api_key="alias",
                  ctf=None):
         if not client:
             client = OpenAI(base_url=base_url, api_key=api_key)
@@ -87,16 +84,17 @@ class CAI:
         create_params = {
             "model": model_override or agent.model,
             "messages": messages,
-            "tools": tools or None,
-            "tool_choice": agent.tool_choice,
             "stream": stream,
             # "temperature": 0.0,
         }
 
         if tools:
             create_params["parallel_tool_calls"] = agent.parallel_tool_calls
+            create_params["tools"] = tools
+            create_params["tool_choice"] = agent.tool_choice
+        
+        return litellm.completion(**create_params)
 
-        return self.client.chat.completions.create(**create_params)
 
     def handle_function_result(self, result, debug) -> Result:
         """
