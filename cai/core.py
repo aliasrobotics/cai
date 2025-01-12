@@ -18,6 +18,9 @@ from typing import List
 import time
 from openai import OpenAI  # pylint: disable=import-error
 from cai.logger import exploit_logger
+import litellm
+import os
+from dotenv import load_dotenv
 
 # Local imports
 from .util import function_to_json, debug_print, merge_chunk
@@ -43,6 +46,7 @@ class CAI:
                  ctf=None):
         self.ctf = ctf
         self.brief = False
+        load_dotenv()
 
     def get_chat_completion(  # pylint: disable=too-many-arguments
         self,
@@ -90,6 +94,8 @@ class CAI:
             create_params["tools"] = tools
             create_params["tool_choice"] = agent.tool_choice
         
+        if os.getenv("OLLAMA").lower() == "true":
+            return litellm.completion(**create_params, api_base="http://host.docker.internal:8000/v1", custom_llm_provider="openai")
         return litellm.completion(**create_params)
 
 
