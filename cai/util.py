@@ -103,7 +103,7 @@ def rec_training_data(create_params, msg) -> str:
     Stores both input messages and completion responses during execution.
     """
     # Use a single training data file
-    filename = 'train_data/completions.jsonl'
+    filename = f'train_data/test_{datetime.now().strftime("%Y%m%d_%H%M%S")}.jsonl'
 
     # Create training data directory if it doesn't exist
     os.makedirs('train_data', exist_ok=True)
