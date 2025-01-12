@@ -7,17 +7,6 @@ from typing import List, Union
 from cai import CAI, Agent
 
 
-models = [
-    "dwightfoster03/functionary-small-v3.1",
-    # "llama3.1:70b", not supported in CI, try it in local
-    # "llama3.3:70b", not supported in CI, try it in local
-    "llama3.1:8b",
-    "qwen2.5:14b",
-    "qwen2.5:32b",
-    "marco-o1:7b-fp16"  # Does not support tools
-]
-
-
 class TestFunctionCallBenchmarksBasic:
     @pytest.fixture(autouse=True)
     def setup_teardown(self):
@@ -77,32 +66,38 @@ class TestFunctionCallBenchmarksBasic:
             print(f"\n❌ Test failed for {model_name}: {str(e)}")
             return False
 
-    def test_function_call_benchmark(self):
+    @pytest.mark.parametrize("model", [
+        "dwightfoster03/functionary-small-v3.1",
+        "llama3.1:8b", 
+        "qwen2.5:14b",
+        "qwen2.5:32b",
+        "marco-o1:7b-fp16"
+    ])
+    def test_function_call_benchmark(self, model):
         results = []
-        for model in models:
-            print(f"\nTesting {model}")
-            single_results = []
-            multi_results = []
+        print(f"\nTesting {model}")
+        single_results = []
+        multi_results = []
 
-            for i in range(3):
-                print(f"Iteration {i + 1}:")
-                single_results.append(self._test_function_call(model, False))
-                multi_results.append(self._test_function_call(model, True))
+        for i in range(3):
+            print(f"Iteration {i + 1}:")
+            single_results.append(self._test_function_call(model, False))
+            multi_results.append(self._test_function_call(model, True))
 
-            single_avg = statistics.mean(single_results)
-            multi_avg = statistics.mean(multi_results)
-            overall = (single_avg + multi_avg) / 2
+        single_avg = statistics.mean(single_results)
+        multi_avg = statistics.mean(multi_results)
+        overall = (single_avg + multi_avg) / 2
 
-            print(f"Results for {model}:")
-            print(f"Single: {single_avg * 100:.1f}%")
-            print(f"Multi: {multi_avg * 100:.1f}%")
-            print(f"Overall: {overall * 100:.1f}%")
+        print(f"Results for {model}:")
+        print(f"Single: {single_avg * 100:.1f}%")
+        print(f"Multi: {multi_avg * 100:.1f}%")
+        print(f"Overall: {overall * 100:.1f}%")
 
-            results.append({
-                "model": model,
-                "single": single_avg,
-                "multi": multi_avg
-            })
+        results.append({
+            "model": model,
+            "single": single_avg,
+            "multi": multi_avg
+        })
 
         total = statistics.mean([
             (r["single"] + r["multi"]) / 2
