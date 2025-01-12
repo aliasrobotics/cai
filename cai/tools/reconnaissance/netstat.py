@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # NetworkConnectionstool in exploitFlow
 """
 Netstat tool
@@ -15,3 +16,6 @@ def netstat(args: str = '', ctf=None) -> str:
     """
     command = f'netstat -tuln {args}'
     return run_command(command, ctf=ctf)
+=======
+#NetworkConnectionstool in exploitFlow
+>>>>>>> edbe53c (Revert precommit)
