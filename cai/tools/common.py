@@ -24,6 +24,10 @@ def _run_ctf(ctf, command, stdout=True):
 
 
 def _run_local(command, stdout=True):
+    if "netcat" or command.startswith("nc"):
+        return "netcat is not allowed"
+    if "nikto" in command:
+        return "nikto is not allowed"
     try:
         # nosec B602 - shell=True is required for command chaining
         result = subprocess.run(
@@ -31,7 +35,8 @@ def _run_local(command, stdout=True):
             shell=True,  # nosec B602
             capture_output=True,
             text=True,
-            check=True)
+            check=True,
+            timeout=100)
         output = result.stdout
         if stdout:
             print("\033[32m" + output + "\033[0m")
