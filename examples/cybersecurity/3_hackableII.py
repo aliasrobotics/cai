@@ -56,7 +56,7 @@ thought_agent = Agent(
     name="ThoughAgent",
     instructions=thought_agent_system_prompt + env_context,
     functions=[thought, CliAgent, Code_Executor_Expert],
-    model="claude-3-5-sonnet-20240620",
+    model="gpt-4o",
     parallel_tool_calls=False
 )
 
@@ -71,14 +71,14 @@ cli_agent = Agent(
         execute_python_code,
         web_request_framework],
     parallel_tool_calls=False,
-    model="claude-3-5-sonnet-20240620"
+    model="gpt-4o"
 )
 
 code_agent = Agent(
     name="Boot2Root Exploit Developer",
     instructions=exploit_agent_system_prompt + env_context,
     functions=[execute_python_code, CliAgent, Thought_Agent],
-    model="claude-3-5-sonnet-20240620",
+    model="gpt-4o",
     parallel_tool_calls=False
 )
 
