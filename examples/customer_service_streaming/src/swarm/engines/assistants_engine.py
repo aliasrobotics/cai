@@ -122,7 +122,8 @@ class AssistantsEngine:
 
         if assistant:
             print(
-                f"{Colors.OKGREEN}\nSelected Assistant:{Colors.ENDC} {Colors.BOLD}{assistant.name}{Colors.ENDC}"
+                f"{Colors.OKGREEN}\nSelected Assistant:{Colors.ENDC} {
+                    Colors.BOLD}{assistant.name}{Colors.ENDC}"
             )
             assistant.add_assistant_message(
                 'Selected Assistant: ' + assistant.name)
@@ -193,7 +194,8 @@ class AssistantsEngine:
             assistant_response_text = assistant_response.content[0].text.value
             if not test_mode:
                 print(
-                    f"{Colors.RED}Response:{Colors.ENDC} {assistant_response_text}",
+                    f"{Colors.RED}Response:{Colors.ENDC} {
+                        assistant_response_text}",
                     "\n")
             return assistant_response_text
         return "No response from the assistant."
@@ -282,11 +284,13 @@ class AssistantsEngine:
         """
         if not test_mode:
             print(
-                f"{Colors.OKCYAN}User Query:{Colors.ENDC} {Colors.BOLD}{task.description}{Colors.ENDC}"
+                f"{Colors.OKCYAN}User Query:{Colors.ENDC} {
+                    Colors.BOLD}{task.description}{Colors.ENDC}"
             )
         else:
             print(
-                f"{Colors.OKCYAN}Test:{Colors.ENDC} {Colors.BOLD}{task.description}{Colors.ENDC}"
+                f"{Colors.OKCYAN}Test:{Colors.ENDC} {
+                    Colors.BOLD}{task.description}{Colors.ENDC}"
             )
 
         if task.assistant == 'auto':
@@ -296,7 +300,8 @@ class AssistantsEngine:
             # Fetch the specified assistant
             assistant = self.get_assistant(task.assistant)
             print(
-                f"{Colors.OKGREEN}\nSelected Assistant:{Colors.ENDC} {Colors.BOLD}{assistant.name}{Colors.ENDC}"
+                f"{Colors.OKGREEN}\nSelected Assistant:{Colors.ENDC} {
+                    Colors.BOLD}{assistant.name}{Colors.ENDC}"
             )
 
         if test_mode:
@@ -338,19 +343,63 @@ class AssistantsEngine:
 
                 if response.content == 'True':
                     groundtruth_tests += 1
-                    print(f"{Colors.OKGREEN}✔ Groundtruth test passed for: {Colors.ENDC}{task.description}{Colors.OKBLUE}. Expected: {Colors.ENDC}{task.groundtruth}{Colors.OKBLUE}, Got: {Colors.ENDC}{output}{Colors.ENDC}")
+                    print(
+                        f"{
+                            Colors.OKGREEN}✔ Groundtruth test passed for: {
+                            Colors.ENDC}{
+                            task.description}{
+                            Colors.OKBLUE}. Expected: {
+                            Colors.ENDC}{
+                            task.groundtruth}{
+                                Colors.OKBLUE}, Got: {
+                                    Colors.ENDC}{output}{
+                                        Colors.ENDC}")
                 else:
-                    print(f"{Colors.RED}✘ Test failed for: {Colors.ENDC}{task.description}{Colors.OKBLUE}. Expected: {Colors.ENDC}{task.groundtruth}{Colors.OKBLUE}, Got: {Colors.ENDC}{output}{Colors.ENDC}")
+                    print(
+                        f"{
+                            Colors.RED}✘ Test failed for: {
+                            Colors.ENDC}{
+                            task.description}{
+                            Colors.OKBLUE}. Expected: {
+                            Colors.ENDC}{
+                            task.groundtruth}{
+                                Colors.OKBLUE}, Got: {
+                                    Colors.ENDC}{output}{
+                                        Colors.ENDC}")
 
                 if task.assistant == task.expected_assistant:
-                    print(f"{Colors.OKGREEN}✔ Correct assistant assigned for: {Colors.ENDC}{task.description}{Colors.OKBLUE}. Expected: {Colors.ENDC}{task.expected_assistant}{Colors.OKBLUE}, Got: {Colors.ENDC}{task.assistant}{Colors.ENDC}\n")
+                    print(
+                        f"{
+                            Colors.OKGREEN}✔ Correct assistant assigned for: {
+                            Colors.ENDC}{
+                            task.description}{
+                            Colors.OKBLUE}. Expected: {
+                            Colors.ENDC}{
+                            task.expected_assistant}{
+                                Colors.OKBLUE}, Got: {
+                                    Colors.ENDC}{
+                                        task.assistant}{
+                                            Colors.ENDC}\n")
                     assistant_tests += 1
                 else:
-                    print(f"{Colors.RED}✘ Incorrect assistant assigned for: {Colors.ENDC}{task.description}{Colors.OKBLUE}. Expected: {Colors.ENDC}{task.expected_assistant}{Colors.OKBLUE}, Got: {Colors.ENDC}{task.assistant}{Colors.ENDC}\n")
+                    print(
+                        f"{
+                            Colors.RED}✘ Incorrect assistant assigned for: {
+                            Colors.ENDC}{
+                            task.description}{
+                            Colors.OKBLUE}. Expected: {
+                            Colors.ENDC}{
+                            task.expected_assistant}{
+                                Colors.OKBLUE}, Got: {
+                                    Colors.ENDC}{
+                                        task.assistant}{
+                                            Colors.ENDC}\n")
 
         if test_mode:
-            print(f"\n{Colors.OKGREEN}Passed {groundtruth_tests} groundtruth tests out of {total_tests} tests. Success rate: {groundtruth_tests/total_tests*100}%{Colors.ENDC}\n")
-            print(f"{Colors.OKGREEN}Passed {assistant_tests} assistant tests out of {total_tests} tests. Success rate: {groundtruth_tests/total_tests*100}%{Colors.ENDC}\n")
+            print(f"\n{Colors.OKGREEN}Passed {groundtruth_tests} groundtruth tests out of {
+                  total_tests} tests. Success rate: {groundtruth_tests / total_tests * 100}%{Colors.ENDC}\n")
+            print(f"{Colors.OKGREEN}Passed {assistant_tests} assistant tests out of {
+                  total_tests} tests. Success rate: {groundtruth_tests / total_tests * 100}%{Colors.ENDC}\n")
             print("Completed testing the swarm\n\n")
         else:
             print("🍯🐝🍯 Swarm operations complete 🍯🐝🍯\n\n")

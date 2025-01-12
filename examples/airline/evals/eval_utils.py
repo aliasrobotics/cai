@@ -36,7 +36,9 @@ def run_function_evals(agent, test_cases, n=1, eval_path=None):
 
             if "tool_calls" in output:
                 print(
-                    f'\033[95mExpected function: \033[0m {test_case["function"]}, \033[95mGot: \033[0m{output["tool_calls"]}\n'
+                    f'\033[95mExpected function: \033[0m {
+                        test_case["function"]}, \033[95mGot: \033[0m{
+                        output["tool_calls"]}\n'
                 )
                 if output["tool_calls"] == test_case["function"]:
                     case_correct += 1
@@ -44,7 +46,8 @@ def run_function_evals(agent, test_cases, n=1, eval_path=None):
 
             elif "message" in output:
                 print(
-                    f'\033[95mExpected function: \033[0m {test_case["function"]}, \033[95mGot: \033[0mNone'
+                    f'\033[95mExpected function: \033[0m {
+                        test_case["function"]}, \033[95mGot: \033[0mNone'
                 )
                 print(f'\033[90mMessage: {output["message"]}\033[0m\n')
                 if test_case["function"] == "None":
@@ -56,13 +59,15 @@ def run_function_evals(agent, test_cases, n=1, eval_path=None):
         results.append(case_results)
 
         print(
-            f"\033[92mCorrect functions for this case: {case_correct} out of {n}\033[0m"
+            f"\033[92mCorrect functions for this case: {
+                case_correct} out of {n}\033[0m"
         )
         print(f"\033[93mAccuracy for this case: {case_accuracy:.2f}%\033[0m")
     overall_accuracy = (correct_function / (len(test_cases) * n)) * 100
     print(50 * "**")
     print(
-        f"\n\033[92mOVERALL: Correct functions selected: {correct_function} out of {len(test_cases) * n}\033[0m"
+        f"\n\033[92mOVERALL: Correct functions selected: {
+            correct_function} out of {len(test_cases) * n}\033[0m"
     )
     print(f"\033[93mOVERALL: Accuracy: {overall_accuracy:.2f}%\033[0m")
 

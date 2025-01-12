@@ -76,7 +76,8 @@ def order_item(user_id, product_id):
     if result:
         product_id, product_name, price = result
         print(
-            f"Ordering product {product_name} for user ID {user_id}. The price is {price}."
+            f"Ordering product {product_name} for user ID {
+                user_id}. The price is {price}."
         )
         # Add the purchase to the database
         database.add_purchase(user_id, date_of_purchase, item_id, price)
