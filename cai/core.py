@@ -102,7 +102,7 @@ class CAI:
             create_params["parallel_tool_calls"] = agent.parallel_tool_calls
             create_params["tools"] = tools
             create_params["tool_choice"] = agent.tool_choice
-
+        
         try:
             if os.getenv("OLLAMA", "").lower() == "true":
                 litellm_completion = litellm.completion(
