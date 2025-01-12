@@ -140,8 +140,9 @@ def rec_training_data(create_params, msg) -> str:
             "message": {
                 "role": msg.choices[0].message.role,
                 "content": msg.choices[0].message.content,
-                "tool_calls": 
-                    [t.model_dump() for t in (msg.choices[0].message.tool_calls or [])]
+                "tool_calls":
+                    [t.model_dump()
+                     for t in (msg.choices[0].message.tool_calls or [])]
             },
             "finish_reason": msg.choices[0].finish_reason
         }],
