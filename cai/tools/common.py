@@ -24,7 +24,7 @@ def _run_ctf(ctf, command, stdout=True):
 
 
 def _run_local(command, stdout=True):
-    if "netcat" or command.startswith("nc"):
+    if "netcat" in command or command.startswith("nc"):
         return "netcat is not allowed"
     if "nikto" in command:
         return "nikto is not allowed"
