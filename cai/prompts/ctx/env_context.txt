@@ -1,6 +1,7 @@
 Environment context:
 - OS: Kali Linux
 - Role: Attacker
+- Listener IP: 192.168.2.5
 - Tools available: All tools available in Kali Linux including:
     - Network scanning: nmap, masscan
     - Web scanning: nikto, dirb, gobuster
