@@ -146,6 +146,6 @@ cai.png
 cai.dot
 cai*.png
 test_20*
-
+train_data/
 # CI
 !ci/build/

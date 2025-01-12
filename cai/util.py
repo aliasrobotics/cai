@@ -96,6 +96,70 @@ def format_value(value: Any, prev_value: Any = None, brief: bool = False) -> str
         return f"{colorcillo}{str(value)}{COLORS['reset']}"
 
 
+def rec_training_data(create_params, msg) -> str:
+    """
+    Record training data from litellm.completion calls
+    in OpenAI-like JSON format.
+    Stores both input messages and completion responses during execution.
+    """
+    # Use a single training data file
+    filename = 'train_data/completions.jsonl'
+
+    # Create training data directory if it doesn't exist
+    os.makedirs('train_data', exist_ok=True)
+
+    # Format request params in OpenAI format
+    request_data = {
+        "model": create_params["model"],
+        "messages": create_params["messages"],
+        "stream": create_params["stream"]
+    }
+    if "tools" in create_params:
+        request_data.update({
+            "tools": create_params["tools"],
+            "tool_choice": create_params["tool_choice"],
+            "parallel_tool_calls": create_params["parallel_tool_calls"]
+        })
+
+    # Format completion data in OpenAI format
+    completion_data = {
+        "id": msg.id,
+        "object": "chat.completion",
+        "created": int(datetime.now().timestamp()),
+        "model": msg.model,
+        "messages": [
+            {
+                "role": m.role,
+                "content": m.content,
+                "tool_calls": [t.model_dump() for t in (m.tool_calls or [])]
+            }
+            for m in msg.messages
+        ] if hasattr(msg, "messages") else [],
+        "choices": [{
+            "index": 0,
+            "message": {
+                "role": msg.choices[0].message.role,
+                "content": msg.choices[0].message.content,
+                "tool_calls": 
+                    [t.model_dump() for t in (msg.choices[0].message.tool_calls or [])]
+            },
+            "finish_reason": msg.choices[0].finish_reason
+        }],
+        "usage": {
+            "prompt_tokens": msg.usage.prompt_tokens,
+            "completion_tokens": msg.usage.completion_tokens,
+            "total_tokens": msg.usage.total_tokens
+        }
+    }
+
+    # Append both request and completion to jsonl file
+    with open(filename, 'a', encoding='utf-8') as f:
+        json.dump(request_data, f)
+        f.write('\n')
+        json.dump(completion_data, f)
+        f.write('\n')
+
+
 def format_chat_completion(msg, prev_msg=None) -> str:  # pylint: disable=unused-argument # noqa: E501
     """
     Format a ChatCompletionMessage object with proper indentation and colors.
@@ -165,11 +229,19 @@ def format_chat_completion(msg, prev_msg=None) -> str:  # pylint: disable=unused
         COLORS['reset']}(\n    " + '\n    '.join(colored_lines) + "\n  )"
 
 
+def get_ollama_api_base() -> str:
+    """
+    Get the Ollama API base URL from the environment variable.
+    """
+    return os.getenv("OLLAMA_API_BASE", "http://host.docker.internal:8000/v1")
+
+
 def debug_print(debug: bool, intro: str, *args: Any, brief: bool = False, colours: bool = True) -> None:  # pylint: disable=too-many-locals,line-too-long,too-many-branches # noqa: E501
     """
     Print debug messages if debug mode is enabled with color-coded components.
     If brief is True, prints a simplified timestamp and message format.
     """
+
     if not debug:
         return
 

@@ -23,7 +23,13 @@ import os
 from dotenv import load_dotenv
 
 # Local imports
-from .util import function_to_json, debug_print, merge_chunk
+from .util import (
+    function_to_json,
+    debug_print,
+    merge_chunk,
+    get_ollama_api_base,
+    rec_training_data
+)
 from .types import (
     Agent,
     AgentFunction,
@@ -43,9 +49,11 @@ class CAI:
     """
 
     def __init__(self,
-                 ctf=None):
+                 ctf=None,
+                 log_training_data=False):
         self.ctf = ctf
         self.brief = False
+        self.log_training_data = log_training_data
         load_dotenv()
 
     def get_chat_completion(  # pylint: disable=too-many-arguments
@@ -72,7 +80,8 @@ class CAI:
             debug,
             "Getting chat completion for...:",
             messages,
-            brief=self.brief)
+            brief=self.brief,
+        )
 
         tools = [function_to_json(f) for f in agent.functions]
         # hide context_variables from model
@@ -93,11 +102,29 @@ class CAI:
             create_params["parallel_tool_calls"] = agent.parallel_tool_calls
             create_params["tools"] = tools
             create_params["tool_choice"] = agent.tool_choice
-        
-        if os.getenv("OLLAMA").lower() == "true":
-            return litellm.completion(**create_params, api_base="http://host.docker.internal:8000/v1", custom_llm_provider="openai")
-        return litellm.completion(**create_params)
 
+        try:
+            if os.getenv("OLLAMA", "").lower() == "true":
+                litellm_completion = litellm.completion(
+                    **create_params,
+                    api_base=get_ollama_api_base(),
+                    custom_llm_provider="openai"
+                )
+            else:
+                litellm_completion = litellm.completion(**create_params)
+
+        except litellm.exceptions.BadRequestError as e:
+            if "LLM Provider NOT provided" in str(e):
+                create_params["api_base"] = get_ollama_api_base()
+                create_params["custom_llm_provider"] = "openai"
+                os.environ["OLLAMA"] = "true"
+                litellm_completion = litellm.completion(**create_params)
+            else:
+                raise e
+
+        if self.log_training_data:
+            rec_training_data(create_params, litellm_completion)
+        return litellm_completion
 
     def handle_function_result(self, result, debug) -> Result:
         """
@@ -123,7 +150,7 @@ class CAI:
                     return Result(value=str(result))
                 except Exception as e:
                     error_message = f"Failed to cast response to string: {result}. Make sure agent functions return a string or Result object. Error: {str(e)}"  # noqa: E501 # pylint: disable=C0301
-                    debug_print(debug, error_message, brief=self.brief)
+                    debug_print(debug, error_message, brief=self.brief, )
                     raise TypeError(error_message) from e
 
     def handle_tool_calls(
@@ -177,7 +204,8 @@ class CAI:
                 debug_print(
                     debug,
                     f"Tool {name} not found in function map.",
-                    brief=self.brief)
+                    brief=self.brief,
+                )
                 partial_response.messages.append(
                     {
                         "role": "tool",
@@ -194,7 +222,8 @@ class CAI:
                 name,
                 "with arguments",
                 args,
-                brief=self.brief)
+                brief=self.brief,
+            )
 
             func = function_map[name]
             # pass context_variables to agent functions
@@ -285,11 +314,12 @@ class CAI:
                 debug,
                 "Received completion:",
                 message,
-                brief=self.brief)
+                brief=self.brief,
+            )
             history.append(message)
 
             if not message["tool_calls"] or not execute_tools:
-                debug_print(debug, "Ending turn.", brief=self.brief)
+                debug_print(debug, "Ending turn.", brief=self.brief, )
                 break
 
             # convert tool_calls to objects
@@ -376,7 +406,8 @@ class CAI:
                 debug,
                 "Received completion:",
                 message,
-                brief=self.brief)
+                brief=self.brief,
+            )
             message.sender = active_agent.name
             history.append(
                 json.loads(message.model_dump_json())
