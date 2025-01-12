@@ -137,15 +137,13 @@ class LocalEngine:
         # If it's a new assistant, so a sub assistant
         if assistant_name and assistant_name != assistant.name:
             print(
-                f"{Colors.OKGREEN}Selecting sub-assistant:{Colors.ENDC} {
-                    Colors.BOLD}{assistant_new.name}{Colors.ENDC}"
+                f"{Colors.OKGREEN}Selecting sub-assistant:{Colors.ENDC} {Colors.BOLD}{assistant_new.name}{Colors.ENDC}"
             )
             assistant.add_assistant_message(
                 f"Selecting sub-assistant: {assistant_new.name}")
         else:
             print(
-                f"{Colors.OKGREEN}Assistant:{Colors.ENDC} {
-                    Colors.BOLD}{assistant_new.name}{Colors.ENDC}"
+                f"{Colors.OKGREEN}Assistant:{Colors.ENDC} {Colors.BOLD}{assistant_new.name}{Colors.ENDC}"
             )
         return assistant_new
 
@@ -271,13 +269,11 @@ class LocalEngine:
 
         if not test_mode:
             print(
-                f"{Colors.OKCYAN}User Query:{Colors.ENDC} {
-                    Colors.BOLD}{task.description}{Colors.ENDC}"
+                f"{Colors.OKCYAN}User Query:{Colors.ENDC} {Colors.BOLD}{task.description}{Colors.ENDC}"
             )
         else:
             print(
-                f"{Colors.OKCYAN}Test:{Colors.ENDC} {
-                    Colors.BOLD}{task.description}{Colors.ENDC}"
+                f"{Colors.OKCYAN}Test:{Colors.ENDC} {Colors.BOLD}{task.description}{Colors.ENDC}"
             )
         # Maintain assistant if persist flag is true
         if self.persist and self.last_assistant is not None:
@@ -347,56 +343,16 @@ class LocalEngine:
                                 original_plan, task.groundtruth)}])
                 if response.content.lower() == 'true':
                     groundtruth_pass += 1
-                    print(
-                        f"{
-                            Colors.OKGREEN}✔ Groundtruth test passed for: {
-                            Colors.ENDC}{
-                            task.description}{
-                            Colors.OKBLUE}. Expected: {
-                            Colors.ENDC}{
-                            task.groundtruth}{
-                                Colors.OKBLUE}, Got: {
-                                    Colors.ENDC}{original_plan}{
-                                        Colors.ENDC}")
+                    print(f"{Colors.OKGREEN}✔ Groundtruth test passed for: {Colors.ENDC}{task.description}{Colors.OKBLUE}. Expected: {Colors.ENDC}{task.groundtruth}{Colors.OKBLUE}, Got: {Colors.ENDC}{original_plan}{Colors.ENDC}")
                 else:
-                    print(
-                        f"{
-                            Colors.RED}✘ Test failed for: {
-                            Colors.ENDC}{
-                            task.description}{
-                            Colors.OKBLUE}. Expected: {
-                            Colors.ENDC}{
-                            task.groundtruth}{
-                                Colors.OKBLUE}, Got: {
-                                    Colors.ENDC}{original_plan}{
-                                        Colors.ENDC}")
+                    print(f"{Colors.RED}✘ Test failed for: {Colors.ENDC}{task.description}{Colors.OKBLUE}. Expected: {Colors.ENDC}{task.groundtruth}{Colors.OKBLUE}, Got: {Colors.ENDC}{original_plan}{Colors.ENDC}")
 
                 total_assistant += 1
                 if task.assistant == task.expected_assistant:
                     assistant_pass += 1
-                    print(
-                        f"{
-                            Colors.OKGREEN}✔ Correct assistant assigned. {
-                            Colors.ENDC}{
-                            Colors.OKBLUE} Expected: {
-                            Colors.ENDC}{
-                            task.expected_assistant}{
-                            Colors.OKBLUE}, Got: {
-                                Colors.ENDC}{
-                                    task.assistant}{
-                                        Colors.ENDC}\n")
+                    print(f"{Colors.OKGREEN}✔ Correct assistant assigned. {Colors.ENDC}{Colors.OKBLUE} Expected: {Colors.ENDC}{task.expected_assistant}{Colors.OKBLUE}, Got: {Colors.ENDC}{task.assistant}{Colors.ENDC}\n")
                 else:
-                    print(
-                        f"{
-                            Colors.RED}✘ Incorrect assistant assigned. {
-                            Colors.ENDC}{
-                            Colors.OKBLUE} Expected: {
-                            Colors.ENDC}{
-                            task.expected_assistant}{
-                            Colors.OKBLUE}, Got: {
-                                Colors.ENDC}{
-                                    task.assistant}{
-                                        Colors.ENDC}\n")
+                    print(f"{Colors.RED}✘ Incorrect assistant assigned. {Colors.ENDC}{Colors.OKBLUE} Expected: {Colors.ENDC}{task.expected_assistant}{Colors.OKBLUE}, Got: {Colors.ENDC}{task.assistant}{Colors.ENDC}\n")
 
             elif task.expected_plan:
                 total_planning += 1
@@ -410,96 +366,31 @@ class LocalEngine:
 
                 if response.content.lower() == 'true':
                     planning_pass += 1
-                    print(
-                        f"{
-                            Colors.OKGREEN}✔ Planning test passed for: {
-                            Colors.ENDC}{
-                            task.description}{
-                            Colors.OKBLUE}. Expected: {
-                            Colors.ENDC}{
-                            task.expected_plan}{
-                                Colors.OKBLUE}, Got: {
-                                    Colors.ENDC}{original_plan}{
-                                        Colors.ENDC}")
+                    print(f"{Colors.OKGREEN}✔ Planning test passed for: {Colors.ENDC}{task.description}{Colors.OKBLUE}. Expected: {Colors.ENDC}{task.expected_plan}{Colors.OKBLUE}, Got: {Colors.ENDC}{original_plan}{Colors.ENDC}")
                 else:
-                    print(
-                        f"{
-                            Colors.RED}✘ Test failed for: {
-                            Colors.ENDC}{
-                            task.description}{
-                            Colors.OKBLUE}. Expected: {
-                            Colors.ENDC}{
-                            task.expected_plan}{
-                                Colors.OKBLUE}, Got: {
-                                    Colors.ENDC}{original_plan}{
-                                        Colors.ENDC}")
+                    print(f"{Colors.RED}✘ Test failed for: {Colors.ENDC}{task.description}{Colors.OKBLUE}. Expected: {Colors.ENDC}{task.expected_plan}{Colors.OKBLUE}, Got: {Colors.ENDC}{original_plan}{Colors.ENDC}")
 
                 total_assistant += 1
                 if task.assistant == task.expected_assistant:
                     assistant_pass += 1
-                    print(
-                        f"{
-                            Colors.OKGREEN}✔ Correct assistant assigned.  {
-                            Colors.ENDC}{
-                            Colors.OKBLUE}Expected: {
-                            Colors.ENDC}{
-                            task.expected_assistant}{
-                            Colors.OKBLUE}, Got: {
-                                Colors.ENDC}{
-                                    task.assistant}{
-                                        Colors.ENDC}\n")
+                    print(f"{Colors.OKGREEN}✔ Correct assistant assigned.  {Colors.ENDC}{Colors.OKBLUE}Expected: {Colors.ENDC}{task.expected_assistant}{Colors.OKBLUE}, Got: {Colors.ENDC}{task.assistant}{Colors.ENDC}\n")
                 else:
-                    print(
-                        f"{
-                            Colors.RED}✘ Incorrect assistant assigned for. {
-                            Colors.ENDC}{
-                            Colors.OKBLUE} Expected: {
-                            Colors.ENDC}{
-                            task.expected_assistant}{
-                            Colors.OKBLUE}, Got: {
-                                Colors.ENDC}{
-                                    task.assistant}{
-                                        Colors.ENDC}\n")
+                    print(f"{Colors.RED}✘ Incorrect assistant assigned for. {Colors.ENDC}{Colors.OKBLUE} Expected: {Colors.ENDC}{task.expected_assistant}{Colors.OKBLUE}, Got: {Colors.ENDC}{task.assistant}{Colors.ENDC}\n")
 
             else:
                 total_assistant += 1
                 if task.assistant == task.expected_assistant:
                     assistant_pass += 1
-                    print(
-                        f"{
-                            Colors.OKGREEN}✔ Correct assistant assigned for: {
-                            Colors.ENDC}{
-                            task.description}{
-                            Colors.OKBLUE}. Expected: {
-                            Colors.ENDC}{
-                            task.expected_assistant}{
-                                Colors.OKBLUE}, Got: {
-                                    Colors.ENDC}{
-                                        task.assistant}{
-                                            Colors.ENDC}\n")
+                    print(f"{Colors.OKGREEN}✔ Correct assistant assigned for: {Colors.ENDC}{task.description}{Colors.OKBLUE}. Expected: {Colors.ENDC}{task.expected_assistant}{Colors.OKBLUE}, Got: {Colors.ENDC}{task.assistant}{Colors.ENDC}\n")
                 else:
-                    print(
-                        f"{
-                            Colors.RED}✘ Incorrect assistant assigned for: {
-                            Colors.ENDC}{
-                            task.description}{
-                            Colors.OKBLUE}. Expected: {
-                            Colors.ENDC}{
-                            task.expected_assistant}{
-                                Colors.OKBLUE}, Got: {
-                                    Colors.ENDC}{
-                                        task.assistant}{
-                                            Colors.ENDC}\n")
+                    print(f"{Colors.RED}✘ Incorrect assistant assigned for: {Colors.ENDC}{task.description}{Colors.OKBLUE}. Expected: {Colors.ENDC}{task.expected_assistant}{Colors.OKBLUE}, Got: {Colors.ENDC}{task.assistant}{Colors.ENDC}\n")
 
         if total_groundtruth > 0:
-            print(f"\n{Colors.OKGREEN}Passed {groundtruth_pass} groundtruth tests out of {
-                  total_groundtruth} tests. Success rate: {groundtruth_pass / total_groundtruth * 100}%{Colors.ENDC}\n")
+            print(f"\n{Colors.OKGREEN}Passed {groundtruth_pass} groundtruth tests out of {total_groundtruth} tests. Success rate: {groundtruth_pass / total_groundtruth * 100}%{Colors.ENDC}\n")
         if total_planning > 0:
-            print(f"{Colors.OKGREEN}Passed {planning_pass} planning tests out of {
-                  total_planning} tests. Success rate: {planning_pass / total_planning * 100}%{Colors.ENDC}\n")
+            print(f"{Colors.OKGREEN}Passed {planning_pass} planning tests out of {total_planning} tests. Success rate: {planning_pass / total_planning * 100}%{Colors.ENDC}\n")
         if total_assistant > 0:
-            print(f"{Colors.OKGREEN}Passed {assistant_pass} assistant tests out of {
-                  total_assistant} tests. Success rate: {assistant_pass / total_assistant * 100}%{Colors.ENDC}\n")
+            print(f"{Colors.OKGREEN}Passed {assistant_pass} assistant tests out of {total_assistant} tests. Success rate: {assistant_pass / total_assistant * 100}%{Colors.ENDC}\n")
         print("Completed testing the swarm\n\n")
 
     def deploy(self, client, test_mode=False, test_file_path=None):

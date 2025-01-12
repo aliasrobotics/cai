@@ -1,6 +1,5 @@
 def escalate_to_agent(reason=None):
-    return f"Escalating to agent: {
-        reason}" if reason else "Escalating to agent"
+    return f"Escalating to agent: {reason}" if reason else "Escalating to agent"
 
 
 def valid_to_change_flight():

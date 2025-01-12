@@ -23,5 +23,4 @@ class Conversation:
         self.current_messages = []
 
     def __repr__(self):
-        return f"Conversation(History: {len(self.history)}, Current Messages: {
-            len(self.current_messages)}, Summary: {self.summary})"
+        return f"Conversation(History: {len(self.history)}, Current Messages: {len(self.current_messages)}, Summary: {self.summary})"
