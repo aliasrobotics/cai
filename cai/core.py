@@ -125,7 +125,7 @@ class CAI:
                 raise e
 
         except litellm.exceptions.RateLimitError as e:
-                print("Rate Limit Error:" + e)
+                print("Rate Limit Error:" + str(e))
                 time.sleep(60)
                 litellm_completion = litellm.completion(**create_params)
 
