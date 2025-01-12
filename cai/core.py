@@ -124,6 +124,11 @@ class CAI:
             else:
                 raise e
 
+        except litellm.exceptions.RateLimitError as e:
+                print("Rate Limit Error:" + e)
+                time.sleep(60)
+                litellm_completion = litellm.completion(**create_params)
+
         if self.rec_training_data:
             self.rec_training_data.rec_training_data(
                 create_params, litellm_completion)
