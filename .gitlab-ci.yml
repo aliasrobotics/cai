@@ -9,31 +9,23 @@ stages:
   - ctf-super-hard      # "Super hard" CTF challenges coming out of PentestPerf
 
 variables:
-  DOCKER_TLS_CERTDIR: "/certs"
-  DOCKER_HOST: tcp://docker:2376
+  DOCKER_HOST: tcp://docker:2375
   DOCKER_DRIVER: overlay2
-  GIT_STRATEGY: clone
-  GIT_DEPTH: "20"
+  DOCKER_TLS_CERTDIR: ""
   VERSION: "0.1"
   DISTRO: ubuntu:22.04
+  CI_DEBUG_TRACE: "true"
 
 services:
   - name: docker:dind
-    command: ["--tls=true", "--tlsverify=false"]
-    entrypoint: ["sh", "-c", "dockerd-entrypoint.sh && sleep 5"]
+    command: ["--host=tcp://0.0.0.0:2375", "--host=unix:///var/run/docker.sock"]
+    dns: ["8.8.8.8", "8.8.4.4"]
 
 include:
   - project: 'aliasrobotics/alias_research/cai'
     ref: main
     file:
-      - 'ci/build/.build.yml'
-      - 'ci/test/.test.yml'
-
-before_script:
-  - |
-    for i in $(seq 1 30); do
-      docker info && break
-      echo "Waiting for Docker to start..."
-      sleep 1
-    done
-    docker info
+      - 'ci/build/.build.yml'                # build
+      #- 'ci/setup/.setup.yml'               # setup
+      - 'ci/test/.test.yml'                  # test
+      #- 'ci/ctfs/.ctf.yml'                  # ctf
