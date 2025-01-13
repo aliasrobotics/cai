@@ -20,6 +20,7 @@
   script:
     - cat .devcontainer/Dockerfile > Dockerfile_base
     # Build the image
+    - unset DOCKER_HOST
     - docker build -t $CI_REGISTRY_IMAGE:$TAGGING -f Dockerfile_base .
     - docker push $CI_REGISTRY_IMAGE:$TAGGING
 
