@@ -8,6 +8,7 @@ from typing import Any
 import json
 import os
 from wasabi import color  # pylint: disable=import-error
+import pytz
 
 # ANSI color codes in a nice, readable palette
 COLORS = {
@@ -104,7 +105,8 @@ def rec_training_data(create_params, msg) -> str:
     """
     # Use a single training data file
     filename = f'train_data/test_{
-        datetime.now().strftime("%Y%m%d_%H%M%S")}.jsonl'
+        datetime.now().astimezone(pytz.timezone("Europe/Madrid"))
+        .strftime("%Y%m%d_%H%M%S")}.jsonl'
 
     # Create training data directory if it doesn't exist
     os.makedirs('train_data', exist_ok=True)
