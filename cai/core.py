@@ -103,7 +103,7 @@ class CAI:
             create_params["parallel_tool_calls"] = agent.parallel_tool_calls
             create_params["tools"] = tools
             create_params["tool_choice"] = agent.tool_choice
-        
+
         try:
             if os.getenv("OLLAMA", "").lower() == "true":
                 litellm_completion = litellm.completion(
@@ -158,7 +158,7 @@ class CAI:
                     return Result(value=str(result))
                 except Exception as e:
                     error_message = f"Failed to cast response to string: {result}. Make sure agent functions return a string or Result object. Error: {str(e)}"  # noqa: E501 # pylint: disable=C0301
-                    debug_print(debug, error_message, brief=self.brief, )
+                    debug_print(debug, error_message, brief=self.brief)
                     raise TypeError(error_message) from e
 
     def handle_tool_calls(
@@ -212,8 +212,7 @@ class CAI:
                 debug_print(
                     debug,
                     f"Tool {name} not found in function map.",
-                    brief=self.brief,
-                )
+                    brief=self.brief)
                 partial_response.messages.append(
                     {
                         "role": "tool",
@@ -230,8 +229,7 @@ class CAI:
                 name,
                 "with arguments",
                 args,
-                brief=self.brief,
-            )
+                brief=self.brief)
 
             func = function_map[name]
             # pass context_variables to agent functions
@@ -322,12 +320,11 @@ class CAI:
                 debug,
                 "Received completion:",
                 message,
-                brief=self.brief,
-            )
+                brief=self.brief)
             history.append(message)
 
             if not message["tool_calls"] or not execute_tools:
-                debug_print(debug, "Ending turn.", brief=self.brief, )
+                debug_print(debug, "Ending turn.", brief=self.brief)
                 break
 
             # convert tool_calls to objects
@@ -414,8 +411,7 @@ class CAI:
                 debug,
                 "Received completion:",
                 message,
-                brief=self.brief,
-            )
+                brief=self.brief)
             message.sender = active_agent.name
             history.append(
                 json.loads(message.model_dump_json())
