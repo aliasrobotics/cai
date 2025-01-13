@@ -53,9 +53,9 @@ def Thought_Agent():
 # Thought Process Agent for analysis and planning
 thought_agent = Agent(
     name="ThoughAgent",
-    instructions=thought_agent_system_prompt + env_context,
-    functions=[thought, CliAgent, Code_Executor_Expert, write_key_findings, read_key_findings],
-    model="gpt-4o",
+    instructions=thought_agent_system_prompt,
+    functions=[thought, CliAgent, Code_Executor_Expert],
+    model="claude-3-5-sonnet-20240620",
     parallel_tool_calls=False
 )
 
@@ -70,14 +70,14 @@ cli_agent = Agent(
         execute_python_code,
         web_request_framework],
     parallel_tool_calls=False,
-    model="gpt-4o"
+    model="claude-3-5-sonnet-20240620"
 )
 
 code_agent = Agent(
     name="Boot2Root Exploit Developer",
     instructions=exploit_agent_system_prompt + env_context,
-    functions=[execute_python_code, CliAgent, Thought_Agent, read_key_findings],
-    model="gpt-4o",
+    functions=[execute_python_code, CliAgent, Thought_Agent],
+    model="claude-3-5-sonnet-20240620",
     parallel_tool_calls=False
 )
 

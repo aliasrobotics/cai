@@ -244,7 +244,7 @@ class CAI:
                     "role": "tool",
                     "tool_call_id": tool_call.id,
                     "tool_name": name,
-                    "content": result.value,
+                    "content": result.value[:5000],
                 }
             )
             partial_response.context_variables.update(result.context_variables)
