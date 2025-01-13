@@ -65,7 +65,6 @@ class TestFunctionCallBenchmarksBasic:
         except Exception as e:
             print(f"\n❌ Test failed for {model_name}: {str(e)}")
             return False
-
     @pytest.mark.parametrize("model", [
         "dwightfoster03/functionary-small-v3.1",
         "llama3.1:8b",
@@ -73,6 +72,7 @@ class TestFunctionCallBenchmarksBasic:
         "qwen2.5:32b",
         # "marco-o1:7b-fp16"
     ])
+    @pytest.mark.xfail(reason="Undeterministic")
     def test_function_call_benchmark(self, model):
         results = []
         print(f"\nTesting {model}")

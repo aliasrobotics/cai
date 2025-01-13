@@ -16,11 +16,19 @@ from collections import defaultdict
 from typing import List
 # Package/library imports
 import time
-from openai import OpenAI  # pylint: disable=import-error
+import os
+import litellm  # pylint: disable=import-error
+from dotenv import load_dotenv  # pylint: disable=import-error  # noqa: E501
 from cai.logger import exploit_logger
 
 # Local imports
-from .util import function_to_json, debug_print, merge_chunk
+from cai.datarecorder import DataRecorder
+from .util import (
+    function_to_json,
+    debug_print,
+    merge_chunk,
+    get_ollama_api_base,
+)
 from .types import (
     Agent,
     AgentFunction,
@@ -32,6 +40,7 @@ from .types import (
 )
 
 __CTX_VARS_NAME__ = "context_variables"
+litellm.suppress_debug_info = True
 
 
 class CAI:
@@ -40,15 +49,13 @@ class CAI:
     """
 
     def __init__(self,
-                 client=None,
-                 base_url="http://host.docker.internal:8000/v1",
-                 api_key="alias",
-                 ctf=None):
-        if not client:
-            client = OpenAI(base_url=base_url, api_key=api_key)
-        self.client = client
+                 ctf=None,
+                 log_training_data=True):
         self.ctf = ctf
         self.brief = False
+        if log_training_data:
+            self.rec_training_data = DataRecorder()
+        load_dotenv()
 
     def get_chat_completion(  # pylint: disable=too-many-arguments
         self,
@@ -87,16 +94,39 @@ class CAI:
         create_params = {
             "model": model_override or agent.model,
             "messages": messages,
-            "tools": tools or None,
-            "tool_choice": agent.tool_choice,
             "stream": stream,
             # "temperature": 0.0,
         }
 
         if tools:
             create_params["parallel_tool_calls"] = agent.parallel_tool_calls
+            create_params["tools"] = tools
+            create_params["tool_choice"] = agent.tool_choice
 
-        return self.client.chat.completions.create(**create_params)
+        try:
+            if os.getenv("OLLAMA", "").lower() == "true":
+                litellm_completion = litellm.completion(
+                    **create_params,
+                    api_base=get_ollama_api_base(),
+                    custom_llm_provider="openai"
+                )
+            else:
+                litellm_completion = litellm.completion(**create_params)
+
+        except litellm.exceptions.BadRequestError as e:
+            if "LLM Provider NOT provided" in str(e):
+                create_params["api_base"] = get_ollama_api_base()
+                create_params["custom_llm_provider"] = "openai"
+                os.environ["OLLAMA"] = "true"
+                os.environ["OPENAI_API_KEY"] = "Placeholder"
+                litellm_completion = litellm.completion(**create_params)
+            else:
+                raise e
+
+        if self.rec_training_data:
+            self.rec_training_data.rec_training_data(
+                create_params, litellm_completion)
+        return litellm_completion
 
     def handle_function_result(self, result, debug) -> Result:
         """

@@ -1,9 +1,10 @@
-#FileDownloadTool in exploitFlow
+# FileDownloadTool in exploitFlow
 
 """
 Wget tool
 """
 from cai.tools.common import run_command   # pylint: disable=import-error
+
 
 def wget(url: str, args: str = '', ctf=None) -> str:
     """

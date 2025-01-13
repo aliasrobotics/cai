@@ -165,6 +165,13 @@ def format_chat_completion(msg, prev_msg=None) -> str:  # pylint: disable=unused
         COLORS['reset']}(\n    " + '\n    '.join(colored_lines) + "\n  )"
 
 
+def get_ollama_api_base() -> str:
+    """
+    Get the Ollama API base URL from the environment variable.
+    """
+    return os.getenv("OLLAMA_API_BASE", "http://host.docker.internal:8000/v1")
+
+
 def debug_print(debug: bool, intro: str, *args: Any, brief: bool = False, colours: bool = True) -> None:  # pylint: disable=too-many-locals,line-too-long,too-many-branches # noqa: E501
     """
     Print debug messages if debug mode is enabled with color-coded components.

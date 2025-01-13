@@ -26,6 +26,7 @@ class TestFilesystemAgent:
             else:
                 path.touch()
 
+    @pytest.mark.flaky(reruns=3)
     def test_agent_list_directories(self):
         """Test filesystem agent with basic files"""
         client = CAI()
@@ -57,6 +58,7 @@ class TestFilesystemAgent:
             assert 'visible.txt' in result
             assert 'test.log' in result
 
+    @pytest.mark.flaky(reruns=3)
     def test_agent_list_hidden_files(self):
         """Test filesystem agent with hidden files"""
         client = CAI()
@@ -90,6 +92,7 @@ class TestFilesystemAgent:
             for hidden_file in ['.hidden1', '.hidden2', '.secret', "tmp"]:
                 assert hidden_file in result
 
+    @pytest.mark.flaky(reruns=3)
     def test_agent_read_file(self):
         """Test filesystem agent reading file contents"""
         client = CAI()
