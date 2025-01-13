@@ -14,8 +14,12 @@ variables:
   DOCKER_TLS_CERTDIR: ""
   VERSION: "0.1"
   DISTRO: ubuntu:22.04
-  # CI_DEBUG_TRACE: "true"
+  CI_DEBUG_TRACE: "true"
   GIT_FETCH_TIMEOUT: 300
+
+services:
+  - name: docker:dind
+    alias: docker
 
 include:
   - project: 'aliasrobotics/alias_research/cai'
