@@ -6,6 +6,8 @@ import inspect
 from datetime import datetime
 from typing import Any
 import json
+import os
+from wasabi import color  # pylint: disable=import-error
 
 # ANSI color codes in a nice, readable palette
 COLORS = {
@@ -90,8 +92,8 @@ def format_value(value: Any, prev_value: Any = None, brief: bool = False) -> str
 
     # Handle basic types
     else:
-        color = get_color('arg_value', value, prev_value)
-        return f"{color}{str(value)}{COLORS['reset']}"
+        colorcillo = get_color('arg_value', value, prev_value)
+        return f"{colorcillo}{str(value)}{COLORS['reset']}"
 
 
 def format_chat_completion(msg, prev_msg=None) -> str:  # pylint: disable=unused-argument # noqa: E501
@@ -332,3 +334,47 @@ def function_to_json(func) -> dict:
             },
         },
     }
+
+
+def check_flag(output, ctf, challenge=None):
+    """
+    Check if the CTF flag is present in the output.
+
+    Args:
+        output (str): The output to check for the flag.
+        ctf: The CTF environment object.
+        challenge (str, optional): The specific challenge to check.
+            Defaults to None.
+
+    Returns:
+        tuple: A tuple containing a boolean indicating if the flag was
+            found and the flag itself if found, otherwise None.
+    """
+
+    # Get the challenge from the environment variable or default to the first
+    # challenge
+    challenge_key = os.getenv("CTF_CHALLENGE")
+    challenges = list(ctf.get_challenges().keys())
+    challenge = (
+        challenge_key
+        if challenge_key in challenges
+        else (challenges[0] if len(challenges) > 0 else None)
+    )
+
+    if ctf:
+        if ctf.check_flag(
+            output, challenge
+        ):  # check if the flag is in the output
+            flag = ctf.flags[challenge]
+            print(
+                color(
+                    f"Flag found: {flag}",
+                    fg="green") +
+                " in output " +
+                color(
+                    f"{output}",
+                    fg="blue"))
+            return True, flag
+    else:
+        print(color("CTF environment not found or provided", fg="yellow"))
+    return False, None

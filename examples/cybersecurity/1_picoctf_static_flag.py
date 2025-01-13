@@ -4,6 +4,7 @@ This is a short example of how we can solve ctf scenarios programmatically. With
 # 1. Instance CAI, pentestperf and tools
 from cai import CAI, Agent
 from cai.tools.reconnaissance.filesystem import list_dir, cat_file
+from cai.util import check_flag
 import pentestperf as ptt
 from wasabi import color
 import os
@@ -22,7 +23,7 @@ challenge = challenges[0]
 # 3. Instance the cybersecurity AI Framework client
 client = CAI(ctf=ctf)
 
-# 4. Instance the agent/agents to solve the CTF
+# 4. Create instances the agent/agents to solve the CTF
 ctf_agent = Agent(
     model="qwen2.5:14b",
     name="A file listing tool",
@@ -31,21 +32,42 @@ ctf_agent = Agent(
     # parallel_tool_calls=True, Enable multi function calling
 )
 
+flag_discriminator = Agent(
+    model="qwen2.5:14b",
+    name="A flag discriminator",
+    instructions="You are an agent tailored to extract the flag from the output. ONLY return the flag, nothing else.",
+    # functions=[check_flag],  # This code can execute by LLM
+)
+
+#  handoff from ctf_agent to flag_discriminator
+
+
+def transfer_to_flag_discriminator(**kwargs):
+    """Transfer flag discriminator. Accepts any keyword arguments but ignores them."""
+    return flag_discriminator
+
+
+ctf_agent.functions.append(transfer_to_flag_discriminator)
 
 messages = [{
     "role": "user",
     "content": "Instructions: " + ctf.get_instructions() +
                "\nChallenge: " + ctf.get_challenges()[challenge] +
                "\nTechniques: " + ctf.get_techniques() +
-               "\nExtract and return only the flag"
+               "\nExtract the flag and once finished, handoff to the flag discriminator."
 }]
 
 # 5. Run the CAI
-response = client.run(
+response, time = client.run(
     agent=ctf_agent,
     messages=messages,
     debug=True,
-    brief=True)
+    brief=False)
 print(response.messages[-1]["content"])
+print(f"Time taken: {time} seconds")
 
+# 6. Check if the flag is correct
+success, flag = check_flag(response.messages[-1]["content"], ctf, challenge)
+
+# 7. Stop the CTF environment
 ctf.stop_ctf()

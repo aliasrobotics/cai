@@ -13,10 +13,10 @@ and local modules.
 import copy
 import json
 from collections import defaultdict
-from typing import List
+from typing import List, Tuple
 # Package/library imports
+import time
 from openai import OpenAI  # pylint: disable=import-error
-
 
 # Local imports
 from .util import function_to_json, debug_print, merge_chunk
@@ -331,10 +331,12 @@ class CAI:
         max_turns: int = float("inf"),
         execute_tools: bool = True,
         brief: bool = False,
-    ) -> Response:
+    ) -> Tuple[Response, float]:
         """
-        Run the cai and return the final response.
+        Run the cai and return the final response along
+        with execution time in seconds.
         """
+        start_time = time.time()
         self.brief = brief
         if stream:
             return self.run_and_stream(
@@ -388,8 +390,9 @@ class CAI:
             if partial_response.agent:
                 active_agent = partial_response.agent
 
+        execution_time = time.time() - start_time
         return Response(
             messages=history[init_len:],
             agent=active_agent,
             context_variables=context_variables,
-        )
+        ), execution_time
