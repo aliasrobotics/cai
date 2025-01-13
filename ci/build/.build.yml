@@ -7,7 +7,9 @@
   stage: build
   image: docker:latest
   services:
-    - docker:dind
+    - name: docker:dind
+      # NOTE: The alias is key to resolving the DNS issue.
+      alias: docker
   before_script:
     # - echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY;
     - |
