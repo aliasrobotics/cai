@@ -391,7 +391,8 @@ CAI is developed by [Alias Robotics](https://aliasrobotics.com) and funded as pa
   - [x] add agent span
   - [ ] add tool span
 - [ ] add state to the reasoning chain
-   - [ ] create state.py inspired by previous work
+   - [x] create state.py inspired by previous work
+   - [ ] create a harcoded state for 1_picoctf_static_flag and experiment with it to locate how to use it best
    - [ ] stateless and stateful capability in CAI
    - [ ] insert state in inference (1) to be inserted, (2) to build iteratively the state
       - [ ] via a handoff?
