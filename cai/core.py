@@ -13,10 +13,11 @@ and local modules.
 import copy
 import json
 from collections import defaultdict
-from typing import List, Tuple
+from typing import List
 # Package/library imports
 import time
 from openai import OpenAI  # pylint: disable=import-error
+from cai.logger import exploit_logger
 
 # Local imports
 from .util import function_to_json, debug_print, merge_chunk
@@ -320,6 +321,10 @@ class CAI:
             )
         }
 
+    @exploit_logger.log_response("CAI")
+    # @exploit_logger.log_response(
+    #         "🚩" + os.getenv("CTF_NAME") + " @ " + os.getenv("CI_JOB_ID", "local")  # noqa: E501
+    # )
     def run(  # pylint: disable=too-many-arguments,dangerous-default-value, too-many-locals # noqa: E501
         self,
         agent: Agent,
@@ -331,7 +336,7 @@ class CAI:
         max_turns: int = float("inf"),
         execute_tools: bool = True,
         brief: bool = False,
-    ) -> Tuple[Response, float]:
+    ) -> Response:
         """
         Run the cai and return the final response along
         with execution time in seconds.
@@ -353,8 +358,9 @@ class CAI:
         history = copy.deepcopy(messages)
         init_len = len(messages)
 
-        while len(history) - init_len < max_turns and active_agent:
-
+        @exploit_logger.log_agent()
+        def process_turn(self, active_agent, history, context_variables,
+                         model_override, stream, debug, execute_tools):
             # get completion with current history, agent
             completion = self.get_chat_completion(
                 agent=active_agent,
@@ -377,7 +383,7 @@ class CAI:
 
             if not message.tool_calls or not execute_tools:
                 debug_print(debug, "Ending turn.", brief=self.brief)
-                break
+                return None
 
             # handle function calls, updating context_variables, and switching
             # agents
@@ -385,10 +391,26 @@ class CAI:
                 message.tool_calls, active_agent.functions,
                 context_variables, debug
             )
+
             history.extend(partial_response.messages)
             context_variables.update(partial_response.context_variables)
-            if partial_response.agent:
-                active_agent = partial_response.agent
+            return (partial_response.agent
+                    if partial_response.agent
+                    else active_agent)
+
+        while len(history) - init_len < max_turns and active_agent:
+            active_agent = process_turn(
+                self,
+                active_agent,
+                history,
+                context_variables,
+                model_override,
+                stream,
+                debug,
+                execute_tools
+            )
+            if active_agent is None:
+                break
 
         execution_time = time.time() - start_time
         return Response(

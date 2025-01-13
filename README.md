@@ -375,13 +375,20 @@ CAI is developed by [Alias Robotics](https://aliasrobotics.com) and funded as pa
 - [x] A first example with agents - picoctf_static_flag
   - [x] polish aesthetics (coloring with alpha past content, brief/summarized)
   - [x] re-organize tools
-     - [ ] add tests -> Fill up all empty files or remove them
+     - [x] add tests -> Fill up all empty files or remove them
   - [x] add tests
-     - [ ] review agent tests and use pytest utilities (parametrize, etc)
+     - [x] review agent tests and use pytest utilities (parametrize, etc)
 - [x] CI
      - [x] add .gitlab-ci.yml
      - [x] add first tests
      - [ ] add CTFs
-- [ ] Tracing
+- [ ] Other fixes
+     - [x] `check_flag`
+     - [x] time in ~~`run()`~~ Response
+- [x] Tracing
+  - [x] add top level span
+  - [x] add agent span
+  - [ ] add tool span
+- [ ] add state to the reasoning chain
 - [ ] Graph/flow and other abstractions
 - [ ] Plan/router

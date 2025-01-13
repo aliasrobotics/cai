@@ -26,7 +26,7 @@ client = CAI(ctf=ctf)
 # 4. Create instances the agent/agents to solve the CTF
 ctf_agent = Agent(
     model="qwen2.5:14b",
-    name="A file listing tool",
+    name="File listing and reader",
     instructions="You are an agent tailored to list and read files within a file system.",
     functions=[list_dir, cat_file],  # This code can execute by LLM
     # parallel_tool_calls=True, Enable multi function calling
@@ -34,7 +34,7 @@ ctf_agent = Agent(
 
 flag_discriminator = Agent(
     model="qwen2.5:14b",
-    name="A flag discriminator",
+    name="Flag discriminator",
     instructions="You are an agent tailored to extract the flag from the output. ONLY return the flag, nothing else.",
     # functions=[check_flag],  # This code can execute by LLM
 )
