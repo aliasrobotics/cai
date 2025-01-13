@@ -41,6 +41,7 @@ from .types import (
 )
 
 __CTX_VARS_NAME__ = "context_variables"
+litellm.suppress_debug_info = True
 
 
 class CAI:
