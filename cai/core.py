@@ -81,8 +81,7 @@ class CAI:
             debug,
             "Getting chat completion for...:",
             messages,
-            brief=self.brief,
-        )
+            brief=self.brief)
 
         tools = [function_to_json(f) for f in agent.functions]
         # hide context_variables from model
