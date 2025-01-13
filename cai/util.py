@@ -102,10 +102,12 @@ class TrainingDataRecorder:
     Records training data from litellm.completion calls in OpenAI-like JSON format.
     Stores both input messages and completion responses during execution in a single JSONL file.
     """
+
     def __init__(self):
-        
-        os.makedirs('train_data', exist_ok=True)        
-        self.filename = f'train_data/test_{datetime.now().astimezone(pytz.timezone("Europe/Madrid")).strftime("%Y%m%d_%H%M%S")}.jsonl'
+
+        os.makedirs('train_data', exist_ok=True)
+        self.filename = f'train_data/test_{datetime.now().astimezone(
+            pytz.timezone("Europe/Madrid")).strftime("%Y%m%d_%H%M%S")}.jsonl'
 
     def rec_training_data(self, create_params, msg) -> None:
         """Records a single training data entry to the JSONL file"""
@@ -156,6 +158,7 @@ class TrainingDataRecorder:
             f.write('\n')
             json.dump(completion_data, f)
             f.write('\n')
+
 
 def format_value(value: Any, prev_value: Any = None, brief: bool = False) -> str:  # pylint: disable=too-many-locals # noqa: E501
     """
