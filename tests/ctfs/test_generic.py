@@ -1,4 +1,6 @@
 """
+
+How to use it: $ CTF_NAME="picoctf_static_flag" TEST_PATH="tests/ctfs/test_generic.py" pytest -s tests/ctfs/test_generic.py
 This is a test benchmark for automating benchmarking in CI/CD jobs.
 The test itself is meant to evaluate whether a RIS2 constructed agent is able to solve a given CTF challenge.
 
@@ -14,11 +16,9 @@ To use it as part of the CI/CD pipeline, use the following structure within the 
   optional
     CTF_CHALLENGE
 """
-# TODO: create new variable for Challenge
-from cai.logger import exploit_logger
+
 import pytest
-
-
+import cai as CAI
 from cai import CAI, Agent
 from cai.tools.reconnaissance.filesystem import list_dir, cat_file
 from cai.util import check_flag
@@ -64,28 +64,10 @@ class TestGenericCTF(object):
         # create ctf object
         ctf, flag = basic_ctf
 
-        # reset graph
-        #ef.graph.reset_default_graph()
-
-        # create flow
-        #flow = ef.Flow()
-        #init = ef.Init()
-        #init_state = flow.run(init, target=ctf.get_ip(), debug=False)
-
-        # select planner and other parameters
-        #planner_class_name = os.getenv('CTF_PLANNER_CLASS', 'PlannerG1')
-        #planner_class = getattr(ef, planner_class_name, ef.PlannerG1)  # default to PlannerG1
-    
-       #max_tasks = int(os.getenv('CTF_MAX_TASKS', 20))
-       #replan_n = int(os.getenv('CTF_REPLAN_N', 10))
-
         # Get the challenge from the environment variable or default to the first challenge
         challenge_key = os.getenv('CTF_CHALLENGE') # TODO: 
         challenges = list(ctf.get_challenges().keys())
         challenge = challenge_key if challenge_key in challenges else (challenges[0] if len(challenges) > 0 else None)
-        # print("debugging: line 98 generic.py", challenge)
-        # print(color("Planner: " + planner_class_name, fg="white", bold=True))
-        print(color("Logging URL: " + exploit_logger.get_logger_url(), fg="white", bg="pink"))
         print(color("Testing CTF: ", fg="black", bg="yellow") + color(ctf.name, fg="black", bg="yellow"))
         if not challenge_key or challenge_key not in challenges:
             print(color("No challenge provided or challenge not found. Attempting to use the first challenge.", fg="white", bg="blue"))
@@ -138,9 +120,8 @@ class TestGenericCTF(object):
             
             # 6. Check if the flag is correct
             success, flag = check_flag(response.messages[-1]["content"], ctf, challenge)
-            ctf.stop_ctf()
             # assert results
-            assert not success, "Failed to find the flag" # TODO: comprobar que es así 
+            assert success, "Flag found" 
         else:
             print(color("No challenge found", fg="white", bg="red"))
             assert False, "No challenge found"
