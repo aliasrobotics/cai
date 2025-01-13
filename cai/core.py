@@ -119,6 +119,7 @@ class CAI:
                 create_params["api_base"] = get_ollama_api_base()
                 create_params["custom_llm_provider"] = "openai"
                 os.environ["OLLAMA"] = "true"
+                os.environ["OPENAI_API_KEY"] = "Placeholder"
                 litellm_completion = litellm.completion(**create_params)
             else:
                 raise e
