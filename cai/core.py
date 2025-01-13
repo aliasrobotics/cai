@@ -395,4 +395,5 @@ class CAI:
             messages=history[init_len:],
             agent=active_agent,
             context_variables=context_variables,
-        ), execution_time
+            time=execution_time
+        )

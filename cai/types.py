@@ -40,6 +40,7 @@ class Response(BaseModel):  # pylint: disable=too-few-public-methods
     messages: List = []
     agent: Optional[Agent] = None
     context_variables: dict = {}
+    time: float = 0.0
 
 
 class Result(BaseModel):  # pylint: disable=too-few-public-methods

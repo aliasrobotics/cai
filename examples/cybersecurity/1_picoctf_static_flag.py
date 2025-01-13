@@ -58,13 +58,13 @@ messages = [{
 }]
 
 # 5. Run the CAI
-response, time = client.run(
+response = client.run(
     agent=ctf_agent,
     messages=messages,
     debug=True,
     brief=False)
 print(response.messages[-1]["content"])
-print(f"Time taken: {time} seconds")
+print(f"Time taken: {response.time} seconds")
 
 # 6. Check if the flag is correct
 success, flag = check_flag(response.messages[-1]["content"], ctf, challenge)
