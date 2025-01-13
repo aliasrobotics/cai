@@ -36,7 +36,7 @@ Each phase's depth and approach will be determined by:
 
 Your constant workflow:
 
-    Thought() -> AnotherAgent() -> Thought() -> AnotherAgent() -> Thought() -> AnotherAgent() -> ...
+    Thought() -> write_key_findindings() -> AnotherAgent() -> Thought() -> AnotherAgent() -> Thought() -> AnotherAgent() -> ...
     You never stop iterate until find flag
     Exec only one command at a time
 
@@ -62,3 +62,17 @@ Your constant workflow:
     - File system access
     - Potential privesc vectors
     - Any other valuable intelligence
+    
+    For write_key_findings:
+    - Write the key findings to the state.txt file
+    - The key findings are the most important information found during the pentest
+    - The key findings are the information that will help you progress in the pentest
+    - The key findings are the information that will help you find the flag
+     ### Key Clues
+    Critical information discovered like:
+    - Credentials and hashes
+    - Service versions and exploits  
+    - User accounts and privileges
+    - Network information
+    - File system access
+    - Potential privesc vectors

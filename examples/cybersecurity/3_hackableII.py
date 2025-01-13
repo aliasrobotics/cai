@@ -8,7 +8,7 @@ import pentestperf as ptt
 from cai.tools.llm_plugins.code_interpreter import execute_python_code
 from cai.tools.llm_plugins.cli_utils import execute_cli_command
 from cai.tools.web.headers import web_request_framework
-from cai.tools.llm_plugins.reasoning import thought
+from cai.tools.llm_plugins.reasoning import thought, write_key_findings, read_key_findings
 from mako.template import Template
 
 # Prompts
@@ -54,8 +54,8 @@ def Thought_Agent():
 thought_agent = Agent(
     name="ThoughAgent",
     instructions=thought_agent_system_prompt + env_context,
-    functions=[thought, CliAgent, Code_Executor_Expert],
-    model="claude-3-5-sonnet-20240620",
+    functions=[thought, CliAgent, Code_Executor_Expert, write_key_findings, read_key_findings],
+    model="gpt-4o",
     parallel_tool_calls=False
 )
 
@@ -70,14 +70,14 @@ cli_agent = Agent(
         execute_python_code,
         web_request_framework],
     parallel_tool_calls=False,
-    model="claude-3-5-sonnet-20240620"
+    model="gpt-4o"
 )
 
 code_agent = Agent(
     name="Boot2Root Exploit Developer",
     instructions=exploit_agent_system_prompt + env_context,
-    functions=[execute_python_code, CliAgent, Thought_Agent],
-    model="claude-3-5-sonnet-20240620",
+    functions=[execute_python_code, CliAgent, Thought_Agent, read_key_findings],
+    model="gpt-4o",
     parallel_tool_calls=False
 )
 
