@@ -1,0 +1,59 @@
+.use_base_container: &use_base_container
+  stage: test
+  image: "${CI_REGISTRY_IMAGE}:latest"
+  services:
+    - name: docker:dind
+      command: ["dockerd", "--host=tcp://192.168.2.1:2375", "--host=unix:///var/run/docker.sock", "--dns=8.8.8.8", "--dns=8.8.4.4"]
+.run_test: &run_test
+  <<: *use_base_container
+  before_script:
+    - |
+      for i in $(seq 1 5); do
+        echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY_IMAGE && break || sleep 10
+
+        echo "Retrying docker login ($i/5)..."
+      done
+  script:
+    - pip3 uninstall pentestperf --yes  # remove old version
+    - pip3 install -e .
+    - msfrpcd -P cai > /dev/null 2>&1 &
+    - |
+      # Set additional environment variables if defined
+      for var in $(compgen -e); do
+        if [[ $var == CTF_* && -n ${!var} ]]; then
+          export $var="${!var}"
+        fi
+      done
+    - pytest $TEST_PATH -s
+  artifacts:
+    paths:
+      - cai.png
+      - cai.dot
+    expire_in: 1 month  # Retain the artifacts for 1 month
+  tags:
+    - p40
+    - x86
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      when: on_success
+
+################################################################################
+# CTF
+################################################################################
+
+# 🚩 picoctf_static_flag | qw:14b | 📝 r:
+#   <<: *run_test
+#   stage: ctf-super-easy
+#   variables:
+#     TEST_PATH: tests/benchmarks/generic.py -s
+#     CTF_NAME: picoctf_static_flag
+#     CTF_MODEL: qwen2.5:14b
+#     # Optional
+#     CTF_MODEL_STATE_OVERRIDE: marco-o1:7b-fp16
+#     CTF_MODEL_AGENT_OVERRIDE: qwen2.5:14b
+#     CTF_PLANNER_CLASS: PlannerR
+#     CTF_SUBNET: 192.168.3.0/24
+#     CTF_IP: 192.168.3.100
+#     CTF_MULTI_CALL: true
+#     CTF_MAX_TASKS: 50
+#     CTF_REPLAN_N: 10

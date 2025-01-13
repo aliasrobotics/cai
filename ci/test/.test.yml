@@ -10,7 +10,7 @@
   <<: *use_base_container
   script:
     - pip3 install -e .
-    - pytest $TEST_PATH -s
+    - pytest -s $TEST_PATH
   tags:
     - p40
     - x86
@@ -24,7 +24,13 @@
     TEST_PATH: tests/tools/reconnaissance/test_filesystem.py
 
 
-# 🏗️ tools test_list_dir:
-#   <<: *run_test
-#   variables:
-#     TEST_PATH: tests/tests/tools/reconnaissance/filesystem/list_dir.py
+🏗️ tools test_architecture:
+  <<: *run_test
+  variables:
+    TEST_PATH: tests/tools/architecture
+
+
+🏗️ tools test_agents:
+  <<: *run_test
+  variables:
+    TEST_PATH: tests/tools/agents
