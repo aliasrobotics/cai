@@ -62,7 +62,7 @@ response = client.run(
     agent=ctf_agent,
     messages=messages,
     debug=True,
-    brief=True)
+    brief=False)
 print(response.messages[-1]["content"])
 print(f"Time taken: {response.time} seconds")
 

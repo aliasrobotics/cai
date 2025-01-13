@@ -28,8 +28,9 @@ from .util import (
     debug_print,
     merge_chunk,
     get_ollama_api_base,
-    TrainingDataRecorder
 )
+
+from .train_data import TrainingDataRecorder
 from .types import (
     Agent,
     AgentFunction,
@@ -125,7 +126,8 @@ class CAI:
                 raise e
 
         if self.rec_training_data:
-            self.rec_training_data.rec_training_data(create_params, litellm_completion)
+            self.rec_training_data.rec_training_data(
+                create_params, litellm_completion)
         return litellm_completion
 
     def handle_function_result(self, result, debug) -> Result:
