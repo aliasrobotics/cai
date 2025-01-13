@@ -95,13 +95,13 @@ class CAI:
             "model": model_override or agent.model,
             "messages": messages,
             "stream": stream,
-            # "temperature": 0.0,
         }
 
         if tools:
             create_params["parallel_tool_calls"] = agent.parallel_tool_calls
             create_params["tools"] = tools
             create_params["tool_choice"] = agent.tool_choice
+            create_params["temperature"] = 0.7
 
         try:
             if os.getenv("OLLAMA", "").lower() == "true":
