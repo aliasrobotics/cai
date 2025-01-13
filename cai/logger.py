@@ -82,7 +82,6 @@ class ExploitLogger:
         def decorator(func):
             @wraps(func)
             def wrapper(*args, **kwargs):
-                # NOTE: @vmayoral Review this
                 if not self.log:
                     return func(*args, **kwargs)
 
@@ -153,6 +152,9 @@ class ExploitLogger:
         def decorator(func):
             @wraps(func)
             def wrapper(cai, active_agent, *args, **kwargs):
+                if not self.log:
+                    return func(*args, **kwargs)
+
                 if not active_agent:
                     return func(cai, active_agent, *args, **kwargs)
 

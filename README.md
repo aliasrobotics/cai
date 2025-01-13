@@ -378,6 +378,7 @@ CAI is developed by [Alias Robotics](https://aliasrobotics.com) and funded as pa
      - [x] add tests -> Fill up all empty files or remove them
   - [x] add tests
      - [x] review agent tests and use pytest utilities (parametrize, etc)
+     - [x] add tests for core
 - [x] CI
      - [x] add .gitlab-ci.yml
      - [x] add first tests
@@ -390,5 +391,11 @@ CAI is developed by [Alias Robotics](https://aliasrobotics.com) and funded as pa
   - [x] add agent span
   - [ ] add tool span
 - [ ] add state to the reasoning chain
+   - [ ] create state.py inspired by previous work
+   - [ ] stateless and stateful capability in CAI
+   - [ ] insert state in inference (1) to be inserted, (2) to build iteratively the state
+      - [ ] via a handoff?
+      - [ ] via a an agent?
+      - [ ] via a tool?
 - [ ] Graph/flow and other abstractions
 - [ ] Plan/router
