@@ -15,10 +15,15 @@ variables:
   VERSION: "0.1"
   DISTRO: ubuntu:22.04
   CI_DEBUG_TRACE: "true"
+  GIT_FETCH_TIMEOUT: 300
 
 services:
   - name: docker:dind
     command: ["--host=tcp://0.0.0.0:2375", "--host=unix:///var/run/docker.sock"]
+    network_mode: "host"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
 
 include:
   - project: 'aliasrobotics/alias_research/cai'
