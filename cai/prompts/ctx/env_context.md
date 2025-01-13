@@ -1,35 +1,17 @@
 Environment context:
-# Environment Context
+- OS: Kali Linux
+- IP Attacker: 192.168.2.5
+- Role: Attacker
+- Tools available: All tools available in Kali Linux including:
+    - Network scanning: nmap, masscan
+    - Web scanning: nikto, dirb, gobuster
+    - Exploitation: metasploit, searchsploit
+    - Password attacks: hashcat
+    - Privilege escalation: linpeas, winpeas
+    - Post exploitation: meterpreter, empire
+- Interesting dirs:
+    - /usr/share/wordlists/
+      - amass  dirb  fasttrack.txt  john.lst  nmap.lst  rockyou.txt  sqlmap.txt  wfuzz  wifite.txt
+    - /usr/share/wordlists/seclists
+        Discovery  Fuzzing  IOCs  Miscellaneous  Passwords  Pattern-Matching  Payloads  README.md  Usernames  Web-Shells
 
-## System Information
-- **OS**: Kali Linux
-- **Role**: Attacker
-- **Listener IP**: 192.168.2.5
-
-## Available Tools
-All standard Kali Linux tools.
-
-## Wordlists & Resources
-
-### /usr/share/wordlists/
-- amass
-- dirb
-- fasttrack.txt
-- john.lst
-- nmap.lst
-- rockyou.txt
-- sqlmap.txt
-- wfuzz
-- wifite.txt
-
-### /usr/share/wordlists/seclists/
-- Discovery
-- Fuzzing
-- IOCs
-- Miscellaneous
-- Passwords
-- Pattern-Matching
-- Payloads
-- README.md
-- Usernames
-- Web-Shells
