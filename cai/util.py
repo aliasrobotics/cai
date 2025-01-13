@@ -8,7 +8,6 @@ from typing import Any
 import json
 import os
 from wasabi import color  # pylint: disable=import-error
-import pytz
 
 # ANSI color codes in a nice, readable palette
 COLORS = {
@@ -97,68 +96,6 @@ def format_value(value: Any, prev_value: Any = None, brief: bool = False) -> str
         return f"{colorcillo}{str(value)}{COLORS['reset']}"
 
 
-def format_value(value: Any, prev_value: Any = None, brief: bool = False) -> str:  # pylint: disable=too-many-locals # noqa: E501
-    """
-    Format a value for debug printing with appropriate colors.
-    Compare with previous value to determine if content is new.
-    """
-    def get_color(key: str, current, previous) -> str:
-        """Determine if we should use the normal or darker color variant"""
-        if previous is not None and str(current) == str(previous):
-            return COLORS.get(f'{key}_old', COLORS[key])
-        return COLORS[key]
-
-    # Handle lists
-    if isinstance(value, list):  # pylint: disable=no-else-return
-        items = []
-        prev_items = prev_value if isinstance(prev_value, list) else []
-
-        for i, item in enumerate(value):
-            prev_item = prev_items[i] if i < len(prev_items) else None
-            if isinstance(item, dict):
-                # Format dictionary items in the list
-                dict_items = []
-                for k, v in item.items():
-                    prev_v = prev_item.get(k) if prev_item and isinstance(
-                        prev_item, dict) else None
-                    color_key = get_color(
-                        'arg_key', k, k if prev_item else None)
-                    formatted_value = format_value(v, prev_v, brief)
-                    if brief:
-                        dict_items.append(
-                            f"{color_key}{k}{
-                                COLORS['reset']}: {formatted_value}")
-                    else:
-                        dict_items.append(
-                            f"\n    {color_key}{k}{
-                                COLORS['reset']}: {formatted_value}")
-                items.append(
-                    "{" + (" " if brief else ",").join(dict_items) + "}")
-            else:
-                items.append(format_value(item, prev_item, brief))
-        if brief:
-            return f"[{' '.join(items)}]"
-        return f"[\n  {','.join(items)}\n]"
-
-    # Handle dictionaries
-    elif isinstance(value, dict):
-        formatted_items = []
-        for k, v in value.items():
-            prev_v = prev_value.get(k) if prev_value and isinstance(
-                prev_value, dict) else None
-            color_key = get_color('arg_key', k, k if prev_value else None)
-            formatted_value = format_value(v, prev_v, brief)
-            formatted_items.append(
-                f"{color_key}{k}{
-                    COLORS['reset']}: {formatted_value}")
-        return "{ " + (" " if brief else ", ").join(formatted_items) + " }"
-
-    # Handle basic types
-    else:
-        color = get_color('arg_value', value, prev_value)
-        return f"{color}{str(value)}{COLORS['reset']}"
-
-
 def format_chat_completion(msg, prev_msg=None) -> str:  # pylint: disable=unused-argument # noqa: E501
     """
     Format a ChatCompletionMessage object with proper indentation and colors.
@@ -240,7 +177,6 @@ def debug_print(debug: bool, intro: str, *args: Any, brief: bool = False, colour
     Print debug messages if debug mode is enabled with color-coded components.
     If brief is True, prints a simplified timestamp and message format.
     """
-
     if not debug:
         return
 
