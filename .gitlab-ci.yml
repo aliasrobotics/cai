@@ -23,7 +23,7 @@ services:
 
 include:
   - project: 'aliasrobotics/alias_research/cai'
-    ref: main
+    ref: generic_ci
     file:
       # - 'ci/build/.build.yml'                # build
       #- 'ci/setup/.setup.yml'               # setup
