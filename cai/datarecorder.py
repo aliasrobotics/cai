@@ -1,13 +1,20 @@
+"""
+Data recorder
+"""
+
 import os  # pylint: disable=import-error
 from datetime import datetime
-import pytz
 import json
+import pytz  # pylint: disable=import-error
 
 
-class TrainingDataRecorder:
+class DataRecorder:  # pylint: disable=too-few-public-methods
     """
-    Records training data from litellm.completion calls in OpenAI-like JSON format.
-    Stores both input messages and completion responses during execution in a single JSONL file.
+    Records training data from litellm.completion
+    calls in OpenAI-like JSON format.
+
+    Stores both input messages and completion
+    responses during execution in a single JSONL file.
     """
 
     def __init__(self):
@@ -39,7 +46,7 @@ class TrainingDataRecorder:
                 {
                     "role": m.role,
                     "content": m.content,
-                    "tool_calls": [t.model_dump() for t in (m.tool_calls or [])]
+                    "tool_calls": [t.model_dump() for t in (m.tool_calls or [])]  # pylint: disable=line-too-long  # noqa: E501
                 }
                 for m in msg.messages
             ] if hasattr(msg, "messages") else [],
@@ -48,7 +55,7 @@ class TrainingDataRecorder:
                 "message": {
                     "role": msg.choices[0].message.role,
                     "content": msg.choices[0].message.content,
-                    "tool_calls": [t.model_dump() for t in (msg.choices[0].message.tool_calls or [])]
+                    "tool_calls": [t.model_dump() for t in (msg.choices[0].message.tool_calls or [])]  # pylint: disable=line-too-long  # noqa: E501
                 },
                 "finish_reason": msg.choices[0].finish_reason
             }],

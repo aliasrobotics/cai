@@ -16,21 +16,19 @@ from collections import defaultdict
 from typing import List
 # Package/library imports
 import time
-from openai import OpenAI  # pylint: disable=import-error
-from cai.logger import exploit_logger
-import litellm
 import os
-from dotenv import load_dotenv
+import litellm  # pylint: disable=import-error
+from dotenv import load_dotenv  # pylint: disable=import-error  # noqa: E501
+from cai.logger import exploit_logger
 
 # Local imports
+from cai.datarecorder import DataRecorder
 from .util import (
     function_to_json,
     debug_print,
     merge_chunk,
     get_ollama_api_base,
 )
-
-from .train_data import TrainingDataRecorder
 from .types import (
     Agent,
     AgentFunction,
@@ -56,7 +54,7 @@ class CAI:
         self.ctf = ctf
         self.brief = False
         if log_training_data:
-            self.rec_training_data = TrainingDataRecorder()
+            self.rec_training_data = DataRecorder()
         load_dotenv()
 
     def get_chat_completion(  # pylint: disable=too-many-arguments
