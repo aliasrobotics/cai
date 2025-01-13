@@ -23,14 +23,22 @@
   variables:
     TEST_PATH: tests/tools/reconnaissance/test_filesystem.py
 
-
-🏗️ tools test_architecture:
+🏗️ tools test_architecture_core:
   <<: *run_test
   variables:
-    TEST_PATH: tests/tools/architecture
+    TEST_PATH: tests/tools/architecture/test_core.py
 
-
-🏗️ tools test_agents:
+🏗️ tools test_architecture_util:
   <<: *run_test
   variables:
-    TEST_PATH: tests/tools/agents
+    TEST_PATH: tests/tools/architecture/test_util.py
+
+🏗️ tools test_agents_filesystem:
+  <<: *run_test
+  variables:
+    TEST_PATH: tests/tools/agents/test_filesystem.py
+
+🏗️ tools test_agents_models:
+  <<: *run_test
+  variables:
+    TEST_PATH: tests/tools/agents/test_models.py
