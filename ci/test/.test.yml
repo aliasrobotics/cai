@@ -4,6 +4,7 @@
   image: "${CI_REGISTRY_IMAGE}:latest"
   services:
     - name: docker:dind
+      alias: docker
 
 .run_test: &run_test
   <<: *use_base_container

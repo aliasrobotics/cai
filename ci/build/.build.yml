@@ -8,7 +8,6 @@
   image: docker:latest
   services:
     - name: docker:dind
-      # NOTE: The alias is key to resolving the DNS issue.
       alias: docker
   before_script:
     # - echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY;
@@ -22,7 +21,7 @@
   script:
     - cat .devcontainer/Dockerfile > Dockerfile_base
     # Build the image
-    # - unset DOCKER_HOST
+    - unset DOCKER_HOST  # see https://forums.docker.com/t/error-error-during-connect-get-http-docker-2375-ping-dial-tcp-lookup-docker-on-10-10-15-22-server-misbehaving/138383/9
     - docker build -t $CI_REGISTRY_IMAGE:$TAGGING -f Dockerfile_base .
     - docker push $CI_REGISTRY_IMAGE:$TAGGING
 
