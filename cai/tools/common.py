@@ -24,10 +24,15 @@ def _run_ctf(ctf, command, stdout=True):
 
 
 def _run_local(command, stdout=True):
-    if "netcat" in command or command.startswith("nc"):
-        return "netcat is not allowed"
-    if "nikto" in command:
-        return "nikto is not allowed"
+    
+    disallowed_tools = {
+        "netcat": ["netcat", "nc"],
+        "nikto": ["nikto"]
+    }
+
+    for tool, patterns in disallowed_tools.items():
+        if any(pattern in command for pattern in patterns):
+            return f"{tool} is not allowed"
     try:
         # nosec B602 - shell=True is required for command chaining
         result = subprocess.run(
