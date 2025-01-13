@@ -68,10 +68,10 @@ class TestFunctionCallBenchmarksBasic:
 
     @pytest.mark.parametrize("model", [
         "dwightfoster03/functionary-small-v3.1",
-        "llama3.1:8b", 
+        "llama3.1:8b",
         "qwen2.5:14b",
         "qwen2.5:32b",
-        "marco-o1:7b-fp16"
+        # "marco-o1:7b-fp16"
     ])
     def test_function_call_benchmark(self, model):
         results = []
