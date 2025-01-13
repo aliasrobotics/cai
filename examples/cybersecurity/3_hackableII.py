@@ -54,7 +54,7 @@ def Thought_Agent():
 thought_agent = Agent(
     name="ThoughAgent",
     instructions=thought_agent_system_prompt,
-    functions=[thought, CliAgent, Code_Executor_Expert],
+    functions=[thought, CliAgent],
     model="claude-3-5-sonnet-20240620",
     parallel_tool_calls=False
 )
