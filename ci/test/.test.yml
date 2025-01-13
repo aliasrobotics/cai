@@ -10,6 +10,7 @@
   <<: *use_base_container
   script:
     - pip3 install -e .
+    - export OPENAI_API_KEY="sk-proj-1234567890"
     - pytest -s $TEST_PATH
   tags:
     - p40
