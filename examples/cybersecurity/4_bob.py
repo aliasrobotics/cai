@@ -13,15 +13,13 @@ from cai.tools.llm_plugins.cli_utils import execute_cli_command
 from cai.tools.web.headers import web_request_framework
 from cai.tools.llm_plugins.reasoning import thought
 from cai.tools.command_and_control.command_and_control import ReverseShellClient
-# Prompts
-cli_agent_system_prompt = open(
-    "cai/prompts/system_cli_pentest_expert.txt").read()
-thought_agent_system_prompt = open(
-    "cai/prompts/system_thought_router.txt").read()
-env_context = open("cai/prompts/ctx/env_context.txt").read()
-exploit_agent_system_prompt = open(
-    "cai/prompts/system_exploit_expert.txt").read()
+from mako.template import Template
 
+# Prompts
+cli_agent_system_prompt = Template(filename="cai/prompts/system_cli_pentest_expert.md").render()
+thought_agent_system_prompt = Template(filename="cai/prompts/system_thought_router.md").render()
+env_context = Template(filename="cai/prompts/ctx/env_context.md").render()
+exploit_agent_system_prompt = Template(filename="cai/prompts/system_exploit_expert.md").render()
 client = CAI()
 
 # Init CTF environment
