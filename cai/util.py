@@ -97,71 +97,65 @@ def format_value(value: Any, prev_value: Any = None, brief: bool = False) -> str
         return f"{colorcillo}{str(value)}{COLORS['reset']}"
 
 
-def rec_training_data(create_params, msg) -> str:
+class TrainingDataRecorder:
     """
-    Record training data from litellm.completion calls
-    in OpenAI-like JSON format.
-    Stores both input messages and completion responses during execution.
+    Records training data from litellm.completion calls in OpenAI-like JSON format.
+    Stores both input messages and completion responses during execution in a single JSONL file.
     """
-    # Use a single training data file
-    filename = f'train_data/test_{
-        datetime.now().astimezone(pytz.timezone("Europe/Madrid"))
-        .strftime("%Y%m%d_%H%M%S")}.jsonl'
+    def __init__(self):
+        
+        os.makedirs('train_data', exist_ok=True)        
+        self.filename = f'train_data/test_{datetime.now().astimezone(pytz.timezone("Europe/Madrid")).strftime("%Y%m%d_%H%M%S")}.jsonl'
 
-    # Create training data directory if it doesn't exist
-    os.makedirs('train_data', exist_ok=True)
-
-    # Format request params in OpenAI format
-    request_data = {
-        "model": create_params["model"],
-        "messages": create_params["messages"],
-        "stream": create_params["stream"]
-    }
-    if "tools" in create_params:
-        request_data.update({
-            "tools": create_params["tools"],
-            "tool_choice": create_params["tool_choice"],
-            "parallel_tool_calls": create_params["parallel_tool_calls"]
-        })
-
-    # Format completion data in OpenAI format
-    completion_data = {
-        "id": msg.id,
-        "object": "chat.completion",
-        "created": int(datetime.now().timestamp()),
-        "model": msg.model,
-        "messages": [
-            {
-                "role": m.role,
-                "content": m.content,
-                "tool_calls": [t.model_dump() for t in (m.tool_calls or [])]
-            }
-            for m in msg.messages
-        ] if hasattr(msg, "messages") else [],
-        "choices": [{
-            "index": 0,
-            "message": {
-                "role": msg.choices[0].message.role,
-                "content": msg.choices[0].message.content,
-                "tool_calls":
-                    [t.model_dump()
-                     for t in (msg.choices[0].message.tool_calls or [])]
-            },
-            "finish_reason": msg.choices[0].finish_reason
-        }],
-        "usage": {
-            "prompt_tokens": msg.usage.prompt_tokens,
-            "completion_tokens": msg.usage.completion_tokens,
-            "total_tokens": msg.usage.total_tokens
+    def rec_training_data(self, create_params, msg) -> None:
+        """Records a single training data entry to the JSONL file"""
+        request_data = {
+            "model": create_params["model"],
+            "messages": create_params["messages"],
+            "stream": create_params["stream"]
         }
-    }
+        if "tools" in create_params:
+            request_data.update({
+                "tools": create_params["tools"],
+                "tool_choice": create_params["tool_choice"],
+                "parallel_tool_calls": create_params["parallel_tool_calls"]
+            })
 
-    # Append both request and completion to jsonl file
-    with open(filename, 'a', encoding='utf-8') as f:
-        json.dump(request_data, f)
-        f.write('\n')
-        json.dump(completion_data, f)
-        f.write('\n')
+        completion_data = {
+            "id": msg.id,
+            "object": "chat.completion",
+            "created": int(datetime.now().timestamp()),
+            "model": msg.model,
+            "messages": [
+                {
+                    "role": m.role,
+                    "content": m.content,
+                    "tool_calls": [t.model_dump() for t in (m.tool_calls or [])]
+                }
+                for m in msg.messages
+            ] if hasattr(msg, "messages") else [],
+            "choices": [{
+                "index": 0,
+                "message": {
+                    "role": msg.choices[0].message.role,
+                    "content": msg.choices[0].message.content,
+                    "tool_calls": [t.model_dump() for t in (msg.choices[0].message.tool_calls or [])]
+                },
+                "finish_reason": msg.choices[0].finish_reason
+            }],
+            "usage": {
+                "prompt_tokens": msg.usage.prompt_tokens,
+                "completion_tokens": msg.usage.completion_tokens,
+                "total_tokens": msg.usage.total_tokens
+            }
+        }
+
+        # Append both request and completion to the instance's jsonl file
+        with open(self.filename, 'a', encoding='utf-8') as f:
+            json.dump(request_data, f)
+            f.write('\n')
+            json.dump(completion_data, f)
+            f.write('\n')
 
 
 def format_chat_completion(msg, prev_msg=None) -> str:  # pylint: disable=unused-argument # noqa: E501

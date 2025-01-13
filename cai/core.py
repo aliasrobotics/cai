@@ -28,7 +28,7 @@ from .util import (
     debug_print,
     merge_chunk,
     get_ollama_api_base,
-    rec_training_data
+    TrainingDataRecorder
 )
 from .types import (
     Agent,
@@ -54,7 +54,8 @@ class CAI:
                  log_training_data=True):
         self.ctf = ctf
         self.brief = False
-        self.log_training_data = log_training_data
+        if log_training_data:
+            self.rec_training_data = TrainingDataRecorder()
         load_dotenv()
 
     def get_chat_completion(  # pylint: disable=too-many-arguments
@@ -122,8 +123,8 @@ class CAI:
             else:
                 raise e
 
-        if self.log_training_data:
-            rec_training_data(create_params, litellm_completion)
+        if self.rec_training_data:
+            self.rec_training_data.rec_training_data(create_params, litellm_completion)
         return litellm_completion
 
     def handle_function_result(self, result, debug) -> Result:
