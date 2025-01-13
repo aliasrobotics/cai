@@ -19,8 +19,8 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
 
     def __init__(self):
 
-        os.makedirs('train_data', exist_ok=True)
-        self.filename = f'train_data/test_{datetime.now().astimezone(
+        os.makedirs('logs', exist_ok=True)
+        self.filename = f'logs/test_{datetime.now().astimezone(
             pytz.timezone("Europe/Madrid")).strftime("%Y%m%d_%H%M%S")}.jsonl'
 
     def rec_training_data(self, create_params, msg) -> None:

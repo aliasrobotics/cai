@@ -145,7 +145,7 @@ pentestperf
 cai.png
 cai.dot
 cai*.png
-test_20*
-train_data/
+logs/
+
 # CI
 !ci/build/
