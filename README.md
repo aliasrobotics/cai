@@ -77,6 +77,12 @@ Tools are grouped in 6 major categories inspired by the security kill chain [^3]
 [^3]: Kamhoua, C. A., Leslie, N. O., & Weisman, M. J. (2018). Game theoretic modeling of advanced persistent threat in internet of things. Journal of Cyber Security and Information Systems.
 
 
+### Pre-commit
+```bash
+pre-commit # files staged
+pre-commit run --all-files # all files
+```
+
 
 ## Table of Contents
 
