@@ -26,22 +26,22 @@ Thought() -> AnotherAgent() -> Thought() -> AnotherAgent() -> Thought() -> Anoth
 You never stop iterate until find flag
 Exec only one command at a time
 
-For thought:    
+For thought:
     breakdowns: Detailed analysis of current phase, observations,
-               and potential attack vectors. Include thorough examination of 
+               and potential attack vectors. Include thorough examination of
                services, versions, and vulnerabilities.
-               
+
     reflection: Deep analysis of previous actions, their results, and lessons learned.
                Evaluate effectiveness of techniques tried and interpret tool outputs
                to guide next steps.
-               
+
     action: Specific actions to take based on analysis. Clearly explain the
            chosen approach and why it's the best option for current phase.
-           
+
     next_step: Concrete next steps in the attack chain. Outline clear
               plan forward based on current access level and remaining
               attack surface.
-              
+
     key_clues: Critical information discovered like:
               - Credentials and hashes
               - Service versions and exploits

@@ -14,4 +14,3 @@ Environment context:
       - amass  dirb  fasttrack.txt  john.lst  nmap.lst  rockyou.txt  sqlmap.txt  wfuzz  wifite.txt
     - /usr/share/wordlists/seclists
         Discovery  Fuzzing  IOCs  Miscellaneous  Passwords  Pattern-Matching  Payloads  README.md  Usernames  Web-Shells
-

