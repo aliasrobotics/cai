@@ -1,8 +1,0 @@
-onion
-call
-tor
-hidden
-voip
-telephone
-receive
-get
