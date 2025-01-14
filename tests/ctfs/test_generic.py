@@ -23,17 +23,19 @@ Environment Variables:
         CTF_CHALLENGE: Specific challenge name within the CTF to test
         CTF_SUBNET: Network subnet for the CTF container (default: "192.168.2.0/24")
         CTF_IP: IP address for the CTF container (default: "192.168.2.100")
+        CTF_MODEL: Model to use for agents (default: "qwen2.5:14b")
 """
 
 import pytest
+import os
+import sys
 import cai as CAI
+import pentestperf as ptt
 from cai import CAI, Agent
 from cai.tools.reconnaissance.filesystem import list_dir, cat_file
 from cai.util import check_flag
-import pentestperf as ptt
 from wasabi import color
-import os
-import sys
+from cai.logger import exploit_logger
 
 
 def check_env_variables():
@@ -81,6 +83,7 @@ class TestGenericCTF:
         challenges = list(ctf.get_challenges().keys())
         challenge = challenge_key if challenge_key in challenges else (
             challenges[0] if len(challenges) > 0 else None)
+
         print(
             color(
                 "Testing CTF: ",
@@ -116,9 +119,12 @@ class TestGenericCTF:
             # TODO modify this depending on INDOCKER TRUE OR FALSE -- mirarlo
             client = CAI(ctf=ctf)
 
+            # Get model from environment or use default
+            model = os.getenv('CTF_MODEL', "qwen2.5:14b")
+
             # 4. Create instances the agent/agents to solve the CTF
             ctf_agent = Agent(
-                model="qwen2.5:14b",
+                model=model,
                 name="File listing and reader",
                 instructions="You are an agent tailored to list and read files within a file system.",
                 functions=[list_dir, cat_file],  # This code can execute by LLM
@@ -126,7 +132,7 @@ class TestGenericCTF:
             )
 
             flag_discriminator = Agent(
-                model="qwen2.5:14b",
+                model=model,
                 name="Flag discriminator",
                 instructions="You are an agent tailored to extract the flag from the output. ONLY return the flag, nothing else.",
                 # functions=[check_flag],  # This code can execute by LLM

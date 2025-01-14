@@ -65,10 +65,33 @@ class ExploitLogger:
           for the general concept of traces and spans.
     """
 
-    def __init__(self, log=True):
+    def __init__(self, tracing=True):
         self.tracer = trace.get_tracer(__name__)
-        self.log = log  # if False, doesn't log anything
+        self.tracing = tracing  # if False, doesn't log anything
         self.active_agent_name = None
+
+    def get_logger_url(self):
+        """Get the current Phoenix logger's log URL."""
+        # First try to get span from our context var
+        span = current_span.get()
+
+        # If no span in our context var, try getting current span from trace
+        # API
+        if span is None:
+            span = trace.get_current_span()
+
+        # If we still don't have a valid span, check agent span
+        if span is None or not span.is_recording():
+            span = current_agent_span.get()
+
+        if span is None or not span.is_recording():
+            return "No active span found."
+
+        span_context = span.get_span_context()
+        trace_id_hex = format(span_context.trace_id, "032x")
+
+        return f"http://11.0.0.1:6006/projects/UHJvamVjdDo1/traces/{
+            trace_id_hex}"
 
     def log_response(self, chain_element_name):
         """Decorator to log the response of a function call.
@@ -82,7 +105,7 @@ class ExploitLogger:
         def decorator(func):
             @wraps(func)
             def wrapper(*args, **kwargs):
-                if not self.log:
+                if not self.tracing:
                     return func(*args, **kwargs)
 
                 parent_context = context.get_current()
@@ -152,7 +175,7 @@ class ExploitLogger:
         def decorator(func):
             @wraps(func)
             def wrapper(cai, active_agent, *args, **kwargs):
-                if not self.log:
+                if not self.tracing:
                     return func(*args, **kwargs)
 
                 if not active_agent:

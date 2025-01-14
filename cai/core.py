@@ -14,11 +14,13 @@ import copy
 import json
 from collections import defaultdict
 from typing import List
+
 # Package/library imports
 import time
 import os
 import litellm  # pylint: disable=import-error
 from dotenv import load_dotenv  # pylint: disable=import-error  # noqa: E501
+from wasabi import color  # pylint: disable=import-error
 from cai.logger import exploit_logger
 
 # Local imports
@@ -387,6 +389,12 @@ class CAI:
         context_variables = copy.deepcopy(context_variables)
         history = copy.deepcopy(messages)
         init_len = len(messages)
+
+        print(
+            color("Logging URL: " +
+                  exploit_logger.get_logger_url(),
+                  fg="white", bg="pink")
+        )
 
         @exploit_logger.log_agent()
         def process_turn(self, active_agent, history, context_variables,
