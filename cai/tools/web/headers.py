@@ -7,11 +7,16 @@ analysis, parameter inspection, and security vulnerability detection.
 """
 
 from urllib.parse import urlparse
-import requests
+import requests  # pylint: disable=E0401
 
 
-def web_request_framework(url: str = "", method: str = "GET", headers: dict = None,
-                          data: dict = None, cookies: dict = None, params: dict = None) -> str:
+def web_request_framework(  # noqa: E501 # pylint: disable=too-many-arguments,too-many-locals,too-many-branches
+    url: str = "",
+        method: str = "GET",
+        headers: dict = None,
+        data: dict = None,
+        cookies: dict = None,
+        params: dict = None) -> str:
     """
     Analyze HTTP requests and responses in detail for security testing.
 
@@ -128,5 +133,5 @@ def web_request_framework(url: str = "", method: str = "GET", headers: dict = No
 
         return "\n".join(analysis)
 
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         return f"Error analyzing request: {str(e)}"

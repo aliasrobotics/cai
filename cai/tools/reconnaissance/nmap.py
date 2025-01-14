@@ -1,7 +1,8 @@
-from cai.tools.common import run_command
 """
 Here are the nmap tools.
 """
+
+from cai.tools.common import run_command  # pylint: disable=E0401
 
 
 def nmap(args: str, target: str, ctf=None) -> str:

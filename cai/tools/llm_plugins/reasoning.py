@@ -1,10 +1,24 @@
+"""
+Reasoning tools module for tracking thoughts, findings and analysis
+Provides utilities for recording and retrieving key information discovered
+during CTF progression.
+"""
+
+
 def thought(breakdowns: str = "", reflection: str = "",
             action: str = "", next_step: str = "", key_clues: str = "") -> str:
     """
     Tool used to express detailed thoughts and analysis during boot2root CTF.
 
     Args:
+        breakdowns: Detailed breakdown of current situation/findings
+        reflection: Reflections on progress and insights gained
+        action: Current or planned actions
+        next_step: Next steps to take
+        key_clues: Important clues or hints discovered
 
+    Returns:
+        str: Formatted string containing the provided thoughts and analysis
     """
     output = []
     if breakdowns:
@@ -37,16 +51,16 @@ def write_key_findings(findings: str) -> str:
         String confirming the findings were written
     """
     try:
-        with open("state.txt", "a") as f:
+        with open("state.txt", "a", encoding="utf-8") as f:
             f.write("\n" + findings + "\n")
         return f"Successfully wrote findings to state.txt:\n{findings}"
-    except Exception as e:
+    except OSError as e:
         return f"Error writing to state.txt: {str(e)}"
 
 
 def read_key_findings() -> str:
     """
-    Read key findings from the state.txt file to retrieve important CTF details.
+    Read key findings from the state.txt file to retrieve important data
     Retrieves critical information like:
     - Discovered credentials
     - Found vulnerabilities
@@ -55,13 +69,14 @@ def read_key_findings() -> str:
     - Other key findings needed for progression
 
     Returns:
-        String containing all findings from state.txt, or error message if file not found
+        String containing all findings from state.txt, or error message
+        if file not found
     """
     try:
-        with open("state.txt") as f:
+        with open("state.txt", encoding="utf-8") as f:
             findings = f.read()
-        return findings if findings else "No findings recorded yet in state.txt"
+        return findings or "Not finding"
     except FileNotFoundError:
         return "state.txt file not found. No findings have been recorded."
-    except Exception as e:
+    except OSError as e:
         return f"Error reading state.txt: {str(e)}"

