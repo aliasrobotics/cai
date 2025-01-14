@@ -27,6 +27,12 @@ Requires Python 3.10+
 pip install git+https://gitlab.com/aliasrobotics/alias_research/cai.git
 ```
 
+### Re-install PentestPerf
+
+```shell
+pip3 uninstall -y pentestperf && pip3 install git+https://gitlab:gldt-1NfZ2XRWdHNip4K45auL@gitlab.com/aliasrobotics/alias_research/pentestperf
+```
+
 ## Usage
 
 ```python
