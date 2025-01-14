@@ -375,6 +375,14 @@ class CAI:
         """
         start_time = time.time()
         self.brief = brief
+
+        if os.getenv("CAI_TRACING", "true").lower() == "true":
+            print(
+                color("Logging URL: " +
+                      exploit_logger.get_logger_url(),
+                      fg="white", bg="pink")
+            )
+
         if stream:
             return self.run_and_stream(
                 agent=agent,
@@ -389,12 +397,6 @@ class CAI:
         context_variables = copy.deepcopy(context_variables)
         history = copy.deepcopy(messages)
         init_len = len(messages)
-
-        print(
-            color("Logging URL: " +
-                  exploit_logger.get_logger_url(),
-                  fg="white", bg="pink")
-        )
 
         @exploit_logger.log_agent()
         def process_turn(self, active_agent, history, context_variables,

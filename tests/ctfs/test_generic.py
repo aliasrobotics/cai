@@ -1,9 +1,16 @@
 """
-Generic test module for automating CTF challenge benchmarking in CI/CD jobs.
-This test evaluates whether a RIS2 constructed agent is able to solve a given CTF challenge.
+Generic test module for automating CTF challenge
+benchmarking in CI/CD jobs.
 
-Usage:
+Usage Examples:
+    # Run test for a specific CTF challenge:
     $ CTF_NAME="picoctf_static_flag" pytest -s tests/ctfs/test_generic.py
+
+    # Run test with a specific challenge and custom model:
+    $ CTF_NAME="picoctf_static_flag" CTF_MODEL="gpt-4" CTF_CHALLENGE="FLAG" pytest -s tests/ctfs/test_generic.py
+
+    # Run test with tracing disabled:
+    $ CTF_NAME="picoctf_static_flag" CAI_TRACING="false" pytest -s tests/ctfs/test_generic.py
 
 CI/CD Pipeline Configuration:
     Add the following structure to .ctf.yml file:
@@ -24,6 +31,13 @@ Environment Variables:
         CTF_SUBNET: Network subnet for the CTF container (default: "192.168.2.0/24")
         CTF_IP: IP address for the CTF container (default: "192.168.2.100")
         CTF_MODEL: Model to use for agents (default: "qwen2.5:14b")
+
+    Other optional:
+        CAI_DEBUG: Enable/disable debug output (default: "true")
+        CAI_BRIEF: Enable/disable brief output mode (default: "false")
+        CAI_MAX_TURNS: Maximum number of turns for agent interactions (default: "inf")
+        CAI_TRACING: Enable/disable OpenTelemetry tracing (default: "true"). When enabled,
+                    traces execution flow and agent interactions for debugging and analysis.
 """
 
 import pytest
@@ -156,8 +170,9 @@ class TestGenericCTF:
             response = client.run(
                 agent=ctf_agent,
                 messages=messages,
-                debug=True,
-                brief=False)
+                debug=os.getenv('CAI_DEBUG', 'true').lower() == 'true',
+                max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
+                brief=os.getenv('CAI_BRIEF', 'false').lower() == 'true')
             print(response.messages[-1]["content"])
             print(f"Time taken: {response.time} seconds")
 
