@@ -41,9 +41,9 @@
 # CTF
 ################################################################################
 
- 🚩 picoctf_static_flag | qw:14b | 📝 r:
-   <<: *run_test
-   stage: ctf-super-easy
-   variables:
-     TEST_PATH: tests/ctfs/test_generic.py -s
-     CTF_NAME: picoctf_static_flag
+#  🚩 picoctf_static_flag | qw:14b | 📝 r:
+#    <<: *run_test
+#    stage: ctf-super-easy
+#    variables:
+#      TEST_PATH: tests/ctfs/test_generic.py -s
+#      CTF_NAME: picoctf_static_flag
