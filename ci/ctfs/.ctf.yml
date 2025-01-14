@@ -41,19 +41,9 @@
 # CTF
 ################################################################################
 
-# 🚩 picoctf_static_flag | qw:14b | 📝 r:
-#   <<: *run_test
-#   stage: ctf-super-easy
-#   variables:
-#     TEST_PATH: tests/benchmarks/generic.py -s
-#     CTF_NAME: picoctf_static_flag
-#     CTF_MODEL: qwen2.5:14b
-#     # Optional
-#     CTF_MODEL_STATE_OVERRIDE: marco-o1:7b-fp16
-#     CTF_MODEL_AGENT_OVERRIDE: qwen2.5:14b
-#     CTF_PLANNER_CLASS: PlannerR
-#     CTF_SUBNET: 192.168.3.0/24
-#     CTF_IP: 192.168.3.100
-#     CTF_MULTI_CALL: true
-#     CTF_MAX_TASKS: 50
-#     CTF_REPLAN_N: 10
+ 🚩 picoctf_static_flag | qw:14b | 📝 r:
+   <<: *run_test
+   stage: ctf-super-easy
+   variables:
+     TEST_PATH: tests/ctfs/test_generic.py -s
+     CTF_NAME: picoctf_static_flag
