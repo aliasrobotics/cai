@@ -4,7 +4,11 @@
   image: "${CI_REGISTRY_IMAGE}:latest"
   services:
     - name: docker:dind
-      command: ["dockerd", "--host=tcp://192.168.2.1:2375", "--host=unix:///var/run/docker.sock", "--dns=8.8.8.8", "--dns=8.8.4.4"]
+      alias: docker
+
+  # services:
+  #   - name: docker:dind
+  #     command: ["dockerd", "--host=tcp://192.168.2.1:2375", "--host=unix:///var/run/docker.sock", "--dns=8.8.8.8", "--dns=8.8.4.4"]
 
 .run_ctf: &run_ctf
   <<: *use_base_container
@@ -52,62 +56,62 @@
      CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
 
-🚩 chal1 | qw:14b:
-   <<: *run_ctf
-   stage: ctf-super-easy
-   variables:
-     CTF_NAME: chal1
-     CTF_MODEL: qwen2.5:14b
-     CTF_RERUN: 5
+# 🚩 chal1 | qw:14b:
+#    <<: *run_ctf
+#    stage: ctf-super-easy
+#    variables:
+#      CTF_NAME: chal1
+#      CTF_MODEL: qwen2.5:14b
+#      CTF_RERUN: 5
 
-🚩 kiddoctf | qw:14b | i:
-   <<: *run_ctf
-   stage: ctf-super-easy
-   variables:
-     CTF_NAME: kiddoctf
-     CTF_MODEL: qwen2.5:14b
-     CTF_CHALLENGE: '01 linux i'
-     CTF_RERUN: 5
+# 🚩 kiddoctf | qw:14b | i:
+#    <<: *run_ctf
+#    stage: ctf-super-easy
+#    variables:
+#      CTF_NAME: kiddoctf
+#      CTF_MODEL: qwen2.5:14b
+#      CTF_CHALLENGE: '01 linux i'
+#      CTF_RERUN: 5
 
-🚩 kiddoctf | qw:14b | ii:
-   <<: *run_ctf
-   stage: ctf-super-easy
-   variables:
-     CTF_NAME: kiddoctf
-     CTF_MODEL: qwen2.5:14b
-     CTF_CHALLENGE: '02 linux ii'
-     CTF_RERUN: 5
+# 🚩 kiddoctf | qw:14b | ii:
+#    <<: *run_ctf
+#    stage: ctf-super-easy
+#    variables:
+#      CTF_NAME: kiddoctf
+#      CTF_MODEL: qwen2.5:14b
+#      CTF_CHALLENGE: '02 linux ii'
+#      CTF_RERUN: 5
 
-🚩 kiddoctf | qw:14b | iii:
-   <<: *run_ctf
-   stage: ctf-super-easy
-   variables:
-     CTF_NAME: kiddoctf
-     CTF_MODEL: qwen2.5:14b
-     CTF_CHALLENGE: '03 linux iii'
-     CTF_RERUN: 5
+# 🚩 kiddoctf | qw:14b | iii:
+#    <<: *run_ctf
+#    stage: ctf-super-easy
+#    variables:
+#      CTF_NAME: kiddoctf
+#      CTF_MODEL: qwen2.5:14b
+#      CTF_CHALLENGE: '03 linux iii'
+#      CTF_RERUN: 5
 
-🚩 kiddoctf | qw:14b | iv:
-   <<: *run_ctf
-   stage: ctf-super-easy
-   variables:
-     CTF_NAME: kiddoctf
-     CTF_MODEL: qwen2.5:14b
-     CTF_CHALLENGE: '04 linux iv'
-     CTF_RERUN: 5
+# 🚩 kiddoctf | qw:14b | iv:
+#    <<: *run_ctf
+#    stage: ctf-super-easy
+#    variables:
+#      CTF_NAME: kiddoctf
+#      CTF_MODEL: qwen2.5:14b
+#      CTF_CHALLENGE: '04 linux iv'
+#      CTF_RERUN: 5
 
-🚩 my_first_pwnie | qw:14b:
-   <<: *run_ctf
-   stage: ctf-super-easy
-   variables:
-     CTF_NAME: my_first_pwnie
-     CTF_MODEL: qwen2.5:14b
-     CTF_RERUN: 5
+# 🚩 my_first_pwnie | qw:14b:
+#    <<: *run_ctf
+#    stage: ctf-super-easy
+#    variables:
+#      CTF_NAME: my_first_pwnie
+#      CTF_MODEL: qwen2.5:14b
+#      CTF_RERUN: 5
 
-🚩 picoctf_reversing_python | qw:14b:
-   <<: *run_ctf
-   stage: ctf-super-easy
-   variables:
-     CTF_NAME: picoctf_reversing_python
-     CTF_MODEL: qwen2.5:14b
-     CTF_RERUN: 5
+# 🚩 picoctf_reversing_python | qw:14b:
+#    <<: *run_ctf
+#    stage: ctf-super-easy
+#    variables:
+#      CTF_NAME: picoctf_reversing_python
+#      CTF_MODEL: qwen2.5:14b
+#      CTF_RERUN: 5
