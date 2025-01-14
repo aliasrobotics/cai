@@ -54,13 +54,13 @@ services:
      CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
 
-# 🚩 chal1 | qw:14b:
-#    <<: *run_ctf
-#    stage: ctf-super-easy
-#    variables:
-#      CTF_NAME: chal1
-#      CTF_MODEL: qwen2.5:14b
-#      CTF_RERUN: 5
+🚩 chal1 | qw:14b:
+   <<: *run_ctf
+   stage: ctf-super-easy
+   variables:
+     CTF_NAME: chal1
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
 
 # 🚩 kiddoctf | qw:14b | i:
 #    <<: *run_ctf
