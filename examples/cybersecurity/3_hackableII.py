@@ -3,13 +3,12 @@ Advanced Boot2Root CTF Framework with CLI, Code Interpreter and Analysis Modes
 """
 from cai import CAI, Agent
 import pentestperf as ptt
-
 # Codebase Tools
-from cai.tools.llm_plugins.code_interpreter import execute_python_code
 from cai.tools.llm_plugins.cli_utils import execute_cli_command
-from cai.tools.web.headers import web_request_framework
-from cai.tools.llm_plugins.reasoning import thought, write_key_findings, read_key_findings
+from cai.tools.web.headers import web_request_framework 
+from cai.tools.llm_plugins.reasoning import thought
 from mako.template import Template
+from cai.tools.web.webshell_suit import generate_php_webshell, upload_webshell as upload_ftp_webshell
 
 # Prompts
 cli_agent_system_prompt = Template(filename="cai/prompts/system_cli_pentest_expert.md").render()
@@ -28,12 +27,11 @@ ctf = ptt.ctf(
 )
 ctf.start_ctf()
 
-
-def Code_Executor_Expert():
-    """
-    Code Executor Expert, call this function empty Code_Executor_Expert() to transfer to code_agent
-    """
-    return code_agent
+# def Code_Executor_Expert():
+#     """
+#     Code Executor Expert, call this function empty Code_Executor_Expert() to transfer to code_agent
+#     """
+#     return code_agent
 
 
 def CliAgent():
@@ -66,20 +64,22 @@ cli_agent = Agent(
     functions=[
         execute_cli_command,
         Thought_Agent,
-        Code_Executor_Expert,
-        execute_python_code,
-        web_request_framework],
+        #Code_Executor_Expert,
+        web_request_framework,
+        generate_php_webshell,
+        upload_ftp_webshell
+    ],
     parallel_tool_calls=False,
     model="claude-3-5-sonnet-20240620"
 )
-
-code_agent = Agent(
-    name="Boot2Root Exploit Developer",
-    instructions=exploit_agent_system_prompt + env_context,
-    functions=[execute_python_code, CliAgent, Thought_Agent],
-    model="claude-3-5-sonnet-20240620",
-    parallel_tool_calls=False
-)
+# Disabled Boot2Root Exploit Developer agent
+# code_agent = Agent(
+#     name="Boot2Root Exploit Developer", 
+#     instructions=exploit_agent_system_prompt + env_context,
+#     functions=[CliAgent, Thought_Agent],
+#     model="claude-3-5-sonnet-20240620",
+#     parallel_tool_calls=False
+# )
 
 
 messages = [{

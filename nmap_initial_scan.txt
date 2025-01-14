@@ -1,0 +1,13 @@
+# Nmap 7.95 scan initiated Tue Jan 14 09:53:19 2025 as: /usr/lib/nmap/nmap -sS -sV -p- -oN nmap_initial_scan.txt 192.168.2.11
+Nmap scan report for hackableii.cybersecurity_ais_devcontainer_cainet (192.168.2.11)
+Host is up (0.0000020s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     ProFTPD
+22/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.10 (Ubuntu Linux; protocol 2.0)
+80/tcp open  http    Apache httpd 2.4.18 ((Ubuntu))
+MAC Address: 08:00:27:85:55:86 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Tue Jan 14 09:53:30 2025 -- 1 IP address (1 host up) scanned in 11.53 seconds
