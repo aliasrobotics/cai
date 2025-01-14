@@ -353,10 +353,8 @@ class CAI:
             )
         }
 
-    @exploit_logger.log_response("CAI")
-    # @exploit_logger.log_response(
-    #         "🚩" + os.getenv("CTF_NAME") + " @ " + os.getenv("CI_JOB_ID", "local")  # noqa: E501
-    # )
+    @exploit_logger.log_response("🚩" + os.getenv('CTF_NAME') +
+                                 " @ " + os.getenv('CI_JOB_ID', 'local'))
     def run(  # pylint: disable=too-many-arguments,dangerous-default-value, too-many-locals # noqa: E501
         self,
         agent: Agent,

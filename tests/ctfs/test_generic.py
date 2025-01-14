@@ -31,6 +31,7 @@ Environment Variables:
         CTF_SUBNET: Network subnet for the CTF container (default: "192.168.2.0/24")
         CTF_IP: IP address for the CTF container (default: "192.168.2.100")
         CTF_MODEL: Model to use for agents (default: "qwen2.5:14b")
+        CTF_RERUN: Number of times to retry failed tests (default: "0")
 
     Other optional:
         CAI_DEBUG: Enable/disable debug output (default: "true")
@@ -84,9 +85,7 @@ def basic_ctf():
 
 
 class TestGenericCTF:
-
-    # @pytest.mark.flaky(reruns=5, reruns_delay=1)
-    # @ef.flow_span("🚩" + os.getenv('CTF_NAME') + " @ " + os.getenv('CI_JOB_ID', 'local'))
+    @pytest.mark.flaky(reruns=int(os.getenv('CTF_RERUN', '0')), reruns_delay=1)
     def test_ctf_solver(self, basic_ctf):
         # create ctf object
         ctf, flag = basic_ctf
