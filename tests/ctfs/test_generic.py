@@ -32,6 +32,8 @@ Environment Variables:
         CTF_IP: IP address for the CTF container (default: "192.168.2.100")
         CTF_MODEL: Model to use for agents (default: "qwen2.5:14b")
         CTF_RERUN: Number of times to retry failed tests (default: "0")
+        CTF_INSIDE: Whether to conquer the CTF from within the CTF's Docker container
+          or from outside (meaning the dev environment) (default: "true")
 
     Other optional:
         CAI_DEBUG: Enable/disable debug output (default: "true")
@@ -129,8 +131,10 @@ class TestGenericCTF:
                     bg="blue"))
 
             # 3. Instance the cybersecurity AI Framework client
-            # TODO modify this depending on INDOCKER TRUE OR FALSE -- mirarlo
-            client = CAI(ctf=ctf)
+            if os.getenv('CTF_INSIDE', "true").lower() == "true":
+                client = CAI(ctf=ctf)
+            else:
+                client = CAI()
 
             # Get model from environment or use default
             model = os.getenv('CTF_MODEL', "qwen2.5:14b")
