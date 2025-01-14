@@ -35,4 +35,4 @@ include:
     rules:
       - if: $CI_COMMIT_BRANCH == "main"
         when: never
-      - when: on_success
+      - if: $CI_COMMIT_BRANCH
