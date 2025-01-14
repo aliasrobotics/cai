@@ -2,12 +2,9 @@
 .use_base_container: &use_base_container
   stage: test
   image: "${CI_REGISTRY_IMAGE}:latest"
-  # services:
-  #   - name: docker:dind
-  #     command: ["dockerd", "--host=tcp://192.168.2.1:2375", "--host=unix:///var/run/docker.sock", "--dns=8.8.8.8", "--dns=8.8.4.4"]
   services:
     - name: docker:dind
-      alias: docker
+      command: ["dockerd", "--host=tcp://192.168.2.1:2375", "--host=unix:///var/run/docker.sock", "--dns=8.8.8.8", "--dns=8.8.4.4"]
 
 .run_ctf: &run_ctf
   <<: *use_base_container
@@ -29,7 +26,7 @@
           export $var="${!var}"
         fi
       done
-    - pytest -s tests/ctfs/test_generic.py
+    - pytest -s tests/ctfs/test_generic.py  # NOTE: hardcoded file name
   artifacts:
     paths:
       - cai.png
@@ -50,5 +47,4 @@
    <<: *run_ctf
    stage: ctf-super-easy
    variables:
-    #  TEST_PATH: tests/ctfs/test_generic.py
      CTF_NAME: picoctf_static_flag

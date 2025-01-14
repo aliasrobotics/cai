@@ -382,7 +382,7 @@ CAI is developed by [Alias Robotics](https://aliasrobotics.com) and funded as pa
 - [x] CI
      - [x] add .gitlab-ci.yml
      - [x] add first tests
-     - [ ] add CTFs
+     - [x] add CTFs
 - [ ] Other fixes
      - [x] `check_flag`
      - [x] time in ~~`run()`~~ Response
