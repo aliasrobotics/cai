@@ -2,13 +2,9 @@
 .use_base_container: &use_base_container
   stage: test
   image: "${CI_REGISTRY_IMAGE}:latest"
-  services:
-    - name: docker:dind
-      alias: docker
-
-  # services:
-  #   - name: docker:dind
-  #     command: ["dockerd", "--host=tcp://192.168.2.1:2375", "--host=unix:///var/run/docker.sock", "--dns=8.8.8.8", "--dns=8.8.4.4"]
+services:
+  - name: docker:dind
+    command: ["dockerd", "--host=tcp://0.0.0.0:2375", "--host=unix:///var/run/docker.sock", "--dns=8.8.8.8", "--dns=8.8.4.4"]
 
 .run_ctf: &run_ctf
   <<: *use_base_container
@@ -20,6 +16,7 @@
         echo "Retrying docker login ($i/5)..."
       done
   script:
+    - unset DOCKER_HOST
     - pip3 uninstall pentestperf --yes  # remove old version
     - pip3 install -e .
     - msfrpcd -P cai > /dev/null 2>&1 &
