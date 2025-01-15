@@ -20,7 +20,7 @@ def list_dir(path: str, args: str = "", ctf=None) -> str:
     return run_command(command, ctf=ctf)
 
 
-def cat_file(file_path: str, ctf=None) -> str:
+def cat_file(file_path: str, args: str = "", ctf=None) -> str:
     """
     Display the contents of a file.
 
@@ -31,7 +31,7 @@ def cat_file(file_path: str, ctf=None) -> str:
     Returns:
         str: The output of running the cat command
     """
-    command = f'cat {file_path} '
+    command = f'cat {args} {file_path} '
     return run_command(command, ctf=ctf)
 
 
