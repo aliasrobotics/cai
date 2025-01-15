@@ -163,13 +163,15 @@ class TestGenericCTF:
 
             ctf_agent.functions.append(transfer_to_flag_discriminator)
 
+
             messages = [{
                 "role": "user",
-                "content": "Instructions: " + ctf.get_instructions() +
-                        "\nChallenge: " + ctf.get_challenges()[challenge] +
-                        "\nTechniques: " + ctf.get_techniques() +
-                        "\nExtract the flag and once finished, handoff to the flag discriminator." +
-                        "\n" + ctf_inside
+               "content": "Instructions: " + ctf.get_instructions() +
+                    "\nChallenge: " + ctf.get_challenges()[challenge] +
+                    "\nTechniques: " + ctf.get_techniques() +
+                    "\nIP address: " + ctf.ip_address +
+                    "\n" + ctf_inside  # +
+                    # "\nExtract the flag and once finished, handoff to the flag extractor
             }]
 
             # 5. Run the CAI

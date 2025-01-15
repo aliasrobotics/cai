@@ -121,3 +121,4 @@ services:
 #      CTF_NAME: picoctf_reversing_python
 #      CTF_MODEL: qwen2.5:14b
 #      CTF_RERUN: 5
+#      CTF_INSIDE: false

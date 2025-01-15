@@ -20,7 +20,7 @@ def list_dir(path: str, args: str = "", ctf=None) -> str:
     return run_command(command, ctf=ctf)
 
 
-def cat_file(file_path: str, args: str = "", ctf=None) -> str:
+def cat_file(file_path: str, ctf=None) -> str:
     """
     Display the contents of a file.
 
@@ -31,7 +31,7 @@ def cat_file(file_path: str, args: str = "", ctf=None) -> str:
     Returns:
         str: The output of running the cat command
     """
-    command = f'cat {args} {file_path} '
+    command = f'cat {file_path} '
     return run_command(command, ctf=ctf)
 
 
@@ -65,4 +65,12 @@ def pwd_command(ctf=None) -> str:
         str: The absolute path of the current working directory
     """
     command = 'pwd'
+    return run_command(command, ctf=ctf)
+
+
+def find_file(file_path: str, args: str = "", ctf=None) -> str:
+    """
+    Find a file in the filesystem.
+    """
+    command = f'find {file_path} {args}'
     return run_command(command, ctf=ctf)
