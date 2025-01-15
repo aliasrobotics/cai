@@ -13,7 +13,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
         asciinema dnsutils \
         apt-transport-https ca-certificates \
         wget dirb gobuster whatweb gfortran \
-        cmake libopenblas-dev
+        cmake libopenblas-dev sshpass
 
 # # Install Metasploit - path 1
 # RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > /tmp/msfinstall \

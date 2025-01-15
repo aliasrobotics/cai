@@ -1,3 +1,4 @@
+exclude: ^(examples|tests)/
 repos:
   - repo: https://github.com/hhatto/autopep8
     rev: v2.1.0
@@ -6,6 +7,7 @@ repos:
         args:
           - --in-place
           - --aggressive
+        exclude: ^(examples|tests)/
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
@@ -17,10 +19,12 @@ repos:
       - id: check-toml
       - id: end-of-file-fixer
       - id: trailing-whitespace
+        exclude: ^(examples|tests)/
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.16.0
     hooks:
       - id: pyupgrade
+        exclude: ^(examples|tests)/
   # - repo: https://github.com/astral-sh/ruff-pre-commit
   #   rev: v0.5.2
   #   hooks:

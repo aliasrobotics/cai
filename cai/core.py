@@ -97,13 +97,13 @@ class CAI:
             "model": model_override or agent.model,
             "messages": messages,
             "stream": stream,
-            # "temperature": 0.0,
         }
 
         if tools:
             create_params["parallel_tool_calls"] = agent.parallel_tool_calls
             create_params["tools"] = tools
             create_params["tool_choice"] = agent.tool_choice
+            create_params["temperature"] = 0.7
 
         try:
             if os.getenv("OLLAMA", "").lower() == "true":
@@ -124,6 +124,11 @@ class CAI:
                 litellm_completion = litellm.completion(**create_params)
             else:
                 raise e
+
+        except litellm.exceptions.RateLimitError as e:
+            print("Rate Limit Error:" + str(e))
+            time.sleep(60)
+            litellm_completion = litellm.completion(**create_params)
 
         if self.rec_training_data:
             self.rec_training_data.rec_training_data(
@@ -241,7 +246,7 @@ class CAI:
                     "role": "tool",
                     "tool_call_id": tool_call.id,
                     "tool_name": name,
-                    "content": result.value,
+                    "content": result.value[:5000],
                 }
             )
             partial_response.context_variables.update(result.context_variables)

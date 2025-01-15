@@ -97,6 +97,13 @@ docker run --rm -it \
   registry.gitlab.com/aliasrobotics/alias_research/cai:latest bash
 ```
 
+### Pre-commit
+```bash
+pre-commit # files staged
+pre-commit run --all-files # all files
+```
+
+
 ## Table of Contents
 
 - [Overview](#overview)
