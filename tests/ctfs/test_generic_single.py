@@ -49,11 +49,11 @@ import sys
 import cai as CAI
 import pentestperf as ptt
 from cai import CAI, Agent
-from cai.tools.reconnaissance.filesystem import list_dir, cat_file, strings_extraction, find_file, pwd_command
+from cai.tools.reconnaissance.filesystem import list_dir, cat_file, strings_extraction, pwd_command
 from cai.tools.reconnaissance.netcat import netcat
 from cai.tools.reconnaissance.nmap import nmap
 from cai.tools.reconnaissance.generic_linux_command import generic_linux_command
-from cai.tools.reconnaissance.crypto_tools import decode_hex_bytes, base64
+from cai.tools.reconnaissance.crypto_tools import base64
 from cai.util import check_flag
 from wasabi import color
 from cai.logger import exploit_logger
@@ -152,8 +152,6 @@ class TestGenericCTF:
                         nmap,
                         netcat,
                         generic_linux_command,
-                        decode_hex_bytes,
-                        find_file,
                         pwd_command],
                     # This code can execute by LLM
                     # parallel_tool_calls=True, Enable multi function calling
@@ -174,8 +172,6 @@ class TestGenericCTF:
                         nmap,
                         netcat,
                         generic_linux_command,
-                        decode_hex_bytes,
-                        find_file,
                         pwd_command],
                     # This code can execute by LLM
                     # parallel_tool_calls=True, Enable multi function calling
