@@ -22,28 +22,31 @@ from opentelemetry.trace import Status, StatusCode  # pylint: disable=import-err
 from openinference.semconv.resource import ResourceAttributes  # pylint: disable=import-error,ungrouped-imports  # noqa: E501
 from openinference.semconv.trace import SpanAttributes  # pylint: disable=import-error  # noqa: E501
 
+# Instrument OpenAI if tracing is enabled
+if os.getenv("CAI_TRACING", "true").lower() == "true":
 
-# Context variable to store the current span
-current_span = contextvars.ContextVar("current_span", default=None)
-# Add this at the top with other context vars
-current_agent_span = contextvars.ContextVar(
-    "current_agent_span", default=None)
+    # Context variable to store the current span
+    current_span = contextvars.ContextVar("current_span", default=None)
+    # Add this at the top with other context vars
+    current_agent_span = contextvars.ContextVar(
+        "current_agent_span", default=None)
 
-# This will set project name based in the file stacking
-# inferences of a file in a project as per
-# https://docs.arize.com/phoenix/tracing/how-to-tracing/manual-instrumentation/custom-spans
-current_file = os.path.basename(sys.argv[0]).split(".")[0]
-project_name = f"{current_file}"
-# project_name = f"{sys.argv[1]}"
-resource = Resource(attributes={ResourceAttributes.PROJECT_NAME: project_name})
-tracer_provider = trace_sdk.TracerProvider(resource=resource)
-span_exporter = OTLPSpanExporter("http://11.0.0.1:6006/v1/traces")
-span_processor = SimpleSpanProcessor(span_exporter)
-tracer_provider.add_span_processor(span_processor)
-trace_api.set_tracer_provider(tracer_provider)
+    # This will set project name based in the file stacking
+    # inferences of a file in a project as per
+    # https://docs.arize.com/phoenix/tracing/how-to-tracing/manual-instrumentation/custom-spans
+    current_file = os.path.basename(sys.argv[0]).split(".")[0]
+    project_name = f"{current_file}"
+    # project_name = f"{sys.argv[1]}"
+    resource = Resource(
+        attributes={
+            ResourceAttributes.PROJECT_NAME: project_name})
+    tracer_provider = trace_sdk.TracerProvider(resource=resource)
+    span_exporter = OTLPSpanExporter("http://11.0.0.1:6006/v1/traces")
+    span_processor = SimpleSpanProcessor(span_exporter)
+    tracer_provider.add_span_processor(span_processor)
+    trace_api.set_tracer_provider(tracer_provider)
 
-
-OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
+    OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
 
 
 class ExploitLogger:
@@ -65,10 +68,33 @@ class ExploitLogger:
           for the general concept of traces and spans.
     """
 
-    def __init__(self, log=True):
+    def __init__(self, tracing=True):
         self.tracer = trace.get_tracer(__name__)
-        self.log = log  # if False, doesn't log anything
+        self.tracing = tracing  # if False, doesn't log anything
         self.active_agent_name = None
+
+    def get_logger_url(self):
+        """Get the current Phoenix logger's log URL."""
+        # First try to get span from our context var
+        span = current_span.get()
+
+        # If no span in our context var, try getting current span from trace
+        # API
+        if span is None:
+            span = trace.get_current_span()
+
+        # If we still don't have a valid span, check agent span
+        if span is None or not span.is_recording():
+            span = current_agent_span.get()
+
+        if span is None or not span.is_recording():
+            return "No active span found."
+
+        span_context = span.get_span_context()
+        trace_id_hex = format(span_context.trace_id, "032x")
+
+        return f"http://11.0.0.1:6006/projects/UHJvamVjdDo1/traces/{
+            trace_id_hex}"
 
     def log_response(self, chain_element_name):
         """Decorator to log the response of a function call.
@@ -82,7 +108,7 @@ class ExploitLogger:
         def decorator(func):
             @wraps(func)
             def wrapper(*args, **kwargs):
-                if not self.log:
+                if not self.tracing:
                     return func(*args, **kwargs)
 
                 parent_context = context.get_current()
@@ -152,8 +178,8 @@ class ExploitLogger:
         def decorator(func):
             @wraps(func)
             def wrapper(cai, active_agent, *args, **kwargs):
-                if not self.log:
-                    return func(*args, **kwargs)
+                if not self.tracing:
+                    return func(cai, active_agent, *args, **kwargs)
 
                 if not active_agent:
                     return func(cai, active_agent, *args, **kwargs)
@@ -212,4 +238,6 @@ class ExploitLogger:
 
 
 # Create a global instance of ExploitLogger
-exploit_logger = ExploitLogger()
+exploit_logger = ExploitLogger(
+    tracing=os.getenv("CAI_TRACING", "true").lower() == "true"
+)

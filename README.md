@@ -27,6 +27,12 @@ Requires Python 3.10+
 pip install git+https://gitlab.com/aliasrobotics/alias_research/cai.git
 ```
 
+### Re-install PentestPerf
+
+```shell
+pip3 uninstall -y pentestperf && pip3 install git+https://gitlab:gldt-1NfZ2XRWdHNip4K45auL@gitlab.com/aliasrobotics/alias_research/pentestperf
+```
+
 ## Usage
 
 ```python
@@ -77,12 +83,19 @@ Tools are grouped in 6 major categories inspired by the security kill chain [^3]
 [^3]: Kamhoua, C. A., Leslie, N. O., & Weisman, M. J. (2018). Game theoretic modeling of advanced persistent threat in internet of things. Journal of Cyber Security and Information Systems.
 
 
-### Pre-commit
-```bash
-pre-commit # files staged
-pre-commit run --all-files # all files
-```
+### Develop
 
+To simulate the CI/CD pipeline, you can run the following in the Gitlab runner machines:
+
+```bash
+docker run --rm -it \
+  --privileged \
+  --network=exploitflow_net \
+  --add-host="host.docker.internal:host-gateway" \
+  -v /cache:/cache \
+  -v /var/run/docker.sock:/var/run/docker.sock:rw \
+  registry.gitlab.com/aliasrobotics/alias_research/cai:latest bash
+```
 
 ## Table of Contents
 
@@ -388,7 +401,7 @@ CAI is developed by [Alias Robotics](https://aliasrobotics.com) and funded as pa
 - [x] CI
      - [x] add .gitlab-ci.yml
      - [x] add first tests
-     - [ ] add CTFs
+     - [x] add CTFs
 - [ ] Other fixes
      - [x] `check_flag`
      - [x] time in ~~`run()`~~ Response

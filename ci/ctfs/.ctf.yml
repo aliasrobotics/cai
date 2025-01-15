@@ -1,10 +1,12 @@
+
 .use_base_container: &use_base_container
   stage: test
   image: "${CI_REGISTRY_IMAGE}:latest"
-  services:
-    - name: docker:dind
-      command: ["dockerd", "--host=tcp://192.168.2.1:2375", "--host=unix:///var/run/docker.sock", "--dns=8.8.8.8", "--dns=8.8.4.4"]
-.run_test: &run_test
+services:
+  - name: docker:dind
+    command: ["dockerd", "--host=tcp://0.0.0.0:2375", "--host=unix:///var/run/docker.sock", "--dns=8.8.8.8", "--dns=8.8.4.4"]
+
+.run_ctf: &run_ctf
   <<: *use_base_container
   before_script:
     - |
@@ -14,6 +16,7 @@
         echo "Retrying docker login ($i/5)..."
       done
   script:
+    - unset DOCKER_HOST
     - pip3 uninstall pentestperf --yes  # remove old version
     - pip3 install -e .
     - msfrpcd -P cai > /dev/null 2>&1 &
@@ -24,15 +27,17 @@
           export $var="${!var}"
         fi
       done
-    - pytest $TEST_PATH -s
+    - pytest -s tests/ctfs/test_generic.py  # NOTE: hardcoded file name
   artifacts:
     paths:
       - cai.png
       - cai.dot
+      - logs
     expire_in: 1 month  # Retain the artifacts for 1 month
   tags:
     - p40
     - x86
+    - one
   rules:
     - if: $CI_COMMIT_BRANCH
       when: on_success
@@ -41,19 +46,78 @@
 # CTF
 ################################################################################
 
-# 🚩 picoctf_static_flag | qw:14b | 📝 r:
-#   <<: *run_test
-#   stage: ctf-super-easy
-#   variables:
-#     TEST_PATH: tests/benchmarks/generic.py -s
-#     CTF_NAME: picoctf_static_flag
-#     CTF_MODEL: qwen2.5:14b
-#     # Optional
-#     CTF_MODEL_STATE_OVERRIDE: marco-o1:7b-fp16
-#     CTF_MODEL_AGENT_OVERRIDE: qwen2.5:14b
-#     CTF_PLANNER_CLASS: PlannerR
-#     CTF_SUBNET: 192.168.3.0/24
-#     CTF_IP: 192.168.3.100
-#     CTF_MULTI_CALL: true
-#     CTF_MAX_TASKS: 50
-#     CTF_REPLAN_N: 10
+🚩 picoctf_static_flag | qw:14b:
+   <<: *run_ctf
+   stage: ctf-super-easy
+   variables:
+     CTF_NAME: picoctf_static_flag
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+
+🚩 baby_first | qw:14b:
+   <<: *run_ctf
+   stage: ctf-super-easy
+   variables:
+     CTF_NAME: baby_first
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+
+# 🚩 chal1 | qw:14b:
+#    <<: *run_ctf
+#    stage: ctf-super-easy
+#    variables:
+#      CTF_NAME: chal1
+#      CTF_MODEL: qwen2.5:14b
+#      CTF_RERUN: 5
+
+# 🚩 kiddoctf | qw:14b | i:
+#    <<: *run_ctf
+#    stage: ctf-super-easy
+#    variables:
+#      CTF_NAME: kiddoctf
+#      CTF_MODEL: qwen2.5:14b
+#      CTF_CHALLENGE: '01 linux i'
+#      CTF_RERUN: 5
+
+# 🚩 kiddoctf | qw:14b | ii:
+#    <<: *run_ctf
+#    stage: ctf-super-easy
+#    variables:
+#      CTF_NAME: kiddoctf
+#      CTF_MODEL: qwen2.5:14b
+#      CTF_CHALLENGE: '02 linux ii'
+#      CTF_RERUN: 5
+
+# 🚩 kiddoctf | qw:14b | iii:
+#    <<: *run_ctf
+#    stage: ctf-super-easy
+#    variables:
+#      CTF_NAME: kiddoctf
+#      CTF_MODEL: qwen2.5:14b
+#      CTF_CHALLENGE: '03 linux iii'
+#      CTF_RERUN: 5
+
+# 🚩 kiddoctf | qw:14b | iv:
+#    <<: *run_ctf
+#    stage: ctf-super-easy
+#    variables:
+#      CTF_NAME: kiddoctf
+#      CTF_MODEL: qwen2.5:14b
+#      CTF_CHALLENGE: '04 linux iv'
+#      CTF_RERUN: 5
+
+# 🚩 my_first_pwnie | qw:14b:
+#    <<: *run_ctf
+#    stage: ctf-easy
+#    variables:
+#      CTF_NAME: my_first_pwnie
+#      CTF_MODEL: qwen2.5:14b
+#      CTF_RERUN: 5
+
+# 🚩 picoctf_reversing_python | qw:14b:
+#    <<: *run_ctf
+#    stage: ctf-easy
+#    variables:
+#      CTF_NAME: picoctf_reversing_python
+#      CTF_MODEL: qwen2.5:14b
+#      CTF_RERUN: 5

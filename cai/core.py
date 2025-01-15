@@ -14,11 +14,13 @@ import copy
 import json
 from collections import defaultdict
 from typing import List
+
 # Package/library imports
 import time
 import os
 import litellm  # pylint: disable=import-error
 from dotenv import load_dotenv  # pylint: disable=import-error  # noqa: E501
+from wasabi import color  # pylint: disable=import-error
 from cai.logger import exploit_logger
 
 # Local imports
@@ -356,10 +358,8 @@ class CAI:
             )
         }
 
-    @exploit_logger.log_response("CAI")
-    # @exploit_logger.log_response(
-    #         "🚩" + os.getenv("CTF_NAME") + " @ " + os.getenv("CI_JOB_ID", "local")  # noqa: E501
-    # )
+    @exploit_logger.log_response("🚩" + os.getenv('CTF_NAME') +
+                                 " @ " + os.getenv('CI_JOB_ID', 'local'))
     def run(  # pylint: disable=too-many-arguments,dangerous-default-value, too-many-locals # noqa: E501
         self,
         agent: Agent,
@@ -378,6 +378,14 @@ class CAI:
         """
         start_time = time.time()
         self.brief = brief
+
+        if os.getenv("CAI_TRACING", "true").lower() == "true":
+            print(
+                color("Logging URL: " +
+                      exploit_logger.get_logger_url(),
+                      fg="white", bg="pink")
+            )
+
         if stream:
             return self.run_and_stream(
                 agent=agent,
