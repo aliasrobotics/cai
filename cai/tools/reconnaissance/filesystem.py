@@ -34,6 +34,19 @@ def cat_file(file_path: str, args: str = "", ctf=None) -> str:
     command = f'cat {args} {file_path} '
     return run_command(command, ctf=ctf)
 
+
+def strings_extraction(file_path: str, ctf=None) -> str:
+    """
+    Execute the 'strings' command on a specified file.
+
+    Args:
+       file_path: Path to the file to extract strings from
+
+    Returns:
+        str: The output of running the strings command
+    """
+    command = f'strings {file_path}'
+    return run_command(command, ctf=ctf)
 # FileSearchTool
 # ListDirTool
 # TextSearchTool

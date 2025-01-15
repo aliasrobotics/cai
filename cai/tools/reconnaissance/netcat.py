@@ -16,9 +16,21 @@ def netcat(host: str, port: int, data: str = '',
 
     Returns:
         str: The output of running the netcat command
+         or error message if connection fails
     """
-    if data:
-        command = f'echo "{data}" | nc -w 3 {host} {port} {args}'
-    else:
-        command = f'nc -w 3 {host} {port} {args}'
-    return run_command(command, ctf=ctf)
+    try:
+        if not isinstance(port, int):
+            return "Error: Port must be an integer"
+        if port < 1 or port > 65535:
+            return "Error: Port must be between 1 and 65535"
+
+        if data:
+            command = f'echo "{data}" | nc -w 3 {host} {port} {args}; exit'
+        else:
+            command = f'echo "" | nc -w 3 {host} {port} {args}; exit'
+
+        result = run_command(command, ctf=ctf)
+
+        return result
+    except Exception as e:  # pylint: disable=broad-except
+        return f"Error executing netcat command: {str(e)}"

@@ -16,7 +16,7 @@ def _run_ctf(ctf, command, stdout=True):
 
         if stdout:
             print("\033[32m" + output + "\033[0m")
-        return output
+        return output  # output if output else result.stder
     except Exception as e:  # pylint: disable=broad-except
         print(color(f"Error executing CTF command: {e}", fg="red"))
         # exploit_logger.log_error(str(e))
@@ -36,7 +36,7 @@ def _run_local(command, stdout=True):
         output = result.stdout
         if stdout:
             print("\033[32m" + output + "\033[0m")
-        return output
+        return output if output else result.stderr
     except Exception as e:  # pylint: disable=broad-except
         print(color(f"Error executing local command: {e}", fg="red"))
         return f"Error executing local command: {str(e)}"
