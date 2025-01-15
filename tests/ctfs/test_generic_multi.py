@@ -47,12 +47,13 @@ import pytest
 import os
 import sys
 import cai as CAI
+from cai import ctf_agent
 import pentestperf as ptt
-from cai import CAI, Agent
-from cai.tools.reconnaissance.filesystem import list_dir, cat_file
+from cai import CAI  # , Agent
 from cai.util import check_flag
 from wasabi import color
 from cai.logger import exploit_logger
+import re
 
 
 def check_env_variables():
@@ -133,45 +134,23 @@ class TestGenericCTF:
             # 3. Instance the cybersecurity AI Framework client
             if os.getenv('CTF_INSIDE', "true").lower() == "true":
                 client = CAI(ctf=ctf)
-                ctf_inside = "You are inside the CTF docker container" 
+                ctf_inside = "You are inside the CTF docker container"
             else:
                 client = CAI()
                 ctf_inside = "You are outside the CTF docker container"
 
-            # Get model from environment or use default
-            model = os.getenv('CTF_MODEL', "qwen2.5:14b")
-
-            # 4. Create instances the agent/agents to solve the CTF
-            ctf_agent = Agent(
-                model=model,
-                name="File listing and reader",
-                instructions="You are an agent tailored to list and read files within a file system.",
-                functions=[list_dir, cat_file],  # This code can execute by LLM
-                # parallel_tool_calls=True, Enable multi function calling
-            )
-
-            flag_discriminator = Agent(
-                model=model,
-                name="Flag discriminator",
-                instructions="You are an agent tailored to extract the flag from the output. ONLY return the flag, nothing else.",
-                # functions=[check_flag],  # This code can execute by LLM
-            )
-
-            def transfer_to_flag_discriminator(**kwargs):
-                """Transfer flag discriminator. Accepts any keyword arguments but ignores them."""
-                return flag_discriminator
-
-            ctf_agent.functions.append(transfer_to_flag_discriminator)
-
-
+            # 4. Instantiate agents in __init__
+            # 5. Create messages for the CAI
             messages = [{
                 "role": "user",
-               "content": "Instructions: " + ctf.get_instructions() +
+                "content": (
+                    "Instructions: " + ctf.get_instructions() +
                     "\nChallenge: " + ctf.get_challenges()[challenge] +
                     "\nTechniques: " + ctf.get_techniques() +
                     "\nIP address: " + ctf.ip_address +
                     "\n" + ctf_inside  # +
-                    # "\nExtract the flag and once finished, handoff to the flag extractor
+                    # "\nExtract the flag and once finished, handoff to the flag extractor."
+                )
             }]
 
             # 5. Run the CAI
@@ -184,9 +163,11 @@ class TestGenericCTF:
             print(response.messages[-1]["content"])
             print(f"Time taken: {response.time} seconds")
 
-            # 6. Check if the flag is correct
-            success, flag = check_flag(
-                response.messages[-1]["content"], ctf, challenge)
+            # 6. Extract potential flag from the response
+
+            output = response.messages[-1]["content"]
+            success, flag = check_flag(output, ctf, challenge)
+
             # assert results
             assert success, "Flag found"
         else:
