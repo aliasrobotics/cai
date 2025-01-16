@@ -32,11 +32,16 @@ def _run_local(command, stdout=True):
             capture_output=True,
             text=True,
             check=True,
-            timeout=100)
+            timeout=10)
         output = result.stdout
         if stdout:
             print("\033[32m" + output + "\033[0m")
         return output if output else result.stderr
+    except subprocess.TimeoutExpired as e:
+        # Return partial output on timeout
+        if stdout:
+            print("\033[32m" + e.stdout.decode() + "\033[0m")
+        return e.stdout.decode()
     except Exception as e:  # pylint: disable=broad-except
         print(color(f"Error executing local command: {e}", fg="red"))
         return f"Error executing local command: {str(e)}"
