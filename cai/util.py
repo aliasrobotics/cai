@@ -315,6 +315,10 @@ def function_to_json(func) -> dict:
 
     parameters = {}
     for param in signature.parameters.values():
+        # Skip the ctf parameter
+        if param.name == "ctf":
+            continue
+
         try:
             param_type = type_map.get(param.annotation, "string")
         except KeyError as e:
@@ -326,7 +330,7 @@ def function_to_json(func) -> dict:
     required = [
         param.name
         for param in signature.parameters.values()
-        if param.default == inspect._empty  # pylint: disable=protected-access
+        if param.default == inspect._empty and param.name != "ctf"  # pylint: disable=protected-access # noqa: E501
     ]
 
     return {

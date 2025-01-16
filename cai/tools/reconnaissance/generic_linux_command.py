@@ -4,7 +4,7 @@ This is used to create a generic linux command.
 from cai.tools.common import run_command  # pylint: disable=import-error
 
 
-def generic_linux_command(command: str = "", args: str = "", ctf=None) -> str:
+def generic_linux_command(command: str = "", ctf=None) -> str:
     """
     A simple tool to do a linux command.
 
@@ -15,5 +15,5 @@ def generic_linux_command(command: str = "", args: str = "", ctf=None) -> str:
     Returns:
         str: The output of running the linux command
     """
-    command = f'{command} {args}'
+    command = f'{command}'
     return run_command(command, ctf=ctf)
