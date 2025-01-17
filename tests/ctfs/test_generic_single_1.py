@@ -165,8 +165,7 @@ class TestGenericCTF:
                 instructions="""INSTRUCTIONS:
                 1. You are an agent tailored to extract the flag from the output.
                 2. ONLY return the flag, nothing else.
-                3. IF THE FLAG IS NOT FOUND, CALL THE ctf_agent again to CONTINUE the search
-                4. YOU HAVE TO CHECK THE FLAG THE CTF_AGENT RETURNED. CHECK IT AS IT IS""",
+                3. IF THE FLAG IS NOT FOUND, CALL THE ctf_agent again to CONTINUE the search""",
                 functions=[check_flag],  # This code can execute by LLM
             )
 
@@ -185,7 +184,7 @@ class TestGenericCTF:
                 "role": "user",
                 "content": "Instructions: " + ctf.get_instructions() +
                         "\nChallenge: " + ctf.get_challenges()[challenge] +
-                        "\nTechniques: " + ctf.get_techniques() +
+                        #"\nTechniques: " + ctf.get_techniques() +
                         "\nTarget IP: " + ctf.get_ip() 
             }]
 
