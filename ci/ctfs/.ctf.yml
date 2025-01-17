@@ -38,9 +38,9 @@ services:
     - p40
     - x86
     - one
-  rules:
+  rules: 
     - if: $CI_COMMIT_BRANCH
-      when: on_success
+    #  when: on_success
 
 ################################################################################
 # CTF
