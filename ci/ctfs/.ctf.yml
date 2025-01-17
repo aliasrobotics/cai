@@ -27,7 +27,7 @@ services:
           export $var="${!var}"
         fi
       done
-    - pytest -s tests/ctfs/test_generic.py  # NOTE: hardcoded file name
+    - pytest -s tests/ctfs/test_generic_single_1.py  # NOTE: hardcoded file name
   artifacts:
     paths:
       - cai.png
@@ -54,6 +54,79 @@ services:
      CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
 
+🚩 chal1 | qw:14b:
+   <<: *run_ctf
+   stage: ctf-super-easy
+   variables:
+     CTF_NAME: chal1
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+
+🚩 kiddoctf | qw:14b | i:
+   <<: *run_ctf
+   stage: ctf-super-easy
+   variables:
+     CTF_NAME: kiddoctf
+     CTF_MODEL: qwen2.5:14b
+     CTF_CHALLENGE: '01 linux i'
+     CTF_RERUN: 5
+
+🚩 kiddoctf | qw:14b | ii:
+   <<: *run_ctf
+   stage: ctf-super-easy
+   variables:
+     CTF_NAME: kiddoctf
+     CTF_MODEL: qwen2.5:14b
+     CTF_CHALLENGE: '02 linux ii'
+     CTF_RERUN: 5
+
+🚩 kiddoctf | qw:14b | iii:
+   <<: *run_ctf
+   stage: ctf-super-easy
+   variables:
+     CTF_NAME: kiddoctf
+     CTF_MODEL: qwen2.5:14b
+     CTF_CHALLENGE: '03 linux iii'
+     CTF_RERUN: 5
+
+🚩 kiddoctf | qw:14b | iv:
+   <<: *run_ctf
+   stage: ctf-super-easy
+   variables:
+     CTF_NAME: kiddoctf
+     CTF_MODEL: qwen2.5:14b
+     CTF_CHALLENGE: '04 linux iv'
+     CTF_RERUN: 5
+
+
+🚩 my_first_pwnie | qw:14b:
+   <<: *run_ctf
+   stage: ctf-easy
+   variables:
+     CTF_NAME: my_first_pwnie
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false
+
+🚩 picoctf_reversing_python | qw:14b:
+   <<: *run_ctf
+   stage: ctf-easy
+   variables:
+     CTF_NAME: picoctf_reversing_python
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false
+
+🚩 hackableii | qw:14b:
+   <<: *run_ctf
+   stage: ctf-medium
+   variables:
+     CTF_NAME: hackableii
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false
+
+
 🚩 baby_first | qw:14b:
    <<: *run_ctf
    stage: ctf-super-easy
@@ -62,63 +135,117 @@ services:
      CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
 
-# 🚩 chal1 | qw:14b:
-#    <<: *run_ctf
-#    stage: ctf-super-easy
-#    variables:
-#      CTF_NAME: chal1
-#      CTF_MODEL: qwen2.5:14b
-#      CTF_RERUN: 5
+🚩 baby_third | qw:14b:
+   <<: *run_ctf
+   stage: ctf-super-easy
+   variables:
+     CTF_NAME: baby_third
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
 
-# 🚩 kiddoctf | qw:14b | i:
-#    <<: *run_ctf
-#    stage: ctf-super-easy
-#    variables:
-#      CTF_NAME: kiddoctf
-#      CTF_MODEL: qwen2.5:14b
-#      CTF_CHALLENGE: '01 linux i'
-#      CTF_RERUN: 5
+🚩 android-dropper | qw:14b:
+   <<: *run_ctf
+   stage: ctf-medium
+   variables:
+     CTF_NAME: android-dropper
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false
 
-# 🚩 kiddoctf | qw:14b | ii:
-#    <<: *run_ctf
-#    stage: ctf-super-easy
-#    variables:
-#      CTF_NAME: kiddoctf
-#      CTF_MODEL: qwen2.5:14b
-#      CTF_CHALLENGE: '02 linux ii'
-#      CTF_RERUN: 5
+🚩 lottery | qw:14b:
+   <<: *run_ctf
+   stage: ctf-medium
+   variables:
+     CTF_NAME: lottery
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false
 
-# 🚩 kiddoctf | qw:14b | iii:
-#    <<: *run_ctf
-#    stage: ctf-super-easy
-#    variables:
-#      CTF_NAME: kiddoctf
-#      CTF_MODEL: qwen2.5:14b
-#      CTF_CHALLENGE: '03 linux iii'
-#      CTF_RERUN: 5
+🚩 puffin | qw:14b:
+   <<: *run_ctf
+   stage: ctf-medium
+   variables:
+     CTF_NAME: puffin
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false
 
-# 🚩 kiddoctf | qw:14b | iv:
-#    <<: *run_ctf
-#    stage: ctf-super-easy
-#    variables:
-#      CTF_NAME: kiddoctf
-#      CTF_MODEL: qwen2.5:14b
-#      CTF_CHALLENGE: '04 linux iv'
-#      CTF_RERUN: 5
+🚩 bob | qw:14b:
+   <<: *run_ctf
+   stage: ctf-medium
+   variables:
+     CTF_NAME: bob
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false
 
-# 🚩 my_first_pwnie | qw:14b:
-#    <<: *run_ctf
-#    stage: ctf-easy
-#    variables:
-#      CTF_NAME: my_first_pwnie
-#      CTF_MODEL: qwen2.5:14b
-#      CTF_RERUN: 5
+🚩 linear_aggressor | qw:14b:
+   <<: *run_ctf
+   stage: ctf-medium
+   variables:
+     CTF_NAME: linear_aggressor
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false
 
-# 🚩 picoctf_reversing_python | qw:14b:
-#    <<: *run_ctf
-#    stage: ctf-easy
-#    variables:
-#      CTF_NAME: picoctf_reversing_python
-#      CTF_MODEL: qwen2.5:14b
-#      CTF_RERUN: 5
-#      CTF_INSIDE: false
+🚩 blocky-nonsense | qw:14b:
+   <<: *run_ctf
+   stage: ctf-medium
+   variables:
+     CTF_NAME: blocky-nonsense
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false
+
+🚩 rox | qw:14b:
+   <<: *run_ctf
+   stage: ctf-medium
+   variables:
+     CTF_NAME: picoctf_reversing_python
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+
+🚩 tradinggame | qw:14b:
+   <<: *run_ctf
+   stage: ctf-medium
+   variables:
+     CTF_NAME: tradinggame
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false  
+
+🚩 xbow_four_twentyfour | qw:14b:
+   <<: *run_ctf
+   stage: ctf-medium
+   variables:
+     CTF_NAME: xbow_four_twentyfour
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false  
+
+🚩 xbow_five_twentyfour | qw:14b:
+   <<: *run_ctf
+   stage: ctf-medium
+   variables:
+     CTF_NAME: xbow_five_twentyfour
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false    
+
+🚩 breakvault | qw:14b:
+   <<: *run_ctf
+   stage: ctf-medium
+   variables:
+     CTF_NAME: breakvault
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false    
+
+🚩 mental-poker | qw:14b:
+   <<: *run_ctf
+   stage: ctf-medium
+   variables:
+     CTF_NAME: mental
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false    
