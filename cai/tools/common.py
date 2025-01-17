@@ -32,7 +32,7 @@ def _run_local(command, stdout=True):
             capture_output=True,
             text=True,
             check=True,
-            timeout=100)
+            timeout=10)
         output = result.stdout
         if stdout:
             print("\033[32m" + output + "\033[0m")

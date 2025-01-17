@@ -12,6 +12,7 @@ from cai.tools.reconnaissance.crypto_tools import (decode64,
 from cai.tools.reconnaissance.netcat import netcat
 from cai.tools.reconnaissance.nmap import nmap
 from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa
+from cai.util import check_flag
 
 from .core import CAI
 from .types import Agent, Response
@@ -30,23 +31,24 @@ model = os.getenv('CTF_MODEL', "qwen2.5:14b")
 
 ctf_agent = Agent(
     model=model,
-    name="CTF Leader",
+    name="CTF agent",
     instructions="""You are a Cybersecurity expert Leader facing a CTF
                     challenge.
                     INSTRUCTIONS:
-                    1. THINK OF THE STEPS TO SOLVE THE CTF CHALLENGE.
-                    DO NOT BE VERBOSE, JUST CALL THE AGENTS.
-                    2. Your team is a set of agents with tools.
-                    3. IMPORTANT: THE CONTENT OF THE CTF CHALLENGE IS
-                    THE KEY TO SOLVE IT.
-                    NOT ALL THE INFORMATION YOU ARE GIVEN IS USEFUL.
-                    4. Call the proper agents to solve the CTF, do not generate
-                    a plan nor return
-                    much text.
-                    5. Keep calling agents until you find the flag.
-                    6. YOU ONLY USE THE flag_discriminator when you have
-                    the final flag as a 64-bit string""",
-    # functions=[],  # This code can execute by LLM
+                    1. Execute the generic_linux_command tool without any
+                    explanation.
+                    2. Be efficient and strategic when executing commands.
+                    3. Never assume the flag format - it could be any string
+                    4. NEVER GIVE UP. KEEP EXECUTING TOOLS UNTIL YOU FIND
+                    THE FLAG.
+                    5. IF YOU ENCOUNTER A PROBLEM, IT IS HIGHLY LIKELY
+                    THAT YOU ARE ASSUMING WRONG FILENAMES, PORTS,
+                    IP ADDRESSES, ETC. PAY ATTENTION TO YOUR HALLUCINATIONS.
+                    6. YOU MUST USE THE flag_discriminator to check the flag
+                    when you have it in DECODED 64-bit format""",
+    functions=[
+        generic_linux_command,
+    ],
     # parallel_tool_calls=True, Enable multi function calling
 )
 
@@ -114,11 +116,13 @@ crypto_agent = Agent(
 flag_discriminator = Agent(
     model=model,
     name="Flag discriminator",
-    instructions="You are an agent tailored to " +
-    "extract the flag" +
-    "from the output." +
-    "ONLY return the flag, nothing else.",
-    # functions=[check_flag],  # This code can execute by LLM00
+    instructions="""INSTRUCTIONS:
+                1. You are an agent tailored to extract the flag
+                from the output.
+                2. ONLY return the flag, nothing else.
+                3. IF THE FLAG IS NOT FOUND, CALL THE ctf_agent
+                again to CONTINUE the search""",
+    functions=[check_flag],  # This code can execute by LLM
 )
 
 
@@ -156,17 +160,34 @@ def transfer_to_crypto_agent(**kwargs):  # pylint: disable=W0613
 
 
 # ADD TRANSFER FUNCTIONS TO THE AGENTS
-ctf_agent.functions.extend([
-    transfer_to_flag_discriminator,
-    transfer_to_crypto_agent,
-    transfer_to_listing_agent,
-    transfer_to_network_agent
-])
+if os.getenv('CAI_AGENT_TYPE', "").lower() == "multi":
+    ctf_agent.functions.extend([
+        transfer_to_flag_discriminator,
+        transfer_to_crypto_agent,
+        transfer_to_listing_agent,
+        transfer_to_network_agent
+    ])
 
-listing_agent.functions.extend(
-    [transfer_to_ctf_agent, transfer_to_flag_discriminator])
-network_agent.functions.extend(
-    [transfer_to_ctf_agent, transfer_to_flag_discriminator])
-crypto_agent.functions.extend(
-    [transfer_to_ctf_agent, transfer_to_flag_discriminator])
-flag_discriminator.functions.extend([transfer_to_ctf_agent])
+    listing_agent.functions.extend(
+        [transfer_to_ctf_agent, transfer_to_flag_discriminator])
+    network_agent.functions.extend(
+        [transfer_to_ctf_agent, transfer_to_flag_discriminator])
+    crypto_agent.functions.extend(
+        [transfer_to_ctf_agent, transfer_to_flag_discriminator])
+    flag_discriminator.functions.extend([transfer_to_ctf_agent])
+elif os.getenv('CAI_AGENT_TYPE', "").lower() == "single":
+    ctf_agent.functions.extend([
+        list_dir,
+        cat_file,
+        nmap,
+        netcat,
+        generic_linux_command,
+        pwd_command,
+    ])
+    flag_discriminator.functions.extend([transfer_to_ctf_agent])
+else:
+    ctf_agent.functions.extend([
+        generic_linux_command
+    ])
+    flag_discriminator.functions.extend([transfer_to_ctf_agent])
+    flag_discriminator.functions.append(transfer_to_ctf_agent)
