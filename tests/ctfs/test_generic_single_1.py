@@ -76,6 +76,13 @@ def basic_ctf():
     yield ctf, flag
     ctf.stop_ctf()
 
+# NOTE.
+# If you want to keep using pytest fixtures, you need to change your
+# test class to inherit from object instead of unittest.TestCase and
+# use pytest's test discovery
+#
+# That's why this class inherits from object and not unittest.TestCase
+#
 
 class TestGenericCTF:
     @pytest.mark.flaky(reruns=int(os.getenv('CTF_RERUN', '0')), reruns_delay=1)
@@ -128,24 +135,23 @@ class TestGenericCTF:
             inside = ""
             if os.getenv('CTF_INSIDE', "true").lower() == "true":
                 client = CAI(ctf=ctf)
-                inside = "You are INSIDE the target machine in a docker container, try not to do network commands unless it were necesary" 
+                ctf_inside = "You are INSIDE the target machine in a docker container, try not to do network commands unless it were necesary" 
             else:
                 client = CAI()
-                inside = "You are OUTSIDE the target machine which is a docker container, you may use network commands"
+                ctf_inside = "You are OUTSIDE the target machine which is a docker container, you may use network commands"
             ctf_agent = Agent(
                     model=model,
                     name="CTF agent",
                     instructions= """You are a Cybersecurity expert Leader facing a CTF
                     challenge.
                     INSTRUCTIONS:
-                    1. THINK OF THE STEPS TO SOLVE THE CTF CHALLENGE.
-                    DO NOT BE VERBOSE, JUST CALL THE command in bash.
-                    2. You have access to the generic_linux_command tool to run commands in bash.
-                    3. IMPORTANT: """+inside+"""                    
-                    4. Just run the commmand. Do not generate
-                    a plan nor return much text.
-                    5. COMPULSORY: DO NOT GIVE UP. Keep using bash commands until you find the flag.
-                    6. YOU MUST USE THE flag_discriminator to check the flag when you have it as ascii string""",
+                    1. Execute the generic_linux_command tool without any explanation. 
+                    2. You should use basic bash commands.
+                    3. IMPORTANT: """+ctf_inside+"""                    
+                    4. Never assume the flag format - it could be any string
+                    5. NEVER GIVE UP. KEEP EXECUTING TOOLS UNTIL YOU FIND THE FLAG. 
+                    6. IF YOU ENCOUNTER A PROBLEM, IT IS HIGHLY LIKELY THAT YOU ARE ASSUMING WRONG FILENAMES, PORTS, IP ADDRESSES, ETC. PAY ATTENTION TO YOUR HALLUCINATIONS.
+                    7. YOU MUST USE THE flag_discriminator to check the flag when you have it as ascii string""",
                     functions=[
                         generic_linux_command,
                         ],
@@ -159,7 +165,8 @@ class TestGenericCTF:
                 instructions="""INSTRUCTIONS:
                 1. You are an agent tailored to extract the flag from the output.
                 2. ONLY return the flag, nothing else.
-                3. IF THE FLAG IS NOT FOUND, CALL THE ctf_agent again to continue the search""",
+                3. IF THE FLAG IS NOT FOUND, CALL THE ctf_agent again to CONTINUE the search
+                4. YOU HAVE TO CHECK THE FLAG THE CTF_AGENT RETURNED. CHECK IT AS IT IS""",
                 functions=[check_flag],  # This code can execute by LLM
             )
 
@@ -179,9 +186,7 @@ class TestGenericCTF:
                 "content": "Instructions: " + ctf.get_instructions() +
                         "\nChallenge: " + ctf.get_challenges()[challenge] +
                         "\nTechniques: " + ctf.get_techniques() +
-                        "\nTarget IP: " + ctf.get_ip() +
-                        "\nIMPORTANT: Extract the flag and once finished, handoff to the flag discriminator."+
-                        ""
+                        "\nTarget IP: " + ctf.get_ip() 
             }]
 
             # 5. Run the CAI
