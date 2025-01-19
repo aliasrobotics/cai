@@ -8,6 +8,13 @@ from typing import Any
 import json
 import os
 from wasabi import color  # pylint: disable=import-error
+from rich.text import Text
+from rich.panel import Panel
+from rich.box import ROUNDED
+from rich.console import Console, Group
+
+console = Console()
+_message_counters = {}
 
 # ANSI color codes in a nice, readable palette
 COLORS = {
@@ -172,6 +179,105 @@ def get_ollama_api_base() -> str:
     return os.getenv("OLLAMA_API_BASE", "http://host.docker.internal:8000/v1")
 
 
+def cli_print(message=None, Tool_Name=None, Tool_Args=None, Tool_Output=None, agent_name=None, turn_token=None, token_count=None, model=None) -> None:
+    """
+    Print a CLI message with improved formatting including timestamps, token counts and costs.
+    
+    Args:
+        message: The message content
+        Tool_Name: Name of the tool being called
+        Tool_Args: Arguments passed to the tool
+        Tool_Output: Output from the tool execution
+        agent_name: Name of the agent
+        turn_token: Number of tokens used in this turn
+        token_count: Total number of tokens used
+        model: Model name being used
+    """
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    
+    # Update message counter for agent
+    counter = None
+    if agent_name:
+        if agent_name not in _message_counters:
+            _message_counters[agent_name] = 0
+        _message_counters[agent_name] += 1
+        counter = _message_counters[agent_name] - 3
+    
+    try:
+        # Handle agent messages/thoughts
+        if message:
+            if isinstance(message, list):
+                for msg in message:
+                    if msg.get("role") == "assistant":
+                        content = msg.get('content')
+                        if content and isinstance(content, str):
+                            content = content.strip()
+                            if content:
+                                text = Text()
+                                text.append(f"[{counter}] ", style="bold white")
+                                text.append(f"{msg.get('sender', 'AGENT')} >> ", style="bold #36f9f6")
+                                text.append(f"{content} ", style="#7bf1a8")
+                                text.append(f"[{timestamp}", style="bold #888888")
+                                if model:
+                                    text.append(f" ({model})", style="bold #ff69b4")
+                                text.append("]", style="bold #888888")
+                                console.print(text)
+
+        # Handle tool calls
+        if Tool_Name:
+            # Filter out ctf argument
+            filtered_args = {k:v for k,v in Tool_Args.items() if k != 'ctf'} if Tool_Args else {}
+            args_str = ", ".join(f"{k}={v}" for k, v in filtered_args.items())
+            
+            # Tool call header
+            text = Text()
+            text.append(f"[{counter}] ", style="bold white")
+            text.append(f"{agent_name} >> ", style="bold #36f9f6") 
+            text.append(f"{Tool_Name}(", style="bold #ff6b6b")
+            text.append(args_str, style="bold #ffeb3b") # Brighter yellow
+            text.append(f") ", style="bold #ff6b6b")
+            text.append(f"[{timestamp}", style="bold #888888")
+            if model:
+                text.append(f" ({model})", style="bold #ff69b4")
+            text.append("]", style="bold #888888")
+            console.print(text)
+            # Tool output
+            if Tool_Output:
+                max_length = 5000
+                output = str(Tool_Output)
+                output = output[:max_length] + "...\n[Output truncated]" if len(output) > max_length else output
+                
+                # Build token info string
+                if turn_token is not None and token_count is not None:
+                    token_str = f"Turn tokens: {turn_token} Total tokens: {token_count}"
+                else:
+                    token_str = ""
+
+                # Create token box with proper borders if tokens exist
+                if token_str:
+                    token_box = Text(token_str, style="yellow")
+                else:
+                    token_box = Text("")
+
+                # Create main panel with output and token box
+                main_panel = Panel(
+                    Group(
+                        Text(output, style="white"),
+                        Text(token_str, style="yellow", justify="right") if token_str else Text("")
+                    ),
+                    title=f"{Tool_Name}({args_str})",
+                    border_style="blue",
+                    title_align="left", 
+                    box=ROUNDED,
+                    padding=(1,2),
+                    width=console.width,
+                    style="white"
+                )
+                console.print(main_panel)
+
+    except Exception as e:
+        print(f"Error printing message: {str(e)}")
+        
 def debug_print(debug: bool, intro: str, *args: Any, brief: bool = False, colours: bool = True) -> None:  # pylint: disable=too-many-locals,line-too-long,too-many-branches # noqa: E501
     """
     Print debug messages if debug mode is enabled with color-coded components.

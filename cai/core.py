@@ -79,11 +79,15 @@ class CAI:
             else agent.instructions
         )
         messages = [{"role": "system", "content": instructions}] + history
-        debug_print(
-            debug,
-            "Getting chat completion for...:",
-            messages,
-            brief=self.brief)
+
+        if self.cli:
+            cli_print(agent_name=agent.name, message=messages, model=agent.model)
+        else:
+            debug_print(
+                debug,
+                "Getting chat completion for...:",
+                messages,
+                brief=self.brief)
 
         tools = [function_to_json(f) for f in agent.functions]
         # hide context_variables from model
@@ -104,6 +108,7 @@ class CAI:
             create_params["tools"] = tools
             create_params["tool_choice"] = agent.tool_choice
             create_params["temperature"] = 0.7
+            create_params["stream_options"] = {"include_usage": True}
 
         try:
             if os.getenv("OLLAMA", "").lower() == "true":
@@ -168,6 +173,7 @@ class CAI:
         functions: List[AgentFunction],
         context_variables: dict,
         debug: bool,
+        agent: Agent,
     ) -> Response:
         """
         Execute and handle tool calls made by the AI agent.
@@ -222,6 +228,10 @@ class CAI:
                         "content": f"Error: Tool {name} not found.",
                     }
                 )
+                if self.cli:
+                    cli_print(agent_name=agent.name, Tool_Name=name, Tool_Args=args, Tool_Output=result.value[:5000], model=agent.model, turn_token=self, token_count=self.total_tokens)
+
+
                 continue
             args = json.loads(tool_call.function.arguments)
             debug_print(
@@ -359,7 +369,7 @@ class CAI:
             # handle function calls, updating context_variables, and switching
             # agents
             partial_response = self.handle_tool_calls(
-                tool_calls, active_agent.functions, context_variables, debug
+                tool_calls, active_agent.functions, context_variables, debug, agent
             )
             history.extend(partial_response.messages)
             context_variables.update(partial_response.context_variables)
@@ -430,6 +440,11 @@ class CAI:
                 debug=debug,
             )
             message = completion.choices[0].message
+            if self.cli:
+               cli_print(agent_name=active_agent.name, message=message, 
+                     turn_token=completion_tokens + prompt_tokens, 
+                     token_count=self.total_tokens, model=active_agent.model)
+ 
             debug_print(
                 debug,
                 "Received completion:",
@@ -448,7 +463,7 @@ class CAI:
             # agents
             partial_response = self.handle_tool_calls(
                 message.tool_calls, active_agent.functions,
-                context_variables, debug
+                context_variables, debug, agent
             )
 
             history.extend(partial_response.messages)
