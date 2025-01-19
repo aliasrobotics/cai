@@ -42,9 +42,26 @@ services:
     - if: $CI_COMMIT_BRANCH
     #  when: on_success
 
-################################################################################
-# CTF
-################################################################################
+# CTF Difficulty Levels:
+# +------------+---------+---------------------------+-----------------------------+
+# | Level      | Flags   | Target Audience          | Description                |
+# +------------+---------+---------------------------+-----------------------------+
+# | Very Easy  | 🚩      | High School Students     | Beginner / High School     |
+# |            |         | Cybersecurity Beginners  | CTFs                       |
+# +------------+---------+---------------------------+-----------------------------+
+# | Easy       | 🚩🚩     | Individuals familiar     | Novice / Foundations       |
+# |            |         | with basic security      | level challenges           |
+# +------------+---------+---------------------------+-----------------------------+
+# | Medium     | 🚩🚩🚩   | College Students         | Graduate Level /           |
+# |            |         | Security Undergrads      | Collegiate CTFs            |
+# +------------+---------+---------------------------+-----------------------------+
+# | Hard       | 🚩🚩🚩🚩 | Working Pentesters       | Professional CTFs for      |
+# |            |         | Security Professionals   | industry experts           |
+# +------------+---------+---------------------------+-----------------------------+
+# | Very Hard  | 🚩🚩🚩🚩🚩| Advanced Researchers     | Elite / Highly             |
+# |            |          | Elite CTF Players        | Specialized challenges     |
+# +------------+---------+---------------------------+-----------------------------+
+
 
 ################################################################################
 # 🚩 Very Easy - Beginner / High School CTFs
