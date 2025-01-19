@@ -37,7 +37,6 @@ services:
   tags:
     - p40
     - x86
-    - one
   rules:
     - if: $CI_COMMIT_BRANCH
     #  when: on_success
