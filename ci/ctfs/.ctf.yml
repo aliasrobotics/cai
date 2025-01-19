@@ -46,10 +46,22 @@ services:
 # CTF
 ################################################################################
 
-🚩 picoctf_static_flag | qw:14b:
+################################################################################
+# 🚩 Very Easy - Beginner / High School CTFs
+# For high school students and cybersecurity beginners
+################################################################################
+
+🚩 baby_first | qw:14b:
    <<: *run_ctf
    variables:
-     CTF_NAME: picoctf_static_flag
+     CTF_NAME: baby_first
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+
+🚩 baby_third | qw:14b:
+   <<: *run_ctf
+   variables:
+     CTF_NAME: baby_third
      CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
 
@@ -92,6 +104,18 @@ services:
      CTF_CHALLENGE: '04 linux iv'
      CTF_RERUN: 5
 
+🚩 picoctf_static_flag | qw:14b:
+   <<: *run_ctf
+   variables:
+     CTF_NAME: picoctf_static_flag
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+
+################################################################################
+# 🚩🚩 Easy - Novice / Foundations
+# For individuals familiar with basic cybersecurity concepts
+################################################################################
+
 🚩🚩 my_first_pwnie | qw:14b:
    <<: *run_ctf
    variables:
@@ -108,27 +132,10 @@ services:
      CTF_RERUN: 5
      CTF_INSIDE: false
 
-🚩🚩🚩 hackableii | qw:14b:
-   <<: *run_ctf
-   variables:
-     CTF_NAME: hackableii
-     CTF_MODEL: qwen2.5:14b
-     CTF_RERUN: 5
-     CTF_INSIDE: false
-
-🚩 baby_first | qw:14b:
-   <<: *run_ctf
-   variables:
-     CTF_NAME: baby_first
-     CTF_MODEL: qwen2.5:14b
-     CTF_RERUN: 5
-
-🚩 baby_third | qw:14b:
-   <<: *run_ctf
-   variables:
-     CTF_NAME: baby_third
-     CTF_MODEL: qwen2.5:14b
-     CTF_RERUN: 5
+################################################################################
+# 🚩🚩🚩 Medium - Graduate Level / Collegiate CTFs
+# For college students, cybersecurity undergraduates or graduates
+################################################################################
 
 🚩🚩🚩 android-dropper | qw:14b:
    <<: *run_ctf
@@ -138,18 +145,10 @@ services:
      CTF_RERUN: 5
      CTF_INSIDE: false
 
-🚩🚩🚩 lottery | qw:14b:
+🚩🚩🚩 blocky-nonsense | qw:14b:
    <<: *run_ctf
    variables:
-     CTF_NAME: lottery
-     CTF_MODEL: qwen2.5:14b
-     CTF_RERUN: 5
-     CTF_INSIDE: false
-
-🚩🚩🚩 puffin | qw:14b:
-   <<: *run_ctf
-   variables:
-     CTF_NAME: puffin
+     CTF_NAME: blocky-nonsense
      CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
      CTF_INSIDE: false
@@ -162,6 +161,22 @@ services:
      CTF_RERUN: 5
      CTF_INSIDE: false
 
+🚩🚩🚩 breakvault | qw:14b:
+   <<: *run_ctf
+   variables:
+     CTF_NAME: breakvault
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false
+
+🚩🚩🚩 hackableii | qw:14b:
+   <<: *run_ctf
+   variables:
+     CTF_NAME: hackableii
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false
+
 🚩🚩🚩 linear_aggressor | qw:14b:
    <<: *run_ctf
    variables:
@@ -170,10 +185,26 @@ services:
      CTF_RERUN: 5
      CTF_INSIDE: false
 
-🚩🚩🚩 blocky-nonsense | qw:14b:
+🚩🚩🚩 lottery | qw:14b:
    <<: *run_ctf
    variables:
-     CTF_NAME: blocky-nonsense
+     CTF_NAME: lottery
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false
+
+🚩🚩🚩 mental-poker | qw:14b:
+   <<: *run_ctf
+   variables:
+     CTF_NAME: mental
+     CTF_MODEL: qwen2.5:14b
+     CTF_RERUN: 5
+     CTF_INSIDE: false
+
+🚩🚩🚩 puffin | qw:14b:
+   <<: *run_ctf
+   variables:
+     CTF_NAME: puffin
      CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
      CTF_INSIDE: false
@@ -193,14 +224,6 @@ services:
      CTF_RERUN: 5
      CTF_INSIDE: false
 
-🚩🚩🚩 xbow_four_twentyfour | qw:14b:
-   <<: *run_ctf
-   variables:
-     CTF_NAME: xbow_four_twentyfour
-     CTF_MODEL: qwen2.5:14b
-     CTF_RERUN: 5
-     CTF_INSIDE: false
-
 🚩🚩🚩 xbow_five_twentyfour | qw:14b:
    <<: *run_ctf
    variables:
@@ -209,18 +232,10 @@ services:
      CTF_RERUN: 5
      CTF_INSIDE: false
 
-🚩🚩🚩 breakvault | qw:14b:
+🚩🚩🚩 xbow_four_twentyfour | qw:14b:
    <<: *run_ctf
    variables:
-     CTF_NAME: breakvault
-     CTF_MODEL: qwen2.5:14b
-     CTF_RERUN: 5
-     CTF_INSIDE: false
-
-🚩🚩🚩 mental-poker | qw:14b:
-   <<: *run_ctf
-   variables:
-     CTF_NAME: mental
+     CTF_NAME: xbow_four_twentyfour
      CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
      CTF_INSIDE: false
