@@ -216,7 +216,8 @@ def cli_print(  # pylint: disable=too-many-arguments,too-many-locals,too-many-st
     tool_output=None,
     model=None,
     turn_token=None,
-    token_count=None
+    token_count=None,
+    debug=False  # Add debug parameter
 ) -> None:
     """
     Print a CLI message with improved formatting including timestamps
@@ -231,7 +232,14 @@ def cli_print(  # pylint: disable=too-many-arguments,too-many-locals,too-many-st
         model: Model name being used
         turn_token: Number of tokens used in this turn
         token_count: Total number of tokens used
+        debug: Whether to print in debug mode
     """
+    if not debug:  # Add early return if debug is False
+        return
+
+    if debug != 2:  # debug level 2
+        return
+
     def _update_counter(agent_name):
         """Update and return message counter for an agent."""
         if agent_name not in _message_counters:
@@ -340,6 +348,9 @@ def debug_print(debug: bool, intro: str, *args: Any, brief: bool = False, colour
     If brief is True, prints a simplified timestamp and message format.
     """
     if not debug:
+        return
+
+    if debug != 1:  # debug level 1
         return
 
     if brief:

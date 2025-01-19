@@ -60,7 +60,6 @@ class CAI:
             self.rec_training_data = DataRecorder()
         self.completion_tokens = 0
         self.total_tokens = 0
-        self.cli = False
         load_dotenv()
 
     def get_chat_completion(  # pylint: disable=too-many-arguments
@@ -83,11 +82,11 @@ class CAI:
             else agent.instructions
         )
         messages = [{"role": "system", "content": instructions}] + history
-        if self.cli:
-            cli_print(
-                agent_name=agent.name,
-                message=messages,
-                model=agent.model)
+        cli_print(
+            agent_name=agent.name,
+            message=messages,
+            model=agent.model,
+            debug=debug)
         debug_print(
             debug,
             "Getting chat completion for...:",
@@ -268,6 +267,14 @@ class CAI:
 
             raw_result = execute_tool(name, **args)
 
+            # print result if not in debug mode so that at least
+            # something is visible in the terminal
+            if not debug:
+                if isinstance(raw_result, str):
+                    print("\033[32m" + raw_result + "\033[0m")
+                elif isinstance(raw_result, Agent):  # handoffs
+                    print("\033[33m" + raw_result.name + "\033[0m")
+
             result: Result = self.handle_function_result(raw_result, debug)
             partial_response.messages.append(
                 {
@@ -277,14 +284,14 @@ class CAI:
                     "content": result.value[:5000],
                 }
             )
-            if self.cli:
-                cli_print(agent_name=agent.name,
-                          tool_name=name,
-                          tool_args=args,
-                          tool_output=result.value[:5000],
-                          model=agent.model,
-                          turn_token=self.completion_tokens,
-                          token_count=self.total_tokens)
+            cli_print(agent_name=agent.name,
+                      tool_name=name,
+                      tool_args=args,
+                      tool_output=result.value[:5000],
+                      model=agent.model,
+                      turn_token=self.completion_tokens,
+                      token_count=self.total_tokens,
+                      debug=debug)
             partial_response.context_variables.update(result.context_variables)
             if result.agent:
                 partial_response.agent = result.agent
@@ -406,11 +413,10 @@ class CAI:
         context_variables: dict = {},
         model_override: str = None,
         stream: bool = False,
-        debug: bool = False,
+        debug: int = 0,
         max_turns: int = float("inf"),
         execute_tools: bool = True,
         brief: bool = False,
-        cli: bool = False,
     ) -> Response:
         """
         Run the cai and return the final response along
@@ -418,7 +424,6 @@ class CAI:
         """
         start_time = time.time()
         self.brief = brief
-        self.cli = cli
         if os.getenv("CAI_TRACING", "true").lower() == "true":
             print(
                 color("Logging URL: " +
@@ -461,14 +466,13 @@ class CAI:
 
             message = completion.choices[0].message
 
-            if self.cli:
-                cli_print(
-                    agent_name=active_agent.name,
-                    message=message,
-                    turn_token=self.completion_tokens,
-                    token_count=self.total_tokens,
-                    model=active_agent.model
-                )
+            cli_print(
+                agent_name=active_agent.name,
+                message=message,
+                turn_token=self.completion_tokens,
+                token_count=self.total_tokens,
+                model=active_agent.model,
+                debug=debug)
 
             debug_print(
                 debug,
