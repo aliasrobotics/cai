@@ -29,6 +29,7 @@ from .util import (
     function_to_json,
     debug_print,
     merge_chunk,
+    cli_print,
     get_ollama_api_base,
 )
 from .types import (
@@ -57,6 +58,9 @@ class CAI:
         self.brief = False
         if log_training_data:
             self.rec_training_data = DataRecorder()
+        self.completion_tokens = 0
+        self.total_tokens = 0
+        self.cli = False
         load_dotenv()
 
     def get_chat_completion(  # pylint: disable=too-many-arguments
@@ -79,15 +83,16 @@ class CAI:
             else agent.instructions
         )
         messages = [{"role": "system", "content": instructions}] + history
-
         if self.cli:
-            cli_print(agent_name=agent.name, message=messages, model=agent.model)
-        else:
-            debug_print(
-                debug,
-                "Getting chat completion for...:",
-                messages,
-                brief=self.brief)
+            cli_print(
+                agent_name=agent.name,
+                message=messages,
+                model=agent.model)
+        debug_print(
+            debug,
+            "Getting chat completion for...:",
+            messages,
+            brief=self.brief)
 
         tools = [function_to_json(f) for f in agent.functions]
         # hide context_variables from model
@@ -167,7 +172,7 @@ class CAI:
                     debug_print(debug, error_message, brief=self.brief)
                     raise TypeError(error_message) from e
 
-    def handle_tool_calls(
+    def handle_tool_calls(  # pylint: disable=too-many-arguments
         self,
         tool_calls: List[ChatCompletionMessageToolCall],
         functions: List[AgentFunction],
@@ -228,11 +233,8 @@ class CAI:
                         "content": f"Error: Tool {name} not found.",
                     }
                 )
-                if self.cli:
-                    cli_print(agent_name=agent.name, Tool_Name=name, Tool_Args=args, Tool_Output=result.value[:5000], model=agent.model, turn_token=self, token_count=self.total_tokens)
-
-
                 continue
+
             args = json.loads(tool_call.function.arguments)
             debug_print(
                 debug,
@@ -275,6 +277,14 @@ class CAI:
                     "content": result.value[:5000],
                 }
             )
+            if self.cli:
+                cli_print(agent_name=agent.name,
+                          tool_name=name,
+                          tool_args=args,
+                          tool_output=result.value[:5000],
+                          model=agent.model,
+                          turn_token=self.completion_tokens,
+                          token_count=self.total_tokens)
             partial_response.context_variables.update(result.context_variables)
             if result.agent:
                 partial_response.agent = result.agent
@@ -369,7 +379,10 @@ class CAI:
             # handle function calls, updating context_variables, and switching
             # agents
             partial_response = self.handle_tool_calls(
-                tool_calls, active_agent.functions, context_variables, debug, agent
+                tool_calls, active_agent.functions,
+                context_variables,
+                debug,
+                agent
             )
             history.extend(partial_response.messages)
             context_variables.update(partial_response.context_variables)
@@ -397,6 +410,7 @@ class CAI:
         max_turns: int = float("inf"),
         execute_tools: bool = True,
         brief: bool = False,
+        cli: bool = False,
     ) -> Response:
         """
         Run the cai and return the final response along
@@ -404,7 +418,7 @@ class CAI:
         """
         start_time = time.time()
         self.brief = brief
-
+        self.cli = cli
         if os.getenv("CAI_TRACING", "true").lower() == "true":
             print(
                 color("Logging URL: " +
@@ -439,12 +453,23 @@ class CAI:
                 stream=stream,
                 debug=debug,
             )
+            if completion.usage:
+                prompt_tokens = completion.usage.prompt_tokens or 0
+                self.completion_tokens = completion.usage.completion_tokens + \
+                    prompt_tokens or self.completion_tokens
+                self.total_tokens += self.completion_tokens
+
             message = completion.choices[0].message
+
             if self.cli:
-               cli_print(agent_name=active_agent.name, message=message, 
-                     turn_token=completion_tokens + prompt_tokens, 
-                     token_count=self.total_tokens, model=active_agent.model)
- 
+                cli_print(
+                    agent_name=active_agent.name,
+                    message=message,
+                    turn_token=self.completion_tokens,
+                    token_count=self.total_tokens,
+                    model=active_agent.model
+                )
+
             debug_print(
                 debug,
                 "Received completion:",
