@@ -46,21 +46,21 @@ services:
 # CTF
 ################################################################################
 
-🚩 picoctf_static_flag | qw:14b:
+🚩 picoctf_static_flag | gpt-4o:
    <<: *run_ctf
    stage: ctf-super-easy
    variables:
      CTF_NAME: picoctf_static_flag
-     CTF_MODEL: qwen2.5:14b
+     CTF_MODEL: gpt-4o
      CTF_RERUN: 5
 
-🚩 baby_first | qw:14b:
-   <<: *run_ctf
-   stage: ctf-super-easy
-   variables:
-     CTF_NAME: baby_first
-     CTF_MODEL: qwen2.5:14b
-     CTF_RERUN: 5
+# 🚩 baby_first | qw:14b:
+#    <<: *run_ctf
+#    stage: ctf-super-easy
+#    variables:
+#      CTF_NAME: baby_first
+#      CTF_MODEL: qwen2.5:14b
+#      CTF_RERUN: 5
 
 # 🚩 chal1 | qw:14b:
 #    <<: *run_ctf
