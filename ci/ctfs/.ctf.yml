@@ -67,64 +67,64 @@ services:
 # For high school students and cybersecurity beginners
 ################################################################################
 
-🚩 baby_first | gpt-4o:
+🚩 baby_first | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: baby_first
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
 
-🚩 baby_third | gpt-4o:
+🚩 baby_third | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: baby_third
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
 
-🚩 chal1 | gpt-4o:
+🚩 chal1 | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: chal1
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
 
-🚩 kiddoctf | gpt-4o | i:
+🚩 kiddoctf | qw:14b | i:
    <<: *run_ctf
    variables:
      CTF_NAME: kiddoctf
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_CHALLENGE: '01 linux i'
      CTF_RERUN: 5
 
-🚩 kiddoctf | gpt-4o | ii:
+🚩 kiddoctf | qw:14b | ii:
    <<: *run_ctf
    variables:
      CTF_NAME: kiddoctf
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_CHALLENGE: '02 linux ii'
      CTF_RERUN: 5
 
-🚩 kiddoctf | gpt-4o | iii:
+🚩 kiddoctf | qw:14b | iii:
    <<: *run_ctf
    variables:
      CTF_NAME: kiddoctf
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_CHALLENGE: '03 linux iii'
      CTF_RERUN: 5
 
-🚩 kiddoctf | gpt-4o | iv:
+🚩 kiddoctf | qw:14b | iv:
    <<: *run_ctf
    variables:
      CTF_NAME: kiddoctf
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_CHALLENGE: '04 linux iv'
      CTF_RERUN: 5
 
-🚩 picoctf_static_flag | gpt-4o:
+🚩 picoctf_static_flag | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: picoctf_static_flag
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
 
 ################################################################################
@@ -132,19 +132,19 @@ services:
 # For individuals familiar with basic cybersecurity concepts
 ################################################################################
 
-🚩🚩 my_first_pwnie | gpt-4o:
+🚩🚩 my_first_pwnie | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: my_first_pwnie
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
      CTF_INSIDE: false
 
-🚩🚩 picoctf_reversing_python | gpt-4o:
+🚩🚩 picoctf_reversing_python | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: picoctf_reversing_python
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
      CTF_INSIDE: false
 
@@ -153,105 +153,105 @@ services:
 # For college students, cybersecurity undergraduates or graduates
 ################################################################################
 
-🚩🚩🚩 android-dropper | gpt-4o:
+🚩🚩🚩 android-dropper | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: android-dropper
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
      CTF_INSIDE: false
 
-🚩🚩🚩 blocky-nonsense | gpt-4o:
+🚩🚩🚩 blocky-nonsense | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: blocky-nonsense
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
      CTF_INSIDE: false
 
-🚩🚩🚩 bob | gpt-4o:
+🚩🚩🚩 bob | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: bob
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
      CTF_INSIDE: false
 
-🚩🚩🚩 breakvault | gpt-4o:
+🚩🚩🚩 breakvault | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: breakvault
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
      CTF_INSIDE: false
 
-🚩🚩🚩 hackableii | gpt-4o:
+🚩🚩🚩 hackableii | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: hackableii
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
      CTF_INSIDE: false
 
-🚩🚩🚩 linear_aggressor | gpt-4o:
+🚩🚩🚩 linear_aggressor | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: linear_aggressor
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
      CTF_INSIDE: false
 
-🚩🚩🚩 lottery | gpt-4o:
+🚩🚩🚩 lottery | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: lottery
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
      CTF_INSIDE: false
 
-🚩🚩🚩 mental-poker | gpt-4o:
+🚩🚩🚩 mental-poker | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: mental
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
      CTF_INSIDE: false
 
-🚩🚩🚩 puffin | gpt-4o:
+🚩🚩🚩 puffin | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: puffin
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
      CTF_INSIDE: false
 
-🚩🚩🚩 rox | gpt-4o:
+🚩🚩🚩 rox | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: picoctf_reversing_python
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
 
-🚩🚩🚩 tradinggame | gpt-4o:
+🚩🚩🚩 tradinggame | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: tradinggame
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
      CTF_INSIDE: false
 
-🚩🚩🚩 xbow_five_twentyfour | gpt-4o:
+🚩🚩🚩 xbow_five_twentyfour | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: xbow_five_twentyfour
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
      CTF_INSIDE: false
 
-🚩🚩🚩 xbow_four_twentyfour | gpt-4o:
+🚩🚩🚩 xbow_four_twentyfour | qw:14b:
    <<: *run_ctf
    variables:
      CTF_NAME: xbow_four_twentyfour
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
      CTF_INSIDE: false
