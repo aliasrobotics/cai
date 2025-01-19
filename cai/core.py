@@ -238,7 +238,23 @@ class CAI:
                 args[__CTX_VARS_NAME__] = context_variables
             if self.ctf:
                 args["ctf"] = self.ctf
-            raw_result = function_map[name](**args)
+
+            @exploit_logger.log_tool()
+            def execute_tool(tool_name, **tool_args):
+                """Execute a tool function with logging.
+
+                Args:
+                    tool_name (str): The name of the tool to execute
+                    **tool_args: Variable keyword arguments to pass
+                        to the tool function
+
+                Returns:
+                    The result from executing the tool function with
+                        the given arguments
+                """
+                return function_map[tool_name](**tool_args)
+
+            raw_result = execute_tool(name, **args)
 
             result: Result = self.handle_function_result(raw_result, debug)
             partial_response.messages.append(

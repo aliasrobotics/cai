@@ -37,7 +37,6 @@ services:
   tags:
     - p40
     - x86
-    - one
   rules:
     - if: $CI_COMMIT_BRANCH
       when: on_success
@@ -46,12 +45,12 @@ services:
 # CTF
 ################################################################################
 
-🚩 picoctf_static_flag | gpt-4o:
+🚩 picoctf_static_flag | qw:14b:
    <<: *run_ctf
    stage: ctf-super-easy
    variables:
      CTF_NAME: picoctf_static_flag
-     CTF_MODEL: gpt-4o
+     CTF_MODEL: qwen2.5:14b
      CTF_RERUN: 5
 
 # 🚩 baby_first | qw:14b:
