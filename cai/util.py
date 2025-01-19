@@ -16,20 +16,32 @@ from rich.theme import Theme  # pylint: disable=import-error
 from rich.traceback import install  # pylint: disable=import-error
 from rich.pretty import install as install_pretty  # pylint: disable=import-error # noqa: 501
 
+
 theme = Theme({
-    "timestamp": "cyan",
-    "agent": "blue",
-    "arrow": "white",
-    "content": "white",
-    "tool": "magenta",
-    "token_count": "yellow",
-    "cost": "green"
+    # Primary colors - Material Design inspired
+    "timestamp": "#00BCD4",  # Cyan 500
+    "agent": "#4CAF50",      # Green 500
+    "arrow": "#FFFFFF",      # White
+    "content": "#ECEFF1",    # Blue Grey 50
+    "tool": "#F44336",       # Red 500
+
+    # Secondary colors
+    "token_count": "#FFC107",  # Amber 500
+    "cost": "#009688",        # Teal 500
+
+    # UI elements
+    "border": "#2196F3",      # Blue 500
+    "model": "#673AB7",       # Deep Purple 500
+    "dim": "#9E9E9E",         # Grey 500
+
+    # Status indicators
+    "success": "#4CAF50",     # Green 500
+    "warning": "#FF9800",     # Orange 500
+    "error": "#F44336"        # Red 500
 })
 
 console = Console(theme=theme)
-
 _message_counters = {}
-
 install()
 install_pretty()
 
@@ -237,16 +249,16 @@ def cli_print(  # pylint: disable=too-many-arguments,too-many-locals,too-many-st
                         content = content.strip()
                         if content:
                             text = Text()
-                            text.append(f"[{counter}] ", style="bold white")
+                            text.append(f"[{counter}] ", style="arrow")
                             text.append(
                                 f"{msg.get('sender', 'AGENT')} >> ",
-                                style="bold #36f9f6")
-                            text.append(f"{content} ", style="#7bf1a8")
-                            text.append(f"[{timestamp}", style="bold #888888")
+                                style="timestamp")
+                            text.append(f"{content} ", style="agent")
+                            text.append(f"[{timestamp}", style="dim")
                             if model:
                                 text.append(
-                                    f" ({model})", style="bold #ff69b4")
-                            text.append("]", style="bold #888888")
+                                    f" ({model})", style="model")
+                            text.append("]", style="dim")
                             console.print(text)
 
     def _print_tool_call(agent_name, tool_name, tool_args,
@@ -257,17 +269,17 @@ def cli_print(  # pylint: disable=too-many-arguments,too-many-locals,too-many-st
         args_str = ", ".join(f"{k}={v}" for k, v in filtered_args.items())
 
         text = Text()
-        text.append(f"[{counter}] ", style="bold white")
-        text.append(f"{agent_name} >> ", style="bold #36f9f6")
-        text.append(f"{tool_name}(", style="bold #ff6b6b")
-        text.append(args_str, style="bold #ffeb3b")
+        text.append(f"[{counter}] ", style="arrow")
+        text.append(f"{agent_name} >> ", style="timestamp")
+        text.append(f"{tool_name}(", style="tool")
+        text.append(args_str, style="token_count")
         text.append(
             ") ",
-            style="bold #ff6b6b")
-        text.append(f"[{timestamp}", style="bold #888888")
+            style="tool")
+        text.append(f"[{timestamp}", style="dim")
         if model:
-            text.append(f" ({model})", style="bold #ff69b4")
-        text.append("]", style="bold #888888")
+            text.append(f" ({model})", style="model")
+        text.append("]", style="dim")
         console.print(text)
         return args_str
 
@@ -287,17 +299,17 @@ def cli_print(  # pylint: disable=too-many-arguments,too-many-locals,too-many-st
 
             main_panel = Panel(
                 Group(
-                    Text(output, style="white"),
-                    Text(token_str, style="yellow", justify="right")
+                    Text(output, style="content"),
+                    Text(token_str, style="dim", justify="right")
                     if token_str else Text("")
                 ),
                 title=f"{tool_name}({args_str})",
-                border_style="blue",
+                border_style="border",
                 title_align="left",
                 box=ROUNDED,
                 padding=(1, 2),
                 width=console.width,
-                style="white"
+                style="content"
             )
             console.print(main_panel)
 
