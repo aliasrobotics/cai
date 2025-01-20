@@ -479,8 +479,9 @@ class CAI:
         init_len = len(messages)
 
         @exploit_logger.log_agent()
-        def process_turn(self, active_agent, history, context_variables,
-                         model_override, stream, debug, execute_tools, n_turn):
+        def process_interaction(self, active_agent, history, context_variables,
+                                model_override, stream, debug, execute_tools,
+                                n_turn):
             # get completion with current history, agent
             completion = self.get_chat_completion(
                 agent=active_agent,
@@ -514,7 +515,7 @@ class CAI:
                                          n_turn,
                                          active_agent.model,
                                          debug)
-                debug_print(debug, "Ending session.", brief=self.brief)
+                debug_print(debug, "Ending turn.", brief=self.brief)
                 return None
 
             # handle function calls, updating context_variables, and switching
@@ -533,7 +534,7 @@ class CAI:
 
         n_turn = 0
         while len(history) - init_len < max_turns and active_agent:
-            active_agent = process_turn(
+            active_agent = process_interaction(
                 self,
                 active_agent,
                 history,
