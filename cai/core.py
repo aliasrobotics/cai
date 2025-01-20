@@ -87,11 +87,6 @@ class CAI:
             else agent.instructions
         )
         messages = [{"role": "system", "content": instructions}] + history
-        # cli_print(
-        #     agent_name=agent.name,
-        #     message=messages,
-        #     model=agent.model,
-        #     debug=debug)
         debug_print(
             debug,
             "Getting chat completion for...:",
@@ -183,7 +178,9 @@ class CAI:
         context_variables: dict,
         debug: bool,
         agent: Agent,
-        n_turn: int = 0
+        n_turn: int = 0,
+        message: str = "",
+
     ) -> Response:
         """
         Execute and handle tool calls made by the AI agent.
@@ -256,7 +253,18 @@ class CAI:
                         "content": "Error: Invalid JSON in tool arguments.",
                     }
                 )
+              
                 continue
+            cli_print(
+                    agent_name=agent.name,
+                    message=message,
+                    tool_name=name,
+                    tool_args=args,
+                    turn_token_count=self.completion_tokens,
+                    total_token_count=self.total_tokens,
+                    model=agent.model,
+                    debug=debug,
+                    n_turn=n_turn)
             debug_print(
                 debug,
                 "Processing tool call",
@@ -315,6 +323,7 @@ class CAI:
                 }
             )
             cli_print(agent_name=agent.name,
+                      
                       tool_name=name,
                       tool_args=args,
                       tool_output=result.value,
@@ -497,13 +506,7 @@ class CAI:
 
             message = completion.choices[0].message
 
-            cli_print(
-                agent_name=active_agent.name,
-                message=message,
-                turn_token_count=self.completion_tokens,
-                total_token_count=self.total_tokens,
-                model=active_agent.model,
-                debug=debug)
+            
 
             debug_print(
                 debug,
@@ -516,6 +519,14 @@ class CAI:
             )  # to avoid OpenAI types (?)
 
             if not message.tool_calls or not execute_tools:
+                cli_print(
+                    agent_name=active_agent.name,
+                    message=message.content,
+                    turn_token_count=self.completion_tokens,
+                    total_token_count=self.total_tokens,
+                    model=active_agent.model,
+                    debug=debug,
+                    n_turn=n_turn)
                 debug_print(debug, "Ending turn.", brief=self.brief)
                 return None
 
@@ -523,7 +534,7 @@ class CAI:
             # agents
             partial_response = self.handle_tool_calls(
                 message.tool_calls, active_agent.functions,
-                context_variables, debug, agent, n_turn
+                context_variables, debug, agent, n_turn, message=message.content
             )
 
             history.extend(partial_response.messages)

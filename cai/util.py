@@ -249,30 +249,20 @@ def cli_print(  # pylint: disable=too-many-arguments,too-many-locals,too-many-st
     #     _message_counters[agent_name] += 1
     #     return _message_counters[agent_name]
 
-    def _print_agent_messages(message, counter, timestamp, model):
+    def _print_agent_messages(agent_name, message, counter, timestamp, model):
         """Print agent messages/thoughts."""
-        if isinstance(message, list):  # pylint: disable=too-many-nested-blocks
-            for msg in message:
-                if msg.get("role") == "assistant":
-                    content = msg.get('content')
-                    if content and isinstance(content, str):
-                        content = content.strip()
-                        if content:
-                            text = Text()
-                            text.append(f"[{counter}] ", style="arrow")
-                            text.append(
-                                f"{msg.get('sender', 'AGENT')} >> ",
-                                style="timestamp")
-                            text.append(f"{content} ", style="agent")
-                            text.append(f"[{timestamp}", style="dim")
-                            if model:
-                                text.append(
-                                    f" ({model})", style="model")
-                            text.append("]", style="dim")
-                            console.print(text)
-
+        text = Text()
+        text.append(f"[{counter}] ", style="arrow")
+        text.append(f"{agent_name} >> ", style="timestamp")
+        text.append(f"{message} ", style="agent")
+        text.append(f"[{timestamp}", style="dim")
+        if model:
+            text.append(
+            f" ({model})", style="model")
+        text.append("]", style="dim")
+        console.print(text)
     def _print_tool_call(agent_name, tool_name, tool_args,
-                         counter, timestamp, model):  # pylint: disable=too-many-arguments # noqa: E501
+                         counter, timestamp, model, message = ""):  # pylint: disable=too-many-arguments # noqa: E501
         """Print tool call information."""
         filtered_args = ({k: v for k, v in tool_args.items() if k != 'ctf'}
                          if tool_args else {})  # noqa: F541
@@ -281,6 +271,8 @@ def cli_print(  # pylint: disable=too-many-arguments,too-many-locals,too-many-st
         text = Text()
         text.append(f"[{counter}] ", style="arrow")
         text.append(f"{agent_name} >> ", style="timestamp")
+        if message:
+            text.append(f"{message} >> ", style="agent")
         text.append(f"{tool_name}(", style="tool")
         text.append(args_str, style="total_token_count")
         text.append(
@@ -329,15 +321,16 @@ def cli_print(  # pylint: disable=too-many-arguments,too-many-locals,too-many-st
         timestamp = datetime.now().strftime("%H:%M:%S")
         # counter = _update_counter(agent_name) if agent_name else None
 
-        if message:
-            _print_agent_messages(message, n_turn, timestamp, model)
+        if message and not tool_name and not tool_args:
+            _print_agent_messages(agent_name, message, n_turn, timestamp, model)
 
-        if tool_name:
-            args_str = _print_tool_call(agent_name, tool_name, tool_args,
-                                        n_turn, timestamp, model)
+        if tool_name and tool_args and not tool_output:
+            _print_tool_call(agent_name, tool_name, tool_args,
+                                        n_turn, timestamp, model, message)
+        if tool_output:
             _print_tool_output(
                 tool_name,
-                args_str,
+                tool_args,
                 tool_output,
                 turn_token_count,
                 total_token_count)
