@@ -26,7 +26,7 @@ theme = Theme({
     "tool": "#F44336",       # Red 500
 
     # Secondary colors
-    "token_count": "#FFC107",  # Amber 500
+    "total_token_count": "#FFC107",  # Amber 500
     "cost": "#009688",        # Teal 500
 
     # UI elements
@@ -215,9 +215,10 @@ def cli_print(  # pylint: disable=too-many-arguments,too-many-locals,too-many-st
     tool_args=None,
     tool_output=None,
     model=None,
-    turn_token=None,
-    token_count=None,
-    debug=False  # Add debug parameter
+    turn_token_count=None,
+    total_token_count=None,
+    debug=0,
+    n_turn=0
 ) -> None:
     """
     Print a CLI message with improved formatting including timestamps
@@ -230,9 +231,10 @@ def cli_print(  # pylint: disable=too-many-arguments,too-many-locals,too-many-st
         tool_args: Arguments passed to the tool
         tool_output: Output from the tool execution
         model: Model name being used
-        turn_token: Number of tokens used in this turn
-        token_count: Total number of tokens used
-        debug: Whether to print in debug mode
+        turn_token_count: Number of tokens used in this turn
+        total_token_count: Total number of tokens used
+        debug: Whether to print in debug mode (0, 1, 2)
+        n_turn: Number of the turn
     """
     if not debug:  # Add early return if debug is False
         return
@@ -240,12 +242,12 @@ def cli_print(  # pylint: disable=too-many-arguments,too-many-locals,too-many-st
     if debug != 2:  # debug level 2
         return
 
-    def _update_counter(agent_name):
-        """Update and return message counter for an agent."""
-        if agent_name not in _message_counters:
-            _message_counters[agent_name] = 0
-        _message_counters[agent_name] += 1
-        return _message_counters[agent_name] - 3
+    # def _update_counter(agent_name):
+    #     """Update and return message counter for an agent."""
+    #     if agent_name not in _message_counters:
+    #         _message_counters[agent_name] = 0
+    #     _message_counters[agent_name] += 1
+    #     return _message_counters[agent_name]
 
     def _print_agent_messages(message, counter, timestamp, model):
         """Print agent messages/thoughts."""
@@ -280,7 +282,7 @@ def cli_print(  # pylint: disable=too-many-arguments,too-many-locals,too-many-st
         text.append(f"[{counter}] ", style="arrow")
         text.append(f"{agent_name} >> ", style="timestamp")
         text.append(f"{tool_name}(", style="tool")
-        text.append(args_str, style="token_count")
+        text.append(args_str, style="total_token_count")
         text.append(
             ") ",
             style="tool")
@@ -292,7 +294,7 @@ def cli_print(  # pylint: disable=too-many-arguments,too-many-locals,too-many-st
         return args_str
 
     def _print_tool_output(tool_name, args_str,
-                           tool_output, turn_token, token_count):
+                           tool_output, turn_token_count, total_token_count):
         """Print tool output with optional token information."""
         if tool_output:
             max_length = 5000
@@ -301,9 +303,9 @@ def cli_print(  # pylint: disable=too-many-arguments,too-many-locals,too-many-st
                       if len(output) > max_length else output)
 
             token_str = ""  # nosec B105:hardcoded_password_string
-            if turn_token is not None and token_count is not None:
+            if turn_token_count is not None and total_token_count is not None:
                 token_str = f"Turn tokens: {
-                    turn_token} Total tokens: {token_count}"
+                    turn_token_count} Total tokens: {total_token_count}"
 
             main_panel = Panel(
                 Group(
@@ -322,27 +324,29 @@ def cli_print(  # pylint: disable=too-many-arguments,too-many-locals,too-many-st
             console.print(main_panel)
 
     try:
+        # TODO: consider using the timestamp from the message  # pylint: disable=fixme # noqa: E501
+        # or the LLM interaction timestamp
         timestamp = datetime.now().strftime("%H:%M:%S")
-        counter = _update_counter(agent_name) if agent_name else None
+        # counter = _update_counter(agent_name) if agent_name else None
 
         if message:
-            _print_agent_messages(message, counter, timestamp, model)
+            _print_agent_messages(message, n_turn, timestamp, model)
 
         if tool_name:
             args_str = _print_tool_call(agent_name, tool_name, tool_args,
-                                        counter, timestamp, model)
+                                        n_turn, timestamp, model)
             _print_tool_output(
                 tool_name,
                 args_str,
                 tool_output,
-                turn_token,
-                token_count)
+                turn_token_count,
+                total_token_count)
 
     except Exception as exc:  # pylint: disable=broad-exception-caught
         print(f"Error printing message: {str(exc)}")
 
 
-def debug_print(debug: bool, intro: str, *args: Any, brief: bool = False, colours: bool = True) -> None:  # pylint: disable=too-many-locals,line-too-long,too-many-branches # noqa: E501
+def debug_print(debug: int, intro: str, *args: Any, brief: bool = False, colours: bool = True) -> None:  # pylint: disable=too-many-locals,line-too-long,too-many-branches # noqa: E501
     """
     Print debug messages if debug mode is enabled with color-coded components.
     If brief is True, prints a simplified timestamp and message format.

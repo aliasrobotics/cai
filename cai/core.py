@@ -87,11 +87,11 @@ class CAI:
             else agent.instructions
         )
         messages = [{"role": "system", "content": instructions}] + history
-        cli_print(
-            agent_name=agent.name,
-            message=messages,
-            model=agent.model,
-            debug=debug)
+        # cli_print(
+        #     agent_name=agent.name,
+        #     message=messages,
+        #     model=agent.model,
+        #     debug=debug)
         debug_print(
             debug,
             "Getting chat completion for...:",
@@ -183,6 +183,7 @@ class CAI:
         context_variables: dict,
         debug: bool,
         agent: Agent,
+        n_turn: int = 0
     ) -> Response:
         """
         Execute and handle tool calls made by the AI agent.
@@ -203,7 +204,8 @@ class CAI:
             context_variables (dict): Context variables to pass
                 to functions
             debug (bool): Flag to enable debug logging
-
+            agent: Agent object
+            n_turn: Number of the turn
         Returns:
             Response: Object containing:
                 messages (List): Tool call results
@@ -317,9 +319,10 @@ class CAI:
                       tool_args=args,
                       tool_output=result.value,
                       model=agent.model,
-                      turn_token=self.completion_tokens,
-                      token_count=self.total_tokens,
-                      debug=debug)
+                      turn_token_count=self.completion_tokens,
+                      total_token_count=self.total_tokens,
+                      debug=debug,
+                      n_turn=n_turn)
             partial_response.context_variables.update(result.context_variables)
             if result.agent:
                 partial_response.agent = result.agent
@@ -476,7 +479,7 @@ class CAI:
 
         @exploit_logger.log_agent()
         def process_turn(self, active_agent, history, context_variables,
-                         model_override, stream, debug, execute_tools):
+                         model_override, stream, debug, execute_tools, n_turn):
             # get completion with current history, agent
             completion = self.get_chat_completion(
                 agent=active_agent,
@@ -497,8 +500,8 @@ class CAI:
             cli_print(
                 agent_name=active_agent.name,
                 message=message,
-                turn_token=self.completion_tokens,
-                token_count=self.total_tokens,
+                turn_token_count=self.completion_tokens,
+                total_token_count=self.total_tokens,
                 model=active_agent.model,
                 debug=debug)
 
@@ -520,7 +523,7 @@ class CAI:
             # agents
             partial_response = self.handle_tool_calls(
                 message.tool_calls, active_agent.functions,
-                context_variables, debug, agent
+                context_variables, debug, agent, n_turn
             )
 
             history.extend(partial_response.messages)
@@ -529,6 +532,7 @@ class CAI:
                     if partial_response.agent
                     else active_agent)
 
+        n_turn = 0
         while len(history) - init_len < max_turns and active_agent:
             active_agent = process_turn(
                 self,
@@ -538,8 +542,10 @@ class CAI:
                 model_override,
                 stream,
                 debug,
-                execute_tools
+                execute_tools,
+                n_turn
             )
+            n_turn += 1
             if active_agent is None:
                 break
 
