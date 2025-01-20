@@ -91,10 +91,13 @@ def run_demo_loop(
             debug=debug,
         )
 
-        if stream:
-            response = process_and_print_streaming_response(response)
-        else:
-            pretty_print_messages(response.messages)
+        # if stream:
+        #     response = process_and_print_streaming_response(response)
+        # else:
+        #     pretty_print_messages(response.messages)
+
+        print("response.messages", response.messages)
+        print("messages", messages)
 
         messages.extend(response.messages)
         agent = response.agent
