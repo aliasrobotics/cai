@@ -189,5 +189,6 @@ else:
     ctf_agent.functions.extend([
         generic_linux_command
     ])
+
     flag_discriminator.functions.extend([transfer_to_ctf_agent])
     flag_discriminator.functions.append(transfer_to_ctf_agent)
