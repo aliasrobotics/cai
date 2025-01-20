@@ -67,8 +67,12 @@ def pretty_print_messages(messages) -> None:
             print(f"\033[95m{name}\033[0m({arg_str[1:-1]})")
 
 
-def run_demo_loop(
-    starting_agent, context_variables=None, stream=False, debug=False
+def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks
+    starting_agent,
+    context_variables=None,
+    stream=False,
+    debug=False,
+    max_turns=10000
 ) -> None:
     """
     Run the demo loop for CAI.
@@ -78,7 +82,6 @@ def run_demo_loop(
 
     messages = []
     agent = starting_agent
-
     while True:
         user_input = input("\033[90mUser\033[0m: ")
         messages.append({"role": "user", "content": user_input})
@@ -89,15 +92,33 @@ def run_demo_loop(
             context_variables=context_variables or {},
             stream=stream,
             debug=debug,
+            max_turns=max_turns,
         )
 
-        # if stream:
-        #     response = process_and_print_streaming_response(response)
-        # else:
-        #     pretty_print_messages(response.messages)
+        formatted_messages = []
+        for msg in response.messages:
+            if msg.get("content") or msg.get("tool_calls"):
+                content = msg.get("content", "")
 
-        print("response.messages", response.messages)
-        print("messages", messages)
+                if msg.get("tool_calls"):
+                    for tool_call in msg["tool_calls"]:
+                        tool_result = next(
+                            (m for m in response.messages
+                             if m.get("tool_call_id") == tool_call["id"]),
+                            None
+                        )
+                        if tool_result:
+                            if content:
+                                content += "\n"
+                            content += f"{tool_result['content']}"
 
-        messages.extend(response.messages)
-        agent = response.agent
+                formatted_msg = {
+                    "role": "assistant",
+                    "content": content,
+                    "sender": msg.get("sender", agent.name)
+                }
+                formatted_messages.append(formatted_msg)
+        if formatted_messages:
+            messages.extend(formatted_messages)
+        if response.agent:
+            agent = response.agent

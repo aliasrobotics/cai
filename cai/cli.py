@@ -53,6 +53,7 @@ def thought_agent_handoff():
 thought_agent = Agent(
     name="ThoughAgent",
     instructions=thought_agent_system_prompt,
+    model="deepseek/deepseek-chat",
     functions=[thought, cli_agent_handoff],
     parallel_tool_calls=False
 )
@@ -61,6 +62,7 @@ thought_agent = Agent(
 cli_agent = Agent(
     name="Boot2Root CTF Tester",
     instructions=cli_agent_system_prompt + env_context,
+    model="deepseek/deepseek-chat",
     functions=[
         execute_cli_command,
         thought_agent_handoff,
@@ -73,4 +75,4 @@ cli_agent = Agent(
 )
 
 if __name__ == "__main__":
-    run_demo_loop(thought_agent, debug=2)
+    run_demo_loop(thought_agent, debug=2, max_turns=3)
