@@ -8,6 +8,42 @@ from typing import Any
 import json
 import os
 from wasabi import color  # pylint: disable=import-error
+from rich.text import Text  # pylint: disable=import-error
+from rich.panel import Panel  # pylint: disable=import-error
+from rich.box import ROUNDED  # pylint: disable=import-error
+from rich.console import Console, Group  # pylint: disable=import-error
+from rich.theme import Theme  # pylint: disable=import-error
+from rich.traceback import install  # pylint: disable=import-error
+from rich.pretty import install as install_pretty  # pylint: disable=import-error # noqa: 501
+
+
+theme = Theme({
+    # Primary colors - Material Design inspired
+    "timestamp": "#00BCD4",  # Cyan 500
+    "agent": "#4CAF50",      # Green 500
+    "arrow": "#FFFFFF",      # White
+    "content": "#ECEFF1",    # Blue Grey 50
+    "tool": "#F44336",       # Red 500
+
+    # Secondary colors
+    "total_token_count": "#FFC107",  # Amber 500
+    "cost": "#009688",        # Teal 500
+
+    # UI elements
+    "border": "#2196F3",      # Blue 500
+    "model": "#673AB7",       # Deep Purple 500
+    "dim": "#9E9E9E",         # Grey 500
+
+    # Status indicators
+    "success": "#4CAF50",     # Green 500
+    "warning": "#FF9800",     # Orange 500
+    "error": "#F44336"        # Red 500
+})
+
+console = Console(theme=theme)
+_message_counters = {}
+install()
+install_pretty()
 
 # ANSI color codes in a nice, readable palette
 COLORS = {
@@ -172,12 +208,86 @@ def get_ollama_api_base() -> str:
     return os.getenv("OLLAMA_API_BASE", "http://host.docker.internal:8000/v1")
 
 
-def debug_print(debug: bool, intro: str, *args: Any, brief: bool = False, colours: bool = True) -> None:  # pylint: disable=too-many-locals,line-too-long,too-many-branches # noqa: E501
+def cli_print_agent_messages(agent_name, message, counter, model, debug):
+    """Print agent messages/thoughts."""
+    if not debug:
+        return
+
+    if debug != 2:  # debug level 2
+        return
+
+    # TODO: consider using the timestamp from the message  # pylint: disable=fixme # noqa: E501
+    # or the LLM interaction timestamp
+    timestamp = datetime.now().strftime("%H:%M:%S")
+
+    text = Text()
+    text.append(f"[{counter}] ", style="arrow")
+    text.append(f"Agent: {agent_name} ", style="timestamp")
+    if message:
+        text.append(f">> {message} ", style="agent")
+    text.append(f"[{timestamp}", style="dim")
+    if model:
+        text.append(
+            f" ({model})", style="model")
+    text.append("]", style="dim")
+    console.print(text)
+
+
+def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=too-many-arguments # noqa: E501
+                        tool_output, turn_token_count, total_token_count,
+                        debug):
+    """Print tool call information."""
+
+    if not debug:
+        return
+
+    if debug != 2:  # debug level 2
+        return
+
+    filtered_args = ({k: v for k, v in tool_args.items() if k != 'ctf'}
+                        if tool_args else {})  # noqa: F541, E127
+    args_str = ", ".join(f"{k}={v}" for k, v in filtered_args.items())
+
+    text = Text()
+    text.append(f"{tool_name}(", style="tool")
+    text.append(args_str, style="total_token_count")
+    text.append(
+        ") ",
+        style="tool")
+
+    if tool_output:
+        output = str(tool_output)
+        token_str = ""  # nosec B105:hardcoded_password_string
+        if turn_token_count is not None and total_token_count is not None:
+            token_str = f"Turn tokens: {
+                turn_token_count} Total tokens: {total_token_count}"
+
+        main_panel = Panel(
+            Group(
+                Text(output, style="content"),
+                Text(token_str, style="dim", justify="right")
+                if token_str else Text("")
+            ),
+            title=text,
+            border_style="border",
+            title_align="left",
+            box=ROUNDED,
+            padding=(1, 2),
+            width=console.width,
+            style="content"
+        )
+        console.print(main_panel)
+
+
+def debug_print(debug: int, intro: str, *args: Any, brief: bool = False, colours: bool = True) -> None:  # pylint: disable=too-many-locals,line-too-long,too-many-branches # noqa: E501
     """
     Print debug messages if debug mode is enabled with color-coded components.
     If brief is True, prints a simplified timestamp and message format.
     """
     if not debug:
+        return
+
+    if debug != 1:  # debug level 1
         return
 
     if brief:

@@ -93,5 +93,6 @@ messages = [{
 thought_response = client.run(
     agent=thought_agent,
     messages=messages,
-    debug=True)
+    debug=2)
+    
 ctf.stop_ctf()

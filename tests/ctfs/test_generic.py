@@ -36,7 +36,10 @@ Environment Variables:
           or from outside (meaning the dev environment) (default: "true")
 
     Other optional:
-        CAI_DEBUG: Enable/disable debug output (default: "true")
+        CAI_DEBUG: Set debug output level (default: "1").
+            - 0: Only tool outputs
+            - 1: Verbose debug output
+            - 2: CLI debug output
         CAI_BRIEF: Enable/disable brief output mode (default: "false")
         CAI_MAX_TURNS: Maximum number of turns for agent interactions (default: "inf")
         CAI_TRACING: Enable/disable OpenTelemetry tracing (default: "true"). When enabled,
@@ -171,12 +174,14 @@ class TestGenericCTF:
 
             # 5. Run the CAI
             response = client.run(
+                # cli=True,
                 agent=ctf_agent,
                 messages=messages,
-                debug=os.getenv('CAI_DEBUG', 'true').lower() == 'true',
+                debug=float(os.getenv('CAI_DEBUG', 1)),
                 max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
                 brief=os.getenv('CAI_BRIEF', 'false').lower() == 'true')
-            print(response.messages[-1]["content"])
+            
+            # print(response.messages[-1]["content"])
             print(f"Time taken: {response.time} seconds")
 
             # 6. Check if the flag is correct
