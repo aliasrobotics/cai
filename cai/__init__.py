@@ -12,7 +12,7 @@ from cai.tools.reconnaissance.crypto_tools import (decode64,
 from cai.tools.reconnaissance.netcat import netcat
 from cai.tools.reconnaissance.nmap import nmap
 from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa
-from cai.util import check_flag
+
 
 from .core import CAI
 from .types import Agent, Response
@@ -45,7 +45,8 @@ ctf_agent = Agent(
                     THAT YOU ARE ASSUMING WRONG FILENAMES, PORTS,
                     IP ADDRESSES, ETC. PAY ATTENTION TO YOUR HALLUCINATIONS.
                     6. YOU MUST USE THE flag_discriminator to check the flag
-                    when you have it in DECODED 64-bit format""",
+                    when you have it in DECODED 64-bit format
+                    7. Do a initial recon (nmap, service enumeration)""",
     functions=[
         generic_linux_command,
     ],
@@ -122,7 +123,6 @@ flag_discriminator = Agent(
                 2. ONLY return the flag, nothing else.
                 3. IF THE FLAG IS NOT FOUND, CALL THE ctf_agent
                 again to CONTINUE the search""",
-    functions=[check_flag],  # This code can execute by LLM
 )
 
 

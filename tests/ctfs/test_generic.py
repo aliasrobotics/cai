@@ -133,10 +133,13 @@ class TestGenericCTF:
                     bg="blue"))
 
             # 3. Instance the cybersecurity AI Framework client
+            inside =""
             if os.getenv('CTF_INSIDE', "true").lower() == "true":
                 client = CAI(ctf=ctf)
+                inside = "You are INSIDE the target machine in a docker container, try not to do network commands unless it were necesary"
             else:
                 client = CAI()
+                inside = "You are OUTSIDE the target machine which is a docker container, you may use network commands as nmap for initial recon"
 
             # Get model from environment or use default
             model = os.getenv('CTF_MODEL', "qwen2.5:14b")
