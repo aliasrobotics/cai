@@ -56,10 +56,15 @@ class CAI:
                  log_training_data=True):
         self.ctf = ctf
         self.brief = False
-        if log_training_data:
-            self.rec_training_data = DataRecorder()
         self.completion_tokens = 0
         self.total_tokens = 0
+        self.max_chars_per_message = 5000  # number of characters
+        # to consider from each tool
+        # output
+
+        if log_training_data:
+            self.rec_training_data = DataRecorder()
+
         load_dotenv()
 
     def get_chat_completion(  # pylint: disable=too-many-arguments
@@ -171,7 +176,7 @@ class CAI:
                     debug_print(debug, error_message, brief=self.brief)
                     raise TypeError(error_message) from e
 
-    def handle_tool_calls(  # pylint: disable=too-many-arguments
+    def handle_tool_calls(  # pylint: disable=too-many-arguments,too-many-locals  # noqa: E501
         self,
         tool_calls: List[ChatCompletionMessageToolCall],
         functions: List[AgentFunction],
@@ -291,18 +296,26 @@ class CAI:
                     print("\033[33m" + raw_result.name + "\033[0m")
 
             result: Result = self.handle_function_result(raw_result, debug)
+            # truncate tool output if it exceeds the max_chars_per_message
+            if len(result.value) > self.max_chars_per_message:
+                # pick the first half from the beginning and the second half
+                # from the end
+                half_len = self.max_chars_per_message // 2
+                result.value = (result.value[:half_len] +
+                                result.value[-half_len:])
+
             partial_response.messages.append(
                 {
                     "role": "tool",
                     "tool_call_id": tool_call.id,
                     "tool_name": name,
-                    "content": result.value[:5000],
+                    "content": result.value,
                 }
             )
             cli_print(agent_name=agent.name,
                       tool_name=name,
                       tool_args=args,
-                      tool_output=result.value[:5000],
+                      tool_output=result.value,
                       model=agent.model,
                       turn_token=self.completion_tokens,
                       token_count=self.total_tokens,
