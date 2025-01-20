@@ -233,8 +233,23 @@ class CAI:
                     }
                 )
                 continue
-
-            args = json.loads(tool_call.function.arguments)
+            try:
+                args = json.loads(tool_call.function.arguments)
+            except json.JSONDecodeError:
+                debug_print(
+                    debug,
+                    f"Invalid JSON in tool arguments: {
+                        tool_call.function.arguments}",
+                    brief=self.brief)
+                partial_response.messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": tool_call.id,
+                        "tool_name": name,
+                        "content": "Error: Invalid JSON in tool arguments.",
+                    }
+                )
+                continue
             debug_print(
                 debug,
                 "Processing tool call",
