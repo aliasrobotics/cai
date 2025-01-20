@@ -29,7 +29,8 @@ from .util import (
     function_to_json,
     debug_print,
     merge_chunk,
-    cli_print,
+    cli_print_agent_messages,
+    cli_print_tool_call,
     get_ollama_api_base,
 )
 from .types import (
@@ -220,6 +221,9 @@ class CAI:
         partial_response = Response(
             messages=[], agent=None, context_variables={})
 
+        cli_print_agent_messages(agent.name, message,
+                                 n_turn, agent.model, debug)
+
         for tool_call in tool_calls:
             name = tool_call.function.name
             # handle missing tool case, skip to next tool
@@ -253,18 +257,8 @@ class CAI:
                         "content": "Error: Invalid JSON in tool arguments.",
                     }
                 )
-              
+
                 continue
-            cli_print(
-                    agent_name=agent.name,
-                    message=message,
-                    tool_name=name,
-                    tool_args=args,
-                    turn_token_count=self.completion_tokens,
-                    total_token_count=self.total_tokens,
-                    model=agent.model,
-                    debug=debug,
-                    n_turn=n_turn)
             debug_print(
                 debug,
                 "Processing tool call",
@@ -322,16 +316,14 @@ class CAI:
                     "content": result.value,
                 }
             )
-            cli_print(agent_name=agent.name,
-                      
-                      tool_name=name,
-                      tool_args=args,
-                      tool_output=result.value,
-                      model=agent.model,
-                      turn_token_count=self.completion_tokens,
-                      total_token_count=self.total_tokens,
-                      debug=debug,
-                      n_turn=n_turn)
+            cli_print_tool_call(
+                name,
+                args,
+                result.value,
+                self.completion_tokens,
+                self.total_tokens,
+                debug)
+
             partial_response.context_variables.update(result.context_variables)
             if result.agent:
                 partial_response.agent = result.agent
@@ -506,8 +498,6 @@ class CAI:
 
             message = completion.choices[0].message
 
-            
-
             debug_print(
                 debug,
                 "Received completion:",
@@ -519,22 +509,20 @@ class CAI:
             )  # to avoid OpenAI types (?)
 
             if not message.tool_calls or not execute_tools:
-                cli_print(
-                    agent_name=active_agent.name,
-                    message=message.content,
-                    turn_token_count=self.completion_tokens,
-                    total_token_count=self.total_tokens,
-                    model=active_agent.model,
-                    debug=debug,
-                    n_turn=n_turn)
-                debug_print(debug, "Ending turn.", brief=self.brief)
+                cli_print_agent_messages(active_agent.name,
+                                         message.content,
+                                         n_turn,
+                                         active_agent.model,
+                                         debug)
+                debug_print(debug, "Ending session.", brief=self.brief)
                 return None
 
             # handle function calls, updating context_variables, and switching
             # agents
             partial_response = self.handle_tool_calls(
                 message.tool_calls, active_agent.functions,
-                context_variables, debug, agent, n_turn, message=message.content
+                context_variables, debug, agent, n_turn,
+                message=message.content
             )
 
             history.extend(partial_response.messages)

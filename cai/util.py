@@ -208,135 +208,75 @@ def get_ollama_api_base() -> str:
     return os.getenv("OLLAMA_API_BASE", "http://host.docker.internal:8000/v1")
 
 
-def cli_print(  # pylint: disable=too-many-arguments,too-many-locals,too-many-statements,too-many-nested-blocks,too-many-branches,broad-exception-caught # noqa: E501
-    agent_name=None,
-    message=None,
-    tool_name=None,
-    tool_args=None,
-    tool_output=None,
-    model=None,
-    turn_token_count=None,
-    total_token_count=None,
-    debug=0,
-    n_turn=0
-) -> None:
-    """
-    Print a CLI message with improved formatting including timestamps
-    token counts and costs.
-
-    Args:
-        agent_name: Name of the agent
-        message: The message content
-        tool_name: Name of the tool being called
-        tool_args: Arguments passed to the tool
-        tool_output: Output from the tool execution
-        model: Model name being used
-        turn_token_count: Number of tokens used in this turn
-        total_token_count: Total number of tokens used
-        debug: Whether to print in debug mode (0, 1, 2)
-        n_turn: Number of the turn
-    """
-    if not debug:  # Add early return if debug is False
+def cli_print_agent_messages(agent_name, message, counter, model, debug):
+    """Print agent messages/thoughts."""
+    if not debug:
         return
 
     if debug != 2:  # debug level 2
         return
 
-    # def _update_counter(agent_name):
-    #     """Update and return message counter for an agent."""
-    #     if agent_name not in _message_counters:
-    #         _message_counters[agent_name] = 0
-    #     _message_counters[agent_name] += 1
-    #     return _message_counters[agent_name]
+    # TODO: consider using the timestamp from the message  # pylint: disable=fixme # noqa: E501
+    # or the LLM interaction timestamp
+    timestamp = datetime.now().strftime("%H:%M:%S")
 
-    def _print_agent_messages(agent_name, message, counter, timestamp, model):
-        """Print agent messages/thoughts."""
-        text = Text()
-        text.append(f"[{counter}] ", style="arrow")
-        text.append(f"{agent_name} >> ", style="timestamp")
-        text.append(f"{message} ", style="agent")
-        text.append(f"[{timestamp}", style="dim")
-        if model:
-            text.append(
-            f" ({model})", style="model")
-        text.append("]", style="dim")
-        console.print(text)
-    def _print_tool_call(agent_name, tool_name, tool_args,
-                         counter, timestamp, model, message = ""):  # pylint: disable=too-many-arguments # noqa: E501
-        """Print tool call information."""
-        filtered_args = ({k: v for k, v in tool_args.items() if k != 'ctf'}
-                         if tool_args else {})  # noqa: F541
-        args_str = ", ".join(f"{k}={v}" for k, v in filtered_args.items())
-
-        text = Text()
-        text.append(f"[{counter}] ", style="arrow")
-        text.append(f"{agent_name} >> ", style="timestamp")
-        if message:
-            text.append(f"{message} >> ", style="agent")
-        text.append(f"{tool_name}(", style="tool")
-        text.append(args_str, style="total_token_count")
+    text = Text()
+    text.append(f"[{counter}] ", style="arrow")
+    text.append(f"Agent: {agent_name} ", style="timestamp")
+    if message:
+        text.append(f">> {message} ", style="agent")
+    text.append(f"[{timestamp}", style="dim")
+    if model:
         text.append(
-            ") ",
-            style="tool")
-        text.append(f"[{timestamp}", style="dim")
-        if model:
-            text.append(f" ({model})", style="model")
-        text.append("]", style="dim")
-        console.print(text)
-        return args_str
+            f" ({model})", style="model")
+    text.append("]", style="dim")
+    console.print(text)
 
-    def _print_tool_output(tool_name, args_str,
-                           tool_output, turn_token_count, total_token_count):
-        """Print tool output with optional token information."""
-        if tool_output:
-            max_length = 5000
-            output = str(tool_output)
-            output = (output[:max_length] + "...\n[Output truncated]"
-                      if len(output) > max_length else output)
 
-            token_str = ""  # nosec B105:hardcoded_password_string
-            if turn_token_count is not None and total_token_count is not None:
-                token_str = f"Turn tokens: {
-                    turn_token_count} Total tokens: {total_token_count}"
+def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=too-many-arguments # noqa: E501
+                        tool_output, turn_token_count, total_token_count,
+                        debug):
+    """Print tool call information."""
 
-            main_panel = Panel(
-                Group(
-                    Text(output, style="content"),
-                    Text(token_str, style="dim", justify="right")
-                    if token_str else Text("")
-                ),
-                title=f"{tool_name}({args_str})",
-                border_style="border",
-                title_align="left",
-                box=ROUNDED,
-                padding=(1, 2),
-                width=console.width,
-                style="content"
-            )
-            console.print(main_panel)
+    if not debug:
+        return
 
-    try:
-        # TODO: consider using the timestamp from the message  # pylint: disable=fixme # noqa: E501
-        # or the LLM interaction timestamp
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        # counter = _update_counter(agent_name) if agent_name else None
+    if debug != 2:  # debug level 2
+        return
 
-        if message and not tool_name and not tool_args:
-            _print_agent_messages(agent_name, message, n_turn, timestamp, model)
+    filtered_args = ({k: v for k, v in tool_args.items() if k != 'ctf'}
+                        if tool_args else {})  # noqa: F541, E127
+    args_str = ", ".join(f"{k}={v}" for k, v in filtered_args.items())
 
-        if tool_name and tool_args and not tool_output:
-            _print_tool_call(agent_name, tool_name, tool_args,
-                                        n_turn, timestamp, model, message)
-        if tool_output:
-            _print_tool_output(
-                tool_name,
-                tool_args,
-                tool_output,
-                turn_token_count,
-                total_token_count)
+    text = Text()
+    text.append(f"{tool_name}(", style="tool")
+    text.append(args_str, style="total_token_count")
+    text.append(
+        ") ",
+        style="tool")
 
-    except Exception as exc:  # pylint: disable=broad-exception-caught
-        print(f"Error printing message: {str(exc)}")
+    if tool_output:
+        output = str(tool_output)
+        token_str = ""  # nosec B105:hardcoded_password_string
+        if turn_token_count is not None and total_token_count is not None:
+            token_str = f"Turn tokens: {
+                turn_token_count} Total tokens: {total_token_count}"
+
+        main_panel = Panel(
+            Group(
+                Text(output, style="content"),
+                Text(token_str, style="dim", justify="right")
+                if token_str else Text("")
+            ),
+            title=text,
+            border_style="border",
+            title_align="left",
+            box=ROUNDED,
+            padding=(1, 2),
+            width=console.width,
+            style="content"
+        )
+        console.print(main_panel)
 
 
 def debug_print(debug: int, intro: str, *args: Any, brief: bool = False, colours: bool = True) -> None:  # pylint: disable=too-many-locals,line-too-long,too-many-branches # noqa: E501

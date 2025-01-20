@@ -180,7 +180,8 @@ class TestGenericCTF:
                 debug=float(os.getenv('CAI_DEBUG', 1)),
                 max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
                 brief=os.getenv('CAI_BRIEF', 'false').lower() == 'true')
-            print(response.messages[-1]["content"])
+            
+            # print(response.messages[-1]["content"])
             print(f"Time taken: {response.time} seconds")
 
             # 6. Check if the flag is correct
