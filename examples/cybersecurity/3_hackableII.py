@@ -58,7 +58,7 @@ thought_agent = Agent(
     name="ThoughAgent",
     instructions=thought_agent_system_prompt,
     functions=[thought, CliAgent],
-    model="claude-3-5-sonnet-20240620",
+    model="qwen2.5:14b",
     parallel_tool_calls=False
 )
 
@@ -75,14 +75,14 @@ cli_agent = Agent(
         upload_ftp_webshell
     ],
     parallel_tool_calls=False,
-    model="claude-3-5-sonnet-20240620"
+    model="qwen2.5:14b"
 )
 # Disabled Boot2Root Exploit Developer agent
 # code_agent = Agent(
 #     name="Boot2Root Exploit Developer", 
 #     instructions=exploit_agent_system_prompt + env_context,
 #     functions=[CliAgent, Thought_Agent],
-#     model="claude-3-5-sonnet-20240620",
+#     model="qwen2.5:14b",
 #     parallel_tool_calls=False
 # )
 
