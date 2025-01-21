@@ -4,6 +4,8 @@ operations using OpenTelemetry.
 """
 
 import contextvars
+import inspect
+import importlib
 import json
 import os
 import sys
@@ -21,6 +23,8 @@ from opentelemetry.trace import Status, StatusCode  # pylint: disable=import-err
 
 from openinference.semconv.resource import ResourceAttributes  # pylint: disable=import-error,ungrouped-imports  # noqa: E501
 from openinference.semconv.trace import SpanAttributes  # pylint: disable=import-error  # noqa: E501
+
+import cai.tools as tools  # pylint: disable=consider-using-from-import  # noqa: E501
 
 # Instrument OpenAI if tracing is enabled
 if os.getenv("CAI_TRACING", "true").lower() == "true":
@@ -169,9 +173,6 @@ class ExploitLogger:
     def log_agent(self):
         """Decorator to log the agent.
 
-        Args:
-            agent (Agent): The agent to log.
-
         Returns:
             Callable: The decorated function.
         """
@@ -204,6 +205,7 @@ class ExploitLogger:
                             SpanAttributes.OPENINFERENCE_SPAN_KIND, "CHAIN")
                         span.set_attribute("chain.name", active_agent.name)
 
+                        new_active_agent = None
                         try:
                             new_active_agent = func(
                                 cai, active_agent, *args, **kwargs)
@@ -213,14 +215,15 @@ class ExploitLogger:
                             span.set_status(Status(StatusCode.ERROR, str(e)))
                             raise
                         finally:
-                            agent_changed = (
-                                not new_active_agent or
-                                new_active_agent.name != active_agent.name
-                            )
-                            if agent_changed:
-                                current_span.set(None)
-                                current_agent_span.set(None)
-                                self.active_agent_name = None
+                            if new_active_agent:
+                                agent_changed = (
+                                    not new_active_agent or
+                                    new_active_agent.name != active_agent.name
+                                )
+                                if agent_changed:
+                                    current_span.set(None)
+                                    current_agent_span.set(None)
+                                    self.active_agent_name = None
                 else:
                     # Reuse existing span
                     existing_span = current_agent_span.get()
@@ -233,6 +236,93 @@ class ExploitLogger:
                         return func(cai, active_agent, *args, **kwargs)
                     finally:
                         context.detach(token)
+            return wrapper
+        return decorator
+
+    def _find_function_docstring(self, tool_name: str) -> str:
+        """Find the docstring for a given tool name by
+        searching through the tools package."""
+        # Get the absolute path of the tools package
+        tools_path = os.path.dirname(tools.__file__)
+
+        # Recursively search through all modules in the tools package
+        for root, _, files in os.walk(tools_path):  # pylint: disable=too-many-nested-blocks # noqa: E501
+            for file in files:
+                if file.endswith('.py') and not file.startswith('__'):
+                    # Convert file path to module path
+                    rel_path = os.path.relpath(os.path.join(
+                        root, file), os.path.dirname(tools_path))
+                    module_path = f"cai.{
+                        os.path.splitext(rel_path)[0].replace(
+                            os.sep, '.')}"
+
+                    try:
+                        module = importlib.import_module(module_path)
+                        # Look for the function in the module
+                        if hasattr(module, tool_name):
+                            func = getattr(module, tool_name)
+                            if func.__doc__:
+                                return inspect.cleandoc(func.__doc__)
+                    except (ImportError, ValueError) as e:
+                        print(f"Warning: Could not import {module_path}: {e}")
+                        continue
+
+        # print(f"Warning: No documentation found for tool {tool_name}")
+        return "No documentation found"
+
+    def log_tool(self):
+        """Decorator to log the tool."""
+        def decorator(func):
+            @wraps(func)
+            def wrapper(tool_name, *args, **kwargs):
+                if not self.tracing:
+                    return func(tool_name, *args, **kwargs)
+
+                parent_context = context.get_current()
+
+                with self.tracer.start_as_current_span(
+                    tool_name, context=parent_context
+                ) as span:
+                    current_span.set(span)
+                    span.set_attribute(
+                        SpanAttributes.OPENINFERENCE_SPAN_KIND, "TOOL")
+                    try:
+                        result = func(tool_name, *args, **kwargs)
+                        span.set_attribute("tool.name", str(tool_name))
+
+                        # Get the function's docstring
+                        docstring = self._find_function_docstring(tool_name)
+                        span.set_attribute("tool.docstring", docstring)
+
+                        for key, value in kwargs.items():
+                            if key != "ctf":
+                                span.set_attribute(
+                                    f"tool.kwargs.{key}", str(value))
+
+                        span.set_attribute("tool.description", str(docstring))
+                        json_result = {
+                            "tool": tool_name,
+                            "docstring": docstring,
+                            "args": {k: str(v) for k, v in kwargs.items() if k != "ctf"},  # noqa: E501  # pylint: disable=line-too-long
+                            "output": str(result),
+                        }
+
+                        span.set_attribute(
+                            "tool.json_schema", json.dumps(
+                                json_result, indent=4)
+                        )
+                        span.set_attribute(
+                            "tool.parameters", json.dumps(
+                                json_result, indent=4)
+                        )
+
+                        return result
+                    except Exception as e:
+                        span.set_status(Status(StatusCode.ERROR, str(e)))
+                        raise
+                    finally:
+                        current_span.set(None)
+
             return wrapper
         return decorator
 

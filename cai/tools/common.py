@@ -7,7 +7,7 @@ import subprocess  # nosec B404
 from wasabi import color  # pylint: disable=import-error
 
 
-def _run_ctf(ctf, command, stdout=True):
+def _run_ctf(ctf, command, stdout=False):
     try:
         # Ensure the command is executed in a shell that supports command
         # chaining
@@ -23,7 +23,7 @@ def _run_ctf(ctf, command, stdout=True):
         return f"Error executing CTF command: {str(e)}"
 
 
-def _run_local(command, stdout=True):
+def _run_local(command, stdout=False):
     try:
         # nosec B602 - shell=True is required for command chaining
         result = subprocess.run(
@@ -47,7 +47,7 @@ def _run_local(command, stdout=True):
         return f"Error executing local command: {str(e)}"
 
 
-def run_command(command, ctf=None, stdout=True):
+def run_command(command, ctf=None, stdout=False):
     """
     Run command either in CTF container or
     on the local attacker machine

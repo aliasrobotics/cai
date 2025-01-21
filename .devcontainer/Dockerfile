@@ -61,7 +61,7 @@ RUN pip3 install tensorflow pandas  \
                  mem0ai PyPDF2 sentence_transformers tf-keras \
                  pytest-repeat parameterized pytest-rerunfailures \
                  pytest-clarity tiktoken blobfile pytest-timeout \
-                 invoke fabric spacy thinc
+                 invoke fabric
 
 # Install rust compiler - dependency of outlines-core
 RUN apt-get update && \
@@ -87,7 +87,7 @@ RUN echo "console-setup console-setup/variant select Latin1 and Latin5 - western
 
 # Update pip again -> python3 -m pip install --upgrade pip causes crashes
 # Install spacy deps - en_core_web_sm
-RUN python3 -m spacy download en_core_web_sm
+# RUN python3 -m spacy download en_core_web_sm
 
 # Install docker inside of dev env
 RUN apt-get update && \

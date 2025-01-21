@@ -37,6 +37,11 @@ ctf.start_ctf()
 def CliAgent():
     """
     CLI Security Tester, call this function empty CliAgent() to transfer to cli_agent
+    This agent has the following tools:
+    execute_cli_command,
+    web_request_framework,
+    generate_php_webshell,
+    upload_ftp_webshell
     """
     return cli_agent
 
@@ -93,5 +98,6 @@ messages = [{
 thought_response = client.run(
     agent=thought_agent,
     messages=messages,
-    debug=True)
+    debug=2)
+    
 ctf.stop_ctf()
