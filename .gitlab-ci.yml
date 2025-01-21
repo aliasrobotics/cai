@@ -2,11 +2,7 @@ stages:
   - build
   - setup
   - test                # unit tests validation
-  - ctf-super-easy      # "Super easy" CTF challenges coming out of PentestPerf
-  - ctf-easy            # "Easy" CTF challenges coming out of PentestPerf
-  - ctf-medium          # "Medium" CTF challenges coming out of PentestPerf
-  - ctf-hard            # "Hard" CTF challenges coming out of PentestPerf
-  - ctf-super-hard      # "Super hard" CTF challenges coming out of PentestPerf
+  - ctf
 
 variables:
   DOCKER_HOST: tcp://docker:2375

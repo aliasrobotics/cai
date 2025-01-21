@@ -34,6 +34,7 @@ def cat_file(file_path: str, args: str = "", ctf=None) -> str:
     command = f'cat {args} {file_path} '
     return run_command(command, ctf=ctf)
 
+
 # FileSearchTool
 # ListDirTool
 # TextSearchTool
@@ -52,4 +53,12 @@ def pwd_command(ctf=None) -> str:
         str: The absolute path of the current working directory
     """
     command = 'pwd'
+    return run_command(command, ctf=ctf)
+
+
+def find_file(file_path: str, args: str = "", ctf=None) -> str:
+    """
+    Find a file in the filesystem.
+    """
+    command = f'find {file_path} {args}'
     return run_command(command, ctf=ctf)
