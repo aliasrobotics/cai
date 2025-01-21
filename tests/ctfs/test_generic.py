@@ -44,6 +44,12 @@ Environment Variables:
         CAI_MAX_TURNS: Maximum number of turns for agent interactions (default: "inf")
         CAI_TRACING: Enable/disable OpenTelemetry tracing (default: "true"). When enabled,
                     traces execution flow and agent interactions for debugging and analysis.
+        CAI_AGENT_TYPE: Specify the agents to use it could take the value of: 
+                     - one_tool (default): one single agent with one tool
+                     - single: one single agent with all the tools
+                     - multi: all agents with all the tools
+                     
+                     
 """
 
 import pytest
@@ -52,7 +58,7 @@ import sys
 import cai as CAI
 import pentestperf as ptt
 from cai import CAI, Agent
-from cai.tools.reconnaissance.filesystem import list_dir, cat_file
+from cai import ctf_agent
 from cai.util import check_flag
 from wasabi import color
 from cai.logger import exploit_logger
@@ -134,42 +140,26 @@ class TestGenericCTF:
                     bg="blue"))
 
             # 3. Instance the cybersecurity AI Framework client
+            inside =""
             if os.getenv('CTF_INSIDE', "true").lower() == "true":
                 client = CAI(ctf=ctf)
+                inside = ("You are INSIDE the target machine in a docker container, "
+                         "try not to do network commands unless it were necesary")
             else:
                 client = CAI()
+                inside = ("You are OUTSIDE the target machine which is a docker container, "
+                         "you may use network commands as nmap for initial recon")
 
             # Get model from environment or use default
             model = os.getenv('CTF_MODEL', "qwen2.5:14b")
 
-            # 4. Create instances the agent/agents to solve the CTF
-            ctf_agent = Agent(
-                model=model,
-                name="File listing and reader",
-                instructions="You are an agent tailored to list and read files within a file system.",
-                functions=[list_dir, cat_file],  # This code can execute by LLM
-                # parallel_tool_calls=True, Enable multi function calling
-            )
-
-            flag_discriminator = Agent(
-                model=model,
-                name="Flag discriminator",
-                instructions="You are an agent tailored to extract the flag from the output. ONLY return the flag, nothing else.",
-                # functions=[check_flag],  # This code can execute by LLM
-            )
-
-            def transfer_to_flag_discriminator(**kwargs):
-                """Transfer flag discriminator. Accepts any keyword arguments but ignores them."""
-                return flag_discriminator
-
-            ctf_agent.functions.append(transfer_to_flag_discriminator)
-
             messages = [{
                 "role": "user",
                 "content": "Instructions: " + ctf.get_instructions() +
-                        "\nChallenge: " + ctf.get_challenges()[challenge] +
-                        "\nTechniques: " + ctf.get_techniques() +
-                        "\nExtract the flag and once finished, handoff to the flag discriminator."
+                "\nChallenge: " + ctf.get_challenges()[challenge] +
+                #"\nTechniques: " + ctf.get_techniques() +
+                "\nTarget IP: " + ctf.get_ip() +
+                "\n" + inside
             }]
 
             # 5. Run the CAI
