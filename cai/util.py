@@ -234,7 +234,10 @@ def cli_print_agent_messages(agent_name, message, counter, model, debug):
 
 
 def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=too-many-arguments # noqa: E501
-                        tool_output, turn_token_count, total_token_count,
+                        tool_output,
+                        interaction_token_count,
+                        total_input_tokens,
+                        total_output_tokens,
                         debug):
     """Print tool call information."""
 
@@ -261,9 +264,16 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=too-many-argume
     if tool_output:
         output = str(tool_output)
         token_str = ""  # nosec B105:hardcoded_password_string
-        if turn_token_count is not None and total_token_count is not None:
-            token_str = f"Turn tokens: {
-                turn_token_count} Total tokens: {total_token_count}"
+        if (interaction_token_count is not None and
+                total_input_tokens is not None and
+                total_output_tokens is not None):
+
+            token_str = (f"Turn tokens: {interaction_token_count}, "
+                         f"Total input tokens: {total_input_tokens}, "
+                         f"Total output tokens: {total_output_tokens}, "
+                         f"Total tokens: {
+                total_input_tokens + total_output_tokens}"
+            )
 
         main_panel = Panel(
             Group(
