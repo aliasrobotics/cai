@@ -516,7 +516,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     completion.usage.prompt_tokens
                 )
                 self.interaction_output_tokens = (
-                    completion.usage.completion_token
+                    completion.usage.completion_tokens
                 )
                 self.total_input_tokens += (
                     self.interaction_input_tokens
