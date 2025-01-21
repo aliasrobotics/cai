@@ -26,9 +26,7 @@ model = os.getenv('CTF_MODEL', "qwen2.5:14b")
 
 
 # AGENTS
-
-# 4. Create instances the agent/s to solve the CTF
-
+# Create instances the agent/s to solve the CTF
 ctf_agent = Agent(
     model=model,
     name="CTF agent",
@@ -127,8 +125,6 @@ flag_discriminator = Agent(
 
 
 # TRANSFER FUNCTIONS
-
-
 def transfer_to_flag_discriminator(**kwargs):  # pylint: disable=W0613
     """Transfer flag discriminator.
     Accepts any keyword arguments but ignores them."""
@@ -160,7 +156,7 @@ def transfer_to_crypto_agent(**kwargs):  # pylint: disable=W0613
 
 
 # ADD TRANSFER FUNCTIONS TO THE AGENTS
-cai_agent = os.getenv('CAI_AGENT_TYPE', "one-tool").lower()
+cai_agent = os.getenv('CAI_AGENT_TYPE', "one_tool").lower()
 
 if cai_agent == "multi":
     ctf_agent.functions.extend([
@@ -187,8 +183,11 @@ elif cai_agent == "single":
         pwd_command,
     ])
     flag_discriminator.functions.extend([transfer_to_ctf_agent])
-else:  # by default one-tool
+elif cai_agent == "one_tool":
     ctf_agent.functions.append(
         transfer_to_flag_discriminator
     )
     flag_discriminator.functions.append(transfer_to_ctf_agent)
+else:
+    # stop and raise error
+    raise ValueError(f"Invalid CAI agent type: {cai_agent}")

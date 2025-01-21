@@ -143,21 +143,23 @@ class TestGenericCTF:
             inside =""
             if os.getenv('CTF_INSIDE', "true").lower() == "true":
                 client = CAI(ctf=ctf)
-                inside = "You are INSIDE the target machine in a docker container, try not to do network commands unless it were necesary"
+                inside = ("You are INSIDE the target machine in a docker container, "
+                         "try not to do network commands unless it were necesary")
             else:
                 client = CAI()
-                inside = "You are OUTSIDE the target machine which is a docker container, you may use network commands as nmap for initial recon"
+                inside = ("You are OUTSIDE the target machine which is a docker container, "
+                         "you may use network commands as nmap for initial recon")
 
             # Get model from environment or use default
             model = os.getenv('CTF_MODEL', "qwen2.5:14b")
-
 
             messages = [{
                 "role": "user",
                 "content": "Instructions: " + ctf.get_instructions() +
                 "\nChallenge: " + ctf.get_challenges()[challenge] +
                 #"\nTechniques: " + ctf.get_techniques() +
-                "\nTarget IP: " + ctf.get_ip() 
+                "\nTarget IP: " + ctf.get_ip() +
+                "\n" + inside
             }]
 
             # 5. Run the CAI
