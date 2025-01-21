@@ -26,7 +26,8 @@ def get_model_tokens(model):
         "o1": 200000,
         "claude": 200000,
         "qwen": 32000,
-        "llama": 32000
+        "llama": 32000,
+        "deepseek": 128000
     }
 
     for model_type, tokens in model_tokens.items():
