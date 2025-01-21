@@ -1,6 +1,8 @@
 """
 This module provides a CLI interface for testing and
 interacting with CAI agents.
+
+NOTE: For now, hard-coded to use selected agents and tools.
 """
 
 from mako.template import Template  # pylint: disable=import-error
@@ -53,6 +55,7 @@ def thought_agent_handoff():
 thought_agent = Agent(
     name="ThoughAgent",
     instructions=thought_agent_system_prompt,
+    model="qwen2.5:14b",
     functions=[thought, cli_agent_handoff],
     parallel_tool_calls=False
 )
@@ -61,6 +64,7 @@ thought_agent = Agent(
 cli_agent = Agent(
     name="Boot2Root CTF Tester",
     instructions=cli_agent_system_prompt + env_context,
+    model="qwen2.5:14b",
     functions=[
         execute_cli_command,
         thought_agent_handoff,
@@ -73,4 +77,4 @@ cli_agent = Agent(
 )
 
 if __name__ == "__main__":
-    run_demo_loop(thought_agent, debug=2)
+    run_demo_loop(thought_agent, debug=2, max_turns=3)
