@@ -47,7 +47,7 @@ __CTX_VARS_NAME__ = "context_variables"
 litellm.suppress_debug_info = True
 
 
-class CAI:
+class CAI:  # pylint: disable=too-many-instance-attributes
     """
     Cybersecurity AI (CAI) object
     """
@@ -59,7 +59,8 @@ class CAI:
         self.brief = False
         self.total_input_tokens = 0
         self.total_output_tokens = 0
-        self.interaction_token_count = 0
+        self.interaction_input_tokens = 0
+        self.interaction_output_tokens = 0
         self.max_chars_per_message = 5000  # number of characters
         # to consider from each tool
         # output
@@ -335,9 +336,11 @@ class CAI:
                 tool_name=name,
                 tool_args=args,
                 tool_output=result.value,
-                interaction_token_count=self.interaction_token_count,
+                interaction_input_tokens=self.interaction_input_tokens,
+                interaction_output_tokens=self.interaction_output_tokens,
                 total_input_tokens=self.total_input_tokens,
                 total_output_tokens=self.total_output_tokens,
+                model=agent.model,
                 debug=debug)
 
             partial_response.context_variables.update(result.context_variables)
@@ -508,14 +511,19 @@ class CAI:
                 debug=debug,
             )
             if completion.usage:
-                self.interaction_token_count = 0
-                self.interaction_token_count = ((
-                    completion.usage.prompt_tokens +
-                    completion.usage.completion_tokens) or
-                    self.interaction_token_count)
-                self.total_input_tokens = (completion.usage.prompt_tokens or
-                                           self.total_input_tokens)
-                self.total_output_tokens += completion.usage.completion_tokens
+
+                self.interaction_input_tokens = (
+                    completion.usage.prompt_tokens
+                )
+                self.interaction_output_tokens = (
+                    completion.usage.completion_token
+                )
+                self.total_input_tokens += (
+                    self.interaction_input_tokens
+                )
+                self.total_output_tokens += (
+                    self.interaction_output_tokens
+                )
 
             message = completion.choices[0].message
 

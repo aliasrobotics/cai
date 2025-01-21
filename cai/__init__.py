@@ -17,7 +17,6 @@ from cai.tools.reconnaissance.generic_linux_command import generic_linux_command
 from .core import CAI
 from .types import Agent, Response
 
-
 __all__ = ["CAI", "Agent", "Response"]
 
 

@@ -17,6 +17,25 @@ from rich.traceback import install  # pylint: disable=import-error
 from rich.pretty import install as install_pretty  # pylint: disable=import-error # noqa: 501
 
 
+def get_model_tokens(model):
+    """
+    Get the number of tokens max context window capacity for a given model.
+    """
+    model_tokens = {
+        "gpt": 128000,
+        "o1": 200000,
+        "claude": 200000,
+        "qwen": 32000,
+        "llama": 32000
+    }
+
+    for model_type, tokens in model_tokens.items():
+        if model_type in model:
+            return tokens
+
+    return model_tokens["gpt"]
+
+
 theme = Theme({
     # Primary colors - Material Design inspired
     "timestamp": "#00BCD4",  # Cyan 500
@@ -235,9 +254,11 @@ def cli_print_agent_messages(agent_name, message, counter, model, debug):
 
 def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=too-many-arguments # noqa: E501
                         tool_output,
-                        interaction_token_count,
+                        interaction_input_tokens,
+                        interaction_output_tokens,
                         total_input_tokens,
                         total_output_tokens,
+                        model,
                         debug):
     """Print tool call information."""
 
@@ -264,15 +285,21 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=too-many-argume
     if tool_output:
         output = str(tool_output)
         token_str = ""  # nosec B105:hardcoded_password_string
-        if (interaction_token_count is not None and
+        if (interaction_input_tokens is not None and
+                interaction_output_tokens is not None and
                 total_input_tokens is not None and
                 total_output_tokens is not None):
-
-            token_str = (f"Turn tokens: {interaction_token_count}, "
-                         f"Total input tokens: {total_input_tokens}, "
-                         f"Total output tokens: {total_output_tokens}, "
-                         f"Total tokens: {
-                total_input_tokens + total_output_tokens}"
+            token_str = (
+                f"(tokens) input: {interaction_input_tokens}, "
+                f"output: {interaction_output_tokens}; "
+                f"total input: {total_input_tokens}, "
+                f"total output: {total_output_tokens}; "
+                f"total: {total_input_tokens + total_output_tokens} "
+                f"total context windows: {get_model_tokens(model)} | "
+                f"{(interaction_input_tokens / get_model_tokens(model) * 100):.4f}% "  # noqa: E501
+                f"{'🟩' if interaction_input_tokens /
+                   get_model_tokens(model) < 0.5 else '🟨' if interaction_input_tokens /  # noqa: E501 # pylint: disable=C0301
+                   get_model_tokens(model) < 0.8 else '🟥'}"
             )
 
         main_panel = Panel(
