@@ -453,6 +453,13 @@ class CAI:
         """
         Run the cai and return the final response along
         with execution time in seconds.
+
+        This method returns when the "turn" finalizes. Each "turn"
+        is composed by one or more "interactions". For clarify,
+        some definitions:
+        - "turn": a single interaction with CAI
+        - "interaction": a single interaction with the LLM, with
+            its corresponding tool calls and responses.
         """
         start_time = time.time()
         self.brief = brief
