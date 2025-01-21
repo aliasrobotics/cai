@@ -160,7 +160,9 @@ def transfer_to_crypto_agent(**kwargs):  # pylint: disable=W0613
 
 
 # ADD TRANSFER FUNCTIONS TO THE AGENTS
-if os.getenv('CAI_AGENT_TYPE', "").lower() == "multi":
+cai_agent = os.getenv('CAI_AGENT_TYPE', "one-tool").lower()
+
+if cai_agent == "multi":
     ctf_agent.functions.extend([
         transfer_to_flag_discriminator,
         transfer_to_crypto_agent,
@@ -175,7 +177,7 @@ if os.getenv('CAI_AGENT_TYPE', "").lower() == "multi":
     crypto_agent.functions.extend(
         [transfer_to_ctf_agent, transfer_to_flag_discriminator])
     flag_discriminator.functions.extend([transfer_to_ctf_agent])
-elif os.getenv('CAI_AGENT_TYPE', "").lower() == "single":
+elif cai_agent == "single":
     ctf_agent.functions.extend([
         list_dir,
         cat_file,
@@ -185,7 +187,7 @@ elif os.getenv('CAI_AGENT_TYPE', "").lower() == "single":
         pwd_command,
     ])
     flag_discriminator.functions.extend([transfer_to_ctf_agent])
-else:
+else:  # by default one-tool
     ctf_agent.functions.append(
         transfer_to_flag_discriminator
     )

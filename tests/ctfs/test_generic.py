@@ -45,7 +45,11 @@ Environment Variables:
         CAI_TRACING: Enable/disable OpenTelemetry tracing (default: "true"). When enabled,
                     traces execution flow and agent interactions for debugging and analysis.
         CAI_AGENT_TYPE: Specify the agents to use it could take the value of: 
-                    multi, single, one_tool (default)
+                     - one_tool (default): one single agent with one tool
+                     - single: one single agent with all the tools
+                     - multi: all agents with all the tools
+                     
+                     
 """
 
 import pytest
