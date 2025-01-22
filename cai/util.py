@@ -26,8 +26,8 @@ def get_model_input_tokens(model):
         "gpt": 128000,
         "o1": 200000,
         "claude": 200000,
-        "qwen2.5": 128000,  # https://ollama.com/library/qwen2.5, 128K input, 8K output  # noqa: E501  # pylint: disable=C0301
-        "llama3.1": 128000,  # https://ollama.com/library/llama3.1, 128K input  # noqa: E501  # pylint: disable=C0301
+        "qwen2.5": 32000,  # https://ollama.com/library/qwen2.5, 128K input, 8K output  # noqa: E501  # pylint: disable=C0301
+        "llama3.1": 32000,  # https://ollama.com/library/llama3.1, 128K input  # noqa: E501  # pylint: disable=C0301
         "deepseek": 128000  # https://api-docs.deepseek.com/quick_start/pricing  # noqa: E501  # pylint: disable=C0301
     }
 
@@ -289,6 +289,7 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
 
     if tool_output:
         output = str(tool_output)
+        tokens_text = None
         if (interaction_input_tokens is not None and
                 interaction_output_tokens is not None and
                 total_input_tokens is not None and
@@ -320,7 +321,7 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
                 get_model_input_tokens(model) * 100
             tokens_text.append("| Context: ", style="context_tokens")
             tokens_text.append(f"{context_pct:.1f}% ", style="context_tokens")
-            tokens_text.append(f"{'🟩' if context_pct < 50 else '🟨' if context_pct < 80 else '🟥'}", style="context_tokens")  # noqa: E501 # pylint: disable=C0301
+            tokens_text.append(f"{'🟩' if context_pct < 50 else '🟨' if context_pct < 80 else '🟥'} ({get_model_input_tokens(model)})", style="context_tokens")  # noqa: E501 # pylint: disable=C0301
 
         # If title text is too long for panel width, show it in the group
         # instead
@@ -334,10 +335,7 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
 
         group_content.extend([
             Text(output, style="content"),
-            Text(
-                token_str,
-                style="dim",
-                justify="right") if token_str else Text("")
+            tokens_text if tokens_text else Text("")
         ])
 
         main_panel = Panel(
