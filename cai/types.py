@@ -27,6 +27,7 @@ class Agent(BaseModel):  # pylint: disable=too-few-public-methods
     functions: List[AgentFunction] = []
     tool_choice: str = None
     parallel_tool_calls: bool = True
+    structured_output_class: Optional[BaseModel] = None
 
 
 class Response(BaseModel):  # pylint: disable=too-few-public-methods

@@ -117,6 +117,11 @@ class CAI:
 
         try:
             if os.getenv("OLLAMA", "").lower() == "true":
+
+                create_params["format"] = (
+                    agent.structured_output_class.model_json_schema()
+                )
+
                 litellm_completion = litellm.completion(
                     **create_params,
                     api_base=get_ollama_api_base(),
