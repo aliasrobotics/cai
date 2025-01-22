@@ -119,15 +119,19 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         # Refer to https://docs.litellm.ai/docs/completion/json_mode
         if agent.structured_output_class:
-            # # if providing the schema
-            # create_params["response_format"] = {
-            #     "type": "json_schema",
-            #     "json_schema": agent.structured_output_class.model_json_schema(),  # noqa: E501
-            #     "strict": True
-            # }
+
+            # if providing the schema
+            #
+            # # NOTE: this is not working
+            # # other than for Ollama-served models
+            # create_params["response_format"] =
+            #   agent.structured_output_class.model_json_schema()
 
             # when using pydantic
             create_params["response_format"] = agent.structured_output_class
+
+            # set temperature to 0 when using structured output
+            create_params["temperature"] = 0.0
 
         try:
             if os.getenv("OLLAMA", "").lower() == "true":

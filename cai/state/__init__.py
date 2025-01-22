@@ -3,7 +3,6 @@ This module provides a state class that can be used to represent
 the state of a cybersecurity system.
 """
 
-import copy
 from pydantic import BaseModel  # pylint: disable=import-error
 
 
@@ -21,9 +20,3 @@ class State(BaseModel):  # pylint: disable=too-few-public-methods
 
     Implementations of the state should inherit from this class.
     """
-
-    def copy(self):
-        """
-        Returns a deep copy of the state.
-        """
-        return copy.deepcopy(self)

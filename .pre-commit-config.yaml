@@ -1,4 +1,4 @@
-exclude: ^(examples|tests|cai/state/pydantic.py)/
+exclude: ^(examples|tests)/
 repos:
   - repo: https://github.com/hhatto/autopep8
     rev: v2.1.0
