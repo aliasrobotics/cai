@@ -322,14 +322,27 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
             tokens_text.append(f"{context_pct:.1f}% ", style="context_tokens")
             tokens_text.append(f"{'🟩' if context_pct < 50 else '🟨' if context_pct < 80 else '🟥'}", style="context_tokens")  # noqa: E501 # pylint: disable=C0301
 
+        # If title text is too long for panel width, show it in the group
+        # instead
+        # Convert Text object to string to get length
+        title_width = len(str(text))
+        max_title_width = console.width - 4  # Account for panel borders
+
+        group_content = []
+        if title_width > max_title_width:
+            group_content.append(text)
+
+        group_content.extend([
+            Text(output, style="content"),
+            Text(
+                token_str,
+                style="dim",
+                justify="right") if token_str else Text("")
+        ])
+
         main_panel = Panel(
-            Group(
-                Text(output, style="content"),
-                # Text(token_str, style="dim", justify="right")
-                # if token_str else Text("")
-                tokens_text
-            ),
-            title=text,
+            Group(*group_content),
+            title="" if title_width > max_title_width else text,
             border_style="border",
             title_align="left",
             box=ROUNDED,
