@@ -17,6 +17,27 @@ from rich.traceback import install  # pylint: disable=import-error
 from rich.pretty import install as install_pretty  # pylint: disable=import-error # noqa: 501
 
 
+def get_model_input_tokens(model):
+    """
+    Get the number of input tokens for
+    max context window capacity for a given model.
+    """
+    model_tokens = {
+        "gpt": 128000,
+        "o1": 200000,
+        "claude": 200000,
+        "qwen2.5": 32000,  # https://ollama.com/library/qwen2.5, 128K input, 8K output  # noqa: E501  # pylint: disable=C0301
+        "llama3.1": 32000,  # https://ollama.com/library/llama3.1, 128K input  # noqa: E501  # pylint: disable=C0301
+        "deepseek": 128000  # https://api-docs.deepseek.com/quick_start/pricing  # noqa: E501  # pylint: disable=C0301
+    }
+
+    for model_type, tokens in model_tokens.items():
+        if model_type in model:
+            return tokens
+
+    return model_tokens["gpt"]
+
+
 theme = Theme({
     # Primary colors - Material Design inspired
     "timestamp": "#00BCD4",  # Cyan 500
@@ -26,13 +47,16 @@ theme = Theme({
     "tool": "#F44336",       # Red 500
 
     # Secondary colors
-    "total_token_count": "#FFC107",  # Amber 500
     "cost": "#009688",        # Teal 500
+    "args_str": "#FFC107",  # Amber 500
 
     # UI elements
     "border": "#2196F3",      # Blue 500
     "model": "#673AB7",       # Deep Purple 500
     "dim": "#9E9E9E",         # Grey 500
+    "current_token_count": "#E0E0E0",  # Grey 300 - Light grey
+    "total_token_count": "#757575",    # Grey 600 - Medium grey
+    "context_tokens": "#0A0A0A",       # Nearly black - Very high contrast
 
     # Status indicators
     "success": "#4CAF50",     # Green 500
@@ -233,8 +257,13 @@ def cli_print_agent_messages(agent_name, message, counter, model, debug):
     console.print(text)
 
 
-def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=too-many-arguments # noqa: E501
-                        tool_output, turn_token_count, total_token_count,
+def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-arguments # noqa: E501
+                        tool_output,
+                        interaction_input_tokens,
+                        interaction_output_tokens,
+                        total_input_tokens,
+                        total_output_tokens,
+                        model,
                         debug):
     """Print tool call information."""
 
@@ -250,25 +279,68 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=too-many-argume
 
     text = Text()
     text.append(f"{tool_name}(", style="tool")
-    text.append(args_str, style="total_token_count")
+    text.append(args_str, style="args_str")
+    if "agent" in tool_name.lower() or "transfer" in tool_name.lower(
+    ) or "handoff" in tool_name.lower():
+        text.append("Handoff", style="agent")
     text.append(
         ") ",
         style="tool")
 
     if tool_output:
         output = str(tool_output)
-        token_str = ""  # nosec B105:hardcoded_password_string
-        if turn_token_count is not None and total_token_count is not None:
-            token_str = f"Turn tokens: {
-                turn_token_count} Total tokens: {total_token_count}"
+        tokens_text = None
+        if (interaction_input_tokens is not None and
+                interaction_output_tokens is not None and
+                total_input_tokens is not None and
+                total_output_tokens is not None):
+
+            tokens_text = Text(justify="right")
+            # Current interaction tokens
+            tokens_text.append(
+                "(tokens) Current: ",
+                style="current_token_count")
+            tokens_text.append(
+                f"I:{interaction_input_tokens} ",
+                style="current_token_count")
+            tokens_text.append(
+                f"O:{interaction_output_tokens} ",
+                style="current_token_count")
+
+            # Total tokens
+            tokens_text.append("| Total: ", style="total_token_count")
+            tokens_text.append(
+                f"I:{total_input_tokens} ",
+                style="total_token_count")
+            tokens_text.append(
+                f"O:{total_output_tokens} ",
+                style="total_token_count")
+
+            # Context usage
+            context_pct = interaction_input_tokens / \
+                get_model_input_tokens(model) * 100
+            tokens_text.append("| Context: ", style="context_tokens")
+            tokens_text.append(f"{context_pct:.1f}% ", style="context_tokens")
+            tokens_text.append(f"{'🟩' if context_pct < 50 else '🟨' if context_pct < 80 else '🟥'} ({get_model_input_tokens(model)})", style="context_tokens")  # noqa: E501 # pylint: disable=C0301
+
+        # If title text is too long for panel width, show it in the group
+        # instead
+        # Convert Text object to string to get length
+        title_width = len(str(text))
+        max_title_width = console.width - 4  # Account for panel borders
+
+        group_content = []
+        if title_width > max_title_width:
+            group_content.append(text)
+
+        group_content.extend([
+            Text(output, style="content"),
+            tokens_text if tokens_text else Text("")
+        ])
 
         main_panel = Panel(
-            Group(
-                Text(output, style="content"),
-                Text(token_str, style="dim", justify="right")
-                if token_str else Text("")
-            ),
-            title=text,
+            Group(*group_content),
+            title="" if title_width > max_title_width else text,
             border_style="border",
             title_align="left",
             box=ROUNDED,

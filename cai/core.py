@@ -47,7 +47,7 @@ __CTX_VARS_NAME__ = "context_variables"
 litellm.suppress_debug_info = True
 
 
-class CAI:
+class CAI:  # pylint: disable=too-many-instance-attributes
     """
     Cybersecurity AI (CAI) object
     """
@@ -57,8 +57,10 @@ class CAI:
                  log_training_data=True):
         self.ctf = ctf
         self.brief = False
-        self.completion_tokens = 0
-        self.total_tokens = 0
+        self.total_input_tokens = 0
+        self.total_output_tokens = 0
+        self.interaction_input_tokens = 0
+        self.interaction_output_tokens = 0
         self.max_chars_per_message = 5000  # number of characters
         # to consider from each tool
         # output
@@ -292,7 +294,21 @@ class CAI:
                     The result from executing the tool function with
                         the given arguments
                 """
-                return function_map[tool_name](**tool_args)
+                try:
+                    raw_result = function_map[tool_name](**tool_args)
+                except TypeError as e:
+                    if "unexpected keyword argument" in str(
+                            e):  # Usual Error when open source model try do a handoff # noqa: E501
+                        print(f"Warning: {e}. Executing tool {
+                              tool_name} without arguments.")
+                        raw_result = function_map[tool_name]()
+                    else:
+                        print(f"Error executing tool {tool_name}: {e}")
+                        raise e
+                except Exception as e:
+                    print(f"Error executing tool {tool_name}: {e}")
+                    raise e
+                return raw_result
 
             raw_result = execute_tool(name, **args)
 
@@ -322,12 +338,15 @@ class CAI:
                 }
             )
             cli_print_tool_call(
-                name,
-                args,
-                result.value,
-                self.completion_tokens,
-                self.total_tokens,
-                debug)
+                tool_name=name,
+                tool_args=args,
+                tool_output=result.value,
+                interaction_input_tokens=self.interaction_input_tokens,
+                interaction_output_tokens=self.interaction_output_tokens,
+                total_input_tokens=self.total_input_tokens,
+                total_output_tokens=self.total_output_tokens,
+                model=agent.model,
+                debug=debug)
 
             partial_response.context_variables.update(result.context_variables)
             if result.agent:
@@ -504,11 +523,18 @@ class CAI:
                 debug=debug,
             )
             if completion.usage:
-                prompt_tokens = completion.usage.prompt_tokens or 0
-                self.completion_tokens = completion.usage.completion_tokens + \
-                    prompt_tokens or self.completion_tokens
-                self.total_tokens += self.completion_tokens
-
+                self.interaction_input_tokens = (
+                    completion.usage.prompt_tokens
+                )
+                self.interaction_output_tokens = (
+                    completion.usage.completion_tokens
+                )
+                self.total_input_tokens += (
+                    self.interaction_input_tokens
+                )
+                self.total_output_tokens += (
+                    self.interaction_output_tokens
+                )
             message = completion.choices[0].message
 
             debug_print(
@@ -534,7 +560,7 @@ class CAI:
             # agents
             partial_response = self.handle_tool_calls(
                 message.tool_calls, active_agent.functions,
-                context_variables, debug, agent, n_turn,
+                context_variables, debug, active_agent, n_turn,
                 message=message.content
             )
 
