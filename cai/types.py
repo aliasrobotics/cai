@@ -11,8 +11,8 @@ from openai.types.chat.chat_completion_message_tool_call import (  # noqa: F401,
 
 # Third-party imports
 from pydantic import BaseModel  # pylint: disable=import-error
-
-AgentFunction = Callable[[], Union[str, "Agent", dict]]
+from cai.state import State
+AgentFunction = Callable[[], Union[str, "Agent", dict, State]]
 
 
 class Agent(BaseModel):  # pylint: disable=too-few-public-methods
@@ -27,7 +27,7 @@ class Agent(BaseModel):  # pylint: disable=too-few-public-methods
     functions: List[AgentFunction] = []
     tool_choice: str = None
     parallel_tool_calls: bool = True
-    structured_output_class: Optional[BaseModel] = None
+    structured_output_class: Optional[type[State]] = None
 
 
 class Response(BaseModel):  # pylint: disable=too-few-public-methods
