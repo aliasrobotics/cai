@@ -251,6 +251,9 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=too-many-argume
     text = Text()
     text.append(f"{tool_name}(", style="tool")
     text.append(args_str, style="total_token_count")
+    if "agent" in tool_name.lower() or "transfer" in tool_name.lower(
+    ) or "handoff" in tool_name.lower():
+        text.append("Handoff", style="agent")
     text.append(
         ") ",
         style="tool")

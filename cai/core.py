@@ -287,7 +287,21 @@ class CAI:
                     The result from executing the tool function with
                         the given arguments
                 """
-                return function_map[tool_name](**tool_args)
+                try:
+                    raw_result = function_map[tool_name](**tool_args)
+                except TypeError as e:
+                    if "unexpected keyword argument" in str(
+                            e):  # Usual Error when open source model try do a handoff # noqa: E501
+                        print(f"Warning: {e}. Executing tool {
+                              tool_name} without arguments.")
+                        raw_result = function_map[tool_name]()
+                    else:
+                        print(f"Error executing tool {tool_name}: {e}")
+                        raise e
+                except Exception as e:
+                    print(f"Error executing tool {tool_name}: {e}")
+                    raise e
+                return raw_result
 
             raw_result = execute_tool(name, **args)
 
@@ -529,7 +543,7 @@ class CAI:
             # agents
             partial_response = self.handle_tool_calls(
                 message.tool_calls, active_agent.functions,
-                context_variables, debug, agent, n_turn,
+                context_variables, debug, active_agent, n_turn,
                 message=message.content
             )
 
