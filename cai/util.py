@@ -265,13 +265,27 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=too-many-argume
             token_str = f"Turn tokens: {
                 turn_token_count} Total tokens: {total_token_count}"
 
+        # If title text is too long for panel width, show it in the group
+        # instead
+        # Convert Text object to string to get length
+        title_width = len(str(text))
+        max_title_width = console.width - 4  # Account for panel borders
+
+        group_content = []
+        if title_width > max_title_width:
+            group_content.append(text)
+
+        group_content.extend([
+            Text(output, style="content"),
+            Text(
+                token_str,
+                style="dim",
+                justify="right") if token_str else Text("")
+        ])
+
         main_panel = Panel(
-            Group(
-                Text(output, style="content"),
-                Text(token_str, style="dim", justify="right")
-                if token_str else Text("")
-            ),
-            title=text,
+            Group(*group_content),
+            title="" if title_width > max_title_width else text,
             border_style="border",
             title_align="left",
             box=ROUNDED,
