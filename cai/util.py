@@ -52,6 +52,7 @@ theme = Theme({
 
     # UI elements
     "border": "#2196F3",      # Blue 500
+    "border_state": "#FFD700",      # Yellow (Gold), complementary to Blue 500
     "model": "#673AB7",       # Deep Purple 500
     "dim": "#9E9E9E",         # Grey 500
     "current_token_count": "#E0E0E0",  # Grey 300 - Light grey
@@ -257,6 +258,129 @@ def cli_print_agent_messages(agent_name, message, counter, model, debug):
     console.print(text)
 
 
+def cli_print_state(agent_name, message, counter, model, debug,  # pylint: disable=too-many-arguments,too-many-locals,unused-argument # noqa: E501
+                    interaction_input_tokens, interaction_output_tokens,
+                    total_input_tokens, total_output_tokens):
+    """Print network state messages/thoughts."""
+    if not debug:
+        return
+
+    if debug != 2:  # debug level 2
+        return
+
+    # TODO: consider using the timestamp from the message  # pylint: disable=fixme # noqa: E501
+    # or the LLM interaction timestamp
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    # agent header
+    text = Text()
+    # text.append(f"[{counter}] ", style="arrow")
+    text.append("[-]", style="arrow")  # do not report on the turn
+    text.append(f"Agent: {agent_name} ", style="timestamp")
+    # timestamp and model
+    text.append(f"[{timestamp}", style="dim")
+    if model:
+        text.append(
+            f" ({model})", style="model")
+    text.append("]", style="dim")
+
+    # state and tokens
+    tokens_text = None
+    if (interaction_input_tokens is not None and
+            interaction_output_tokens is not None and
+            total_input_tokens is not None and
+            total_output_tokens is not None):
+
+        tokens_text = _create_token_display(
+            interaction_input_tokens,
+            interaction_output_tokens,
+            total_input_tokens,
+            total_output_tokens,
+            model
+        )
+
+    group_content = []
+    try:
+        parsed_message = json.loads(message)
+        formatted_message = json.dumps(parsed_message, indent=2)
+        group_content.extend([
+            Text(formatted_message, style="content"),
+            tokens_text if tokens_text else Text("")
+        ])
+    except json.JSONDecodeError:
+        # If message is not valid JSON, use it as-is
+        group_content.extend([
+            Text("⚠️ Invalid JSON", style="warning", justify="right"),
+            Text(message, style="content"),
+            tokens_text if tokens_text else Text("")
+        ])
+
+    if message:
+        main_panel = Panel(
+            Group(*group_content),
+            title="",
+            border_style="border_state",
+            title_align="left",
+            box=ROUNDED,
+            padding=(1, 2),
+            width=console.width,
+            style="content"
+        )
+
+    # print
+    console.print(text)
+    if message:
+        console.print(main_panel)
+
+
+def _create_token_display(interaction_input_tokens, interaction_output_tokens,
+                          total_input_tokens, total_output_tokens, model) -> Text:  # noqa: E501
+    """
+    Create a Text object displaying token usage information.
+
+    Args:
+        interaction_input_tokens: Input tokens for current interaction
+        interaction_output_tokens: Output tokens for current interaction
+        total_input_tokens: Total input tokens used
+        total_output_tokens: Total output tokens used
+        model: The model being used
+
+    Returns:
+        rich.text.Text: Formatted token display text
+    """
+    tokens_text = Text(justify="right")
+    # Current interaction tokens
+    tokens_text.append(
+        "\n(tokens) Current: ",
+        style="current_token_count")
+    tokens_text.append(
+        f"I:{interaction_input_tokens} ",
+        style="current_token_count")
+    tokens_text.append(
+        f"O:{interaction_output_tokens} ",
+        style="current_token_count")
+
+    # Total tokens
+    tokens_text.append("| Total: ", style="total_token_count")
+    tokens_text.append(
+        f"I:{total_input_tokens} ",
+        style="total_token_count")
+    tokens_text.append(
+        f"O:{total_output_tokens} ",
+        style="total_token_count")
+
+    # Context usage
+    context_pct = interaction_input_tokens / \
+        get_model_input_tokens(model) * 100
+    tokens_text.append("| Context: ", style="context_tokens")
+    tokens_text.append(f"{context_pct:.1f}% ", style="context_tokens")
+    tokens_text.append(
+        f"{'🟩' if context_pct < 50 else '🟨' if context_pct <
+            80 else '🟥'} ({get_model_input_tokens(model)})",
+        style="context_tokens")
+
+    return tokens_text
+
+
 def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-arguments # noqa: E501
                         tool_output,
                         interaction_input_tokens,
@@ -295,33 +419,13 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
                 total_input_tokens is not None and
                 total_output_tokens is not None):
 
-            tokens_text = Text(justify="right")
-            # Current interaction tokens
-            tokens_text.append(
-                "(tokens) Current: ",
-                style="current_token_count")
-            tokens_text.append(
-                f"I:{interaction_input_tokens} ",
-                style="current_token_count")
-            tokens_text.append(
-                f"O:{interaction_output_tokens} ",
-                style="current_token_count")
-
-            # Total tokens
-            tokens_text.append("| Total: ", style="total_token_count")
-            tokens_text.append(
-                f"I:{total_input_tokens} ",
-                style="total_token_count")
-            tokens_text.append(
-                f"O:{total_output_tokens} ",
-                style="total_token_count")
-
-            # Context usage
-            context_pct = interaction_input_tokens / \
-                get_model_input_tokens(model) * 100
-            tokens_text.append("| Context: ", style="context_tokens")
-            tokens_text.append(f"{context_pct:.1f}% ", style="context_tokens")
-            tokens_text.append(f"{'🟩' if context_pct < 50 else '🟨' if context_pct < 80 else '🟥'} ({get_model_input_tokens(model)})", style="context_tokens")  # noqa: E501 # pylint: disable=C0301
+            tokens_text = _create_token_display(
+                interaction_input_tokens,
+                interaction_output_tokens,
+                total_input_tokens,
+                total_output_tokens,
+                model
+            )
 
         # If title text is too long for panel width, show it in the group
         # instead

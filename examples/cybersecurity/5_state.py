@@ -6,9 +6,8 @@ with a state-building agent.
 import os
 import time
 from cai.core import CAI
-from cai.types import Agent
-from cai.state.pydantic import NetworkState as JsonNetworkState
-from pydantic import BaseModel, Field
+from cai.state.pydantic import state_agent as pydantic_agent
+from cai.state.free import state_agent as plain_agent
 
 # litellm.enable_json_schema_validation = True
 # litellm.set_verbose = True # see the raw request made by litellm
@@ -58,9 +57,6 @@ def main():
             "content": "Attempting exploit...\nSuccessfully exploited target through buffer overflow",
         }
     ]
-
-    from cai.state.pydantic import state_agent as pydantic_agent
-    from cai.state.free import state_agent as plain_agent
 
     agents = [
         pydantic_agent,
