@@ -151,8 +151,8 @@ class TestGenericCTF:
             if stateful:
                 from cai.state.pydantic import state_agent as pydantic_agent
                 from cai.state.free import state_agent as plain_agent
-                # state_agent = pydantic_agent
-                state_agent = plain_agent
+                state_agent = pydantic_agent
+                # state_agent = plain_agent
                 state_agent.model = model  # set model
 
             # Instance the cybersecurity AI Framework client
@@ -180,7 +180,7 @@ class TestGenericCTF:
                 # cli=True,
                 agent=ctf_agent,
                 messages=messages,
-                debug=float(os.getenv('CAI_DEBUG', 1)),
+                debug=float(os.getenv('CAI_DEBUG', 2)),
                 max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
                 brief=os.getenv('CAI_BRIEF', 'false').lower() == 'true')
             

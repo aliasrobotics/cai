@@ -4,6 +4,8 @@ interacting with CAI agents.
 """
 
 import json
+import os
+from wasabi import color  # pylint: disable=import-error
 from cai import CAI  # pylint: disable=import-error
 
 
@@ -67,17 +69,29 @@ def pretty_print_messages(messages) -> None:
             print(f"\033[95m{name}\033[0m({arg_str[1:-1]})")
 
 
-def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks
+def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too-many-arguments,too-many-branches  # noqa: E501
     starting_agent,
     context_variables=None,
     stream=False,
     debug=False,
-    max_turns=float('inf')
+    max_turns=float('inf'),
+    ctf=None,  # Add CTF parameter
+    state_agent=None  # Add state agent parameter
 ) -> None:
     """
     Run the demo loop for CAI.
+
+    Args:
+        starting_agent: The agent to start with
+        context_variables: Optional context variables
+        stream: Whether to stream responses
+        debug: Debug level
+        max_turns: Maximum number of turns
+        ctf: Optional CTF instance to use
+        state_agent: Optional state agent to use
     """
-    client = CAI()
+    # Initialize CAI with CTF and state agent if provided
+    client = CAI(ctf=ctf, state_agent=state_agent)
     print("""
  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄
 ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌
@@ -95,6 +109,34 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks
 """)
 
     messages = []
+    if ctf:
+        # Get challenge
+        challenge_key = os.getenv('CTF_CHALLENGE')
+        challenges = list(ctf.get_challenges().keys())
+        challenge = challenge_key if challenge_key in challenges else (
+            challenges[0] if len(challenges) > 0 else None)
+
+        if challenge:
+            print(color("Testing challenge: ", fg="white", bg="blue") +
+                  color(f"'{challenge}'", fg="white", bg="blue"))
+
+        # Get initial messages aligned with CTF
+        inside = ""
+        if os.getenv('CTF_INSIDE', "true").lower() == "true":
+            inside = ("You are INSIDE the target machine in a docker container, "  # noqa: E501  # pylint: disable=line-too-long
+                      "try not to do network commands unless it were necesary")
+        else:
+            inside = ("You are OUTSIDE the target machine which is a docker container, "  # noqa: E501  # pylint: disable=line-too-long
+                      "you may use network commands as nmap for initial recon")
+        messages += [{
+            "role": "user",
+            "content": "Instructions: " + ctf.get_instructions() +
+            "\nChallenge: " + ctf.get_challenges()[challenge] +
+            # "\nTechniques: " + ctf.get_techniques() +
+            "\nTarget IP: " + ctf.get_ip() +
+            "\n" + inside
+        }]
+
     agent = starting_agent
     while True:
         user_input = input("\033[93mCAI\033[0m: ")
