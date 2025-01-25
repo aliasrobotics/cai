@@ -28,7 +28,6 @@ from cai.datarecorder import DataRecorder
 from .util import (
     function_to_json,
     debug_print,
-    merge_chunk,
     cli_print_agent_messages,
     cli_print_tool_call,
     cli_print_state,
@@ -39,7 +38,6 @@ from .types import (
     AgentFunction,
     ChatCompletionMessage,
     ChatCompletionMessageToolCall,
-    Function,
     Response,
     Result,
 )
@@ -60,6 +58,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                  state_agent=None):
         self.ctf = ctf
         self.brief = False
+        self.init_len = 0  # initial length of history
         self.state_agent = state_agent
         self.stateful = self.state_agent is not None
         if self.stateful:
@@ -373,111 +372,124 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         return partial_response
 
-    def run_and_stream(  # pylint: disable=too-many-arguments,too-many-locals,dangerous-default-value  # noqa: E501
-        self,
-        agent: Agent,
-        messages: List,
-        context_variables: dict = {},
-        model_override: str = None,
-        debug: bool = False,
-        max_turns: int = float("inf"),
-        execute_tools: bool = True,
-    ):
+    @exploit_logger.log_agent()
+    def process_interaction(self, active_agent, history, context_variables,  # pylint: disable=too-many-arguments  # noqa: E501
+                            model_override, stream, debug, execute_tools,
+                            n_turn):
         """
-        Run the cai and stream the results.
-
-        The key difference from run() is that this streams results
-        incrementally, while run() returns everything at once.
+        Process an interaction with the AI agent.
         """
-        active_agent = agent
-        context_variables = copy.deepcopy(context_variables)
-        history = copy.deepcopy(messages)
-        init_len = len(messages)
-
-        while len(history) - init_len < max_turns:
-
-            message = {
-                "content": "",
-                "sender": agent.name,
-                "role": "assistant",
-                "function_call": None,
-                "tool_calls": defaultdict(
-                    lambda: {
-                        "function": {"arguments": "", "name": ""},
-                        "id": "",
-                        "type": "",
-                    }
-                ),
-            }
-
-            # get completion with current history, agent
-            completion = self.get_chat_completion(
-                agent=active_agent,
-                history=history,
-                context_variables=context_variables,
-                model_override=model_override,
-                stream=True,
-                debug=debug,
-            )
-
-            yield {"delim": "start"}
-            for chunk in completion:
-                delta = json.loads(chunk.choices[0].delta.json())
-                if delta["role"] == "assistant":
-                    delta["sender"] = active_agent.name
-                yield delta
-                delta.pop("role", None)
-                delta.pop("sender", None)
-                merge_chunk(message, delta)
-            yield {"delim": "end"}
-
-            message["tool_calls"] = list(
-                message.get("tool_calls", {}).values())
-            if not message["tool_calls"]:
-                message["tool_calls"] = None
-            debug_print(
-                debug,
-                "Received completion:",
-                message,
-                brief=self.brief)
-            history.append(message)
-
-            if not message["tool_calls"] or not execute_tools:
-                debug_print(debug, "Ending turn.", brief=self.brief)
-                break
-
-            # convert tool_calls to objects
-            tool_calls = []
-            for tool_call in message["tool_calls"]:
-                function = Function(
-                    arguments=tool_call["function"]["arguments"],
-                    name=tool_call["function"]["name"],
+        # stateful
+        #
+        # NOTE: consider adding state to the context variables,
+        # and then adding it to the messages
+        #
+        if self.stateful:
+            self.state_interactions_count += 1
+            if self.state_interactions_count >= CAI.STATE_INTERACTIONS_INTERVAL:  # noqa: E501
+                # get state from existing messages
+                completion = self.get_chat_completion(
+                    agent=self.state_agent,
+                    history=history,
+                    context_variables=context_variables,
+                    model_override=model_override,
+                    stream=stream,
+                    debug=debug
                 )
-                tool_call_object = ChatCompletionMessageToolCall(
-                    id=tool_call["id"], function=function, type=tool_call["type"]  # noqa: E501
-                )
-                tool_calls.append(tool_call_object)
 
-            # handle function calls, updating context_variables, and switching
-            # agents
-            partial_response = self.handle_tool_calls(
-                tool_calls, active_agent.functions,
-                context_variables,
-                debug,
-                agent
-            )
-            history.extend(partial_response.messages)
-            context_variables.update(partial_response.context_variables)
-            if partial_response.agent:
-                active_agent = partial_response.agent
+                # update token counts
+                if completion and completion.usage and completion.choices:  # noqa: E501  # pylint: disable=C0103
+                    # Update interaction and total token counts
+                    self.interaction_input_tokens = completion.usage.prompt_tokens  # noqa: E501  # pylint: disable=C0103
+                    self.interaction_output_tokens = completion.usage.completion_tokens  # noqa: E501  # pylint: disable=C0103
+                    self.total_input_tokens += self.interaction_input_tokens  # noqa: E501  # pylint: disable=C0103
+                    self.total_output_tokens += self.interaction_output_tokens  # noqa: E501  # pylint: disable=C0103
 
-        yield {
-            "response": Response(
-                messages=history[init_len:],
-                agent=active_agent,
-                context_variables=context_variables,
+                    # update history
+                    # set back to initial prompt
+                    history = history[:self.init_len]
+                    # get new state
+                    message = completion.choices[0].message
+                    self.last_state = message
+                    # add state to history
+                    message.sender = active_agent.name
+                    history.append(
+                        json.loads(message.model_dump_json()))
+                    # log
+                    debug_print(
+                        debug,
+                        "State: ",
+                        message,
+                        brief=self.brief)
+                    cli_print_state(self.state_agent.name,
+                                    message.content,
+                                    n_turn,
+                                    self.state_agent.model,
+                                    debug,
+                                    interaction_input_tokens=self.interaction_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                    interaction_output_tokens=self.interaction_output_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                    total_input_tokens=self.total_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                    total_output_tokens=self.total_output_tokens)  # noqa: E501  # pylint: disable=line-too-long
+
+                # reset counter regardless of timeout
+                self.state_interactions_count = 0
+
+        # get completion with current history, agent
+        completion = self.get_chat_completion(
+            agent=active_agent,
+            history=history,
+            context_variables=context_variables,
+            model_override=model_override,
+            stream=stream,
+            debug=debug,
+        )
+        if completion.usage:
+            self.interaction_input_tokens = (
+                completion.usage.prompt_tokens
             )
-        }
+            self.interaction_output_tokens = (
+                completion.usage.completion_tokens
+            )
+            self.total_input_tokens += (
+                self.interaction_input_tokens
+            )
+            self.total_output_tokens += (
+                self.interaction_output_tokens
+            )
+        message = completion.choices[0].message
+
+        debug_print(
+            debug,
+            "Received completion:",
+            message,
+            brief=self.brief)
+        message.sender = active_agent.name
+        history.append(
+            json.loads(message.model_dump_json())
+        )  # to avoid OpenAI types (?)
+
+        if not message.tool_calls or not execute_tools:
+            cli_print_agent_messages(active_agent.name,
+                                     message.content,
+                                     n_turn,
+                                     active_agent.model,
+                                     debug)
+            debug_print(debug, "Ending turn.", brief=self.brief)
+            return None
+
+        # handle function calls, updating context_variables, and switching
+        # agents
+        partial_response = self.handle_tool_calls(
+            message.tool_calls, active_agent.functions,
+            context_variables, debug, active_agent, n_turn,
+            message=message.content
+        )
+
+        history.extend(partial_response.messages)
+        context_variables.update(partial_response.context_variables)
+        return (partial_response.agent
+                if partial_response.agent
+                else active_agent)
 
     @exploit_logger.log_response("🚩" + os.getenv('CTF_NAME', 'test') +
                                  " @ " + os.getenv('CI_JOB_ID', 'local'))
@@ -513,139 +525,15 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                       fg="white", bg="pink")
             )
 
-        if stream:
-            return self.run_and_stream(
-                agent=agent,
-                messages=messages,
-                context_variables=context_variables,
-                model_override=model_override,
-                debug=debug,
-                max_turns=max_turns,
-                execute_tools=execute_tools,
-            )
         active_agent = agent
         context_variables = copy.deepcopy(context_variables)
         history = copy.deepcopy(messages)
-        init_len = len(messages)
-
-        @exploit_logger.log_agent()
-        def process_interaction(self, active_agent, history, context_variables,
-                                model_override, stream, debug, execute_tools,
-                                n_turn):
-
-            # stateful
-            #
-            # NOTE: consider adding state to the context variables,
-            # and then adding it to the messages
-            #
-            if self.stateful:
-                self.state_interactions_count += 1
-                if self.state_interactions_count >= CAI.STATE_INTERACTIONS_INTERVAL:  # noqa: E501
-                    # get state from existing messages
-                    completion = self.get_chat_completion(
-                        agent=self.state_agent,
-                        history=history,
-                        context_variables=context_variables,
-                        model_override=model_override,
-                        stream=stream,
-                        debug=debug
-                    )
-
-                    # update token counts
-                    if completion and completion.usage and completion.choices:  # noqa: E501  # pylint: disable=C0103
-                        # Update interaction and total token counts
-                        self.interaction_input_tokens = completion.usage.prompt_tokens  # noqa: E501  # pylint: disable=C0103
-                        self.interaction_output_tokens = completion.usage.completion_tokens  # noqa: E501  # pylint: disable=C0103
-                        self.total_input_tokens += self.interaction_input_tokens  # noqa: E501  # pylint: disable=C0103
-                        self.total_output_tokens += self.interaction_output_tokens  # noqa: E501  # pylint: disable=C0103
-
-                        # update history
-                        message = completion.choices[0].message
-                        message.sender = active_agent.name
-                        history.append(
-                            json.loads(message.model_dump_json()))
-
-                        # log
-                        debug_print(
-                            debug,
-                            "State: ",
-                            message,
-                            brief=self.brief)
-                        cli_print_state(self.state_agent.name,
-                                        message.content,
-                                        n_turn,
-                                        self.state_agent.model,
-                                        debug,
-                                        interaction_input_tokens=self.interaction_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
-                                        interaction_output_tokens=self.interaction_output_tokens,  # noqa: E501  # pylint: disable=line-too-long
-                                        total_input_tokens=self.total_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
-                                        total_output_tokens=self.total_output_tokens)  # noqa: E501  # pylint: disable=line-too-long
-
-                    # reset counter regardless of timeout
-                    self.state_interactions_count = 0
-
-            # get completion with current history, agent
-            completion = self.get_chat_completion(
-                agent=active_agent,
-                history=history,
-                context_variables=context_variables,
-                model_override=model_override,
-                stream=stream,
-                debug=debug,
-            )
-            if completion.usage:
-                self.interaction_input_tokens = (
-                    completion.usage.prompt_tokens
-                )
-                self.interaction_output_tokens = (
-                    completion.usage.completion_tokens
-                )
-                self.total_input_tokens += (
-                    self.interaction_input_tokens
-                )
-                self.total_output_tokens += (
-                    self.interaction_output_tokens
-                )
-            message = completion.choices[0].message
-
-            debug_print(
-                debug,
-                "Received completion:",
-                message,
-                brief=self.brief)
-            message.sender = active_agent.name
-            history.append(
-                json.loads(message.model_dump_json())
-            )  # to avoid OpenAI types (?)
-
-            if not message.tool_calls or not execute_tools:
-                cli_print_agent_messages(active_agent.name,
-                                         message.content,
-                                         n_turn,
-                                         active_agent.model,
-                                         debug)
-                debug_print(debug, "Ending turn.", brief=self.brief)
-                return None
-
-            # handle function calls, updating context_variables, and switching
-            # agents
-            partial_response = self.handle_tool_calls(
-                message.tool_calls, active_agent.functions,
-                context_variables, debug, active_agent, n_turn,
-                message=message.content
-            )
-
-            history.extend(partial_response.messages)
-            context_variables.update(partial_response.context_variables)
-            return (partial_response.agent
-                    if partial_response.agent
-                    else active_agent)
+        self.init_len = len(messages)
 
         n_turn = 0
-        while len(history) - init_len < max_turns and active_agent:
+        while len(history) - self.init_len < max_turns and active_agent:
             try:
-                active_agent = process_interaction(
-                    self,
+                active_agent = self.process_interaction(
                     active_agent,
                     history,
                     context_variables,
@@ -665,7 +553,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         execution_time = time.time() - start_time
         return Response(
-            messages=history[init_len:],
+            messages=history[self.init_len:],
             agent=active_agent,
             context_variables=context_variables,
             time=execution_time
