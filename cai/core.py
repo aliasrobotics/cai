@@ -11,7 +11,6 @@ and local modules.
 
 # Standard library imports
 import copy
-import concurrent.futures
 import json
 from collections import defaultdict
 from typing import List
@@ -543,65 +542,44 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 self.state_interactions_count += 1
                 if self.state_interactions_count >= CAI.STATE_INTERACTIONS_INTERVAL:  # noqa: E501
                     # get state from existing messages
-                    try:
-                        completion = None
-                        with concurrent.futures.ThreadPoolExecutor() as executor:  # noqa: E501
-                            future = executor.submit(
-                                self.get_chat_completion,
-                                agent=self.state_agent,
-                                history=history,
-                                context_variables=context_variables,
-                                model_override=model_override,
-                                stream=stream,
-                                debug=debug
-                            )
-                            completion = future.result(timeout=60)
+                    completion = self.get_chat_completion(
+                        agent=self.state_agent,
+                        history=history,
+                        context_variables=context_variables,
+                        model_override=model_override,
+                        stream=stream,
+                        debug=debug
+                    )
 
-                        # update token counts
-                        if completion and completion.usage and completion.choices:  # noqa: E501  # pylint: disable=C0103
-                            # Update interaction and total token counts
-                            self.interaction_input_tokens = completion.usage.prompt_tokens  # noqa: E501  # pylint: disable=C0103
-                            self.interaction_output_tokens = completion.usage.completion_tokens  # noqa: E501  # pylint: disable=C0103
-                            self.total_input_tokens += self.interaction_input_tokens  # noqa: E501  # pylint: disable=C0103
-                            self.total_output_tokens += self.interaction_output_tokens  # noqa: E501  # pylint: disable=C0103
+                    # update token counts
+                    if completion and completion.usage and completion.choices:  # noqa: E501  # pylint: disable=C0103
+                        # Update interaction and total token counts
+                        self.interaction_input_tokens = completion.usage.prompt_tokens  # noqa: E501  # pylint: disable=C0103
+                        self.interaction_output_tokens = completion.usage.completion_tokens  # noqa: E501  # pylint: disable=C0103
+                        self.total_input_tokens += self.interaction_input_tokens  # noqa: E501  # pylint: disable=C0103
+                        self.total_output_tokens += self.interaction_output_tokens  # noqa: E501  # pylint: disable=C0103
 
-                            # update history
-                            message = completion.choices[0].message
-                            message.sender = active_agent.name
-                            history.append(
-                                json.loads(message.model_dump_json()))
+                        # update history
+                        message = completion.choices[0].message
+                        message.sender = active_agent.name
+                        history.append(
+                            json.loads(message.model_dump_json()))
 
-                            # log
-                            debug_print(
-                                debug,
-                                "State: ",
-                                message,
-                                brief=self.brief)
-                            cli_print_state(self.state_agent.name,
-                                            message.content,
-                                            n_turn,
-                                            self.state_agent.model,
-                                            debug,
-                                            interaction_input_tokens=self.interaction_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
-                                            interaction_output_tokens=self.interaction_output_tokens,  # noqa: E501  # pylint: disable=line-too-long
-                                            total_input_tokens=self.total_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
-                                            total_output_tokens=self.total_output_tokens)  # noqa: E501  # pylint: disable=line-too-long
-
-                    except concurrent.futures.TimeoutError:
-                        # Handle timeout
+                        # log
                         debug_print(
                             debug,
-                            "State agent timed out after 60 seconds",
+                            "State: ",
+                            message,
                             brief=self.brief)
                         cli_print_state(self.state_agent.name,
-                                        "Timed out after 60 seconds",
+                                        message.content,
                                         n_turn,
                                         self.state_agent.model,
                                         debug,
-                                        interaction_input_tokens=0,  # noqa: E501
-                                        interaction_output_tokens=0,  # noqa: E501
-                                        total_input_tokens=self.total_input_tokens,  # noqa: E501
-                                        total_output_tokens=self.total_output_tokens)  # noqa: E501
+                                        interaction_input_tokens=self.interaction_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                        interaction_output_tokens=self.interaction_output_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                        total_input_tokens=self.total_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                        total_output_tokens=self.total_output_tokens)  # noqa: E501  # pylint: disable=line-too-long
 
                     # reset counter regardless of timeout
                     self.state_interactions_count = 0
@@ -665,18 +643,23 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         n_turn = 0
         while len(history) - init_len < max_turns and active_agent:
-            active_agent = process_interaction(
-                self,
-                active_agent,
-                history,
-                context_variables,
-                model_override,
-                stream,
-                debug,
-                execute_tools,
-                n_turn
-            )
-            n_turn += 1
+            try:
+                active_agent = process_interaction(
+                    self,
+                    active_agent,
+                    history,
+                    context_variables,
+                    model_override,
+                    stream,
+                    debug,
+                    execute_tools,
+                    n_turn
+                )
+                n_turn += 1
+            except EOFError:
+                print("\nCtrl+D pressed, exiting current turn...")
+                break
+
             if active_agent is None:
                 break
 

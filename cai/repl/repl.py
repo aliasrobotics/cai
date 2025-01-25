@@ -138,9 +138,15 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
         }]
 
     agent = starting_agent
+
     while True:
-        user_input = input("\033[93mCAI\033[0m: ")
-        messages.append({"role": "user", "content": user_input})
+
+        # Skip input on first iteration if CTF is enabled
+        if ctf and len(messages) == 1:
+            pass
+        else:
+            user_input = input("\033[93mCAI\033[0m: ")
+            messages.append({"role": "user", "content": user_input})
 
         response = client.run(
             agent=agent,
