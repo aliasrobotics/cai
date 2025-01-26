@@ -410,11 +410,13 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     history = history[:self.init_len]
                     # get new state
                     message = completion.choices[0].message
-                    self.last_state = message
+                    self.last_state = message.content
                     # add state to history
                     message.sender = active_agent.name
                     history.append(
                         json.loads(message.model_dump_json()))
+                    # add to context variables, which is a dict
+                    context_variables["state"] = self.last_state
                     # log
                     debug_print(
                         debug,

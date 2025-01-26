@@ -24,7 +24,9 @@ class Exploit(BaseModel):  # pylint: disable=too-few-public-methods, missing-cla
 
 
 class EndpointState(BaseModel):  # pylint: disable=too-few-public-methods, missing-class-docstring  # noqa: E501
-    """Represents the state of a single network endpoint"""
+    """
+    Represents the state of a single network endpoint
+    """
     ip: str
     ports: list[Port]
     exploits: list[Exploit]
@@ -40,14 +42,28 @@ class NetworkState(State):  # pylint: disable=too-few-public-methods, missing-cl
     network: list[EndpointState]
 
 
+def instructions(context_variables):
+    """
+    Instructions for the pydantic state agent
+    """
+    state = context_variables.get("state", "No previous state")
+    return f"""
+    I am a network state building agent that analyzes chat history to
+    construct network state in JSON format. Consider the following:
+        - For the files, for each, include permissions and complete filepath
+        - Do not repeat Endpoint entries with the same IP address
+
+    The last state of the network is:
+    ----------------------------
+    {state}
+    ----------------------------
+
+    Build upon this state to construct the current state of the network.
+    """
+
+
 state_agent = Agent(
     name="Pydantic NetworkState Agent",
-    instructions="""
-    I am a network state building agent that analyzes chat
-    history to construct network state.
-
-    I look for information about ports, services, exploits and
-    build a structured state representation.
-    """,
+    instructions=instructions,
     structured_output_class=NetworkState
 )
