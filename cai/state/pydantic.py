@@ -5,6 +5,7 @@ representing network state in cybersecurity contexts.
 from pydantic import BaseModel  # pylint: disable=import-error
 from cai.state import State
 from cai.types import Agent
+from cai.state.common import get_base_instructions
 
 
 class Port(BaseModel):  # pylint: disable=too-few-public-methods, missing-class-docstring  # noqa: E501
@@ -47,18 +48,21 @@ def instructions(context_variables):
     Instructions for the pydantic state agent
     """
     state = context_variables.get("state", "No previous state")
+    initial_history = context_variables.get("initial_history", [])
+
     return f"""
     I am a network state building agent that analyzes chat history to
     construct network state in JSON format. Consider the following:
-        - For the files, for each, include permissions and complete filepath
+        - Don't make up information, only use information provided
+        by the chat history and/or previous state.
+        - Don't discard port and/or service information, always
+        reflect it in the state.
+        - For the files, for each, include permissions and
+        complete filepath, including the ip address if a remote
+        path.
         - Do not repeat Endpoint entries with the same IP address
 
-    The last state of the network is:
-    ----------------------------
-    {state}
-    ----------------------------
-
-    Build upon this state to construct the current state of the network.
+    {get_base_instructions(state, initial_history)}
     """
 
 

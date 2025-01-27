@@ -149,8 +149,8 @@ class TestGenericCTF:
             state_agent = None
             stateful = os.getenv('CAI_STATE', "false").lower() == "true"
             if stateful:
-                # from cai.state.pydantic import state_agent
-                from cai.state.free import state_agent
+                from cai.state.pydantic import state_agent
+                # from cai.state.free import state_agent
                 state_agent.model = model  # set model
 
             # Instance the cybersecurity AI Framework client

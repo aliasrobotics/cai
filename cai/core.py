@@ -387,6 +387,12 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         if self.stateful:
             self.state_interactions_count += 1
             if self.state_interactions_count >= CAI.STATE_INTERACTIONS_INTERVAL:  # noqa: E501
+
+                # fill in context variables
+                context_variables["state"] = self.last_state  # state
+                # initial messages
+                context_variables["initial_history"] = history[:self.init_len]
+
                 # get state from existing messages
                 completion = self.get_chat_completion(
                     agent=self.state_agent,
@@ -405,18 +411,18 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     self.total_input_tokens += self.interaction_input_tokens  # noqa: E501  # pylint: disable=C0103
                     self.total_output_tokens += self.interaction_output_tokens  # noqa: E501  # pylint: disable=C0103
 
-                    # update history
-                    # set back to initial prompt
-                    history = history[:self.init_len]
                     # get new state
                     message = completion.choices[0].message
                     self.last_state = message.content
+                    message.sender = "state_agent"
+
+                    # update history
+                    # set back to initial prompt
+                    history = history[:self.init_len]
                     # add state to history
-                    message.sender = active_agent.name
                     history.append(
                         json.loads(message.model_dump_json()))
-                    # add to context variables, which is a dict
-                    context_variables["state"] = self.last_state
+
                     # log
                     debug_print(
                         debug,
@@ -520,6 +526,12 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         """
         start_time = time.time()
         self.brief = brief
+        self.init_len = len(messages)
+
+        # TODO: consider moving this outside of CAI  # pylint: disable=fixme  # noqa: E501
+        # as the logging URL has a harcoded bit which is
+        # dependent on the file that invokes it
+        #
         if os.getenv("CAI_TRACING", "true").lower() == "true":
             print(
                 color("Logging URL: " +
@@ -530,8 +542,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         active_agent = agent
         context_variables = copy.deepcopy(context_variables)
         history = copy.deepcopy(messages)
-        self.init_len = len(messages)
-
         n_turn = 0
         while len(history) - self.init_len < max_turns and active_agent:
             try:
