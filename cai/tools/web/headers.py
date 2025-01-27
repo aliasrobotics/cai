@@ -11,12 +11,13 @@ import requests  # pylint: disable=E0401
 
 
 def web_request_framework(  # noqa: E501 # pylint: disable=too-many-arguments,too-many-locals,too-many-branches
-    url: str = "",
-        method: str = "GET",
-        headers: dict = None,
-        data: dict = None,
-        cookies: dict = None,
-        params: dict = None) -> str:
+                            url: str = "",
+                            method: str = "GET",
+                            headers: dict = None,
+                            data: dict = None,
+                            cookies: dict = None,
+                            params: dict = None,
+                            ctf=None) -> str:  # pylint: disable=unused-argument  # noqa: E501
     """
     Analyze HTTP requests and responses in detail for security testing.
 
@@ -27,7 +28,7 @@ def web_request_framework(  # noqa: E501 # pylint: disable=too-many-arguments,to
         data: Request body data
         cookies: Request cookies
         params: URL parameters
-
+        ctf: CTF object to use for context
     Returns:
         str: Detailed analysis of the HTTP interaction including:
             - Request details (method, headers, parameters)

@@ -5,8 +5,9 @@ during CTF progression.
 """
 
 
-def thought(breakdowns: str = "", reflection: str = "",
-            action: str = "", next_step: str = "", key_clues: str = "") -> str:
+def thought(breakdowns: str = "", reflection: str = "",  # pylint: disable=too-many-arguments  # noqa: E501
+            action: str = "", next_step: str = "", key_clues: str = "",
+            ctf=None) -> str:  # pylint: disable=unused-argument  # noqa: E501
     """
     Tool used to express detailed thoughts and analysis during boot2root CTF.
 
@@ -16,7 +17,7 @@ def thought(breakdowns: str = "", reflection: str = "",
         action: Current or planned actions
         next_step: Next steps to take
         key_clues: Important clues or hints discovered
-
+        ctf: CTF object to use for context
     Returns:
         str: Formatted string containing the provided thoughts and analysis
     """

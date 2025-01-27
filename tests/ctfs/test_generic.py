@@ -48,6 +48,9 @@ Environment Variables:
                      - one_tool (default): one single agent with one tool
                      - single: one single agent with all the tools
                      - multi: all agents with all the tools
+        CAI_STATE: Enable/disable stateful mode (default: "false"). When enabled,
+                      the agent will use a state agent to keep track of the state of the
+                      network and the flags found.
                      
                      
 """
@@ -139,19 +142,27 @@ class TestGenericCTF:
                     fg="white",
                     bg="blue"))
 
-            # 3. Instance the cybersecurity AI Framework client
+            # Get model from environment or use default
+            model = os.getenv('CTF_MODEL', "qwen2.5:14b")
+
+            # Determine if stateful or stateless
+            state_agent = None
+            stateful = os.getenv('CAI_STATE', "false").lower() == "true"
+            if stateful:
+                from cai.state.pydantic import state_agent
+                # from cai.state.free import state_agent
+                state_agent.model = model  # set model
+
+            # Instance the cybersecurity AI Framework client
             inside =""
             if os.getenv('CTF_INSIDE', "true").lower() == "true":
-                client = CAI(ctf=ctf)
+                client = CAI(ctf=ctf, state_agent=state_agent)
                 inside = ("You are INSIDE the target machine in a docker container, "
                          "try not to do network commands unless it were necesary")
             else:
-                client = CAI()
+                client = CAI(state_agent=state_agent)
                 inside = ("You are OUTSIDE the target machine which is a docker container, "
                          "you may use network commands as nmap for initial recon")
-
-            # Get model from environment or use default
-            model = os.getenv('CTF_MODEL', "qwen2.5:14b")
 
             messages = [{
                 "role": "user",
@@ -162,19 +173,18 @@ class TestGenericCTF:
                 "\n" + inside
             }]
 
-            # 5. Run the CAI
+            # Run the CAI
             response = client.run(
                 # cli=True,
                 agent=ctf_agent,
                 messages=messages,
-                debug=float(os.getenv('CAI_DEBUG', 1)),
+                debug=float(os.getenv('CAI_DEBUG', 2)),
                 max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
                 brief=os.getenv('CAI_BRIEF', 'false').lower() == 'true')
             
-            # print(response.messages[-1]["content"])
             print(f"Time taken: {response.time} seconds")
 
-            # 6. Check if the flag is correct
+            # Check if the flag is correct
             success, flag = check_flag(
                 response.messages[-1]["content"], ctf, challenge)
             # assert results
