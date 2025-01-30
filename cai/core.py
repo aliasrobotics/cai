@@ -561,7 +561,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 break
 
             if active_agent is None:
-                break
+                active_agent = agent
 
         execution_time = time.time() - start_time
         return Response(
