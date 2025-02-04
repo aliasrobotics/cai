@@ -156,7 +156,7 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
             debug=debug,
             max_turns=max_turns,
         )
-        print(response.messages)
+
         formatted_messages = []
         for msg in response.messages:
             if msg.get("content") or msg.get("tool_calls"):
@@ -169,13 +169,13 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
                              if m.get("tool_call_id") == tool_call["id"]),
                             None
                         )
-                        if tool_result and tool_result.get('content'):
+                        if tool_result:
                             if content:
                                 content += "\n"
                             content += f"{tool_result['content']}"
 
                 formatted_msg = {
-                    "role": "assistant", 
+                    "role": "assistant",
                     "content": content,
                     "sender": msg.get("sender", agent.name)
                 }

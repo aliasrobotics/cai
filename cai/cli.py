@@ -59,7 +59,6 @@ exploit_agent_system_prompt = Template(  # nosec B702
 ).render()
 
 
-
 def cli_agent_handoff(ctf=None):  # pylint: disable=unused-argument
     """
     CLI Security Tester, call this function
@@ -81,7 +80,6 @@ thought_agent = Agent(
     name="ThoughAgent",
     instructions=thought_agent_system_prompt,
     functions=[thought, cli_agent_handoff],
-    model=os.getenv('CTF_MODEL', "qwen2.5:14b"),
     parallel_tool_calls=False
 )
 
@@ -89,7 +87,6 @@ thought_agent = Agent(
 cli_agent = Agent(
     name="Boot2Root CTF Tester",
     instructions=cli_agent_system_prompt + env_context,
-    model=os.getenv('CTF_MODEL', "qwen2.5:14b"),
     functions=[
         # execute_cli_command,  # does not support ctf context
         generic_linux_command,
@@ -97,7 +94,7 @@ cli_agent = Agent(
         # Code_Executor_Expert,
         web_request_framework,
         generate_php_webshell,
-        upload_ftp_webshell,  
+        upload_ftp_webshell
     ],
     parallel_tool_calls=False,
 )
@@ -107,7 +104,7 @@ def setup_ctf():
     """Setup CTF environment if CTF_NAME is provided"""
     ctf_name = os.getenv('CTF_NAME')
     if not ctf_name:
-        return None
+        return None, None
 
     print(color("Setting up CTF: ", fg="black", bg="yellow") +
           color(ctf_name, fg="black", bg="yellow"))
@@ -139,7 +136,7 @@ def run_with_env():
         run_demo_loop(
             cli_agent,
             debug=float(os.getenv('CAI_DEBUG', 2)),  # pylint: disable=invalid-envvar-default  # noqa: E501
-            max_turns=float(os.getenv('CAI_MAX_TURNS', '5')),  # pylint: disable=invalid-envvar-default  # noqa: E501
+            max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),  # pylint: disable=invalid-envvar-default  # noqa: E501
             ctf=ctf if os.getenv(
                 'CTF_INSIDE',
                 "true").lower() == "true" else None,
@@ -153,4 +150,5 @@ def run_with_env():
 
 
 if __name__ == "__main__":
+    os.environ["CAI_TRACING"] = "true"
     run_with_env()

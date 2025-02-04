@@ -27,15 +27,13 @@ def _run_local(command, stdout=False):
     try:
         # nosec B602 - shell=True is required for command chaining
         result = subprocess.run(
-            f"cd workspaces/ && {command}",
+            command,
             shell=True,  # nosec B602
             capture_output=True,
             text=True,
-            check=False,
+            check=True,
             timeout=100)
         output = result.stdout
-        if result.returncode != 0:
-            return result.stderr
         if stdout:
             print("\033[32m" + output + "\033[0m")
         return output if output else result.stderr
@@ -46,7 +44,7 @@ def _run_local(command, stdout=False):
         return e.stdout.decode()
     except Exception as e:  # pylint: disable=broad-except
         print(color(f"Error executing local command: {e}", fg="red"))
-        return str(e)
+        return f"Error executing local command: {str(e)}"
 
 
 def run_command(command, ctf=None, stdout=False):
