@@ -160,6 +160,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             #  This grab all non supported parameters in reasoning models    
             elif "Unsupported parameter" in str(e):
                 error_msg = str(e)
+
                 def remove_unsupported_params(error_msg, create_params):
                     params_to_check = [
                         'parallel_tool_calls',
