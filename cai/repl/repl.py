@@ -91,7 +91,11 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
         state_agent: Optional state agent to use
     """
     # Initialize CAI with CTF and state agent if provided
-    client = CAI(ctf=ctf, state_agent=state_agent)
+    client = CAI(
+        ctf=ctf if os.getenv(
+            'CTF_INSIDE',
+            "true").lower() == "true" else None,
+        state_agent=state_agent)
     print("""
  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄
 ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌
@@ -160,8 +164,8 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
         formatted_messages = []
         for msg in response.messages:
             if msg.get("content") or msg.get("tool_calls"):
-                content = msg.get("content", "")
-
+                # Ensure the content is a string even if it's None
+                content = msg.get("content") or ""
                 if msg.get("tool_calls"):
                     for tool_call in msg["tool_calls"]:
                         tool_result = next(
@@ -170,10 +174,12 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
                             None
                         )
                         if tool_result:
-                            if content:
-                                content += "\n"
-                            content += f"{tool_result['content']}"
-
+                            # Safely retrieve tool_result content as a string
+                            tool_content = tool_result.get("content") or ""
+                            if tool_content:
+                                if content:
+                                    content += "\n"
+                                content += tool_content
                 formatted_msg = {
                     "role": "assistant",
                     "content": content,

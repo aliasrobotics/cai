@@ -78,6 +78,7 @@ def thought_agent_handoff(ctf=None):  # pylint: disable=unused-argument
 # Thought Process Agent for analysis and planning
 thought_agent = Agent(
     name="ThoughAgent",
+    model=os.getenv('CTF_MODEL', "qwen2.5:14b"),
     instructions=thought_agent_system_prompt,
     functions=[thought, cli_agent_handoff],
     parallel_tool_calls=False
@@ -87,6 +88,7 @@ thought_agent = Agent(
 cli_agent = Agent(
     name="Boot2Root CTF Tester",
     instructions=cli_agent_system_prompt + env_context,
+    model=os.getenv('CTF_MODEL', "qwen2.5:14b"),
     functions=[
         # execute_cli_command,  # does not support ctf context
         generic_linux_command,
@@ -122,7 +124,8 @@ def setup_ctf():
 
 def run_with_env():
     """Run CAI with environment configuration"""
-    ctf = setup_ctf()
+    if os.getenv('CTF_NAME', 1) != 1: # pylint: disable=invalid-envvar-default  # noqa: E501
+        ctf = setup_ctf()
 
     try:
         # Configure state agent if enabled
@@ -137,18 +140,15 @@ def run_with_env():
             cli_agent,
             debug=float(os.getenv('CAI_DEBUG', 2)),  # pylint: disable=invalid-envvar-default  # noqa: E501
             max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),  # pylint: disable=invalid-envvar-default  # noqa: E501
-            ctf=ctf if os.getenv(
-                'CTF_INSIDE',
-                "true").lower() == "true" else None,
+            ctf=ctf if os.getenv('CTF_NAME', 1) != 1 else None, # pylint: disable=invalid-envvar-default  # noqa: E501
             state_agent=state_agent
         )
 
     finally:
         # Cleanup CTF if started
-        if ctf:
+        if os.getenv('CTF_NAME', 1) != 1: # pylint: disable=invalid-envvar-default  # noqa: E501
             ctf.stop_ctf()
 
 
 if __name__ == "__main__":
-    os.environ["CAI_TRACING"] = "true"
     run_with_env()
