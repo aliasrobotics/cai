@@ -160,33 +160,6 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
             debug=debug,
             max_turns=max_turns,
         )
-
-        formatted_messages = []
-        for msg in response.messages:
-            if msg.get("content") or msg.get("tool_calls"):
-                # Ensure the content is a string even if it's None
-                content = msg.get("content") or ""
-                if msg.get("tool_calls"):
-                    for tool_call in msg["tool_calls"]:
-                        tool_result = next(
-                            (m for m in response.messages
-                             if m.get("tool_call_id") == tool_call["id"]),
-                            None
-                        )
-                        if tool_result:
-                            # Safely retrieve tool_result content as a string
-                            tool_content = tool_result.get("content") or ""
-                            if tool_content:
-                                if content:
-                                    content += "\n"
-                                content += tool_content
-                formatted_msg = {
-                    "role": "assistant",
-                    "content": content,
-                    "sender": msg.get("sender", agent.name)
-                }
-                formatted_messages.append(formatted_msg)
-        if formatted_messages:
-            messages.extend(formatted_messages)
+        messages = response.messages
         if response.agent:
             agent = response.agent
