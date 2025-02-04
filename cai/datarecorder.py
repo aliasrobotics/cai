@@ -34,7 +34,6 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
             request_data.update({
                 "tools": create_params["tools"],
                 "tool_choice": create_params["tool_choice"],
-                "parallel_tool_calls": create_params["parallel_tool_calls"]
             })
 
         completion_data = {

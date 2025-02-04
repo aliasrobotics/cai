@@ -144,7 +144,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             if os.getenv("OLLAMA", "").lower() == "true":
                 litellm_completion = litellm.completion(
                     **create_params,
-                    api_base=get_ollama_api_base(),
+                    api_base=get_ollama_api_base(), 
                     custom_llm_provider="openai"
                 )
             else:
@@ -154,9 +154,35 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             if "LLM Provider NOT provided" in str(e):
                 create_params["api_base"] = get_ollama_api_base()
                 create_params["custom_llm_provider"] = "openai"
-                os.environ["OLLAMA"] = "true"
+                os.environ["OLLAMA"] = "true" 
                 os.environ["OPENAI_API_KEY"] = "Placeholder"
                 litellm_completion = litellm.completion(**create_params)
+            #  This grab all non supported parameters in reasoning models    
+            elif "Unsupported parameter" in str(e):
+                error_msg = str(e)
+                def remove_unsupported_params(error_msg, create_params):
+                    params_to_check = [
+                        'parallel_tool_calls',
+                        'tool_choice', 
+                        'tools',
+                        'stream_options',
+                        'temperature'
+                    ]
+                    
+                    for param in params_to_check:
+                        if f"'{param}' is not supported" in error_msg:
+                            create_params.pop(param, None)
+                    
+                    return create_params
+                
+                create_params = remove_unsupported_params(error_msg, create_params)
+                try:
+                    litellm_completion = litellm.completion(**create_params)
+                except litellm.exceptions.BadRequestError as e:
+                    if "Unsupported parameter" in str(e):
+                        error_msg = str(e)
+                        create_params = remove_unsupported_params(error_msg, create_params)
+                        litellm_completion = litellm.completion(**create_params)
             else:
                 raise e
 
@@ -559,10 +585,13 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             except EOFError:
                 print("\nCtrl+D pressed, exiting current turn...")
                 break
-
+            
             if active_agent is None:
-                active_agent = agent
-
+                if active_agent.name != "Flag Discriminator":
+                   active_agent = agent
+                elif active_agent.name == "Flag Discriminator":
+                   break    
+                
         execution_time = time.time() - start_time
         return Response(
             messages=history[self.init_len:],
