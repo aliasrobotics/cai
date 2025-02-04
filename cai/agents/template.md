@@ -4,25 +4,26 @@
 # :shield: Penetration Testing Report
 % endif
 
-| **Date**    | **Client**   | **Assessor**   | **Version**  |
-|-------------|--------------|----------------|--------------|
-| ${date}     | placeholder  | CAI     | 2.1   |
+| **Date**    | **Client**   | **Assessor** | **Version** |
+|-------------|--------------|--------------|-------------|
+| ${date}     | placeholder  | CAI          | 2.1         |
 
 ---
 
 <details>
   <summary><strong>Table of Contents</strong> (Click to Expand)</summary>
 
-  1. [Executive Summary](#1-executive-summary)
-  2. [Scope & Objectives](#2-scope--objectives)
-  3. [Methodology](#3-methodology)
-  4. Findings
-      - [Vulnerability Assessment Metrics](#41-vulnerability-assessment-metrics)
-      - [Network State Analysis](#42-network-state-analysis)
-  5. [Risk Assessment](#5-risk-assessment)
-  6. [Remediation Recommendations](#6-remediation-recommendations)
-  7. [Conclusion](#7-conclusion)
-  8. [Appendix](#8-appendix)
+1. [Executive Summary](#1-executive-summary)  
+2. [Scope & Objectives](#2-scope--objectives)  
+3. [Methodology](#3-methodology)  
+4. [Tools and Techniques](#tools-and-techniques)  
+5. [Detailed Findings](#4-detailed-findings)  
+  - [Vulnerability Assessment Metrics](#41-vulnerability-assessment-metrics)  
+  - [Network State Analysis](#42-network-state-analysis)  
+6. [Risk Assessment](#5-risk-assessment)  
+7. [Remediation Recommendations](#6-remediation-recommendations)  
+8. [Conclusion](#7-conclusion)  
+9. [Appendix](#8-appendix)
 </details>
 
 ---
@@ -35,17 +36,25 @@
 
 ## 2. Scope & Objectives
 
+The following section delineates the scope and objectives of this penetration testing engagement:
+
 ${scope}
 
 ---
 
 ## 3. Methodology
 
+The assessment was conducted using a systematic and comprehensive approach that encompasses reconnaissance, vulnerability analysis, exploitation, and validation:
+
 ${methodology}
 
+---
+
 % if tools:
+## Tools and Techniques
+
 <details>
-  <summary><strong>Tools and Techniques</strong> (Click to Expand)</summary>
+  <summary><strong>Detailed Tools and Techniques</strong> (Click to Expand)</summary>
 
 % for tool in tools:
 - 🛠 ${tool}
@@ -54,86 +63,113 @@ ${methodology}
 </details>
 % endif
 
-## 4. Findings
+---
+
+## 4. Detailed Findings
 
 % for finding in findings:
 <details>
   <summary>
-    <strong>🚨 Finding ID: ${finding.finding_id}</strong> | **Type:** ${finding.finding_type} | **Severity:** ${finding.severity}
+    <strong>🚨 Finding ID: ${finding.finding_id}</strong> | <em>Type:</em> ${finding.finding_type} | <em>Severity:</em> ${finding.severity}
   </summary>
 
-- **Description:** ${finding.description}
+**Description:**  
+${finding.description}
+
 % if finding.cve_cwe:
-- **References:** ${finding.cve_cwe}
+**References:** ${finding.cve_cwe}
 % endif
-- **Exploitation Details:** ${finding.exploitation_details}
-- **Remediation Recommendation:** ${finding.remediation}
+
+**Exploitation Details:**  
+${finding.exploitation_details}
+
+**Remediation Recommendation:**  
+${finding.remediation}
+
 % if finding.evidence:
-- **Evidence:** ${finding.evidence}
+**Evidence:**  
+${finding.evidence}
 % endif
 
 </details>
+
 <br>
 % endfor
+
+---
 
 ## 4.1 Vulnerability Assessment Metrics
 
 <details>
   <summary><strong>View Vulnerability Severity Distribution Chart</strong></summary>
 
-~~~mermaid
+```mermaid
 pie
-    title Vulnerability Severity Distribution
-    "Critical" : 25
-    "High"     : 35
-    "Medium"   : 25
-    "Low"      : 15
-~~~
+    title ${chart_title}
+    "Critical" : ${vuln_critical}
+    "High"     : ${vuln_high}
+    "Medium"   : ${vuln_medium}
+    "Low"      : ${vuln_low}
+```
 
-*Note: Values are placeholders and may vary based on the actual assessment.*
+*Note: The displayed values are placeholders and may vary based on actual assessment data.*
 </details>
+
+---
 
 ## 4.2 Network State Analysis
 
 % if network_state and network_state.network:
 % for endpoint in network_state.network:
 <details>
-  <summary><strong>🖥 Endpoint: ${endpoint.ip_address}</strong></summary>
+  <summary><strong>Host: ${endpoint.ip_address}</strong></summary>
 
-**Open Ports:**
+### Open Ports
+
 % if endpoint.open_ports:
+| Port Number | Service Name | Version | Vulnerabilities |
+|-------------|--------------|---------|-----------------|
 % for port in endpoint.open_ports:
-- **Port:** ${port.port_number} | **Service:** ${port.service_name} | **Version:** ${port.version} | **Vulnerabilities:** ${", ".join(port.vulnerabilities) if port.vulnerabilities else "None"}
+| ${port.port_number} | ${port.service_name} | ${port.version} | ${", ".join(port.vulnerabilities) if port.vulnerabilities else "None"} |
 % endfor
 % else:
-- _No open ports detected._
+_No open ports detected._
 % endif
 
-**Executed Exploits:**
+### Executed Exploits
+
 % if endpoint.executed_exploits:
+| Exploit Name | Exploit Type | Status | Details |
+|--------------|--------------|--------|---------|
 % for exploit in endpoint.executed_exploits:
-- **Exploit:** ${exploit.exploit_name} | **Type:** ${exploit.exploit_type} | **Status:** ${exploit.status} | **Details:** ${exploit.details}
+| ${exploit.exploit_name} | ${exploit.exploit_type} | ${exploit.status} | ${exploit.details} |
 % endfor
 % else:
-- _No exploit attempts recorded._
+_No exploit attempts recorded._
 % endif
 
-**Discovered Files:**
+### Discovered Files
+
 % if endpoint.discovered_files:
+| File Name |
+|-----------|
 % for file in endpoint.discovered_files:
-- ${file}
+| ${file} |
 % endfor
 % else:
-- _No files discovered._
+_No files discovered._
 % endif
 
-**Identified Users:**
+### Identified Users
+
 % if endpoint.identified_users:
+| User Identifier |
+|-----------------|
 % for user in endpoint.identified_users:
-- ${user}
+| ${user} |
 % endfor
 % else:
-- _No users identified._
+_No users identified._
 % endif
 
 </details>
@@ -141,6 +177,8 @@ pie
 % else:
 _No network state data available._
 % endif
+
+---
 
 ## 5. Risk Assessment
 

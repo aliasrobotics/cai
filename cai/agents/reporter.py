@@ -5,7 +5,7 @@ reporting in Cybersecurity contexts.
 from pydantic import BaseModel  # pylint: disable=import-error
 from cai.state import State
 from cai.types import Agent
-
+import os
 class Finding(BaseModel):
     """Represents a detailed security finding in a professional pentesting report."""
     finding_id: str  # Unique identifier for the finding
@@ -51,22 +51,29 @@ class NetworkState(State):  # pylint: disable=too-few-public-methods, missing-cl
 
 class PentestReport(BaseModel):
     """Represents a comprehensive, production-grade professional penetration testing report."""
-    confidential: bool  # True if the report is confidential
-    date: str  # Report date
-    client: str  # Client or project name
-    assessor: str  # Identifier of the penetration tester
-    version: str  # Report version (e.g., "2.1")
-    executive_summary: str  # Summary overview for stakeholders
-    scope: str  # Scope & Objectives of the assessment
-    methodology: str  # Methodology applied during the assessment
-    tools: list[str]  # Tools and Techniques used (if any)
-    findings: list[Finding]
-    network_state: NetworkState  # Detailed network state information as discovered in the test
-    risk_assessment: str  # Risk assessment details (optional)
-    remediation_recommendations: str  # Recommended remediation actions (optional)
-    conclusion: str  # Final conclusion of the report (optional)
-    appendix: str  # Additional documentation or notes (optional)
+    confidential: bool  # True if the report is confidential.
+    date: str  # Report date.
+    client: str  # Client or project name.
+    assessor: str  # Identifier of the penetration tester.
+    version: str  # Report version (e.g., "2.1").
 
+    executive_summary: str  # Comprehensive overview for stakeholders.
+    scope: str  # Scope & Objectives of the assessment.
+    methodology: str  # Detailed methodology applied during the assessment.
+    tools: list[str]  # Tools and Techniques used (if any) with high technical detail.
+    findings: list[Finding]  # List of detailed security findings.
+
+    chart_title: str  # Title for the Vulnerability Assessment Metrics chart.
+    vuln_critical: int  # Count of Critical vulnerabilities.
+    vuln_high: int  # Count of High vulnerabilities.
+    vuln_medium: int  # Count of Medium vulnerabilities.
+    vuln_low: int  # Count of Low vulnerabilities.
+
+    network_state: NetworkState  # Detailed network state analysis.
+    risk_assessment: str  # Risk assessment details.
+    remediation_recommendations: str  # Recommended remediation actions.
+    conclusion: str  # Final conclusion of the report.
+    appendix: str  # Additional documentation or notes.
 
 
 
@@ -99,6 +106,9 @@ def instructions(context_variables):
 
     Scope and Objectives:
       Clearly define the boundaries of the assessment, specifying the types of systems, networks, or operational environments evaluated. Detail the primary objectives including the identification of vulnerabilities, verification of security postures, and formulation of precise mitigation strategies, while noting any inherent limitations or constraints that might affect the analysis.
+
+    Tools:
+      In each tool add high technical details of thinking process execution and results. precise and verbose.
 
     Methodology and Process:
       Describe a systematic, phased approach to the security assessment. Begin with comprehensive data gathering and reconnaissance, proceed with rigorous vulnerability analysis, and conclude with thorough validation of findings. Explain the general procedures and standardized techniques used for information collection, system inspection, and vulnerability verification—without referencing any specific or proprietary tools. The focus should be on universally applicable methods that guarantee repeatability and exact clarity in any scenario.
@@ -134,7 +144,7 @@ def instructions(context_variables):
 
 reporter_agent = Agent(
     name="Report Agent",
-    model="gpt-4o",
+    model=os.getenv("CTF_MODEL", "gpt-4o"),
     instructions=instructions,
     structured_output_class=PentestReport
 )

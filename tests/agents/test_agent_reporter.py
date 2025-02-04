@@ -152,5 +152,5 @@ def test_reporter_agent():
     assert os.path.exists(report_path)
 
     # Cleanup: delete the report file after test execution.
-    os.remove(report_path)
-    os.remove("./report")
+    #os.remove(report_path)
+    #os.remove("./report")
