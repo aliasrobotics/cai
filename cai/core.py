@@ -19,7 +19,7 @@ from typing import List
 import time
 import os
 import litellm  # pylint: disable=import-error
-from dotenv import load_dotenv  # pylint: disable=import-error  # noqa: E501
+from dotenv import load_dotenv  # pylint: disable=import-error # noqa: E501
 from wasabi import color  # pylint: disable=import-error
 from cai.logger import exploit_logger
 
@@ -211,6 +211,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 create_params, litellm_completion)
 
         # print(litellm_completion)  # debug
+        print(litellm_completion)
         return litellm_completion
 
     def handle_function_result(self, result, debug) -> Result:

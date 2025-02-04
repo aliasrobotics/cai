@@ -12,6 +12,8 @@ from openai.types.chat.chat_completion_message_tool_call import (  # noqa: F401,
 # Third-party imports
 from pydantic import BaseModel  # pylint: disable=import-error
 from cai.state import State
+from typing import ClassVar
+
 AgentFunction = Callable[[], Union[str, "Agent", dict, State]]
 
 
@@ -27,7 +29,7 @@ class Agent(BaseModel):  # pylint: disable=too-few-public-methods
     functions: List[AgentFunction] = []
     tool_choice: str = None
     parallel_tool_calls: bool = True
-    structured_output_class: Optional[type[State]] = None
+    structured_output_class: Optional[type] = None
     reasoning_effort: Optional[str] = "low"  # "low", "medium", "high"
 
 
