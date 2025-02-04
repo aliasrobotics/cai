@@ -453,6 +453,9 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
             style="content"
         )
         console.print(main_panel)
+    else:
+        text.append("-> (No output)")
+        console.print(text)
 
 
 def debug_print(debug: int, intro: str, *args: Any, brief: bool = False, colours: bool = True) -> None:  # pylint: disable=too-many-locals,line-too-long,too-many-branches # noqa: E501

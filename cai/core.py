@@ -32,6 +32,7 @@ from .util import (
     cli_print_tool_call,
     cli_print_state,
     get_ollama_api_base,
+    check_flag
 )
 from .types import (
     Agent,
@@ -52,10 +53,34 @@ class CAI:  # pylint: disable=too-many-instance-attributes
     """
     STATE_INTERACTIONS_INTERVAL = 5  # number of interactions between state updates  # noqa: E501
 
-    def __init__(self,
+    def __init__(self,  # pylint: disable=too-many-arguments
                  ctf=None,
                  log_training_data=True,
-                 state_agent=None):
+                 state_agent=None,
+                 force_until_flag=False,
+                 challenge=None):
+        """
+        Initialize the CAI object.
+
+        Args:
+            ctf: Optional CTF configuration object
+            log_training_data: Whether to record training data, defaults to
+                True
+            state_agent: Optional state tracking agent for maintaining network
+                state
+            force_until_flag: Whether to force execution until the expected
+                flag is found
+            challenge: Optional challenge to force execution until the expected
+                flag is found. NOTE: This is only used when force_until_flag is
+                True
+
+        The CAI object manages the core conversation loop, handling messages,
+        tool calls, and agent interactions. It maintains state like:
+        - Token counts for input/output
+        - Message history length
+        - Network state (if state_agent provided)
+        - Training data recording (if enabled)
+        """
         self.ctf = ctf
         self.brief = False
         self.init_len = 0  # initial length of history
@@ -74,6 +99,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         if log_training_data:
             self.rec_training_data = DataRecorder()
 
+        self.force_until_flag = force_until_flag
+        self.challenge = challenge
         load_dotenv()
 
     def get_chat_completion(  # pylint: disable=too-many-arguments
@@ -144,10 +171,14 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # since reasoners don't support parallel tool calls, nor
         # temperature
         #
-        if ["o1", "o3"] in agent.model:
+        # NOTE 2: See further details on reasoners @
+        # https://platform.openai.com/docs/guides/reasoning
+        #
+        if any(x in agent.model for x in ["o1", "o3"]):
             create_params.pop("temperature", None)
             create_params.pop("parallel_tool_calls", None)
-
+            # See https://platform.openai.com/docs/api-reference/chat/create#chat-create-reasoning_effort  # noqa: E501  # pylint: disable=line-too-long
+            create_params["reasoning_effort"] = agent.reasoning_effort
         try:
             if os.getenv("OLLAMA", "").lower() == "true":
                 litellm_completion = litellm.completion(
@@ -568,7 +599,33 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 print("\nCtrl+D pressed, exiting current turn...")
                 break
 
-            if active_agent is None:
+            if active_agent is None and self.force_until_flag:
+                # Check if the flag is found in the last tool output
+                flag_found, flag = check_flag(
+                    history[-1]["content"], self.ctf, self.challenge)
+                if flag_found:
+                    break
+
+                # # Check if flag is found anywhere in history
+                # for message in history:
+                #     flag_found, _ = check_flag(message["content"],
+                #                                self.ctf,
+                #                                self.challenge)
+                #     if flag_found:
+                #         break
+
+                # If flag is not found, continue with the next turn
+                # adding to the history that the flag was not found
+                history.append({
+                    "role": "user",
+                    "content": (
+                        f"Detected flag {flag} is not the expected one. "
+                        "Keep looking for it and reflect on your "
+                        "previous steps."
+                    )
+                })
+                active_agent = agent
+            elif active_agent is None:
                 break
 
         execution_time = time.time() - start_time
