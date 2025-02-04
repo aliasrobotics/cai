@@ -260,7 +260,8 @@ def cli_print_agent_messages(agent_name, message, counter, model, debug):
 
 def cli_print_state(agent_name, message, counter, model, debug,  # pylint: disable=too-many-arguments,too-many-locals,unused-argument # noqa: E501
                     interaction_input_tokens, interaction_output_tokens,
-                    total_input_tokens, total_output_tokens):
+                    interaction_reasoning_tokens, total_input_tokens,
+                    total_output_tokens, total_reasoning_tokens):
     """Print network state messages/thoughts."""
     if not debug:
         return
@@ -285,16 +286,20 @@ def cli_print_state(agent_name, message, counter, model, debug,  # pylint: disab
 
     # state and tokens
     tokens_text = None
-    if (interaction_input_tokens is not None and
+    if (interaction_input_tokens is not None and  # pylint: disable=R0916
             interaction_output_tokens is not None and
+            interaction_reasoning_tokens is not None and
             total_input_tokens is not None and
-            total_output_tokens is not None):
+            total_output_tokens is not None and
+            total_reasoning_tokens is not None):
 
         tokens_text = _create_token_display(
             interaction_input_tokens,
             interaction_output_tokens,
+            interaction_reasoning_tokens,
             total_input_tokens,
             total_output_tokens,
+            total_reasoning_tokens,
             model
         )
 
@@ -332,16 +337,19 @@ def cli_print_state(agent_name, message, counter, model, debug,  # pylint: disab
         console.print(main_panel)
 
 
-def _create_token_display(interaction_input_tokens, interaction_output_tokens,
-                          total_input_tokens, total_output_tokens, model) -> Text:  # noqa: E501
+def _create_token_display(interaction_input_tokens, interaction_output_tokens,  # noqa: E501, pylint: disable=R0913
+                          interaction_reasoning_tokens, total_input_tokens,
+                          total_output_tokens, total_reasoning_tokens, model) -> Text:  # noqa: E501
     """
     Create a Text object displaying token usage information.
 
     Args:
         interaction_input_tokens: Input tokens for current interaction
         interaction_output_tokens: Output tokens for current interaction
+        interaction_reasoning_tokens: Reasoning tokens for current interaction
         total_input_tokens: Total input tokens used
         total_output_tokens: Total output tokens used
+        total_reasoning_tokens: Total reasoning tokens used
         model: The model being used
 
     Returns:
@@ -358,6 +366,9 @@ def _create_token_display(interaction_input_tokens, interaction_output_tokens,
     tokens_text.append(
         f"O:{interaction_output_tokens} ",
         style="current_token_count")
+    tokens_text.append(
+        f"R:{interaction_reasoning_tokens} ",
+        style="current_token_count")
 
     # Total tokens
     tokens_text.append("| Total: ", style="total_token_count")
@@ -366,6 +377,9 @@ def _create_token_display(interaction_input_tokens, interaction_output_tokens,
         style="total_token_count")
     tokens_text.append(
         f"O:{total_output_tokens} ",
+        style="total_token_count")
+    tokens_text.append(
+        f"R:{total_reasoning_tokens} ",
         style="total_token_count")
 
     # Context usage
@@ -385,8 +399,10 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
                         tool_output,
                         interaction_input_tokens,
                         interaction_output_tokens,
+                        interaction_reasoning_tokens,
                         total_input_tokens,
                         total_output_tokens,
+                        total_reasoning_tokens,
                         model,
                         debug):
     """Print tool call information."""
@@ -414,16 +430,20 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
     if tool_output:
         output = str(tool_output)
         tokens_text = None
-        if (interaction_input_tokens is not None and
+        if (interaction_input_tokens is not None and  # pylint: disable=C0103, R0916 # noqa: E501
                 interaction_output_tokens is not None and
+                interaction_reasoning_tokens is not None and
                 total_input_tokens is not None and
-                total_output_tokens is not None):
+                total_output_tokens is not None and
+                total_reasoning_tokens is not None):
 
             tokens_text = _create_token_display(
                 interaction_input_tokens,
                 interaction_output_tokens,
+                interaction_reasoning_tokens,
                 total_input_tokens,
                 total_output_tokens,
+                total_reasoning_tokens,
                 model
             )
 

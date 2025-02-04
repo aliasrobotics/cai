@@ -92,8 +92,10 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         #
         self.total_input_tokens = 0
         self.total_output_tokens = 0
+        self.total_reasoning_tokens = 0
         self.interaction_input_tokens = 0
         self.interaction_output_tokens = 0
+        self.interaction_reasoning_tokens = 0
         self.max_chars_per_message = 5000  # number of characters
         #
         if log_training_data:
@@ -207,6 +209,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         if self.rec_training_data:
             self.rec_training_data.rec_training_data(
                 create_params, litellm_completion)
+
+        # print(litellm_completion)  # debug
         return litellm_completion
 
     def handle_function_result(self, result, debug) -> Result:
@@ -400,8 +404,10 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 tool_output=result.value,
                 interaction_input_tokens=self.interaction_input_tokens,
                 interaction_output_tokens=self.interaction_output_tokens,
+                interaction_reasoning_tokens=self.interaction_reasoning_tokens,
                 total_input_tokens=self.total_input_tokens,
                 total_output_tokens=self.total_output_tokens,
+                total_reasoning_tokens=self.total_reasoning_tokens,
                 model=agent.model,
                 debug=debug)
 
@@ -447,6 +453,17 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     # Update interaction and total token counts
                     self.interaction_input_tokens = completion.usage.prompt_tokens  # noqa: E501  # pylint: disable=C0103
                     self.interaction_output_tokens = completion.usage.completion_tokens  # noqa: E501  # pylint: disable=C0103
+                    if (hasattr(completion.usage, 'completion_tokens_details') and  # noqa: E501  # pylint: disable=C0103
+                            completion.usage.completion_tokens_details and
+                            hasattr(completion.usage.completion_tokens_details,
+                                    'reasoning_tokens') and
+                            completion.usage.completion_tokens_details.reasoning_tokens):  # noqa: E501  # pylint: disable=C0103
+                        self.interaction_reasoning_tokens = (
+                            completion.usage.completion_tokens_details.reasoning_tokens)  # noqa: E501  # pylint: disable=C0103
+                        self.total_reasoning_tokens += self.interaction_reasoning_tokens  # noqa: E501  # pylint: disable=C0103
+                    else:
+                        self.interaction_reasoning_tokens = 0
+
                     self.total_input_tokens += self.interaction_input_tokens  # noqa: E501  # pylint: disable=C0103
                     self.total_output_tokens += self.interaction_output_tokens  # noqa: E501  # pylint: disable=C0103
 
@@ -475,8 +492,10 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                                     debug,
                                     interaction_input_tokens=self.interaction_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
                                     interaction_output_tokens=self.interaction_output_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                    interaction_reasoning_tokens=self.interaction_reasoning_tokens,  # noqa: E501  # pylint: disable=line-too-long
                                     total_input_tokens=self.total_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
-                                    total_output_tokens=self.total_output_tokens)  # noqa: E501  # pylint: disable=line-too-long
+                                    total_output_tokens=self.total_output_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                    total_reasoning_tokens=self.total_reasoning_tokens)  # noqa: E501  # pylint: disable=line-too-long
 
                 # reset counter regardless of timeout
                 self.state_interactions_count = 0
@@ -497,12 +516,24 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             self.interaction_output_tokens = (
                 completion.usage.completion_tokens
             )
+            if (hasattr(completion.usage, 'completion_tokens_details') and  # noqa: E501  # pylint: disable=C0103
+                    completion.usage.completion_tokens_details and
+                    hasattr(completion.usage.completion_tokens_details,
+                            'reasoning_tokens') and
+                    completion.usage.completion_tokens_details.reasoning_tokens):  # noqa: E501  # pylint: disable=C0103
+                self.interaction_reasoning_tokens = (
+                    completion.usage.completion_tokens_details.reasoning_tokens)  # noqa: E501  # pylint: disable=C0103
+                self.total_reasoning_tokens += self.interaction_reasoning_tokens  # noqa: E501  # pylint: disable=C0103
+            else:
+                self.interaction_reasoning_tokens = 0
+
             self.total_input_tokens += (
                 self.interaction_input_tokens
             )
             self.total_output_tokens += (
                 self.interaction_output_tokens
             )
+
         message = completion.choices[0].message
 
         debug_print(
