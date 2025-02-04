@@ -12,6 +12,9 @@ Usage Examples:
     # Run test with tracing disabled:
     $ CTF_NAME="picoctf_static_flag" CAI_TRACING="false" pytest -s tests/ctfs/test_generic.py
 
+    # Run test using a specific challenge:
+    $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CTF_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
+
 CI/CD Pipeline Configuration:
     Add the following structure to .ctf.yml file:
 
