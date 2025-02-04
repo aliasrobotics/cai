@@ -28,6 +28,7 @@ class Agent(BaseModel):  # pylint: disable=too-few-public-methods
     tool_choice: str = None
     parallel_tool_calls: bool = True
     structured_output_class: Optional[type[State]] = None
+    reasoning_effort: Optional[str] = "low"  # "low", "medium", "high"
 
 
 class Response(BaseModel):  # pylint: disable=too-few-public-methods
