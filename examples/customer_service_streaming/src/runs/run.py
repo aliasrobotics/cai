@@ -31,7 +31,7 @@ class Run:
             start_pos = response_string.find('[')
             end_pos = response_string.rfind(']')
 
-            if start_pos != -1 and end_pos = -1 and start_pos < end_pos:
+            if start_pos != -1 and end_pos != -1 and start_pos < end_pos:
                 response_truncated = response_string[start_pos:end_pos + 1]
                 response_formatted = json.loads(response_truncated)
                 return response_formatted

@@ -2,7 +2,7 @@
 This module provides a REPL interface for testing and
 interacting with CAI agents.
 """
-
+import time
 import json
 import os
 from wasabi import color  # pylint: disable=import-error
@@ -338,4 +338,13 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
                 merged_report.appendix += "\n" + report.appendix
 
             report_json = merged_report.model_dump_json()
-            create_report_from_messages(report_json)
+            print(report_json)
+
+            hostname = merged_report.network_state.network[
+                0].hostname if merged_report.network_state.network else "report"  # noqa: E501
+            timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+
+            # Create filename with hostname and timestamp
+            report_filename = f"{hostname}_{timestamp}.md"
+
+            create_report_from_messages(report_json, report_filename)

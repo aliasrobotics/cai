@@ -3,7 +3,7 @@ import os
 from types import SimpleNamespace
 from mako.template import Template
 import pytest
-
+from cai.util import create_report_from_messages
 def test_reporter_agent():
     """
     Test the Report Agent using simulated full pentesting tools output with pytest.
@@ -110,48 +110,5 @@ def test_reporter_agent():
         max_turns=1,
     )
 
-    def create_report_from_messages(messages):
-        def to_namespace(obj):
-            if isinstance(obj, dict):
-                return SimpleNamespace(**{k: to_namespace(v) for k, v in obj.items()})
-            elif isinstance(obj, list):
-                return [to_namespace(item) for item in obj]
-            return obj
-
-        report_data = {}
-        for msg in messages:
-            content = msg.get("content")
-            if content:
-                try:
-                    # Try to parse the content as JSON
-                    data = json.loads(content)
-                    report_data.update(data)
-                except json.JSONDecodeError:
-                    # Fallback: store raw content under a default key if JSON parsing fails
-                    report_data.setdefault("executive_summary", "")
-                    report_data["executive_summary"] += content.strip() + "\n"
-
-        # Convert nested dictionaries to objects for attribute access in the Mako template.
-        report_data = {k: to_namespace(v) for k, v in report_data.items()}
-
-        # Render the full report using the Mako template located at 'cai/agents/template.md'
-        template = Template(filename="cai/agents/template.md")
-        report_output = template.render(**report_data)
-
-        # Ensure the './report' directory exists.
-        report_dir = "./report"
-        os.makedirs(report_dir, exist_ok=True)
-
-        # Define the path for the report file.
-        report_path = os.path.join(report_dir, "report1.md")
-
-        # Write the generated report to the file.
-        with open(report_path, "w", encoding="utf-8") as f:
-            f.write(report_output)
-
-        # Assert that the report file exists at the expected location.
-        assert os.path.exists(report_path)
-
-        # Cleanup: delete the report file after test execution.
-        #os.remove(report_path)
-        #os.remove("./report")
+    create_report_from_messages(response.report, "test_report.md")
+    assert os.path.exists("./report/test_report.md")

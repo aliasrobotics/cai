@@ -702,7 +702,7 @@ def check_flag(output, ctf, challenge=None):
     return False, None
 
 
-def create_report_from_messages(content: str):
+def create_report_from_messages(content: str, save_path: str):
     """
     Create a report from a list of messages.
     """
@@ -733,7 +733,7 @@ def create_report_from_messages(content: str):
     report_dir = "./report"
     os.makedirs(report_dir, exist_ok=True)
 
-    report_path = os.path.join(report_dir, "report1.md")
+    report_path = os.path.join(report_dir, save_path)
 
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(report_output)
