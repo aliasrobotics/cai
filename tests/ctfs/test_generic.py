@@ -7,7 +7,7 @@ Usage Examples:
     $ CTF_NAME="picoctf_static_flag" pytest -s tests/ctfs/test_generic.py
 
     # Run test with a specific challenge and custom model:
-    $ CTF_NAME="picoctf_static_flag" CTF_MODEL="gpt-4" CTF_CHALLENGE="FLAG" pytest -s tests/ctfs/test_generic.py
+    $ CTF_NAME="picoctf_static_flag" CTF_MODEL="gpt-4o" CTF_CHALLENGE="FLAG" pytest -s tests/ctfs/test_generic.py
 
     # Run test with tracing disabled:
     $ CTF_NAME="picoctf_static_flag" CAI_TRACING="false" pytest -s tests/ctfs/test_generic.py

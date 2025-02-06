@@ -14,7 +14,6 @@ from pydantic import BaseModel  # pylint: disable=import-error
 from cai.state import State
 AgentFunction = Callable[[], Union[str, "Agent", dict, State]]
 
-
 class Agent(BaseModel):  # pylint: disable=too-few-public-methods
     """
     Represents an agent in the CAI.
