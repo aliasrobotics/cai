@@ -1,12 +1,14 @@
 """
 This module contains utility functions for the CAI library.
 """
-
+# pylint: disable=cyclic-import
 import inspect
 from datetime import datetime
 from typing import Any
 import json
 import os
+from types import SimpleNamespace
+from mako.template import Template  # pylint: disable=import-error
 from wasabi import color  # pylint: disable=import-error
 from rich.text import Text  # pylint: disable=import-error
 from rich.panel import Panel  # pylint: disable=import-error
@@ -698,3 +700,42 @@ def check_flag(output, ctf, challenge=None):
     else:
         print(color("CTF environment not found or provided", fg="yellow"))
     return False, None
+
+
+def create_report_from_messages(content: str):
+    """
+    Create a report from a list of messages.
+    """
+    def to_namespace(obj):
+        if isinstance(obj, dict):
+            return SimpleNamespace(**{k: to_namespace(v)
+                                   for k, v in obj.items()})
+        if isinstance(obj, list):
+            return [to_namespace(item) for item in obj]
+
+        return obj
+
+    try:
+        # Try to parse the content as JSON
+        report_data = json.loads(content)
+    except json.JSONDecodeError:
+        # Fallback: store raw content under executive_summary
+        report_data = {"executive_summary": content.strip()}
+
+    # Convert nested dictionaries to objects for attribute access in the Mako
+    # template
+    report_data = {k: to_namespace(v) for k, v in report_data.items()}
+
+    # Render the full report using the Mako template
+    template = Template(filename="cai/agents/template.md")  # nosec: B702
+    report_output = template.render(**report_data)
+
+    report_dir = "./report"
+    os.makedirs(report_dir, exist_ok=True)
+
+    report_path = os.path.join(report_dir, "report1.md")
+
+    with open(report_path, "w", encoding="utf-8") as f:
+        f.write(report_output)
+
+    return report_output

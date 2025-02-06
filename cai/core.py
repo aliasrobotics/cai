@@ -22,9 +22,9 @@ import litellm  # pylint: disable=import-error
 from dotenv import load_dotenv  # pylint: disable=import-error # noqa: E501
 from wasabi import color  # pylint: disable=import-error
 from cai.logger import exploit_logger
-
 # Local imports
 from cai.datarecorder import DataRecorder
+import cai
 from .util import (
     function_to_json,
     debug_print,
@@ -32,7 +32,8 @@ from .util import (
     cli_print_tool_call,
     cli_print_state,
     get_ollama_api_base,
-    check_flag
+    check_flag,
+    create_report_from_messages
 )
 from .types import (
     Agent,
@@ -42,7 +43,6 @@ from .types import (
     Response,
     Result,
 )
-
 __CTX_VARS_NAME__ = "context_variables"
 litellm.suppress_debug_info = True
 
@@ -101,6 +101,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         if log_training_data:
             self.rec_training_data = DataRecorder()
 
+        self.report = os.getenv("CAI_REPORT", "false").lower() == "true"
         self.force_until_flag = force_until_flag
         self.challenge = challenge
         load_dotenv()
@@ -211,7 +212,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 create_params, litellm_completion)
 
         # print(litellm_completion)  # debug
-        print(litellm_completion)
+        # print(litellm_completion)
         return litellm_completion
 
     def handle_function_result(self, result, debug) -> Result:
@@ -572,7 +573,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
     @exploit_logger.log_response("🚩" + os.getenv('CTF_NAME', 'test') +
                                  " @ " + os.getenv('CI_JOB_ID', 'local'))
-    def run(  # pylint: disable=too-many-arguments,dangerous-default-value,too-many-locals,too-many-statements # noqa: E501
+    def run(  # pylint: disable=too-many-arguments,dangerous-default-value,too-many-locals,too-many-statements,too-many-branches # noqa: E501
         self,
         agent: Agent,
         messages: List,
@@ -595,10 +596,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         - "interaction": a single interaction with the LLM, with
             its corresponding tool calls and responses.
         """
+
         start_time = time.time()
         self.brief = brief
         self.init_len = len(messages)
-
+        self.report = os.getenv("CAI_REPORT", "false").lower() == "true"
         # TODO: consider moving this outside of CAI  # pylint: disable=fixme  # noqa: E501
         # as the logging URL has a harcoded bit which is
         # dependent on the file that invokes it
@@ -627,8 +629,22 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     n_turn
                 )
                 n_turn += 1
+
             except EOFError:
                 print("\nCtrl+D pressed, exiting current turn...")
+                if self.report:
+                    report = create_report_from_messages(
+                        history[-1]["content"])
+                break
+            except KeyboardInterrupt:
+                print("\nCtrl+C pressed, exiting...")
+
+                if input("Want to create a report? (y/n)").lower() == "y":
+                    active_agent = cai.transfer_to_reporter_agent()
+                    self.report = False
+                    history[-1]["sender"] = "Report Agent"
+                    continue
+
                 break
 
             if active_agent is None and self.force_until_flag:
@@ -657,10 +673,28 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     )
                 })
                 active_agent = agent
+
+            elif active_agent is None and self.report:
+                active_agent = cai.transfer_to_reporter_agent()
+                self.report = False
+                history[-1]["sender"] = "Report Agent"
+
             elif active_agent is None:
+                if history[-1]["sender"] == "Report Agent":
+                    report = create_report_from_messages(
+                        history[-1]["content"])
                 break
 
         execution_time = time.time() - start_time
+
+        if self.report:
+            return Response(
+                messages=history[self.init_len:],
+                agent=active_agent,
+                context_variables=context_variables,
+                time=execution_time,
+                report=report
+            )
         return Response(
             messages=history[self.init_len:],
             agent=active_agent,

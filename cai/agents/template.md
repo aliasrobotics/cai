@@ -6,23 +6,23 @@
 
 | **Date**    | **Client**   | **Assessor** | **Version** |
 |-------------|--------------|--------------|-------------|
-| ${date}     | placeholder  | CAI          | 2.1         |
+| ${date or ""}     | placeholder  | CAI          | 2.1         |
 
 ---
 
 <details>
   <summary><strong>Table of Contents</strong> (Click to Expand)</summary>
 
-1. [Executive Summary](#1-executive-summary)  
-2. [Scope & Objectives](#2-scope--objectives)  
-3. [Methodology](#3-methodology)  
-4. [Tools and Techniques](#tools-and-techniques)  
-5. [Detailed Findings](#4-detailed-findings)  
-  - [Vulnerability Assessment Metrics](#41-vulnerability-assessment-metrics)  
-  - [Network State Analysis](#42-network-state-analysis)  
-6. [Risk Assessment](#5-risk-assessment)  
-7. [Remediation Recommendations](#6-remediation-recommendations)  
-8. [Conclusion](#7-conclusion)  
+1. [Executive Summary](#1-executive-summary)
+2. [Scope & Objectives](#2-scope--objectives)
+3. [Methodology](#3-methodology)
+4. [Tools and Techniques](#tools-and-techniques)
+5. [Detailed Findings](#4-detailed-findings)
+  - [Vulnerability Assessment Metrics](#41-vulnerability-assessment-metrics)
+  - [Network State Analysis](#42-network-state-analysis)
+6. [Risk Assessment](#5-risk-assessment)
+7. [Remediation Recommendations](#6-remediation-recommendations)
+8. [Conclusion](#7-conclusion)
 9. [Appendix](#8-appendix)
 </details>
 
@@ -30,7 +30,7 @@
 
 ## 1. Executive Summary
 
-> ${executive_summary}
+> ${executive_summary or "No executive summary provided."}
 
 ---
 
@@ -38,7 +38,7 @@
 
 The following section delineates the scope and objectives of this penetration testing engagement:
 
-${scope}
+${scope or "No scope defined."}
 
 ---
 
@@ -46,7 +46,7 @@ ${scope}
 
 The assessment was conducted using a systematic and comprehensive approach that encompasses reconnaissance, vulnerability analysis, exploitation, and validation:
 
-${methodology}
+${methodology or "No methodology provided."}
 
 ---
 
@@ -56,8 +56,8 @@ ${methodology}
 <details>
   <summary><strong>Detailed Tools and Techniques</strong> (Click to Expand)</summary>
 
-% for tool in tools:
-- 🛠 ${tool}
+% for tool in (tools or []):
+- 🛠 ${tool or ""}
 % endfor
 
 </details>
@@ -67,28 +67,33 @@ ${methodology}
 
 ## 4. Detailed Findings
 
-% for finding in findings:
+% for finding in (findings or []):
 <details>
   <summary>
-    <strong>🚨 Finding ID: ${finding.finding_id}</strong> | <em>Type:</em> ${finding.finding_type} | <em>Severity:</em> ${finding.severity}
+    <strong>🚨 Finding ID: ${finding.finding_id or "N/A"}</strong> | <em>Type:</em> ${finding.finding_type or "N/A"} | <em>Severity:</em> ${finding.severity or "N/A"}
   </summary>
 
-**Description:**  
-${finding.description}
+**Description:**
+${finding.description or "No description provided."}
 
 % if finding.cve_cwe:
 **References:** ${finding.cve_cwe}
 % endif
 
-**Exploitation Details:**  
-${finding.exploitation_details}
+**Exploitation Details:**
+${finding.exploitation_details or "No exploitation details provided."}
 
-**Remediation Recommendation:**  
-${finding.remediation}
+**Remediation Recommendation:**
+${finding.remediation or "No remediation recommendation provided."}
+
+**Remediation Command:**
+${finding.remediation_command or "No remediation command provided."}
 
 % if finding.evidence:
-**Evidence:**  
-${finding.evidence}
+**Evidence:**
+- Empirical Evidence: ${finding.evidence.empirical_evidence or "N/A"}
+- Tool Log: ${finding.evidence.tool_output_evidence or "N/A"}
+- Command: ${finding.evidence.command or "N/A"}
 % endif
 
 </details>
@@ -105,11 +110,11 @@ ${finding.evidence}
 
 ```mermaid
 pie
-    title ${chart_title}
-    "Critical" : ${vuln_critical}
-    "High"     : ${vuln_high}
-    "Medium"   : ${vuln_medium}
-    "Low"      : ${vuln_low}
+    title ${chart_title or "Vulnerability Severity Distribution"}
+    "Critical" : ${vuln_critical or 0}
+    "High"     : ${vuln_high or 0}
+    "Medium"   : ${vuln_medium or 0}
+    "Low"      : ${vuln_low or 0}
 ```
 
 *Note: The displayed values are placeholders and may vary based on actual assessment data.*
@@ -120,17 +125,17 @@ pie
 ## 4.2 Network State Analysis
 
 % if network_state and network_state.network:
-% for endpoint in network_state.network:
+% for endpoint in (network_state.network or []):
 <details>
-  <summary><strong>Host: ${endpoint.ip_address}</strong></summary>
+  <summary><strong>Host: ${endpoint.ip or "N/A"}</strong></summary>
 
 ### Open Ports
 
-% if endpoint.open_ports:
+% if endpoint.ports:
 | Port Number | Service Name | Version | Vulnerabilities |
 |-------------|--------------|---------|-----------------|
-% for port in endpoint.open_ports:
-| ${port.port_number} | ${port.service_name} | ${port.version} | ${", ".join(port.vulnerabilities) if port.vulnerabilities else "None"} |
+% for port in (endpoint.ports or []):
+| ${port.port or "N/A"} | ${port.service or "N/A"} | ${port.version or "N/A"} | ${", ".join(port.vulns or []) if (port.vulns or []) else "None"} |
 % endfor
 % else:
 _No open ports detected._
@@ -138,11 +143,11 @@ _No open ports detected._
 
 ### Executed Exploits
 
-% if endpoint.executed_exploits:
-| Exploit Name | Exploit Type | Status | Details |
-|--------------|--------------|--------|---------|
-% for exploit in endpoint.executed_exploits:
-| ${exploit.exploit_name} | ${exploit.exploit_type} | ${exploit.status} | ${exploit.details} |
+% if endpoint.exploits:
+| Exploit Name | Exploit Type | Status |
+|--------------|--------------|--------|
+% for exploit in (endpoint.exploits or []):
+| ${exploit.name or "N/A"} | ${exploit.exploit_type or "N/A"} | ${exploit.status or "N/A"} |
 % endfor
 % else:
 _No exploit attempts recorded._
@@ -150,11 +155,11 @@ _No exploit attempts recorded._
 
 ### Discovered Files
 
-% if endpoint.discovered_files:
+% if endpoint.files:
 | File Name |
 |-----------|
-% for file in endpoint.discovered_files:
-| ${file} |
+% for file in (endpoint.files or []):
+| ${file or "N/A"} |
 % endfor
 % else:
 _No files discovered._
@@ -162,11 +167,11 @@ _No files discovered._
 
 ### Identified Users
 
-% if endpoint.identified_users:
+% if endpoint.users:
 | User Identifier |
 |-----------------|
-% for user in endpoint.identified_users:
-| ${user} |
+% for user in (endpoint.users or []):
+| ${user or "N/A"} |
 % endfor
 % else:
 _No users identified._
@@ -182,22 +187,22 @@ _No network state data available._
 
 ## 5. Risk Assessment
 
-> ${risk_assessment if risk_assessment else "Risk assessment details are not provided."}
+> ${risk_assessment or "Risk assessment details are not provided."}
 
 ---
 
 ## 6. Remediation Recommendations
 
-> ${remediation_recommendations if remediation_recommendations else "No remediation recommendations available."}
+> ${remediation_recommendations or "No remediation recommendations available."}
 
 ---
 
 ## 7. Conclusion
 
-> ${conclusion if conclusion else "Conclusion pending further evaluation."}
+> ${conclusion or "Conclusion pending further evaluation."}
 
 ---
 
 ## 8. Appendix
 
-${appendix if appendix else "No additional documentation provided."}
+${appendix or "No additional documentation provided."}

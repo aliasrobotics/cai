@@ -12,7 +12,7 @@ from cai.tools.reconnaissance.crypto_tools import (decode64,
 from cai.tools.reconnaissance.netcat import netcat
 from cai.tools.reconnaissance.nmap import nmap
 from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa
-
+from cai.agents.reporter import reporter_agent
 
 from .core import CAI
 from .types import Agent, Response
@@ -152,6 +152,12 @@ def transfer_to_crypto_agent(**kwargs):  # pylint: disable=W0613
     """ Transfer to crypto agent.
     Accepts any keyword arguments but ignores them."""
     return crypto_agent
+
+
+def transfer_to_reporter_agent(**kwargs):  # pylint: disable=W0613
+    """ Transfer to reporter agent.
+    Accepts any keyword arguments but ignores them."""
+    return reporter_agent
 
 
 # ADD TRANSFER FUNCTIONS TO THE AGENTS
