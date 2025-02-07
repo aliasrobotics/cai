@@ -4,6 +4,7 @@ This module contains utility functions for the CAI library.
 # pylint: disable=cyclic-import
 import inspect
 from datetime import datetime
+import time
 from typing import Any
 import json
 import os
@@ -702,7 +703,7 @@ def check_flag(output, ctf, challenge=None):
     return False, None
 
 
-def create_report_from_messages(content: str, save_path: str):
+def create_report_from_messages(content: str):
     """
     Create a report from a list of messages.
     """
@@ -732,7 +733,8 @@ def create_report_from_messages(content: str, save_path: str):
 
     report_dir = "./report"
     os.makedirs(report_dir, exist_ok=True)
-
+    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+    save_path = f"Report_{timestamp}.md"
     report_path = os.path.join(report_dir, save_path)
 
     with open(report_path, "w", encoding="utf-8") as f:

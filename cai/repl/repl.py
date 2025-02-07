@@ -2,12 +2,10 @@
 This module provides a REPL interface for testing and
 interacting with CAI agents.
 """
-import time
 import json
 import os
 from wasabi import color  # pylint: disable=import-error
 from cai import CAI  # pylint: disable=import-error
-from cai.util import create_report_from_messages
 
 
 def process_and_print_streaming_response(response):  # pylint: disable=inconsistent-return-statements  # noqa: E501
@@ -114,7 +112,6 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
 """)
 
     messages = []
-    all_reports = []
     if ctf:
         # Get challenge
         challenge_key = os.getenv('CTF_CHALLENGE')
@@ -193,158 +190,6 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
         if response.agent:
             agent = response.agent
         if response.report:
-            if all_reports:
-                latest_report = all_reports[-1]
-                latest_report.findings.extend(
-                    response.report.findings
-                )
-                latest_report.vuln_critical += (
-                    response.report.vuln_critical
-                )
-                latest_report.vuln_high += response.report.vuln_high
-                latest_report.vuln_medium += response.report.vuln_medium
-                latest_report.vuln_low += response.report.vuln_low
-                if response.report.network_state:
-                    if not latest_report.network_state:
-                        latest_report.network_state = (
-                            response.report.network_state
-                        )
-                    else:
-                        existing_ips = {
-                            ep.ip
-                            for ep in latest_report.network_state.network
-                        }
-                        for endpoint in response.report.network_state.network:
-                            if endpoint.ip not in existing_ips:
-                                latest_report.network_state.network.append(
-                                    endpoint
-                                )
-                            else:
-                                existing = next(
-                                    ep
-                                    for ep in latest_report.network_state.network  # noqa: E501
-                                    if ep.ip == endpoint.ip
-                                )
-                                existing.ports.extend([
-                                    p
-                                    for p in endpoint.ports
-                                    if p.port not in [
-                                        ep.port
-                                        for ep in existing.ports
-                                    ]
-                                ])
-                                existing.exploits.extend([
-                                    e
-                                    for e in endpoint.exploits
-                                    if e.name not in [
-                                        ex.name
-                                        for ex in existing.exploits
-                                    ]
-                                ])
-                                existing.files.extend([
-                                    f
-                                    for f in endpoint.files
-                                    if f not in existing.files
-                                ])
-                                existing.users.extend([
-                                    u
-                                    for u in endpoint.users
-                                    if u not in existing.users
-                                ])
-                latest_report.executive_summary += (
-                    "\n" + response.report.executive_summary
-                )
-                latest_report.scope += "\n" + response.report.scope
-                latest_report.methodology += (
-                    "\n" + response.report.methodology
-                )
-                latest_report.tools.extend(response.report.tools)
-                latest_report.risk_assessment += (
-                    "\n" + response.report.risk_assessment
-                )
-                latest_report.remediation_recommendations += (
-                    "\n" + response.report.remediation_recommendations
-                )
-                latest_report.conclusion += "\n" + response.report.conclusion
-                latest_report.appendix += "\n" + response.report.appendix
-            else:
-                all_reports.append(response.report)
-
-            merged_report = all_reports[0]
-            for report in all_reports[1:]:
-                merged_report.findings.extend(report.findings)
-                merged_report.vuln_critical += report.vuln_critical
-                merged_report.vuln_high += report.vuln_high
-                merged_report.vuln_medium += report.vuln_medium
-                merged_report.vuln_low += report.vuln_low
-                if report.network_state:
-                    if not merged_report.network_state:
-                        merged_report.network_state = report.network_state
-                    else:
-                        existing_ips = {
-                            ep.ip
-                            for ep in merged_report.network_state.network
-                        }
-                        for endpoint in report.network_state.network:
-                            if endpoint.ip not in existing_ips:
-                                merged_report.network_state.network.append(
-                                    endpoint
-                                )
-                            else:
-                                existing = next(
-                                    ep
-                                    for ep in merged_report.network_state.network  # noqa: E501
-                                    if ep.ip == endpoint.ip
-                                )
-                                existing.ports.extend([
-                                    p
-                                    for p in endpoint.ports
-                                    if p.port not in [
-                                        ep.port
-                                        for ep in existing.ports
-                                    ]
-                                ])
-                                existing.exploits.extend([
-                                    e
-                                    for e in endpoint.exploits
-                                    if e.name not in [
-                                        ex.name
-                                        for ex in existing.exploits
-                                    ]
-                                ])
-                                existing.files.extend([
-                                    f
-                                    for f in endpoint.files
-                                    if f not in existing.files
-                                ])
-                                existing.users.extend([
-                                    u
-                                    for u in endpoint.users
-                                    if u not in existing.users
-                                ])
-                merged_report.executive_summary += (
-                    "\n" + report.executive_summary
-                )
-                merged_report.scope += "\n" + report.scope
-                merged_report.methodology += "\n" + report.methodology
-                merged_report.tools.extend(report.tools)
-                merged_report.risk_assessment += (
-                    "\n" + report.risk_assessment
-                )
-                merged_report.remediation_recommendations += (
-                    "\n" + report.remediation_recommendations
-                )
-                merged_report.conclusion += "\n" + report.conclusion
-                merged_report.appendix += "\n" + report.appendix
-
-            report_json = merged_report.model_dump_json()
-            print(report_json)
-
-            hostname = merged_report.network_state.network[
-                0].hostname if merged_report.network_state.network else "report"  # noqa: E501
-            timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
-
-            # Create filename with hostname and timestamp
-            report_filename = f"{hostname}_{timestamp}.md"
-
-            create_report_from_messages(report_json, report_filename)
+            context_variables = {
+                "previous_reports": response.report
+            }

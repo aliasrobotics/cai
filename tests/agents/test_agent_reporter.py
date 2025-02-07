@@ -110,5 +110,5 @@ def test_reporter_agent():
         max_turns=1,
     )
 
-    create_report_from_messages(response.report, "test_report.md")
-    assert os.path.exists("./report/test_report.md")
+    create_report_from_messages(response.report)
+    assert os.path.exists("./report")
