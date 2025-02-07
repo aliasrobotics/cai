@@ -650,9 +650,16 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 # Check if the flag is found in the last tool output
                 flag_found, flag = check_flag(
                     history[-1]["content"], self.ctf, self.challenge)
-                if flag_found:
-                    break
 
+                if flag_found:
+                    if history[-1]["sender"] == "Report Agent":
+                        report = history[-1]["content"]
+                        create_report_from_messages(history[-1]["content"])
+                    break
+                elif history[-1]["sender"] == "Report Agent":
+                    report = history[-1]["content"]
+                    create_report_from_messages(history[-1]["content"])
+                    break
                 # # Check if flag is found anywhere in history
                 # for message in history:
                 #     flag_found, _ = check_flag(message["content"],
