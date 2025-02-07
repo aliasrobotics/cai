@@ -212,7 +212,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 create_params, litellm_completion)
 
         # print(litellm_completion)  # debug
-        # print(litellm_completion)
         return litellm_completion
 
     def handle_function_result(self, result, debug) -> Result:
@@ -633,8 +632,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             except EOFError:
                 print("\nCtrl+D pressed, exiting current turn...")
                 if self.report:
-                    report = create_report_from_messages(
-                        history[-1]["content"])
+                    report = history[-1]["content"]
+                    create_report_from_messages(history[-1]["content"])
                 break
             except KeyboardInterrupt:
                 print("\nCtrl+C pressed, exiting...")
@@ -681,13 +680,13 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
             elif active_agent is None:
                 if history[-1]["sender"] == "Report Agent":
-                    report = create_report_from_messages(
-                        history[-1]["content"])
+                    report = history[-1]["content"]
+                    create_report_from_messages(history[-1]["content"])
                 break
 
         execution_time = time.time() - start_time
 
-        if self.report:
+        if history[-1]["sender"] == "Report Agent":
             return Response(
                 messages=history[self.init_len:],
                 agent=active_agent,

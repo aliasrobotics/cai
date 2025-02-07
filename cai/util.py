@@ -739,5 +739,3 @@ def create_report_from_messages(content: str):
 
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(report_output)
-
-    return report_output
