@@ -1,0 +1,1 @@
+# Nmap 7.95 scan initiated Fri Feb  7 21:26:59 2025 as: /usr/lib/nmap/nmap -sV -sC -p- -oN initial_scan.nmap 192.168.2.1

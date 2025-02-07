@@ -14,10 +14,11 @@ import copy
 import json
 from collections import defaultdict
 from typing import List
-
+import math
 # Package/library imports
 import time
 import os
+from collections import deque
 import litellm  # pylint: disable=import-error
 from dotenv import load_dotenv  # pylint: disable=import-error  # noqa: E501
 from wasabi import color  # pylint: disable=import-error
@@ -47,214 +48,210 @@ from .types import (
 
 __CTX_VARS_NAME__ = "context_variables"
 litellm.suppress_debug_info = True
-def visualize_agents(agent):
-    """
-    Visualize agent topology as a horizontal tree graph in a Rich panel.
 
-    This version arranges agent nodes in levels from left to right and stacks nodes vertically
-    within each level. Node boxes are sized dynamically based on their display text and tool
-    function labels are placed to the right. Edges are drawn as straight horizontal and
-    vertical (L-shaped) connectors, producing a diagram that resembles a PNG image in the terminal.
-    Se representa solo un nodo por agente, usando un recorrido iterativo (BFS) sin recursión.
+def visualize_agent_graph(start_agent):
     """
-    import math
-    from collections import defaultdict, deque
-    from rich.console import Console
-    from rich.panel import Panel
-
+    Visualiza en CLI un grafo cíclico (estilo Maltego) de agentes.
+    
+    Cada agente tiene:
+      - Handoff(s) que conectan a otros agentes (se muestran como conectores completos).
+      - Herramientas (tools) que se ubican alrededor del agente.
+      
+    El layout es circular, el canvas se ajusta de forma responsiva (más ancho y alto)
+    y los conectores se dibujan como líneas horizontales y verticales con sus esquinas.
+    """
     console = Console()
-    if agent is None:
-        console.print("[red]No agent provided for visualization.[/red]")
+    if start_agent is None:
+        console.print("[red]No se proporcionó ningún agente para visualizar.[/red]")
         return
 
-    # --- Build the graph iteratively (BFS) without recursion ---
-    nodes = []          # List of node dictionaries (holds level, tool_functions, etc.)
-    edges = []          # List of edges: (src_id, tgt_id, function label, type)
-    visited = {}        # Map of agent id to node info
-    queue = deque([(agent, 0)])
-
+    # ------------------------------------------------------------------------
+    # Recorrido BFS para recolectar nodos y conexiones (handoffs)
+    # ------------------------------------------------------------------------
+    nodes = []   # Cada nodo: {id, name, tools, handoffs, ...}
+    edges = []   # Conexiones: (id_origen, id_destino, etiqueta de handoff)
+    visited = {} # Map id(agente) -> nodo ya procesado
+    queue = deque([start_agent])
+    
     while queue:
-        current_agent, level = queue.popleft()
-        node_id = id(current_agent)
-        if node_id in visited:
+        current = queue.popleft()
+        cur_id = id(current)
+        if cur_id in visited:
             continue
-        display_name = current_agent.name + (" (inicio)" if current_agent is agent else "")
-        node_info = {
-            "id": node_id,
-            "name": current_agent.name,
-            "display_name": display_name,
-            "level": level,
-            "tool_functions": [],
-            "transfer_functions": []  # For transfer/handoff functions
+        
+        nodo = {
+            "id": cur_id,
+            "name": current.name,
+            "tools": [],      # Herramientas (no handoff)
+            "handoffs": []    # Etiquetas de funciones de handoff
         }
-        visited[node_id] = node_info
-        nodes.append(node_info)
-
-        # Process attached functions.
-        for fn in getattr(current_agent, "functions", []):
+        visited[cur_id] = nodo
+        nodes.append(nodo)
+        
+        # Se asume que current.functions es una lista de funciones
+        for fn in getattr(current, "functions", []):
             if callable(fn):
                 fn_name = getattr(fn, "__name__", "")
-                if fn_name.startswith("transfer_to") or "handoff" in fn_name:
-                    node_info["transfer_functions"].append(fn_name)
+                # Por convención, las funciones de handoff contienen "handoff" o inician con "transfer_to"
+                if fn_name.lower().find("handoff") != -1 or fn_name.startswith("transfer_to"):
+                    nodo["handoffs"].append(fn_name)
                     try:
                         next_agent = fn()
                     except Exception:
                         next_agent = None
                     if next_agent:
-                        edges.append((node_id, id(next_agent), fn_name, "handoff"))
+                        edges.append((cur_id, id(next_agent), fn_name))
                         if id(next_agent) not in visited:
-                            queue.append((next_agent, level + 1))
+                            queue.append(next_agent)
                 else:
-                    node_info["tool_functions"].append(fn_name)
-
+                    nodo["tools"].append(fn_name)
+    
     if not nodes:
-        console.print("[yellow]No agents found in the graph.[/yellow]")
+        console.print("[yellow]No se encontraron agentes en el grafo.[/yellow]")
         return
 
-    # --- Compute node box dimensions and horizontal tree layout ---
-    MIN_WIDTH = 20
-    BOX_HEIGHT = 5
-    HORIZONTAL_GAP = 40  # Horizontal distance between levels
-    VERTICAL_GAP = BOX_HEIGHT + 3  # Vertical spacing between nodes on the same level
-
-    # Compute dynamic widths for nodes based on display text
-    for node in nodes:
-        node["width"] = max(MIN_WIDTH, len(node["display_name"]) + 4)
-        node["height"] = BOX_HEIGHT
-
-    # Group nodes by level and assign positions (left-to-right levels, top-to-bottom within level)
-    level_groups = defaultdict(list)
-    for node in nodes:
-        level_groups[node["level"]].append(node)
-    for level in sorted(level_groups.keys()):
-        group = level_groups[level]
-        group.sort(key=lambda n: n["name"])  # For consistency
-        for idx, node in enumerate(group):
-            node["x"] = level * HORIZONTAL_GAP
-            node["y"] = idx * VERTICAL_GAP
-            node["cx"] = node["x"] + node["width"] // 2  # Center x of the box
-            node["cy"] = node["y"] + node["height"] // 2  # Center y of the box
-
-    # --- Calculate positions for tool function labels (placed to the right of the node) ---
-    tool_boxes = []  # Each: {agent_id, fn_text, tool_x, tool_y}
-    for node in nodes:
-        funcs = node.get("tool_functions", [])
-        n_funcs = len(funcs)
-        if n_funcs == 0:
-            continue
-        # Align labels vertically centered relative to the node box
-        base_y = node["y"] + node["height"] // 2
-        for j, fn_name in enumerate(funcs):
-            offset = (j - n_funcs // 2) * 2  # Separate multiple labels by 2 rows
-            tool_x = node["x"] + node["width"] + 3
-            tool_y = base_y + offset
-            tool_boxes.append({
-                "agent_id": node["id"],
-                "fn_text": f"({fn_name})",
-                "tool_x": tool_x,
-                "tool_y": tool_y
-            })
-
-    # --- Determine overall canvas dimensions based on nodes and tool boxes ---
-    margin = 2
-    all_x = []
-    all_y = []
-    for node in nodes:
-        all_x.extend([node["x"], node["x"] + node["width"]])
-        all_y.extend([node["y"], node["y"] + node["height"]])
-    for tb in tool_boxes:
-        text_len = len(tb["fn_text"])
-        all_x.extend([tb["tool_x"], tb["tool_x"] + text_len])
-        all_y.append(tb["tool_y"])
-    min_x, max_x = min(all_x), max(all_x)
-    min_y, max_y = min(all_y), max(all_y)
+    # ------------------------------------------------------------------------
+    # Layout circular para los nodos
+    # ------------------------------------------------------------------------
+    n = len(nodes)
+    # Escoge un radio basado en la cantidad de nodos (se asegura una distribución más "cuadrada")
+    layout_radius = max(25, n * 12 / (2 * math.pi))
+    for i, nodo in enumerate(nodes):
+        angle = 2 * math.pi * i / n
+        # Coordenadas centrales del nodo
+        nodo["cx"] = int(round(layout_radius * math.cos(angle)))
+        nodo["cy"] = int(round(layout_radius * math.sin(angle)))
+        # Dimensiones del recuadro del agente (mínimo 10 de ancho)
+        nodo["width"] = max(10, len(nodo["name"]) + 4)
+        nodo["height"] = 3  # Se usará una caja de 3 líneas
+        nodo["x"] = nodo["cx"] - nodo["width"] // 2
+        nodo["y"] = nodo["cy"] - nodo["height"] // 2
+        
+        # Posiciones para las herramientas (distribuidas en círculo alrededor del nodo)
+        nodo["tool_positions"] = []
+        nt = len(nodo["tools"])
+        if nt:
+            tool_offset = max(nodo["width"] // 2 + 4, 8)
+            for j, tool in enumerate(nodo["tools"]):
+                a = 2 * math.pi * j / nt
+                tx = nodo["cx"] + int(round(tool_offset * math.cos(a)))
+                ty = nodo["cy"] + int(round(tool_offset * math.sin(a)))
+                nodo["tool_positions"].append((tx, ty, tool))
+    
+    # ------------------------------------------------------------------------
+    # Definir dimensiones del canvas (ajustado en ancho y alto)
+    # ------------------------------------------------------------------------
+    xs, ys = [], []
+    for nodo in nodes:
+        xs.extend([nodo["x"], nodo["x"] + nodo["width"], nodo["cx"]])
+        ys.extend([nodo["y"], nodo["y"] + nodo["height"], nodo["cy"]])
+        for (tx, ty, _) in nodo.get("tool_positions", []):
+            xs.append(tx)
+            ys.append(ty)
+    min_x, max_x = min(xs), max(xs)
+    min_y, max_y = min(ys), max(ys)
+    margin = 6
     canvas_width = (max_x - min_x) + margin * 2
     canvas_height = (max_y - min_y) + margin * 2
-
-    # Shift positions so that they are within positive canvas coordinates.
     shift_x = -min_x + margin
     shift_y = -min_y + margin
 
-    # --- Create a 2D canvas ---
+    # Crear el canvas 2D (matriz de celdas)
     canvas = [[" " for _ in range(canvas_width)] for _ in range(canvas_height)]
-
-    # Helper: Draw colored text at (x, y) on the canvas.
-    def draw_text(x, y, text, style):
-        for idx, ch in enumerate(text):
+    
+    # ------------------------------------------------------------------------
+    # Helpers para dibujar sobre el canvas
+    # ------------------------------------------------------------------------
+    def put_text(x, y, text, style):
+        """Dibuja un string a partir de (x, y) usando el estilo de Rich."""
+        for idx, char in enumerate(text):
             cx = x + idx
             if 0 <= cx < canvas_width and 0 <= y < canvas_height:
-                canvas[y][cx] = f"[{style}]{ch}[/{style}]"
-
-    # Helper: Draw a box for a node with its display text.
-    def draw_box(x, y, text, width):
-        if width < 2:
-            return
-        top = "┌" + "─" * (width - 2) + "┐"
-        empty = "│" + " " * (width - 2) + "│"
-        middle = "│" + text.center(width - 2) + "│"
-        bottom = "└" + "─" * (width - 2) + "┘"
-        draw_text(x, y, top, "green")
-        draw_text(x, y + 1, empty, "green")
-        draw_text(x, y + 2, middle, "green")
-        draw_text(x, y + 3, empty, "green")
-        draw_text(x, y + 4, bottom, "green")
-
-    # Helper: Draw an L-shaped connector (horizontal then vertical) between two points.
-    def draw_line(x0, y0, x1, y1):
-        # Draw horizontal segment from (x0, y0) to (x1, y0)
-        if x0 != x1:
-            step = 1 if x1 > x0 else -1
-            for x in range(x0, x1 + step, step):
-                if (x, y0) not in [(x0, y0), (x1, y0)]:
-                    canvas[y0][x] = f"[blue]─[/blue]"
-        # Draw vertical segment from (x1, y0) to (x1, y1)
-        if y0 != y1:
-            step = 1 if y1 > y0 else -1
-            for y in range(y0, y1 + step, step):
-                if (x1, y) not in [(x1, y0), (x1, y1)]:
-                    canvas[y][x1] = f"[blue]│[/blue]"
-        # Mark the corner if both segments were drawn
-        if x0 != x1 and y0 != y1:
-            canvas[y0][x1] = f"[blue]┼[/blue]"
-
-    # Create a mapping from node id to node for easy lookup.
-    node_by_id = {node["id"]: node for node in nodes}
-
-    # --- Draw transfer/handoff edges between node centers ---
-    for src_id, tgt_id, label, _ in edges:
-        src_node = node_by_id.get(src_id)
-        tgt_node = node_by_id.get(tgt_id)
-        if not src_node or not tgt_node:
+                canvas[y][cx] = f"[{style}]{char}[/{style}]"
+    
+    def draw_box(x, y, w, h, text):
+        """Dibuja una caja con bordes completos y el texto centrado."""
+        top = "┌" + "─" * (w - 2) + "┐"
+        middle = "│" + text.center(w - 2) + "│"
+        bottom = "└" + "─" * (w - 2) + "┘"
+        put_text(x, y, top, "green")
+        put_text(x, y + 1, middle, "green")
+        put_text(x, y + 2, bottom, "green")
+    
+    def draw_connector(sx, sy, tx, ty, style="blue"):
+        """
+        Dibuja un conector en forma de L desde (sx,sy) hasta (tx,ty) con líneas
+        horizontales y verticales. Si ambos puntos están alineados en una dirección,
+        se dibuja una línea recta.
+        """
+        # Ajustar direcciones
+        sx, sy, tx, ty = int(sx), int(sy), int(tx), int(ty)
+        # Si la línea es horizontal o vertical, dibujarla de un solo tramo:
+        if sy == ty:
+            # Línea horizontal
+            start, end = sorted([sx, tx])
+            for x in range(start + 1, end):
+                canvas[sy][x] = f"[{style}]─[/{style}]"
+        elif sx == tx:
+            # Línea vertical
+            start, end = sorted([sy, ty])
+            for y in range(start + 1, end):
+                canvas[y][sx] = f"[{style}]│[/{style}]"
+        else:
+            # Dibuja segmento horizontal de sx a tx en la fila sy
+            start, end = sorted([sx, tx])
+            for x in range(start + 1, end):
+                canvas[sy][x] = f"[{style}]─[/{style}]"
+            # Dibuja segmento vertical de sy a ty en la columna tx
+            start_y, end_y = sorted([sy, ty])
+            for y in range(start_y + 1, end_y):
+                canvas[y][tx] = f"[{style}]│[/{style}]"
+            # Coloca la esquina (se usa ┼ para indicar la intersección)
+            canvas[sy][tx] = f"[{style}]┼[/{style}]"
+    
+    # ------------------------------------------------------------------------
+    # Dibujar los handoffs (conectores entre nodos)
+    # ------------------------------------------------------------------------
+    # Para cada conexión, se traza una línea L (horizontal + vertical)
+    node_by_id = {nodo["id"]: nodo for nodo in nodes}
+    for src_id, tgt_id, label in edges:
+        src = node_by_id.get(src_id)
+        tgt = node_by_id.get(tgt_id)
+        if not src or not tgt:
             continue
-        src_cx = src_node["cx"] + shift_x
-        src_cy = src_node["cy"] + shift_y
-        tgt_cx = tgt_node["cx"] + shift_x
-        tgt_cy = tgt_node["cy"] + shift_y
-        draw_line(src_cx, src_cy, tgt_cx, tgt_cy)
-        # Place the label near the starting center
-        draw_text(min(src_cx, tgt_cx), src_cy, label, "magenta")
-
-    # --- Draw connections from nodes to their tool labels ---
-    for tb in tool_boxes:
-        node_obj = node_by_id.get(tb["agent_id"])
-        if not node_obj:
-            continue
-        src_cx = node_obj["cx"] + shift_x
-        src_cy = node_obj["cy"] + shift_y
-        tgt_x = tb["tool_x"] + shift_x
-        tgt_y = tb["tool_y"] + shift_y
-        draw_line(src_cx, src_cy, tgt_x, tgt_y)
-
-    # --- Draw agent boxes over the edges ---
-    for node in nodes:
-        draw_box(node["x"] + shift_x, node["y"] + shift_y, node["display_name"], node["width"])
-
-    # --- Draw tool function texts on top ---
-    for tb in tool_boxes:
-        draw_text(tb["tool_x"] + shift_x, tb["tool_y"] + shift_y, tb["fn_text"], "yellow")
-
+        sx = src["cx"] + shift_x
+        sy = src["cy"] + shift_y
+        tx = tgt["cx"] + shift_x
+        ty = tgt["cy"] + shift_y
+        draw_connector(sx, sy, tx, ty, "magenta")
+        # Ubicar la etiqueta en el centro del conector (puede ajustarse)
+        midx = (sx + tx) // 2
+        midy = (sy + ty) // 2
+        put_text(midx, midy, label, "magenta")
+    
+    # ------------------------------------------------------------------------
+    # Dibujar las conexiones a las tools de cada agente
+    # ------------------------------------------------------------------------
+    for nodo in nodes:
+        cx = nodo["cx"] + shift_x
+        cy = nodo["cy"] + shift_y
+        for (tx, ty, tool) in nodo.get("tool_positions", []):
+            draw_connector(cx, cy, tx + shift_x, ty + shift_y, "yellow")
+            put_text(tx + shift_x, ty + shift_y, tool, "yellow")
+    
+    # ------------------------------------------------------------------------
+    # Dibujar las cajas de los agentes
+    # ------------------------------------------------------------------------
+    for nodo in nodes:
+        bx = nodo["x"] + shift_x
+        by = nodo["y"] + shift_y
+        draw_box(bx, by, nodo["width"], nodo["height"], nodo["name"])
+    
+    # ------------------------------------------------------------------------
+    # Ensamblar y mostrar el canvas
+    # ------------------------------------------------------------------------
     output = "\n".join("".join(cell for cell in row) for row in canvas)
-    panel = Panel(output, title="Agent Topology Graph", border_style="blue")
+    panel = Panel(output, title="Graph de Agentes (Estilo Maltego)", border_style="blue")
     console.print(panel)
 
 class CAI:  # pylint: disable=too-many-instance-attributes
@@ -807,7 +804,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         """
         start_time = time.time()
         self.brief = brief
-        visualize_agents(agent)
+        visualize_agent_graph(agent)
         self.init_len = len(messages)
 
         # TODO: consider moving this outside of CAI  # pylint: disable=fixme  # noqa: E501
