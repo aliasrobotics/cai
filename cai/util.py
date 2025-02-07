@@ -728,7 +728,7 @@ def create_report_from_messages(content: str):
     report_data = {k: to_namespace(v) for k, v in report_data.items()}
 
     # Render the full report using the Mako template
-    template = Template(filename="cai/agents/template.md")  # nosec: B702
+    template = Template(filename="cai/report_agent/template.md")  # nosec: B702
     report_output = template.render(**report_data)
 
     report_dir = "./report"

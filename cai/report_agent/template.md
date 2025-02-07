@@ -86,7 +86,7 @@ ${finding.exploitation_details or "No exploitation details provided."}
 **Remediation Recommendation:**
 ${finding.remediation or "No remediation recommendation provided."}
 
-**Remediation Command:**
+**Remediation Actions:**
 ${finding.remediation_command or "No remediation command provided."}
 
 % if finding.evidence:
