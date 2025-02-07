@@ -125,8 +125,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             if callable(agent.instructions)
             else agent.instructions
         )
-        messages = [{"role": "system", "content": instructions}] + history
-
+        messages = [{"role": "system", "content": instructions}]
+        for msg in history:
+            if msg.get("sender") != "Report Agent":
+                messages.append(msg)
+        print(messages)
         debug_print(
             debug,
             "Getting chat completion for...:",
@@ -600,6 +603,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.brief = brief
         self.init_len = len(messages)
         self.report = os.getenv("CAI_REPORTER", "false").lower() == "true"
+        report_interval = int(os.getenv("CAI_REPORT_INTERVAL", "0"))
         # TODO: consider moving this outside of CAI  # pylint: disable=fixme  # noqa: E501
         # as the logging URL has a harcoded bit which is
         # dependent on the file that invokes it
@@ -628,6 +632,23 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     n_turn
                 )
                 n_turn += 1
+
+                # Generate intermediate report if interval is set and reached
+                if report_interval > 0 and n_turn % report_interval == 0:
+                    prev_agent = active_agent
+                    active_agent = cai.transfer_to_reporter_agent()
+                    self.process_interaction(
+                        active_agent,
+                        history,
+                        context_variables,
+                        model_override,
+                        stream,
+                        debug,
+                        execute_tools,
+                        n_turn
+                    )
+                    create_report_from_messages(history)
+                    active_agent = prev_agent
 
             except EOFError:
                 print("\nCtrl+D pressed, exiting current turn...")
@@ -687,8 +708,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
             elif active_agent is None:
                 if history[-1]["sender"] == "Report Agent":
-                    report = history[-1]["content"]
-                    create_report_from_messages(history[-1]["content"])
+                    create_report_from_messages(history)
                 break
 
         execution_time = time.time() - start_time
@@ -699,7 +719,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 agent=active_agent,
                 context_variables=context_variables,
                 time=execution_time,
-                report=report
             )
         return Response(
             messages=history[self.init_len:],

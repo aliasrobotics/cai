@@ -49,8 +49,14 @@ from cai.tools.web.webshell_suit import (
     generate_php_webshell,
     upload_webshell as upload_ftp_webshell
 )
-
+from cai.agents.mail import dns_smtp_agent
 # Prompts
+def transfer_to_dns_agent(**kwargs):
+    """
+    Use THIS always for DNS scans and domain reconnaissance
+    """
+    return dns_smtp_agent
+
 cli_agent_system_prompt = Template(  # nosec B702
     filename="cai/prompts/system_cli_pentest_expert.md"
 ).render()
@@ -110,6 +116,8 @@ cli_agent = Agent(
     parallel_tool_calls=False,
 )
 
+cli_agent.functions.append(transfer_to_dns_agent)
+dns_smtp_agent.functions.append(cli_agent_handoff)
 
 def setup_ctf():
     """Setup CTF environment if CTF_NAME is provided"""

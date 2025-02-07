@@ -5,7 +5,7 @@ This module contains utility functions for the CAI library.
 import inspect
 from datetime import datetime
 import time
-from typing import Any
+from typing import Any, List
 import json
 import os
 from types import SimpleNamespace
@@ -703,9 +703,46 @@ def check_flag(output, ctf, challenge=None):
     return False, None
 
 
-def create_report_from_messages(content: str):
+def merge_report_dicts(base_dict, new_dict):
     """
-    Create a report from a list of messages.
+    Merge two report dictionaries recursively, handling lists and nested structures.
+    
+    Args:
+        base_dict: The base dictionary to merge into
+        new_dict: The new dictionary with values to merge
+        
+    Returns:
+        dict: The merged dictionary
+    """
+    if not isinstance(base_dict, dict) or not isinstance(new_dict, dict):
+        return new_dict
+
+    for key, value in new_dict.items():
+        if key not in base_dict:
+            base_dict[key] = value
+        elif isinstance(value, list) and isinstance(base_dict[key], list):
+            # Merge lists, avoiding duplicates for findings
+            if key == "findings":
+                existing_ids = {f.get("finding_id") for f in base_dict[key] if isinstance(f, dict) and "finding_id" in f}
+                for item in value:
+                    if isinstance(item, dict) and "finding_id" in item and item["finding_id"] not in existing_ids:
+                        base_dict[key].append(item)
+                        existing_ids.add(item["finding_id"])
+            else:
+                base_dict[key].extend(value)
+        elif isinstance(value, dict) and isinstance(base_dict[key], dict):
+            base_dict[key] = merge_report_dicts(base_dict[key], value)
+        else:
+            # For scalar values, prefer non-empty new values
+            if value is not None and value != "":
+                base_dict[key] = value
+    return base_dict
+def create_report_from_messages(history: List[dict]):
+    """
+    Create a report from a list of messages, merging content from Report Agent messages.
+    
+    Args:
+        history: List of message dictionaries containing sender and content
     """
     def to_namespace(obj):
         if isinstance(obj, dict):
@@ -716,16 +753,25 @@ def create_report_from_messages(content: str):
 
         return obj
 
-    try:
-        # Try to parse the content as JSON
-        report_data = json.loads(content)
-    except json.JSONDecodeError:
-        # Fallback: store raw content under executive_summary
-        report_data = {"executive_summary": content.strip()}
+    # Initialize empty base report
+    merged_report = {}
 
+    # Parse and merge content from Report Agent messages
+    for message in history:
+        if message.get("sender") == "Report Agent":
+            try:
+                # Try to parse the content as JSON
+                report_data = json.loads(message["content"])
+            except json.JSONDecodeError:
+                # Fallback: store raw content under executive_summary
+                report_data = {"executive_summary": message["content"].strip()}
+            
+            # Merge with existing report data
+            merged_report = merge_report_dicts(merged_report, report_data)
+    print(merged_report)
     # Convert nested dictionaries to objects for attribute access in the Mako
     # template
-    report_data = {k: to_namespace(v) for k, v in report_data.items()}
+    report_data = {k: to_namespace(v) for k, v in merged_report.items()}
 
     # Render the full report using the Mako template
     template = Template(filename="cai/report_agent/template.md")  # nosec: B702
