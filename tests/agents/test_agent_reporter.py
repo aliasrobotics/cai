@@ -12,7 +12,7 @@ def test_reporter_agent():
     """
     # Import the CAI client and the reporter agent from the CAI library.
     from cai import CAI
-    from cai.agents.reporter import reporter_agent
+    from cai.report_agent.pentesting_web import reporter_agent
 
     # Simulated full output from various pentesting tools to drive report generation.
     pentest_input = (
