@@ -25,6 +25,12 @@ Environment Variables:
             (default: "true")
         CAI_AGENT_TYPE: Specify agent type (default: "one_tool")
         CAI_STATE: Enable/disable stateful mode (default: "false")
+
+Usage Examples:
+
+    # Run in human-in-the-loop mode, generating a report
+    $ CAI_TRACING=False CAI_REPORTER=true CTF_MODEL="gpt-4o"
+        python3 cai/cli.py
 """
 import os
 from mako.template import Template  # pylint: disable=import-error
@@ -124,7 +130,7 @@ def setup_ctf():
 
 def run_with_env():
     """Run CAI with environment configuration"""
-    if os.getenv('CTF_NAME', 1) != 1: # pylint: disable=invalid-envvar-default  # noqa: E501
+    if os.getenv('CTF_NAME', 1) != 1:  # pylint: disable=invalid-envvar-default  # noqa: E501
         ctf = setup_ctf()
 
     try:
@@ -140,13 +146,13 @@ def run_with_env():
             cli_agent,
             debug=float(os.getenv('CAI_DEBUG', 2)),  # pylint: disable=invalid-envvar-default  # noqa: E501
             max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),  # pylint: disable=invalid-envvar-default  # noqa: E501
-            ctf=ctf if os.getenv('CTF_NAME', 1) != 1 else None, # pylint: disable=invalid-envvar-default  # noqa: E501
+            ctf=ctf if os.getenv('CTF_NAME', 1) != 1 else None,  # pylint: disable=invalid-envvar-default  # noqa: E501
             state_agent=state_agent
         )
 
     finally:
         # Cleanup CTF if started
-        if os.getenv('CTF_NAME', 1) != 1: # pylint: disable=invalid-envvar-default  # noqa: E501
+        if os.getenv('CTF_NAME', 1) != 1:  # pylint: disable=invalid-envvar-default  # noqa: E501
             ctf.stop_ctf()
 
 

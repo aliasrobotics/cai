@@ -15,6 +15,10 @@ Usage Examples:
     # Run test using a specific challenge:
     $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CTF_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
 
+    # Run generating a report
+    $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_TRACING=True CAI_REPORTER=true CTF_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
+
+
 CI/CD Pipeline Configuration:
     Add the following structure to .ctf.yml file:
 
@@ -54,8 +58,9 @@ Environment Variables:
         CAI_STATE: Enable/disable stateful mode (default: "false"). When enabled,
                       the agent will use a state agent to keep track of the state of the
                       network and the flags found.
-                     
-                     
+        
+        CAI_REPORTER: Enable/disable reporter mode (default: "false"). When enabled,
+                      the agent will generate a report of the test results.
 """
 
 import pytest

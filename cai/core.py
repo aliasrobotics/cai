@@ -101,7 +101,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         if log_training_data:
             self.rec_training_data = DataRecorder()
 
-        self.report = os.getenv("CAI_REPORT", "false").lower() == "true"
+        self.report = os.getenv("CAI_REPORTER", "false").lower() == "true"
         self.force_until_flag = force_until_flag
         self.challenge = challenge
         load_dotenv()
@@ -599,7 +599,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         start_time = time.time()
         self.brief = brief
         self.init_len = len(messages)
-        self.report = os.getenv("CAI_REPORT", "false").lower() == "true"
+        self.report = os.getenv("CAI_REPORTER", "false").lower() == "true"
         # TODO: consider moving this outside of CAI  # pylint: disable=fixme  # noqa: E501
         # as the logging URL has a harcoded bit which is
         # dependent on the file that invokes it
