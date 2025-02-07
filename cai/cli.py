@@ -27,8 +27,11 @@ Environment Variables:
         CAI_STATE: Enable/disable stateful mode (default: "false")
 
 Usage Examples:
+    # Run against a CTF
+    CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii"
+        CTF_MODEL="gpt-4o" CAI_TRACING="false" python3 cai/cli.py
 
-    # Run in human-in-the-loop mode, generating a report
+    # Run without a target in human-in-the-loop mode, generating a report
     $ CAI_TRACING=False CAI_REPORTER=true CTF_MODEL="gpt-4o"
         python3 cai/cli.py
 """
@@ -110,9 +113,9 @@ cli_agent = Agent(
 
 def setup_ctf():
     """Setup CTF environment if CTF_NAME is provided"""
-    ctf_name = os.getenv('CTF_NAME')
+    ctf_name = os.getenv('CTF_NAME', None)
     if not ctf_name:
-        return None, None
+        return None
 
     print(color("Setting up CTF: ", fg="black", bg="yellow") +
           color(ctf_name, fg="black", bg="yellow"))
@@ -130,7 +133,7 @@ def setup_ctf():
 
 def run_with_env():
     """Run CAI with environment configuration"""
-    if os.getenv('CTF_NAME', 1) != 1:  # pylint: disable=invalid-envvar-default  # noqa: E501
+    if os.getenv('CTF_NAME', None):  # pylint: disable=invalid-envvar-default  # noqa: E501
         ctf = setup_ctf()
 
     try:
@@ -146,13 +149,13 @@ def run_with_env():
             cli_agent,
             debug=float(os.getenv('CAI_DEBUG', 2)),  # pylint: disable=invalid-envvar-default  # noqa: E501
             max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),  # pylint: disable=invalid-envvar-default  # noqa: E501
-            ctf=ctf if os.getenv('CTF_NAME', 1) != 1 else None,  # pylint: disable=invalid-envvar-default  # noqa: E501
+            ctf=ctf if os.getenv('CTF_NAME', None) else None,  # pylint: disable=invalid-envvar-default  # noqa: E501
             state_agent=state_agent
         )
 
     finally:
         # Cleanup CTF if started
-        if os.getenv('CTF_NAME', 1) != 1:  # pylint: disable=invalid-envvar-default  # noqa: E501
+        if os.getenv('CTF_NAME', None):  # pylint: disable=invalid-envvar-default  # noqa: E501
             ctf.stop_ctf()
 
 
