@@ -31,20 +31,21 @@ def _run_local(command, stdout=False):
             shell=True,  # nosec B602
             capture_output=True,
             text=True,
-            check=True,
+            check=False,
             timeout=100)
-        output = result.stdout
+        output = result.stdout if result.stdout else result.stderr
         if stdout:
             print("\033[32m" + output + "\033[0m")
-        return output if output else result.stderr
+        return output
     except subprocess.TimeoutExpired as e:
-        # Return partial output on timeout
+        error_output = e.stdout.decode() if e.stdout else str(e)
         if stdout:
-            print("\033[32m" + e.stdout.decode() + "\033[0m")
-        return e.stdout.decode()
+            print("\033[32m" + error_output + "\033[0m")
+        return error_output
     except Exception as e:  # pylint: disable=broad-except
-        print(color(f"Error executing local command: {e}", fg="red"))
-        return f"Error executing local command: {str(e)}"
+        error_msg = f"Error executing local command: {e}"
+        print(color(error_msg, fg="red"))
+        return error_msg
 
 
 def run_command(command, ctf=None, stdout=False):
