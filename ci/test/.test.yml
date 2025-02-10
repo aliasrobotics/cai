@@ -34,6 +34,11 @@
   variables:
     TEST_PATH: tests/architecture/test_util.py
 
+🏗️ architecture test_architecture_rag:
+  <<: *run_test
+  variables:
+    TEST_PATH: tests/architecture/test_rag.py
+
 🤖 agents test_agents_filesystem:
   <<: *run_test
   variables:
