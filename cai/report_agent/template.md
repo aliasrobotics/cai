@@ -48,19 +48,16 @@ The assessment was conducted using a systematic and comprehensive approach that 
 
 ${methodology or "No methodology provided."}
 
----
 
 % if tools:
-## Tools and Techniques
 
-<details>
-  <summary><strong>Detailed Tools and Techniques</strong> (Click to Expand)</summary>
+<strong>Detailed Tools and Techniques</strong>
 
 % for tool in (tools or []):
 - 🛠 ${tool or ""}
 % endfor
 
-</details>
+
 % endif
 
 ---
@@ -105,8 +102,7 @@ ${finding.remediation_command or "No remediation command provided."}
 
 ## 4.1 Vulnerability Assessment Metrics
 
-<details>
-  <summary><strong>View Vulnerability Severity Distribution Chart</strong></summary>
+<strong> Vulnerability Severity Distribution Chart</strong>
 
 ```mermaid
 pie
@@ -118,7 +114,6 @@ pie
 ```
 
 *Note: The displayed values are placeholders and may vary based on actual assessment data.*
-</details>
 
 ---
 
@@ -126,8 +121,7 @@ pie
 
 % if network_state and network_state.network:
 % for endpoint in (network_state.network or []):
-<details>
-  <summary><strong>Host: ${endpoint.ip or "N/A"}</strong></summary>
+<strong>Host: ${endpoint.ip or "N/A"}</strong>
 
 ### Open Ports
 
@@ -177,7 +171,7 @@ _No files discovered._
 _No users identified._
 % endif
 
-</details>
+
 % endfor
 % else:
 _No network state data available._
@@ -203,7 +197,5 @@ _No network state data available._
 
 ---
 
-## 8. Appendix
-
-${appendix or "No additional documentation provided."}
+## 8. Appendix: Penetration testing exercise in JSON format
 ${history or "No additional history provided."}

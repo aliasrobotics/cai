@@ -728,7 +728,7 @@ def merge_report_dicts(base_dict, new_dict):
                     f.get("finding_id") for f in base_dict[key] if isinstance(
                         f, dict) and "finding_id" in f}
                 for item in value:
-                    if isinstance(
+                    if isinstance(  # noqa: E501
                             item, dict) and "finding_id" in item and item["finding_id"] not in existing_ids:  # noqa: E501
                         base_dict[key].append(item)
                         existing_ids.add(item["finding_id"])
