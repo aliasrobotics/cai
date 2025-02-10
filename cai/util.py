@@ -705,12 +705,13 @@ def check_flag(output, ctf, challenge=None):
 
 def merge_report_dicts(base_dict, new_dict):
     """
-    Merge two report dictionaries recursively, handling lists and nested structures.
-    
+    Merge two report dictionaries recursively,
+    handling lists and nested structures.
+
     Args:
         base_dict: The base dictionary to merge into
         new_dict: The new dictionary with values to merge
-        
+
     Returns:
         dict: The merged dictionary
     """
@@ -723,9 +724,12 @@ def merge_report_dicts(base_dict, new_dict):
         elif isinstance(value, list) and isinstance(base_dict[key], list):
             # Merge lists, avoiding duplicates for findings
             if key == "findings":
-                existing_ids = {f.get("finding_id") for f in base_dict[key] if isinstance(f, dict) and "finding_id" in f}
+                existing_ids = {
+                    f.get("finding_id") for f in base_dict[key] if isinstance(
+                        f, dict) and "finding_id" in f}
                 for item in value:
-                    if isinstance(item, dict) and "finding_id" in item and item["finding_id"] not in existing_ids:
+                    if isinstance(
+                            item, dict) and "finding_id" in item and item["finding_id"] not in existing_ids:  # noqa: E501
                         base_dict[key].append(item)
                         existing_ids.add(item["finding_id"])
             else:
@@ -737,10 +741,13 @@ def merge_report_dicts(base_dict, new_dict):
             if value is not None and value != "":
                 base_dict[key] = value
     return base_dict
+
+
 def create_report_from_messages(history: List[dict]):
     """
-    Create a report from a list of messages, merging content from Report Agent messages.
-    
+    Create a report from a list of messages,
+    merging content from Report Agent messages.
+
     Args:
         history: List of message dictionaries containing sender and content
     """
@@ -765,7 +772,7 @@ def create_report_from_messages(history: List[dict]):
             except json.JSONDecodeError:
                 # Fallback: store raw content under executive_summary
                 report_data = {"executive_summary": message["content"].strip()}
-            
+
             # Merge with existing report data
             merged_report = merge_report_dicts(merged_report, report_data)
     print(merged_report)
@@ -773,6 +780,8 @@ def create_report_from_messages(history: List[dict]):
     # template
     report_data = {k: to_namespace(v) for k, v in merged_report.items()}
 
+    # Add full history to report data
+    report_data["history"] = history
     # Render the full report using the Mako template
     template = Template(filename="cai/report_agent/template.md")  # nosec: B702
     report_output = template.render(**report_data)

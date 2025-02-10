@@ -106,7 +106,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.challenge = challenge
         load_dotenv()
 
-    def get_chat_completion(  # pylint: disable=too-many-arguments
+    def get_chat_completion(  # pylint: disable=too-many-arguments # pylint: disable=too-many-locals noqa: E501
         self,
         agent: Agent,
         history: List,
@@ -129,7 +129,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         for msg in history:
             if msg.get("sender") != "Report Agent":
                 messages.append(msg)
-        print(messages)
+
         debug_print(
             debug,
             "Getting chat completion for...:",
@@ -653,7 +653,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             except EOFError:
                 print("\nCtrl+D pressed, exiting current turn...")
                 if self.report:
-                    report = history[-1]["content"]
                     create_report_from_messages(history[-1]["content"])
                 break
             except KeyboardInterrupt:

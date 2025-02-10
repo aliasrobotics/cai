@@ -206,3 +206,4 @@ _No network state data available._
 ## 8. Appendix
 
 ${appendix or "No additional documentation provided."}
+${history or "No additional history provided."}

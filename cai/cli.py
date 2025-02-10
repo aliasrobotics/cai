@@ -51,11 +51,14 @@ from cai.tools.web.webshell_suit import (
 )
 from cai.agents.mail import dns_smtp_agent
 # Prompts
+
+
 def transfer_to_dns_agent(**kwargs):
     """
     Use THIS always for DNS scans and domain reconnaissance
     """
     return dns_smtp_agent
+
 
 cli_agent_system_prompt = Template(  # nosec B702
     filename="cai/prompts/system_cli_pentest_expert.md"
@@ -71,6 +74,10 @@ env_context = Template(  # nosec B702
 
 exploit_agent_system_prompt = Template(  # nosec B702
     filename="cai/prompts/system_exploit_expert.md"
+).render()
+
+web_bounty_agent_system_prompt = Template(  # nosec B702
+    filename="cai/prompts/system_web_bounty_agent.md"
 ).render()
 
 
@@ -118,6 +125,7 @@ cli_agent = Agent(
 
 cli_agent.functions.append(transfer_to_dns_agent)
 dns_smtp_agent.functions.append(cli_agent_handoff)
+
 
 def setup_ctf():
     """Setup CTF environment if CTF_NAME is provided"""
