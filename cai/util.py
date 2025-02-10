@@ -119,13 +119,16 @@ def visualize_agent_graph(start_agent):
 
         # Create or get existing node for this agent
         if id(agent) in visited:
+            if is_transfer:
+                # Just add a reference for transfers to already visited agents
+                parent.add(f"[cyan]↑ See {agent.name} above[/cyan]")
             return agent_nodes[id(agent)]
 
         visited[id(agent)] = True
 
         # Create node for current agent
         if is_transfer:
-            node = parent.add(f"[green]{agent.name}[/green]")
+            node = parent
         else:
             node = parent.add(
                 f"[green]{
@@ -157,13 +160,7 @@ def visualize_agent_graph(start_agent):
                             # Show bidirectional connection
                             transfer = transfers_node.add(
                                 f"[red]⟷[/red] [green]{next_agent.name}[/green]")  # noqa: E501
-                            if id(next_agent) not in visited:
-                                add_agent_node(next_agent, transfer, True)
-                            else:
-                                # Add cross-connection reference
-                                transfer.add(
-                                    f"[cyan]↑ See {
-                                        next_agent.name} above[/cyan]")
+                            add_agent_node(next_agent, transfer, True)
                     except Exception:  # nosec: B112 # pylint: disable=broad-exception-caught # noqa: E501
                         continue
 
