@@ -106,7 +106,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.challenge = challenge
         load_dotenv()
 
-    def get_chat_completion(  # pylint: disable=too-many-arguments # pylint: disable=too-many-locals noqa: E501
+    def get_chat_completion(  # pylint: disable=too-many-arguments # pylint: disable=too-many-locals # noqa: E501  # pylint: disable=too-many-branches  # noqa: C0301
         self,
         agent: Agent,
         history: List,
@@ -676,7 +676,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                         report = history[-1]["content"]
                         create_report_from_messages(history[-1]["content"])
                     break
-                elif history[-1]["sender"] == "Report Agent":
+                if history[-1]["sender"] == "Report Agent":
                     report = history[-1]["content"]
                     create_report_from_messages(history[-1]["content"])
                     break
@@ -703,6 +703,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             elif active_agent is None and self.report:
                 active_agent = cai.transfer_to_reporter_agent()
                 self.report = False
+                report = history[-1]["content"]
                 history[-1]["sender"] = "Report Agent"
 
             elif active_agent is None:
@@ -713,11 +714,13 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         execution_time = time.time() - start_time
 
         if history[-1]["sender"] == "Report Agent":
+            report = history[-1]["content"]
             return Response(
                 messages=history[self.init_len:],
                 agent=active_agent,
                 context_variables=context_variables,
                 time=execution_time,
+                report=report
             )
         return Response(
             messages=history[self.init_len:],
