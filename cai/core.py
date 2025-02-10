@@ -46,6 +46,7 @@ from .types import (
     Response,
     Result,
 )
+from cai.tools.llm_plugins.rag import query_memory, add_to_memory
 
 __CTX_VARS_NAME__ = "context_variables"
 litellm.suppress_debug_info = True

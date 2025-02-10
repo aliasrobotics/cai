@@ -1,0 +1,1 @@
+# Nmap 7.95 scan initiated Mon Feb 10 17:55:02 2025 as: /usr/lib/nmap/nmap -sC -sV -oN initial_nmap_scan.txt --host-timeout 60s 192.168.2.100
