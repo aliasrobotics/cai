@@ -106,33 +106,44 @@ def visualize_agent_graph(start_agent):
         console.print("[red]No agent provided to visualize.[/red]")
         return
 
-    tree = Tree("🤖 Agent Graph", guide_style="bold blue")
+    tree = Tree(
+        f"🤖 {
+            start_agent.name} (Current Agent)",
+        guide_style="bold blue")
 
     # Track visited agents and their nodes to handle cross-connections
     visited = {}
     agent_nodes = {}
+    agent_positions = {}  # Track positions in tree
+    position_counter = 0  # Counter for tracking positions
 
     def add_agent_node(agent, parent=None, is_transfer=False):  # pylint: disable=too-many-branches # noqa: E501
         """Add agent node and track for cross-connections"""
+        nonlocal position_counter
+
         if agent is None:
             return None
 
         # Create or get existing node for this agent
         if id(agent) in visited:
             if is_transfer:
-                # Just add a reference for transfers to already visited agents
-                parent.add(f"[cyan]↑ See {agent.name} above[/cyan]")
+                # Add reference with position for repeated agents
+                original_pos = agent_positions[id(agent)]
+                parent.add(
+                    f"[cyan]↩ Return to {
+                        agent.name} (Top Level Agent #{original_pos})[/cyan]")
             return agent_nodes[id(agent)]
 
         visited[id(agent)] = True
+        position_counter += 1
+        agent_positions[id(agent)] = position_counter
 
         # Create node for current agent
         if is_transfer:
             node = parent
         else:
             node = parent.add(
-                f"[green]{
-                    agent.name}[/green]") if parent else tree
+                f"[green]{agent.name} (#{position_counter})[/green]") if parent else tree  # noqa: E501 pylint: disable=line-too-long
 
         agent_nodes[id(agent)] = node
 
@@ -145,8 +156,8 @@ def visualize_agent_graph(start_agent):
                         not fn_name.startswith("transfer_to")):
                     tools_node.add(f"[blue]{fn_name}[/blue]")
 
-        # Add transfers section
-        transfers_node = node.add("[magenta]Transfers[/magenta]")
+        # Add Handoffs section
+        transfers_node = node.add("[magenta]Handoffs[/magenta]")
 
         # Process handoff functions
         for fn in getattr(agent, "functions", []):  # pylint: disable=too-many-nested-blocks # noqa: E501
@@ -159,7 +170,7 @@ def visualize_agent_graph(start_agent):
                         if next_agent:
                             # Show bidirectional connection
                             transfer = transfers_node.add(
-                                f"[red]⟷[/red] [green]{next_agent.name}[/green]")  # noqa: E501
+                                f"[red]⟷[/red] [green]Handoff to {next_agent.name}[/green]")  # noqa: E501
                             add_agent_node(next_agent, transfer, True)
                     except Exception:  # nosec: B112 # pylint: disable=broad-exception-caught # noqa: E501
                         continue
