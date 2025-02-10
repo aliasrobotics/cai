@@ -14,18 +14,14 @@ import copy
 import json
 from collections import defaultdict
 from typing import List
-import math
 # Package/library imports
 import time
 import os
-from collections import deque
 import litellm  # pylint: disable=import-error
 from dotenv import load_dotenv  # pylint: disable=import-error  # noqa: E501
 from wasabi import color  # pylint: disable=import-error
 from cai.logger import exploit_logger
-from rich.console import Console
-from rich.panel import Panel
-from rich.tree import Tree
+
 # Local imports
 from cai.datarecorder import DataRecorder
 from .util import (
@@ -35,7 +31,8 @@ from .util import (
     cli_print_tool_call,
     cli_print_state,
     get_ollama_api_base,
-    check_flag
+    check_flag,
+    visualize_agent_graph
 )
 from .types import (
     Agent,
@@ -48,75 +45,7 @@ from .types import (
 
 __CTX_VARS_NAME__ = "context_variables"
 litellm.suppress_debug_info = True
-def visualize_agent_graph(start_agent):
-    """
-    Visualize agent graph showing all bidirectional connections between agents.
-    Uses Rich library for pretty printing.
-    """
-    if start_agent is None:
-        Console().print("[red]No agent provided to visualize.[/red]")
-        return
 
-    console = Console()
-    tree = Tree("🤖 Agent Graph", guide_style="bold blue")
-
-    # Track visited agents and their nodes to handle cross-connections
-    visited = {}
-    agent_nodes = {}
-
-    def add_agent_node(agent, parent=None, is_transfer=False):
-        """Add agent node and track for cross-connections"""
-        if agent is None:
-            return None
-            
-        # Create or get existing node for this agent
-        if id(agent) in visited:
-            return agent_nodes[id(agent)]
-            
-        visited[id(agent)] = True
-        
-        # Create node for current agent
-        if is_transfer:
-            node = parent.add(f"[green]{agent.name}[/green]")
-        else:
-            node = parent.add(f"[green]{agent.name}[/green]") if parent else tree
-            
-        agent_nodes[id(agent)] = node
-        
-        # Add tools as children
-        tools_node = node.add("[yellow]Tools[/yellow]")
-        for fn in getattr(agent, "functions", []):
-            if callable(fn):
-                fn_name = getattr(fn, "__name__", "")
-                if "handoff" not in fn_name.lower() and not fn_name.startswith("transfer_to"):
-                    tools_node.add(f"[blue]{fn_name}[/blue]")
-
-        # Add transfers section
-        transfers_node = node.add("[magenta]Transfers[/magenta]")
-        
-        # Process handoff functions
-        for fn in getattr(agent, "functions", []):
-            if callable(fn):
-                fn_name = getattr(fn, "__name__", "")
-                if "handoff" in fn_name.lower() or fn_name.startswith("transfer_to"):
-                    try:
-                        next_agent = fn()
-                        if next_agent:
-                            # Show bidirectional connection
-                            transfer = transfers_node.add(f"[red]⟷[/red] [green]{next_agent.name}[/green]")
-                            if id(next_agent) not in visited:
-                                add_agent_node(next_agent, transfer, True)
-                            else:
-                                # Add cross-connection reference
-                                transfer.add(f"[cyan]↑ See {next_agent.name} above[/cyan]")
-                    except Exception:
-                        continue
-                        
-        return node
-
-    # Start recursive traversal from root agent
-    add_agent_node(start_agent)
-    console.print(tree)
 
 class CAI:  # pylint: disable=too-many-instance-attributes
     """
@@ -311,7 +240,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     debug_print(debug, error_message, brief=self.brief)
                     raise TypeError(error_message) from e
 
-    def handle_tool_calls(  # pylint: disable=too-many-arguments,too-many-locals  # noqa: E501
+    def handle_tool_calls(  # pylint: disable=too-many-arguments,too-many-locals,too-many-statements  # noqa: E501
         self,
         tool_calls: List[ChatCompletionMessageToolCall],
         functions: List[AgentFunction],
@@ -407,6 +336,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 brief=self.brief)
 
             func = function_map[name]
+            if "transfer" in name or "handoff" in name:
+                visualize_agent_graph(func())
             # pass context_variables to agent functions
             if __CTX_VARS_NAME__ in func.__code__.co_varnames:
                 args[__CTX_VARS_NAME__] = context_variables
@@ -639,7 +570,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         return (partial_response.agent
                 if partial_response.agent
                 else active_agent)
-
 
     @exploit_logger.log_response("🚩" + os.getenv('CTF_NAME', 'test') +
                                  " @ " + os.getenv('CI_JOB_ID', 'local'))

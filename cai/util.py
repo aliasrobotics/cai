@@ -15,6 +15,7 @@ from rich.console import Console, Group  # pylint: disable=import-error
 from rich.theme import Theme  # pylint: disable=import-error
 from rich.traceback import install  # pylint: disable=import-error
 from rich.pretty import install as install_pretty  # pylint: disable=import-error # noqa: 501
+from rich.tree import Tree  # pylint: disable=import-error
 
 
 def get_model_input_tokens(model):
@@ -93,6 +94,84 @@ COLORS = {
 
 # Global cache for message history
 _message_history = {}
+
+
+def visualize_agent_graph(start_agent):
+    """
+    Visualize agent graph showing all bidirectional connections between agents.
+    Uses Rich library for pretty printing.
+    """
+    console = Console()  # pylint: disable=redefined-outer-name
+    if start_agent is None:
+        console.print("[red]No agent provided to visualize.[/red]")
+        return
+
+    tree = Tree("🤖 Agent Graph", guide_style="bold blue")
+
+    # Track visited agents and their nodes to handle cross-connections
+    visited = {}
+    agent_nodes = {}
+
+    def add_agent_node(agent, parent=None, is_transfer=False):  # pylint: disable=too-many-branches # noqa: E501
+        """Add agent node and track for cross-connections"""
+        if agent is None:
+            return None
+
+        # Create or get existing node for this agent
+        if id(agent) in visited:
+            return agent_nodes[id(agent)]
+
+        visited[id(agent)] = True
+
+        # Create node for current agent
+        if is_transfer:
+            node = parent.add(f"[green]{agent.name}[/green]")
+        else:
+            node = parent.add(
+                f"[green]{
+                    agent.name}[/green]") if parent else tree
+
+        agent_nodes[id(agent)] = node
+
+        # Add tools as children
+        tools_node = node.add("[yellow]Tools[/yellow]")
+        for fn in getattr(agent, "functions", []):
+            if callable(fn):
+                fn_name = getattr(fn, "__name__", "")
+                if ("handoff" not in fn_name.lower() and
+                        not fn_name.startswith("transfer_to")):
+                    tools_node.add(f"[blue]{fn_name}[/blue]")
+
+        # Add transfers section
+        transfers_node = node.add("[magenta]Transfers[/magenta]")
+
+        # Process handoff functions
+        for fn in getattr(agent, "functions", []):  # pylint: disable=too-many-nested-blocks # noqa: E501
+            if callable(fn):
+                fn_name = getattr(fn, "__name__", "")
+                if ("handoff" in fn_name.lower() or
+                        fn_name.startswith("transfer_to")):
+                    try:
+                        next_agent = fn()
+                        if next_agent:
+                            # Show bidirectional connection
+                            transfer = transfers_node.add(
+                                f"[red]⟷[/red] [green]{next_agent.name}[/green]")  # noqa: E501
+                            if id(next_agent) not in visited:
+                                add_agent_node(next_agent, transfer, True)
+                            else:
+                                # Add cross-connection reference
+                                transfer.add(
+                                    f"[cyan]↑ See {
+                                        next_agent.name} above[/cyan]")
+                    except Exception:  # nosec: B112 # pylint: disable=broad-exception-caught # noqa: E501
+                        continue
+
+        return node
+
+    # Start recursive traversal from root agent
+    add_agent_node(start_agent)
+    console.print(tree)
 
 
 def format_value(value: Any, prev_value: Any = None, brief: bool = False) -> str:  # pylint: disable=too-many-locals # noqa: E501
