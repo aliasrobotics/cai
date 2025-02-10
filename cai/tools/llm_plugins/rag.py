@@ -28,30 +28,18 @@ def query_memory(query: str, top_k: int = 3) -> str:
             collection_name=collection_name,
             query_text=query,
             limit=top_k,
-
         )
         
         # If no results, fall back to retrieving all documents
-        if not results:
-            results = qdrant.filter_points(
-                collection_name=collection_name,
-                filter_conditions={"CTF": "True"}
-            )[:top_k]
             
         print(results)
         if not results:
             return "No documents found in memory."
             
-        formatted_results = []
-        for i, result in enumerate(results, 1):
-            text = result.get('metadata', {}).get('text', '')
-            if text:
-                formatted_results.append(f"{i}. {text}")
-            
-        return "\n\n".join(formatted_results)
+        return results
         
-    except Exception as e:
-        return f"Error querying vector database: {str(e)}"
+    except Exception:
+        return results
 
 def add_to_memory(texts: str) -> str:
     """

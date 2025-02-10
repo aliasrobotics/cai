@@ -139,17 +139,17 @@ class QdrantConnector:
                 with_payload=True,
                 with_vectors=False,
             )
-            print(results)
-            # Format results
-            return [
-                {
-                    "text": hit.payload.get("text", "")
-                } for hit in results
-            ]
-            
+            # Convert results to list of dicts with metadata
+            extracted_texts = []
+            if results and hasattr(results, 'points'):
+                for point in results.points:
+                    if hasattr(point, 'payload') and isinstance(point.payload, dict):
+                        extracted_texts.append(point.payload.get("text", ""))
+            print(extracted_texts)
+            return "\n".join(extracted_texts)
         except Exception as e:
             print(f"Error searching: {e}")
-            return []
+            return ""
 
     def filter_points(
         self,
