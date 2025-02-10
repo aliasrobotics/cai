@@ -1,1 +1,0 @@
-# Nmap 7.95 scan initiated Mon Feb 10 17:41:09 2025 as: /usr/lib/nmap/nmap -sC -sV -oN nmap_initial.txt --max-retries 3 --max-rate 100 192.168.2.100

@@ -1,1 +1,0 @@
-# Nmap 7.95 scan initiated Mon Feb 10 17:57:05 2025 as: /usr/lib/nmap/nmap -sC -sV -T4 -oN web_scan.txt 192.168.2.100
