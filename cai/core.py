@@ -21,6 +21,8 @@ import litellm  # pylint: disable=import-error
 from dotenv import load_dotenv  # pylint: disable=import-error # noqa: E501
 from wasabi import color  # pylint: disable=import-error
 from cai.logger import exploit_logger
+from cai.rag.vector_db import QdrantConnector
+
 # Local imports
 from cai.datarecorder import DataRecorder
 from cai import (

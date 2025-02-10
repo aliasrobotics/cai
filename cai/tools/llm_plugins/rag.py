@@ -32,7 +32,6 @@ def query_memory(query: str, top_k: int = 3) -> str:
         
         # If no results, fall back to retrieving all documents
             
-        print(results)
         if not results:
             return "No documents found in memory."
             
