@@ -181,8 +181,7 @@ TO FIND THE FLAG and handoff to t he Flag discriminator agent.
   - Web-based? (Use Web Agent)
   - Crypto-related? (Use Crypto Agent)
   - Binary or reverse engineering-related? (Use Reversing Agent)
-3. If unsure, call the Network Agent first.
-4. If you have found the flag, transfer to Flag Discriminator.
+3. If you have found the flag, transfer to Flag Discriminator.
 
 ### Available Agents:
 - Network Agent: analysis, vulnerability discovery, and

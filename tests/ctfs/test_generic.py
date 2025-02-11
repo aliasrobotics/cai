@@ -64,7 +64,7 @@ import sys
 import cai as CAI
 import pentestperf as ptt
 from cai import CAI, Agent
-from cai import cai_initial_agent
+from cai import cai_initial_agent 
 from cai.util import check_flag
 from wasabi import color
 from cai.logger import exploit_logger
