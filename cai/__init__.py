@@ -649,7 +649,7 @@ def transfer_to_scripting_agent02(instructions: str = "", **kwargs):   # pylint:
 
 
 # ADD TRANSFER FUNCTIONS TO THE AGENTS
-cai_agent = os.getenv('CAI_AGENT_TYPE', "proto03").lower()
+cai_agent = os.getenv('CAI_AGENT_TYPE', "one_tool").lower()
 
 if cai_agent == "multi":
     cai_initial_agent = ctf_agent
