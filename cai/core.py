@@ -109,7 +109,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.challenge = challenge
         load_dotenv()
 
-    def get_chat_completion(  # pylint: disable=too-many-arguments # pylint: disable=too-many-locals # noqa: E501  # pylint: disable=too-many-branches  # noqa: C0301
+    def get_chat_completion(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,line-too-long # noqa: E501
         self,
         agent: Agent,
         history: List,
@@ -669,7 +669,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     self.report = False
                     history[-1]["sender"] = "Report Agent"
                     continue
-
                 break
 
             if active_agent is None and self.force_until_flag:
@@ -679,11 +678,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
                 if flag_found:
                     if history[-1]["sender"] == "Report Agent":
-                        report = history[-1]["content"]
                         create_report_from_messages(history[-1]["content"])
                     break
                 if history[-1]["sender"] == "Report Agent":
-                    report = history[-1]["content"]
                     create_report_from_messages(history[-1]["content"])
                     break
                 # # Check if flag is found anywhere in history
@@ -709,7 +706,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             elif active_agent is None and self.report:
                 active_agent = cai.transfer_to_reporter_agent()
                 self.report = False
-                report = history[-1]["content"]
                 history[-1]["sender"] = "Report Agent"
 
             elif active_agent is None:
