@@ -47,7 +47,7 @@ ctf_agent = Agent(
     functions=[
         generic_linux_command,
     ],
-    # parallel_tool_calls=True, Enable multi function calling
+    parallel_tool_calls=False
 )
 
 
@@ -158,6 +158,7 @@ def transfer_to_reporter_agent(**kwargs):  # pylint: disable=W0613
     """ Transfer to reporter agent.
     Accepts any keyword arguments but ignores them."""
     return reporter_agent
+
 
 # controller agent
 controller_agent = Agent(

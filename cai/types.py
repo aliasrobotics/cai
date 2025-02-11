@@ -15,6 +15,7 @@ from cai.state import State
 
 AgentFunction = Callable[[], Union[str, "Agent", dict, State]]
 
+
 class Agent(BaseModel):  # pylint: disable=too-few-public-methods
     """
     Represents an agent in the CAI.
@@ -26,7 +27,7 @@ class Agent(BaseModel):  # pylint: disable=too-few-public-methods
     instructions: Union[str, Callable[[], str]] = "You are a helpful agent."
     functions: List[AgentFunction] = []
     tool_choice: str = None
-    parallel_tool_calls: bool = True
+    parallel_tool_calls: bool = False
     structured_output_class: Optional[type] = None
     reasoning_effort: Optional[str] = "low"  # "low", "medium", "high"
 
