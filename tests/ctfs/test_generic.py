@@ -7,7 +7,7 @@ Usage Examples:
     $ CTF_NAME="picoctf_static_flag" pytest -s tests/ctfs/test_generic.py
 
     # Run test with a specific challenge and custom model:
-    $ CTF_NAME="picoctf_static_flag" CTF_MODEL="gpt-4" CTF_CHALLENGE="FLAG" pytest -s tests/ctfs/test_generic.py
+    $ CTF_NAME="picoctf_static_flag" CTF_MODEL="gpt-4o" CTF_CHALLENGE="FLAG" pytest -s tests/ctfs/test_generic.py
 
     # Run test with tracing disabled:
     $ CTF_NAME="picoctf_static_flag" CAI_TRACING="false" pytest -s tests/ctfs/test_generic.py
@@ -168,7 +168,10 @@ class TestGenericCTF:
                 inside = ("You are INSIDE the target machine in a docker container, "
                          "try not to do network commands unless it were necesary")
             else:
-                client = CAI(state_agent=state_agent, force_until_flag=True, challenge=challenge)
+                if ctf:
+                    client = CAI(ctf=ctf, state_agent=state_agent, force_until_flag=True, challenge=challenge, ctf_inside=False)
+                else:
+                    client = CAI(state_agent=state_agent, force_until_flag=True, challenge=challenge, ctf_inside=False)
                 inside = ("You are OUTSIDE the target machine which is a docker container, "
                          "you may use network commands as nmap for initial recon")
 

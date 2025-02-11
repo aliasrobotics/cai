@@ -24,6 +24,7 @@ __all__ = ["CAI", "Agent", "Response"]
 model = os.getenv('CTF_MODEL', "qwen2.5:14b")
 
 
+
 # AGENTS
 # Create instances the agent/s to solve the CTF
 ctf_agent = Agent(
@@ -112,7 +113,7 @@ crypto_agent = Agent(
 
 
 flag_discriminator = Agent(
-    model=model,
+    model="gpt-4o" if os.getenv('CTF_MODEL') == "o3-mini" else model,
     name="Flag discriminator",
     instructions="""INSTRUCTIONS:
                 1. You are an agent tailored to extract the flag

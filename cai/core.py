@@ -14,7 +14,6 @@ import copy
 import json
 from collections import defaultdict
 from typing import List
-
 # Package/library imports
 import time
 import os
@@ -33,7 +32,8 @@ from .util import (
     cli_print_state,
     get_ollama_api_base,
     check_flag,
-    create_report_from_messages
+    create_report_from_messages,
+    visualize_agent_graph
 )
 from .types import (
     Agent,
@@ -58,7 +58,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                  log_training_data=True,
                  state_agent=None,
                  force_until_flag=False,
-                 challenge=None):
+                 challenge=None,
+                 ctf_inside=True):
         """
         Initialize the CAI object.
 
@@ -73,6 +74,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             challenge: Optional challenge to force execution until the expected
                 flag is found. NOTE: This is only used when force_until_flag is
                 True
+            ctf_inside: Whether the CTF is inside a docker container
 
         The CAI object manages the core conversation loop, handling messages,
         tool calls, and agent interactions. It maintains state like:
@@ -82,6 +84,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         - Training data recording (if enabled)
         """
         self.ctf = ctf
+        self.ctf_inside = ctf_inside
         self.brief = False
         self.init_len = 0  # initial length of history
         self.state_agent = state_agent
@@ -244,7 +247,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     debug_print(debug, error_message, brief=self.brief)
                     raise TypeError(error_message) from e
 
-    def handle_tool_calls(  # pylint: disable=too-many-arguments,too-many-locals  # noqa: E501
+    def handle_tool_calls(  # pylint: disable=too-many-arguments,too-many-locals,too-many-statements  # noqa: E501
         self,
         tool_calls: List[ChatCompletionMessageToolCall],
         functions: List[AgentFunction],
@@ -340,10 +343,12 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 brief=self.brief)
 
             func = function_map[name]
+            if "transfer" in name or "handoff" in name:
+                visualize_agent_graph(func())
             # pass context_variables to agent functions
             if __CTX_VARS_NAME__ in func.__code__.co_varnames:
                 args[__CTX_VARS_NAME__] = context_variables
-            if self.ctf:
+            if self.ctf and self.ctf_inside:
                 args["ctf"] = self.ctf
 
             @exploit_logger.log_tool()
@@ -601,6 +606,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         start_time = time.time()
         self.brief = brief
+        visualize_agent_graph(agent)
         self.init_len = len(messages)
         self.report = os.getenv("CAI_REPORTER", "false").lower() == "true"
         report_interval = int(os.getenv("CAI_REPORT_INTERVAL", "0"))
