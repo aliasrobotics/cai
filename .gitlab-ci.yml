@@ -23,12 +23,13 @@ include:
     file:
       # - 'ci/build/.build.yml'                # build
       #- 'ci/setup/.setup.yml'               # setup
+      - 'ci/test/.test.yml'
       # - 'ci/ctfs/.ctf.yml'                  # ctf
 
-  - project: 'aliasrobotics/alias_research/cai'
-    ref: $CI_COMMIT_REF_NAME
-    file: 'ci/test/.test.yml'
-    rules:
-      - if: $CI_COMMIT_BRANCH == "main"
-        when: never
-      - if: $CI_COMMIT_BRANCH
+  # - project: 'aliasrobotics/alias_research/cai'
+  #   ref: $CI_COMMIT_REF_NAME
+  #   file: 'ci/test/.test.yml'
+  #   rules:
+  #     - if: $CI_COMMIT_BRANCH == "main"
+  #       when: never
+  #     - if: $CI_COMMIT_BRANCH
