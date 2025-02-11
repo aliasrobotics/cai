@@ -649,7 +649,7 @@ def transfer_to_scripting_agent02(instructions: str = "", **kwargs):   # pylint:
 
 
 # ADD TRANSFER FUNCTIONS TO THE AGENTS
-cai_agent = os.getenv('CAI_AGENT_TYPE', "one_tool").lower()
+cai_agent = os.getenv('CAI_AGENT_TYPE', "proto03").lower()
 
 if cai_agent == "multi":
     cai_initial_agent = ctf_agent
@@ -698,8 +698,6 @@ elif cai_agent == "proto03":
         transfer_to_scripting_agent02,
         transfer_to_flag_discriminator02
     ])
-
-
 else:
     # stop and raise error
     raise ValueError(f"Invalid CAI agent type: {cai_agent}")
