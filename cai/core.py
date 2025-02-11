@@ -714,13 +714,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         execution_time = time.time() - start_time
 
         if history[-1]["sender"] == "Report Agent":
-            report = history[-1]["content"]
             return Response(
                 messages=history[self.init_len:],
                 agent=active_agent,
                 context_variables=context_variables,
                 time=execution_time,
-                report=report
             )
         return Response(
             messages=history[self.init_len:],
