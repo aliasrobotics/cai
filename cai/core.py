@@ -58,7 +58,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                  log_training_data=True,
                  state_agent=None,
                  force_until_flag=False,
-                 challenge=None):
+                 challenge=None,
+                 ctf_inside=True):
         """
         Initialize the CAI object.
 
@@ -73,6 +74,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             challenge: Optional challenge to force execution until the expected
                 flag is found. NOTE: This is only used when force_until_flag is
                 True
+            ctf_inside: Whether the CTF is inside a docker container
 
         The CAI object manages the core conversation loop, handling messages,
         tool calls, and agent interactions. It maintains state like:
@@ -82,6 +84,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         - Training data recording (if enabled)
         """
         self.ctf = ctf
+        self.ctf_inside = ctf_inside
         self.brief = False
         self.init_len = 0  # initial length of history
         self.state_agent = state_agent
@@ -339,7 +342,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             # pass context_variables to agent functions
             if __CTX_VARS_NAME__ in func.__code__.co_varnames:
                 args[__CTX_VARS_NAME__] = context_variables
-            if self.ctf:
+            if self.ctf and self.ctf_inside:
                 args["ctf"] = self.ctf
 
             @exploit_logger.log_tool()
