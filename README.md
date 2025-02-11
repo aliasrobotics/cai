@@ -394,35 +394,3 @@ run_demo_loop(agent, stream=True)
 # Acknowledgements
 
 CAI is developed by [Alias Robotics](https://aliasrobotics.com) and funded as part of the project XXXXX. The original agentic principles are inspired from OpenAI's [swarm](https://github.com/openai/swarm) library.
-
-# Plan of development
-- [x] Dev container
-- [x] pre-commit hooks
-- [x] A first example with agents - picoctf_static_flag
-  - [x] polish aesthetics (coloring with alpha past content, brief/summarized)
-  - [x] re-organize tools
-     - [x] add tests -> Fill up all empty files or remove them
-  - [x] add tests
-     - [x] review agent tests and use pytest utilities (parametrize, etc)
-     - [x] add tests for core
-- [x] CI
-     - [x] add .gitlab-ci.yml
-     - [x] add first tests
-     - [x] add CTFs
-- [ ] Other fixes
-     - [x] `check_flag`
-     - [x] time in ~~`run()`~~ Response
-- [x] Tracing
-  - [x] add top level span
-  - [x] add agent span
-  - [ ] add tool span
-- [ ] add state to the reasoning chain
-   - [x] create state.py inspired by previous work
-   - [ ] create a harcoded state for 1_picoctf_static_flag and experiment with it to locate how to use it best
-   - [ ] stateless and stateful capability in CAI
-   - [ ] insert state in inference (1) to be inserted, (2) to build iteratively the state
-      - [ ] via a handoff?
-      - [ ] via a an agent?
-      - [ ] via a tool?
-- [ ] Graph/flow and other abstractions
-- [ ] Plan/router
