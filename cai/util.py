@@ -879,6 +879,7 @@ def create_report_from_messages(history: List[dict]):
 
     # Parse and merge content from Report Agent messages
     for message in history:
+        print(message)
         if message.get("sender") == "Report Agent":
             try:
                 # Try to parse the content as JSON
