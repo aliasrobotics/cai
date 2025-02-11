@@ -233,7 +233,13 @@ def get_ollama_api_base() -> str:
     return os.getenv("OLLAMA_API_BASE", "http://host.docker.internal:8000/v1")
 
 
-def cli_print_agent_messages(agent_name, message, counter, model, debug):
+def cli_print_agent_messages(agent_name, message, counter, model, debug,  # pylint: disable=too-many-arguments,too-many-locals,unused-argument # noqa: E501
+                             interaction_input_tokens=None,
+                             interaction_output_tokens=None,
+                             interaction_reasoning_tokens=None,
+                             total_input_tokens=None,
+                             total_output_tokens=None,
+                             total_reasoning_tokens=None):
     """Print agent messages/thoughts."""
     if not debug:
         return
@@ -255,6 +261,27 @@ def cli_print_agent_messages(agent_name, message, counter, model, debug):
         text.append(
             f" ({model})", style="model")
     text.append("]", style="dim")
+
+    # state and tokens
+    tokens_text = None
+    if (interaction_input_tokens is not None and  # pylint: disable=R0916
+            interaction_output_tokens is not None and
+            interaction_reasoning_tokens is not None and
+            total_input_tokens is not None and
+            total_output_tokens is not None and
+            total_reasoning_tokens is not None):
+
+        tokens_text = _create_token_display(
+            interaction_input_tokens,
+            interaction_output_tokens,
+            interaction_reasoning_tokens,
+            total_input_tokens,
+            total_output_tokens,
+            total_reasoning_tokens,
+            model
+        )
+        text.append(tokens_text)
+
     console.print(text)
 
 
