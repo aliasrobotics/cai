@@ -1,12 +1,15 @@
 """
 This module contains utility functions for the CAI library.
 """
-
+# pylint: disable=cyclic-import
 import inspect
 from datetime import datetime
-from typing import Any
+import time
+from typing import Any, List
 import json
 import os
+from types import SimpleNamespace
+from mako.template import Template  # pylint: disable=import-error
 from wasabi import color  # pylint: disable=import-error
 from rich.text import Text  # pylint: disable=import-error
 from rich.panel import Panel  # pylint: disable=import-error
@@ -812,3 +815,96 @@ def check_flag(output, ctf, challenge=None):
     else:
         print(color("CTF environment not found or provided", fg="yellow"))
     return False, None
+
+
+def merge_report_dicts(base_dict, new_dict):
+    """
+    Merge two report dictionaries recursively,
+    handling lists and nested structures.
+
+    Args:
+        base_dict: The base dictionary to merge into
+        new_dict: The new dictionary with values to merge
+
+    Returns:
+        dict: The merged dictionary
+    """
+    if not isinstance(base_dict, dict) or not isinstance(new_dict, dict):
+        return new_dict
+
+    for key, value in new_dict.items():
+        if key not in base_dict:
+            base_dict[key] = value
+        elif isinstance(value, list) and isinstance(base_dict[key], list):
+            # Merge lists, avoiding duplicates for findings
+            if key == "findings":
+                existing_ids = {
+                    f.get("finding_id") for f in base_dict[key] if isinstance(
+                        f, dict) and "finding_id" in f}
+                for item in value:
+                    if isinstance(  # noqa: E501
+                            item, dict) and "finding_id" in item and item["finding_id"] not in existing_ids:  # noqa: E501
+                        base_dict[key].append(item)
+                        existing_ids.add(item["finding_id"])
+            else:
+                base_dict[key].extend(value)
+        elif isinstance(value, dict) and isinstance(base_dict[key], dict):
+            base_dict[key] = merge_report_dicts(base_dict[key], value)
+        else:
+            # For scalar values, prefer non-empty new values
+            if value is not None and value != "":
+                base_dict[key] = value
+    return base_dict
+
+
+def create_report_from_messages(history: List[dict]):
+    """
+    Create a report from a list of messages,
+    merging content from Report Agent messages.
+
+    Args:
+        history: List of message dictionaries containing sender and content
+    """
+    def to_namespace(obj):
+        if isinstance(obj, dict):
+            return SimpleNamespace(**{k: to_namespace(v)
+                                   for k, v in obj.items()})
+        if isinstance(obj, list):
+            return [to_namespace(item) for item in obj]
+
+        return obj
+
+    # Initialize empty base report
+    merged_report = {}
+
+    # Parse and merge content from Report Agent messages
+    for message in history:
+        if message.get("sender") == "Report Agent":
+            try:
+                # Try to parse the content as JSON
+                report_data = json.loads(message["content"])
+            except json.JSONDecodeError:
+                # Fallback: store raw content under executive_summary
+                report_data = {"executive_summary": message["content"].strip()}
+
+            # Merge with existing report data
+            merged_report = merge_report_dicts(merged_report, report_data)
+    print(merged_report)
+    # Convert nested dictionaries to objects for attribute access in the Mako
+    # template
+    report_data = {k: to_namespace(v) for k, v in merged_report.items()}
+
+    # Add full history to report data
+    report_data["history"] = history
+    # Render the full report using the Mako template
+    template = Template(filename="cai/report_agent/template.md")  # nosec: B702
+    report_output = template.render(**report_data)
+
+    report_dir = "./report"
+    os.makedirs(report_dir, exist_ok=True)
+    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+    save_path = f"Report_{timestamp}.md"
+    report_path = os.path.join(report_dir, save_path)
+
+    with open(report_path, "w", encoding="utf-8") as f:
+        f.write(report_output)

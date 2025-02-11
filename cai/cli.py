@@ -27,8 +27,13 @@ Environment Variables:
         CAI_STATE: Enable/disable stateful mode (default: "false")
 
 Usage Examples:
+    # Run against a CTF
     CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii"
         CTF_MODEL="gpt-4o" CAI_TRACING="false" python3 cai/cli.py
+
+    # Run without a target in human-in-the-loop mode, generating a report
+    $ CAI_TRACING=False CAI_REPORTER=true CTF_MODEL="gpt-4o"
+        python3 cai/cli.py
 """
 import os
 from mako.template import Template  # pylint: disable=import-error
@@ -44,8 +49,17 @@ from cai.tools.web.webshell_suit import (
     generate_php_webshell,
     upload_webshell as upload_ftp_webshell
 )
-
+from cai.agents.mail import dns_smtp_agent
 # Prompts
+
+
+def transfer_to_dns_agent(**kwargs):
+    """
+    Use THIS always for DNS scans and domain reconnaissance
+    """
+    return dns_smtp_agent
+
+
 cli_agent_system_prompt = Template(  # nosec B702
     filename="cai/prompts/system_cli_pentest_expert.md"
 ).render()
@@ -60,6 +74,10 @@ env_context = Template(  # nosec B702
 
 exploit_agent_system_prompt = Template(  # nosec B702
     filename="cai/prompts/system_exploit_expert.md"
+).render()
+
+web_bounty_agent_system_prompt = Template(  # nosec B702
+    filename="cai/prompts/system_web_bounty_agent.md"
 ).render()
 
 
@@ -104,6 +122,9 @@ cli_agent = Agent(
     ],
     parallel_tool_calls=False,
 )
+
+cli_agent.functions.append(transfer_to_dns_agent)
+dns_smtp_agent.functions.append(cli_agent_handoff)
 
 
 def setup_ctf():

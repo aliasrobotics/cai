@@ -2,7 +2,6 @@
 This module provides a REPL interface for testing and
 interacting with CAI agents.
 """
-
 import json
 import os
 from wasabi import color  # pylint: disable=import-error
@@ -69,7 +68,7 @@ def pretty_print_messages(messages) -> None:
             print(f"\033[95m{name}\033[0m({arg_str[1:-1]})")
 
 
-def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too-many-arguments,too-many-branches  # noqa: E501
+def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too-many-arguments,too-many-branches,too-many-statements  # noqa: E501
     starting_agent,
     context_variables=None,
     stream=False,
@@ -163,3 +162,7 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
         messages = response.messages
         if response.agent:
             agent = response.agent
+        if response.report:
+            context_variables = {
+                "previous_reports": response.report
+            }

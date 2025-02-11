@@ -12,7 +12,7 @@ from cai.tools.reconnaissance.crypto_tools import (decode64,
 from cai.tools.reconnaissance.netcat import netcat
 from cai.tools.reconnaissance.nmap import nmap
 from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa
-
+from cai.report_agent.pentesting_web import reporter_agent
 
 from .core import CAI
 from .types import Agent, Response
@@ -154,7 +154,11 @@ def transfer_to_crypto_agent(**kwargs):  # pylint: disable=W0613
     return crypto_agent
 
 
-# desde aqui
+def transfer_to_reporter_agent(**kwargs):  # pylint: disable=W0613
+    """ Transfer to reporter agent.
+    Accepts any keyword arguments but ignores them."""
+    return reporter_agent
+
 # controller agent
 controller_agent = Agent(
     model=model,
@@ -644,8 +648,6 @@ def transfer_to_scripting_agent02(instructions: str = "", **kwargs):   # pylint:
     YOU MUST USE THE instructions argument
     to give the agent instructions"""
     return scripting_agent02
-
-##########
 
 
 # ADD TRANSFER FUNCTIONS TO THE AGENTS

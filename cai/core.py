@@ -18,12 +18,12 @@ from typing import List
 import time
 import os
 import litellm  # pylint: disable=import-error
-from dotenv import load_dotenv  # pylint: disable=import-error  # noqa: E501
+from dotenv import load_dotenv  # pylint: disable=import-error # noqa: E501
 from wasabi import color  # pylint: disable=import-error
 from cai.logger import exploit_logger
-
 # Local imports
 from cai.datarecorder import DataRecorder
+import cai
 from .util import (
     function_to_json,
     debug_print,
@@ -32,6 +32,7 @@ from .util import (
     cli_print_state,
     get_ollama_api_base,
     check_flag,
+    create_report_from_messages,
     visualize_agent_graph
 )
 from .types import (
@@ -42,7 +43,6 @@ from .types import (
     Response,
     Result,
 )
-
 __CTX_VARS_NAME__ = "context_variables"
 litellm.suppress_debug_info = True
 
@@ -104,11 +104,12 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         if log_training_data:
             self.rec_training_data = DataRecorder()
 
+        self.report = os.getenv("CAI_REPORTER", "false").lower() == "true"
         self.force_until_flag = force_until_flag
         self.challenge = challenge
         load_dotenv()
 
-    def get_chat_completion(  # pylint: disable=too-many-arguments
+    def get_chat_completion(  # pylint: disable=too-many-arguments # pylint: disable=too-many-locals # noqa: E501  # pylint: disable=too-many-branches  # noqa: C0301
         self,
         agent: Agent,
         history: List,
@@ -127,7 +128,10 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             if callable(agent.instructions)
             else agent.instructions
         )
-        messages = [{"role": "system", "content": instructions}] + history
+        messages = [{"role": "system", "content": instructions}]
+        for msg in history:
+            if msg.get("sender") != "Report Agent":
+                messages.append(msg)
 
         debug_print(
             debug,
@@ -576,7 +580,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
     @exploit_logger.log_response("🚩" + os.getenv('CTF_NAME', 'test') +
                                  " @ " + os.getenv('CI_JOB_ID', 'local'))
-    def run(  # pylint: disable=too-many-arguments,dangerous-default-value,too-many-locals,too-many-statements # noqa: E501
+    def run(  # pylint: disable=too-many-arguments,dangerous-default-value,too-many-locals,too-many-statements,too-many-branches # noqa: E501
         self,
         agent: Agent,
         messages: List,
@@ -599,11 +603,13 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         - "interaction": a single interaction with the LLM, with
             its corresponding tool calls and responses.
         """
+
         start_time = time.time()
         self.brief = brief
         visualize_agent_graph(agent)
         self.init_len = len(messages)
-
+        self.report = os.getenv("CAI_REPORTER", "false").lower() == "true"
+        report_interval = int(os.getenv("CAI_REPORT_INTERVAL", "0"))
         # TODO: consider moving this outside of CAI  # pylint: disable=fixme  # noqa: E501
         # as the logging URL has a harcoded bit which is
         # dependent on the file that invokes it
@@ -632,17 +638,54 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     n_turn
                 )
                 n_turn += 1
+
+                # Generate intermediate report if interval is set and reached
+                if report_interval > 0 and n_turn % report_interval == 0:
+                    prev_agent = active_agent
+                    active_agent = cai.transfer_to_reporter_agent()
+                    self.process_interaction(
+                        active_agent,
+                        history,
+                        context_variables,
+                        model_override,
+                        stream,
+                        debug,
+                        execute_tools,
+                        n_turn
+                    )
+                    create_report_from_messages(history)
+                    active_agent = prev_agent
+
             except EOFError:
                 print("\nCtrl+D pressed, exiting current turn...")
+                if self.report:
+                    create_report_from_messages(history[-1]["content"])
+                break
+            except KeyboardInterrupt:
+                print("\nCtrl+C pressed, exiting...")
+
+                if input("Want to create a report? (y/n)").lower() == "y":
+                    active_agent = cai.transfer_to_reporter_agent()
+                    self.report = False
+                    history[-1]["sender"] = "Report Agent"
+                    continue
+
                 break
 
             if active_agent is None and self.force_until_flag:
                 # Check if the flag is found in the last tool output
                 flag_found, flag = check_flag(
                     history[-1]["content"], self.ctf, self.challenge)
-                if flag_found:
-                    break
 
+                if flag_found:
+                    if history[-1]["sender"] == "Report Agent":
+                        report = history[-1]["content"]
+                        create_report_from_messages(history[-1]["content"])
+                    break
+                if history[-1]["sender"] == "Report Agent":
+                    report = history[-1]["content"]
+                    create_report_from_messages(history[-1]["content"])
+                    break
                 # # Check if flag is found anywhere in history
                 # for message in history:
                 #     flag_found, _ = check_flag(message["content"],
@@ -662,10 +705,27 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     )
                 })
                 active_agent = agent
+
+            elif active_agent is None and self.report:
+                active_agent = cai.transfer_to_reporter_agent()
+                self.report = False
+                report = history[-1]["content"]
+                history[-1]["sender"] = "Report Agent"
+
             elif active_agent is None:
+                if history[-1]["sender"] == "Report Agent":
+                    create_report_from_messages(history)
                 break
 
         execution_time = time.time() - start_time
+
+        if history[-1]["sender"] == "Report Agent":
+            return Response(
+                messages=history[self.init_len:],
+                agent=active_agent,
+                context_variables=context_variables,
+                time=execution_time,
+            )
         return Response(
             messages=history[self.init_len:],
             agent=active_agent,
