@@ -14,7 +14,6 @@ import copy
 import json
 from collections import defaultdict
 from typing import List
-
 # Package/library imports
 import time
 import os
@@ -32,7 +31,8 @@ from .util import (
     cli_print_tool_call,
     cli_print_state,
     get_ollama_api_base,
-    check_flag
+    check_flag,
+    visualize_agent_graph
 )
 from .types import (
     Agent,
@@ -243,7 +243,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     debug_print(debug, error_message, brief=self.brief)
                     raise TypeError(error_message) from e
 
-    def handle_tool_calls(  # pylint: disable=too-many-arguments,too-many-locals  # noqa: E501
+    def handle_tool_calls(  # pylint: disable=too-many-arguments,too-many-locals,too-many-statements  # noqa: E501
         self,
         tool_calls: List[ChatCompletionMessageToolCall],
         functions: List[AgentFunction],
@@ -339,6 +339,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 brief=self.brief)
 
             func = function_map[name]
+            if "transfer" in name or "handoff" in name:
+                visualize_agent_graph(func())
             # pass context_variables to agent functions
             if __CTX_VARS_NAME__ in func.__code__.co_varnames:
                 args[__CTX_VARS_NAME__] = context_variables
@@ -599,6 +601,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         """
         start_time = time.time()
         self.brief = brief
+        visualize_agent_graph(agent)
         self.init_len = len(messages)
 
         # TODO: consider moving this outside of CAI  # pylint: disable=fixme  # noqa: E501
