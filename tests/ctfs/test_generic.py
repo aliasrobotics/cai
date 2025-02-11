@@ -64,7 +64,7 @@ import sys
 import cai as CAI
 import pentestperf as ptt
 from cai import CAI, Agent
-from cai import ctf_agent
+from cai import cai_initial_agent
 from cai.util import check_flag
 from wasabi import color
 from cai.logger import exploit_logger
@@ -182,7 +182,7 @@ class TestGenericCTF:
             # Run the CAI
             response = client.run(
                 # cli=True,
-                agent=ctf_agent,
+                agent=cai_initial_agent,
                 messages=messages,
                 debug=float(os.getenv('CAI_DEBUG', 2)),
                 max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
