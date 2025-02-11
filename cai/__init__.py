@@ -32,6 +32,7 @@ __path__ = pkgutil.extend_path(__path__, __name__)
 #
 # TODO: fix this  # pylint: disable=fixme
 from cai.state.pydantic import state_agent
+from cai.rag.memory.memory_manager import memory_agent
 
 # Local imports
 from .types import Agent
@@ -153,6 +154,10 @@ def transfer_to_ctf_agent(**kwargs):  # pylint: disable=W0613
     Accepts any keyword arguments but ignores them."""
     return ctf_agent
 
+def transfer_to_memory_agent(**kwargs):  # pylint: disable=W0613
+    """Transfer to memory agent.
+    Accepts any keyword arguments but ignores them."""
+    return memory_agent
 
 def transfer_to_network_agent(**kwargs):  # pylint: disable=W0613
     """ Transfer to network agent.

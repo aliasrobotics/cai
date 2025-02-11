@@ -22,7 +22,7 @@ from dotenv import load_dotenv  # pylint: disable=import-error # noqa: E501
 from wasabi import color  # pylint: disable=import-error
 from cai.logger import exploit_logger
 from cai.rag.vector_db import QdrantConnector
-
+from cai.rag.memory.memory_manager import memory_agent
 # Local imports
 from cai.datarecorder import DataRecorder
 from cai import (
