@@ -1,7 +1,7 @@
 """
 Advanced Boot2Root CTF Framework with CLI, Code Interpreter and Analysis Modes
 """
-from cai import CAI, Agent
+from cai.core import CAI, Agent
 import pentestperf as ptt
 # Codebase Tools
 from cai.tools.llm_plugins.cli_utils import execute_cli_command

@@ -3,7 +3,7 @@ import tempfile
 import shutil
 from pathlib import Path
 from typing import List
-from cai import CAI, Agent
+from cai.core import CAI, Agent
 from cai.tools.reconnaissance.filesystem import list_dir, cat_file
 
 

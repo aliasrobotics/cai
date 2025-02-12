@@ -4,7 +4,7 @@ import shutil
 import statistics
 from pathlib import Path
 from typing import List, Union
-from cai import CAI, Agent
+from cai.core import CAI, Agent
 
 
 class TestFunctionCallBenchmarksBasic:

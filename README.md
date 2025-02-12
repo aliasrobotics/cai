@@ -36,7 +36,7 @@ pip3 uninstall -y pentestperf && pip3 install git+https://gitlab:gldt-1NfZ2XRWdH
 ## Usage
 
 ```python
-from cai import CAI, Agent
+from cai.core import CAI, Agent
 
 client = CAI()
 

@@ -2,7 +2,7 @@
 This is a short example of how we can solve ctf scenarios programmatically. With CAI framework
 """
 # 1. Instance CAI, pentestperf and tools
-from cai import CAI, Agent
+from cai.core import CAI, Agent
 from cai.tools.reconnaissance.crypto_tools import *
 from cai.tools.reconnaissance.nmap import *
 from cai.tools.reconnaissance.netcat import *

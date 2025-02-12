@@ -1,4 +1,4 @@
-from cai import CAI, Agent
+from cai.core import CAI, Agent
 
 client = CAI()
 

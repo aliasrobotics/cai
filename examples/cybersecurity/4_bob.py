@@ -4,7 +4,7 @@ Advanced Boot2Root CTF Framework with CLI, Code Interpreter and Analysis Modes
 import socket
 import sys
 import threading
-from cai import CAI, Agent
+from cai.core import CAI, Agent
 import pentestperf as ptt
 
 # Codebase Tools
