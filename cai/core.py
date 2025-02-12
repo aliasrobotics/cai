@@ -111,7 +111,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.challenge = challenge
         load_dotenv()
 
-    def get_chat_completion(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,line-too-long # noqa: E501
+    def get_chat_completion(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,line-too-long,too-many-statements # noqa: E501
         self,
         agent: Agent,
         history: List,
@@ -209,21 +209,27 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 litellm_completion = litellm.completion(**create_params)
             elif "must be followed by tool messages" in str(e):
                 # EDGE CASE: Report Agent CTRL C error
-                #This fix CTRL C error when message list is incomplete
+                # This fix CTRL C error when message list is incomplete
+                # When a tool is not finished but the LLM generates a tool call
                 messages = create_params["messages"]
-                for msg in messages:
-                    if msg.get("role") == "assistant" and msg.get("tool_calls"):
+
+                messages_copy = messages.copy()
+                for msg in messages_copy:
+                    if msg.get("role") == "assistant" and msg.get(
+                            "tool_calls"):
                         tool_calls = msg["tool_calls"]
                         for tool_call in tool_calls:
                             tool_call_id = tool_call["id"]
-                            # First check if any tool call has no response pair ID
+                            # First check if any tool call has no response pair
+                            # ID
                             has_response = any(
-                                m.get("role") == "tool" and 
+                                m.get("role") == "tool" and
                                 m.get("tool_call_id") == tool_call_id
                                 for m in messages
                             )
                             if not has_response:
-                                # Then if tool call has no response pair, add it empty
+                                # Then if tool call has no response pair, add
+                                # it empty
                                 messages.append({
                                     "role": "tool",
                                     "tool_call_id": tool_call_id,
