@@ -858,7 +858,7 @@ def merge_report_dicts(base_dict, new_dict):
 
 
 def create_report_from_messages(history: List[dict]):
-    
+
     report_data = {}
     """
     Create a report from a list of messages,
@@ -890,7 +890,6 @@ def create_report_from_messages(history: List[dict]):
             pass
     else:
         for message in history:
-            print(message)
             if message.get("sender") == "Report Agent":
                 try:
                     report_data = json.loads(message["content"])
