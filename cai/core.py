@@ -619,7 +619,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         context_variables = copy.deepcopy(context_variables)
         history = copy.deepcopy(messages)
         n_turn = 0
-        if self.rag:
+        if self.rag and n_turn == 0:
             # This will get the 10 first pieces of text from the vector database
             # Each chunk represent a memory segment saved in a previous executions
             # It will be used to answer the current user query
@@ -627,7 +627,17 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             # TO activate this feature, you need to set CTF_RAG_MEMORY="True"
             # TO store the memory, you need to set CTF_RAG_MEMORY_INTERVAL="3" (by def 5)
             results = get_previous_memory(history[-1]["content"], top_k=10)
-            print("Previous memory: " + results)
+            cli_print_tool_call("Memory",
+                                {"From": "Previous Findings"},
+                                results,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                "Python Code",
+                                debug)
             if history and history[-1]["role"] == "user":
                 existing_content = history[-1]["content"]
                 history[-1]["content"] = f"{existing_content}\n\n<previous_memory>\n{results}\n</previous_memory>"
@@ -636,6 +646,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     "role": "user", 
                     "content": f"Context from vector database:\n{results}"
                 })
+
         while len(history) - self.init_len < max_turns and active_agent:
             try:
                 if self.rag and (n_turn != 0 and n_turn % self.RAG_INTERVAL == 0):
