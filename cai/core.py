@@ -112,7 +112,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.challenge = challenge
         load_dotenv()
 
-    def get_chat_completion(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,line-too-long # noqa: E501
+    def get_chat_completion(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,line-too-long,too-many-statements # noqa: E501
         self,
         agent: Agent,
         history: List,
@@ -207,6 +207,37 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 create_params["custom_llm_provider"] = "openai"
                 os.environ["OLLAMA"] = "true"
                 os.environ["OPENAI_API_KEY"] = "Placeholder"
+                litellm_completion = litellm.completion(**create_params)
+            elif "must be followed by tool messages" in str(e):
+                # EDGE CASE: Report Agent CTRL C error
+                # This fix CTRL C error when message list is incomplete
+                # When a tool is not finished but the LLM generates a tool call
+                messages = create_params["messages"]
+
+                messages_copy = messages.copy()
+                for msg in messages_copy:
+                    if msg.get("role") == "assistant" and msg.get(
+                            "tool_calls"):
+                        tool_calls = msg["tool_calls"]
+                        for tool_call in tool_calls:
+                            tool_call_id = tool_call["id"]
+                            # First check if any tool call has no response pair
+                            # ID
+                            has_response = any(
+                                m.get("role") == "tool" and
+                                m.get("tool_call_id") == tool_call_id
+                                for m in messages
+                            )
+                            if not has_response:
+                                # Then if tool call has no response pair, add
+                                # it empty
+                                messages.append({
+                                    "role": "tool",
+                                    "tool_call_id": tool_call_id,
+                                    "name": tool_call["function"]["name"],
+                                    "content": "No response provided"
+                                })
+                # Finish just retry
                 litellm_completion = litellm.completion(**create_params)
             else:
                 raise e
@@ -659,20 +690,20 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                         execute_tools,
                         n_turn
                     )
-                    create_report_from_messages(history)
                     active_agent = prev_agent
 
-            except KeyboardInterrupt:  # Ctrl+C
-
-                # Create report if user wants to,
-                # otherwise, stop the execution
-                if self.report and input(
-                        "Want to create a report? (y/n)").lower() == "y":
-                    active_agent = transfer_to_reporter_agent()
-                    history[-1]["sender"] = "Report Agent"
-                    continue
-                self.report = False
-                break
+            except KeyboardInterrupt:
+                print("\nCtrl+C pressed")
+                try:
+                    time.sleep(2)  # wait for user to press Ctrl+C again
+                except KeyboardInterrupt:
+                    print("\nCtrl+C pressed again")
+                    if input("Want to create a report? (y/n)").lower() == "y":
+                        active_agent = transfer_to_reporter_agent()
+                        self.report = False
+                        history[-1]["sender"] = "Report Agent"
+                        continue
+                    break
 
             # Check if the flag is found in the last tool output
             if active_agent is None and self.force_until_flag:
@@ -680,15 +711,10 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 flag_found, flag = check_flag(
                     history[-1]["content"], self.ctf, self.challenge)
 
-                if self.report:
-                    if flag_found:
-                        if history[-1]["sender"] == "Report Agent":
-                            create_report_from_messages(history[-1]["content"])
-                        break
-
-                    if history[-1]["sender"] == "Report Agent":
-                        create_report_from_messages(history[-1]["content"])
-                        break
+                if flag_found:
+                    if self.report:
+                        create_report_from_messages(history)
+                    break
 
                 # # Check if flag is found anywhere in history
                 # for message in history:
@@ -723,13 +749,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         execution_time = time.time() - start_time
 
-        if self.report and history[-1]["sender"] == "Report Agent":
-            return Response(
-                messages=history[self.init_len:],
-                agent=active_agent,
-                context_variables=context_variables,
-                time=execution_time,
-            )
         return Response(
             messages=history[self.init_len:],
             agent=active_agent,

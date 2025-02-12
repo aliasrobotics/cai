@@ -865,6 +865,9 @@ def create_report_from_messages(history: List[dict]):
     Args:
         history: List of message dictionaries containing sender and content
     """
+    report_data = {}  # last JSON message from Report Agent
+    merged_report = {}  # merged JSON messages from Report Agent
+
     def to_namespace(obj):
         if isinstance(obj, dict):
             return SimpleNamespace(**{k: to_namespace(v)
@@ -874,29 +877,25 @@ def create_report_from_messages(history: List[dict]):
 
         return obj
 
-    # Initialize empty base report
-    merged_report = {}
-
-    # Parse and merge content from Report Agent messages
+    # NOTE: Generic.py dont return a list of messages, it returns a string
+    # so we need to handle it differently
+    #
     for message in history:
         if message.get("sender") == "Report Agent":
             try:
-                # Try to parse the content as JSON
                 report_data = json.loads(message["content"])
+                merged_report = merge_report_dicts(merged_report, report_data)
             except json.JSONDecodeError:
-                # Fallback: store raw content under executive_summary
-                report_data = {"executive_summary": message["content"].strip()}
+                # Continue if because some times report
+                # agent sends non-JSON content (plain text responses)
+                # and it's not a valid JSON
+                continue
+        merged_report = merge_report_dicts(merged_report, report_data)
 
-            # Merge with existing report data
-            merged_report = merge_report_dicts(merged_report, report_data)
-    print(merged_report)
-    # Convert nested dictionaries to objects for attribute access in the Mako
-    # template
+    # To python variables
     report_data = {k: to_namespace(v) for k, v in merged_report.items()}
 
-    # Add full history to report data
     report_data["history"] = history
-    # Render the full report using the Mako template
     template = Template(filename="cai/report_agent/template.md")  # nosec: B702
     report_output = template.render(**report_data)
 
@@ -908,3 +907,4 @@ def create_report_from_messages(history: List[dict]):
 
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(report_output)
+    print(f"!Report generated at: {report_path}")
