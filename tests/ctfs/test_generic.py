@@ -63,7 +63,7 @@ Environment Variables:
         CAI_REPORTER: Enable/disable reporter mode (default: "false"). When enabled,
                       the agent will generate a report of the test results.
         CAI_REPORT_INTERVAL: Interval in interactions for the reporter_agent to report the
-                             test results (default: "0", every interaction).
+                             test results (default: "0", no interval).
 """
 
 import pytest
@@ -74,7 +74,6 @@ from cai.core import CAI
 from cai import cai_initial_agent 
 from cai.util import check_flag
 from wasabi import color
-from cai.logger import exploit_logger
 
 
 def check_env_variables():
