@@ -2,7 +2,7 @@ import datetime
 import json
 import uuid
 
-from cai import CAI
+from cai.core import CAI
 
 
 def run_function_evals(agent, test_cases, n=1, eval_path=None):

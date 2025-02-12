@@ -4,6 +4,7 @@ from types import SimpleNamespace
 from mako.template import Template
 import pytest
 from cai.util import create_report_from_messages
+
 def test_reporter_agent():
     """
     Test the Report Agent using simulated full pentesting tools output with pytest.
@@ -11,7 +12,7 @@ def test_reporter_agent():
     and then deletes the file.
     """
     # Import the CAI client and the reporter agent from the CAI library.
-    from cai import CAI
+    from cai.core import CAI
     from cai.report_agent.pentesting_web import reporter_agent
 
     # Simulated full output from various pentesting tools to drive report generation.

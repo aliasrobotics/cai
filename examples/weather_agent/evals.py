@@ -1,4 +1,4 @@
-from cai import CAI
+from cai.core import CAI
 from agents import weather_agent
 import pytest
 

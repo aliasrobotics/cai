@@ -71,7 +71,7 @@ import os
 import sys
 import pentestperf as ptt
 from cai.core import CAI
-from cai import cai_initial_agent 
+from cai.core import CAI_initial_agent 
 from cai.util import check_flag
 from wasabi import color
 

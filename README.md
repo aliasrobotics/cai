@@ -150,7 +150,7 @@ Check out `/examples` for inspiration! Learn more about each one in its README.
 Start by instantiating a CAI client (which internally just instantiates an `OpenAI` client).
 
 ```python
-from cai import CAI
+from cai.core import CAI
 
 client = CAI()
 ```
