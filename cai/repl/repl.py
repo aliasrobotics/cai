@@ -119,8 +119,7 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
 ▐░░░░░░░░░░░▌▐░▌       ▐░▌▐░░░░░░░░░░░▌
  ▀▀▀▀▀▀▀▀▀▀▀  ▀         ▀  ▀▀▀▀▀▀▀▀▀▀▀
 
-    Cybersecurity AI, by Alias Robotics
-    Version: {version}
+    Cybersecurity AI (CAI) v{version}
 """)
 
     messages = []
