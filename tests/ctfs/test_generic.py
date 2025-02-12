@@ -68,9 +68,8 @@ Environment Variables:
 import pytest
 import os
 import sys
-import cai as CAI
 import pentestperf as ptt
-from cai import CAI, Agent
+from cai.core import CAI
 from cai import cai_initial_agent 
 from cai.util import check_flag
 from wasabi import color
