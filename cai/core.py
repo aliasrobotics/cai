@@ -107,6 +107,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             self.rec_training_data = DataRecorder()
 
         self.report = os.getenv("CAI_REPORTER", "false").lower() == "true"
+        self.report_interval = int(os.getenv("CAI_REPORT_INTERVAL", "0"))
         self.force_until_flag = force_until_flag
         self.challenge = challenge
         load_dotenv()
@@ -610,8 +611,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.brief = brief
         visualize_agent_graph(agent)
         self.init_len = len(messages)
-        self.report = os.getenv("CAI_REPORTER", "false").lower() == "true"
-        report_interval = int(os.getenv("CAI_REPORT_INTERVAL", "0"))
+
         # TODO: consider moving this outside of CAI  # pylint: disable=fixme  # noqa: E501
         # as the logging URL has a harcoded bit which is
         # dependent on the file that invokes it
@@ -642,7 +642,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 n_turn += 1
 
                 # Generate intermediate report if interval is set and reached
-                if report_interval > 0 and n_turn % report_interval == 0:
+                if (self.report_interval > 0 and
+                        n_turn % self.report_interval == 0):
                     prev_agent = active_agent
                     active_agent = transfer_to_reporter_agent()
                     self.process_interaction(

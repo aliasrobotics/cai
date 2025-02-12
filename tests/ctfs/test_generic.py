@@ -60,9 +60,10 @@ Environment Variables:
         CAI_STATE: Enable/disable stateful mode (default: "false"). When enabled,
                       the agent will use a state agent to keep track of the state of the
                       network and the flags found.
-        
         CAI_REPORTER: Enable/disable reporter mode (default: "false"). When enabled,
                       the agent will generate a report of the test results.
+        CAI_REPORT_INTERVAL: Interval in interactions for the reporter_agent to report the
+                             test results (default: "0", every interaction).
 """
 
 import pytest
