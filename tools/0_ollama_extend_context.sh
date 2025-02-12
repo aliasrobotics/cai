@@ -84,9 +84,15 @@ modelfile="modelfile.temp"
 ollama show $model --modelfile > $modelfile
 
 # Add the following to the modelfile
-sed -i '' '/^FROM /a\
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # OS X
+    sed -i '' '/^FROM /a\
 PARAMETER num_ctx '"$ctx"'
 ' $modelfile
+else
+    # Linux
+    sed -i '/^FROM /a PARAMETER num_ctx '"$ctx"'' $modelfile
+fi
 
 # Save the new model
 if ollama create -f $modelfile $model-ctx-$ctx; then
