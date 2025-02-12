@@ -695,14 +695,17 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     create_report_from_messages(history[-1]["content"])
                 break
             except KeyboardInterrupt:
-                print("\nCtrl+C pressed, exiting...")
-
-                if input("Want to create a report? (y/n)").lower() == "y":
-                    active_agent = transfer_to_reporter_agent()
-                    self.report = False
-                    history[-1]["sender"] = "Report Agent"
-                    continue
-                break
+                print("\nCtrl+C pressed")
+                try:
+                    time.sleep(2)  # wait for user to press Ctrl+C again
+                except KeyboardInterrupt:
+                    print("\nCtrl+C pressed again")
+                    if input("Want to create a report? (y/n)").lower() == "y":
+                        active_agent = transfer_to_reporter_agent()
+                        self.report = False
+                        history[-1]["sender"] = "Report Agent"
+                        continue
+                    break
 
             if active_agent is None and self.force_until_flag:
                 # Check if the flag is found in the last tool output
