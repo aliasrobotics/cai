@@ -208,7 +208,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 os.environ["OPENAI_API_KEY"] = "Placeholder"
                 litellm_completion = litellm.completion(**create_params)
             elif "must be followed by tool messages" in str(e):
-                # EDGE CASE: This fix CTRL C error when message list is incomplete
+                # EDGE CASE: Report Agent CTRL C error
+                #This fix CTRL C error when message list is incomplete
                 messages = create_params["messages"]
                 for msg in messages:
                     if msg.get("role") == "assistant" and msg.get("tool_calls"):

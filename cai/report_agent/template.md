@@ -28,13 +28,13 @@
 
 ---
 
-## 1. Executive Summary
+# 1. Executive Summary
 
 > ${executive_summary or "No executive summary provided."}
 
 ---
 
-## 2. Scope & Objectives
+# 2. Scope & Objectives
 
 The following section delineates the scope and objectives of this penetration testing engagement:
 
@@ -42,7 +42,7 @@ ${scope or "No scope defined."}
 
 ---
 
-## 3. Methodology
+# 3. Methodology
 
 The assessment was conducted using a systematic and comprehensive approach that encompasses reconnaissance, vulnerability analysis, exploitation, and validation:
 
@@ -62,7 +62,7 @@ ${methodology or "No methodology provided."}
 
 ---
 
-## 4. Detailed Findings
+# 4. Detailed Findings
 
 % for finding in (findings or []):
 <details>
@@ -100,7 +100,7 @@ ${finding.remediation_command or "No remediation command provided."}
 
 ---
 
-## 4.1 Vulnerability Assessment Metrics
+# 4.1 Vulnerability Assessment Metrics
 
 <strong> Vulnerability Severity Distribution Chart</strong>
 
@@ -117,13 +117,13 @@ pie
 
 ---
 
-## 4.2 Network State Analysis
+# 4.2 Network State Analysis
 
 % if network_state and network_state.network:
 % for endpoint in (network_state.network or []):
 <strong>Host: ${endpoint.ip or "N/A"}</strong>
 
-### Open Ports
+# Open Ports
 
 % if endpoint.ports:
 | Port Number | Service Name | Version | Vulnerabilities |
@@ -135,7 +135,7 @@ pie
 _No open ports detected._
 % endif
 
-### Executed Exploits
+# Executed Exploits
 
 % if endpoint.exploits:
 | Exploit Name | Exploit Type | Status |
@@ -147,7 +147,7 @@ _No open ports detected._
 _No exploit attempts recorded._
 % endif
 
-### Discovered Files
+# Discovered Files
 
 % if endpoint.files:
 | File Name |
@@ -159,7 +159,7 @@ _No exploit attempts recorded._
 _No files discovered._
 % endif
 
-### Identified Users
+# Identified Users
 
 % if endpoint.users:
 | User Identifier |
@@ -179,23 +179,23 @@ _No network state data available._
 
 ---
 
-## 5. Risk Assessment
+# 5. Risk Assessment
 
 > ${risk_assessment or "Risk assessment details are not provided."}
 
 ---
 
-## 6. Remediation Recommendations
+# 6. Remediation Recommendations
 
 > ${remediation_recommendations or "No remediation recommendations available."}
 
 ---
 
-## 7. Conclusion
+# 7. Conclusion
 
 > ${conclusion or "Conclusion pending further evaluation."}
 
 ---
 
-## 8. Appendix: Penetration testing exercise in JSON format
+# 8. Appendix: Penetration testing exercise in JSON format
 ${history or "No additional history provided."}

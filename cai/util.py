@@ -858,6 +858,8 @@ def merge_report_dicts(base_dict, new_dict):
 
 
 def create_report_from_messages(history: List[dict]):
+    
+    report_data = {}
     """
     Create a report from a list of messages,
     merging content from Report Agent messages.
@@ -876,17 +878,28 @@ def create_report_from_messages(history: List[dict]):
 
     merged_report = {}
 
-    # Parse and merge content from Report Agent messages
-    for message in history:
-        print(message)
-        if message.get("sender") == "Report Agent":
-            try:
-                report_data = json.loads(message["content"])
-            except json.JSONDecodeError:
-                # Continue if because some times report 
-                # agent sends non-JSON content (plain text responses)
-                # and it's not a valid JSON
-                continue
+    # NOTE: Generic.py dont return a list of messages, it returns a string
+    # so we need to handle it differently
+    # BUG: cant merge more than one dict, cause only return one report(?)
+    # TODO: fix bug
+    if isinstance(history, str):
+        try:
+            report_data = json.loads(history)
+            merged_report = merge_report_dicts(merged_report, report_data)
+        except json.JSONDecodeError:
+            pass
+    else:
+        for message in history:
+            print(message)
+            if message.get("sender") == "Report Agent":
+                try:
+                    report_data = json.loads(message["content"])
+                    merged_report = merge_report_dicts(merged_report, report_data)
+                except json.JSONDecodeError:
+                    # Continue if because some times report 
+                    # agent sends non-JSON content (plain text responses)
+                    # and it's not a valid JSON
+                    continue
             merged_report = merge_report_dicts(merged_report, report_data)
 
     # To python variables
@@ -904,3 +917,4 @@ def create_report_from_messages(history: List[dict]):
 
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(report_output)
+    print(f"!Report generated at: {report_path}")
