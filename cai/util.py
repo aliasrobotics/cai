@@ -858,8 +858,6 @@ def merge_report_dicts(base_dict, new_dict):
 
 
 def create_report_from_messages(history: List[dict]):
-
-    report_data = {}
     """
     Create a report from a list of messages,
     merging content from Report Agent messages.
@@ -867,6 +865,9 @@ def create_report_from_messages(history: List[dict]):
     Args:
         history: List of message dictionaries containing sender and content
     """
+    report_data = {}  # last JSON message from Report Agent
+    merged_report = {}  # merged JSON messages from Report Agent
+
     def to_namespace(obj):
         if isinstance(obj, dict):
             return SimpleNamespace(**{k: to_namespace(v)
@@ -876,30 +877,20 @@ def create_report_from_messages(history: List[dict]):
 
         return obj
 
-    merged_report = {}
-
     # NOTE: Generic.py dont return a list of messages, it returns a string
     # so we need to handle it differently
-    # BUG: cant merge more than one dict, cause only return one report(?)
-    # TODO: fix bug
-    if isinstance(history, str):
-        try:
-            report_data = json.loads(history)
-            merged_report = merge_report_dicts(merged_report, report_data)
-        except json.JSONDecodeError:
-            pass
-    else:
-        for message in history:
-            if message.get("sender") == "Report Agent":
-                try:
-                    report_data = json.loads(message["content"])
-                    merged_report = merge_report_dicts(merged_report, report_data)
-                except json.JSONDecodeError:
-                    # Continue if because some times report 
-                    # agent sends non-JSON content (plain text responses)
-                    # and it's not a valid JSON
-                    continue
-            merged_report = merge_report_dicts(merged_report, report_data)
+    #
+    for message in history:
+        if message.get("sender") == "Report Agent":
+            try:
+                report_data = json.loads(message["content"])
+                merged_report = merge_report_dicts(merged_report, report_data)
+            except json.JSONDecodeError:
+                # Continue if because some times report
+                # agent sends non-JSON content (plain text responses)
+                # and it's not a valid JSON
+                continue
+        merged_report = merge_report_dicts(merged_report, report_data)
 
     # To python variables
     report_data = {k: to_namespace(v) for k, v in merged_report.items()}

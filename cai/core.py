@@ -714,10 +714,10 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
                 if flag_found:
                     if history[-1]["sender"] == "Report Agent":
-                        create_report_from_messages(history[-1]["content"])
+                        create_report_from_messages(history)
                     break
                 if history[-1]["sender"] == "Report Agent":
-                    create_report_from_messages(history[-1]["content"])
+                    create_report_from_messages(history)
                     break
                 # # Check if flag is found anywhere in history
                 # for message in history:
