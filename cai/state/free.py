@@ -3,8 +3,7 @@ This module provides a free-form text state agent for
 representing network state in cybersecurity contexts.
 """
 
-from cai.types import Agent
-from cai.state.common import get_base_instructions
+from cai.state.common import get_base_instructions, StateAgent
 
 
 def instructions(context_variables):
@@ -25,7 +24,7 @@ def instructions(context_variables):
     """
 
 
-state_agent = Agent(
+state_agent = StateAgent(
     name="Plain Free-form Text NetworkState Agent",
     instructions=instructions,
 )

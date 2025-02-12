@@ -4,8 +4,7 @@ representing network state in cybersecurity contexts.
 """
 from pydantic import BaseModel  # pylint: disable=import-error
 from cai.state import State
-from cai.types import Agent
-from cai.state.common import get_base_instructions
+from cai.state.common import get_base_instructions, StateAgent
 
 
 class Port(BaseModel):  # pylint: disable=too-few-public-methods, missing-class-docstring  # noqa: E501
@@ -66,7 +65,7 @@ def instructions(context_variables):
     """
 
 
-state_agent = Agent(
+state_agent = StateAgent(
     name="Pydantic NetworkState Agent",
     instructions=instructions,
     structured_output_class=NetworkState

@@ -21,9 +21,17 @@ from cai.tools.reconnaissance.nmap import nmap
 from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa
 from cai.report_agent.pentesting_web import reporter_agent
 
+# Import state transfer functions
+# NOTE: this, together with the logic in test_generic.py,
+# is a workaround to make the state agent work.
+# Need to unify it all together and make it work
+# agnostic to the state agent implementation.
+#
+# TODO: fix this  # pylint: disable=fixme
+from cai.state.pydantic import state_agent
+
 # Local imports
 from .types import Agent
-
 
 # Get model from environment or use default
 model = os.getenv('CTF_MODEL', "qwen2.5:14b")
@@ -817,3 +825,10 @@ elif cai_agent == "proto03":
 else:
     # stop and raise error
     raise ValueError(f"Invalid CAI agent type: {cai_agent}")
+
+
+def transfer_to_state_agent():
+    """
+    Transfer to the state agent
+    """
+    return state_agent

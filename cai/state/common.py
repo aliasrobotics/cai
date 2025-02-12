@@ -1,6 +1,11 @@
 """
 Common functionality shared between state agent implementations.
 """
+from cai.types import Agent
+
+
+class StateAgent(Agent):  # pylint: disable=too-few-public-methods
+    """Base class for state agents to inherit from."""
 
 
 def get_base_instructions(state, initial_history):

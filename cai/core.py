@@ -25,7 +25,9 @@ from cai.logger import exploit_logger
 from cai.datarecorder import DataRecorder
 from cai import (
     transfer_to_reporter_agent,
+    transfer_to_state_agent,
 )
+from cai.state.common import StateAgent
 from .util import (
     function_to_json,
     debug_print,
@@ -45,6 +47,7 @@ from .types import (
     Response,
     Result,
 )
+
 __CTX_VARS_NAME__ = "context_variables"
 litellm.suppress_debug_info = True
 
@@ -53,7 +56,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
     """
     Cybersecurity AI (CAI) object
     """
-    STATE_INTERACTIONS_INTERVAL = 5  # number of interactions between state updates  # noqa: E501
+    STATE_INTERACTIONS_INTERVAL = 2  # number of interactions between state updates  # noqa: E501
 
     def __init__(self,  # pylint: disable=too-many-arguments
                  ctf=None,
@@ -250,6 +253,32 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         if self.rec_training_data:
             self.rec_training_data.rec_training_data(
                 create_params, litellm_completion)
+
+        # update token counts
+        if litellm_completion.usage:
+            self.interaction_input_tokens = (
+                litellm_completion.usage.prompt_tokens
+            )
+            self.interaction_output_tokens = (
+                litellm_completion.usage.completion_tokens
+            )
+            if (hasattr(litellm_completion.usage, 'completion_tokens_details') and  # noqa: E501  # pylint: disable=C0103
+                    litellm_completion.usage.completion_tokens_details and
+                    hasattr(litellm_completion.usage.completion_tokens_details,
+                            'reasoning_tokens') and
+                    litellm_completion.usage.completion_tokens_details.reasoning_tokens):  # noqa: E501  # pylint: disable=C0103
+                self.interaction_reasoning_tokens = (
+                    litellm_completion.usage.completion_tokens_details.reasoning_tokens)  # noqa: E501  # pylint: disable=C0103
+                self.total_reasoning_tokens += self.interaction_reasoning_tokens  # noqa: E501  # pylint: disable=C0103
+            else:
+                self.interaction_reasoning_tokens = 0
+
+            self.total_input_tokens += (
+                self.interaction_input_tokens
+            )
+            self.total_output_tokens += (
+                self.interaction_output_tokens
+            )
 
         # print(litellm_completion)  # debug
         return litellm_completion
@@ -470,82 +499,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         """
         Process an interaction with the AI agent.
         """
-        # stateful
-        #
-        # NOTE: consider adding state to the context variables,
-        # and then adding it to the messages
-        #
-        if self.stateful:
-            self.state_interactions_count += 1
-            if self.state_interactions_count >= CAI.STATE_INTERACTIONS_INTERVAL:  # noqa: E501
-
-                # fill in context variables
-                context_variables["state"] = self.last_state  # state
-                # initial messages
-                context_variables["initial_history"] = history[:self.init_len]
-
-                # get state from existing messages
-                completion = self.get_chat_completion(
-                    agent=self.state_agent,
-                    history=history,
-                    context_variables=context_variables,
-                    model_override=model_override,
-                    stream=stream,
-                    debug=debug
-                )
-
-                # update token counts
-                if completion and completion.usage and completion.choices:  # noqa: E501  # pylint: disable=C0103
-                    # Update interaction and total token counts
-                    self.interaction_input_tokens = completion.usage.prompt_tokens  # noqa: E501  # pylint: disable=C0103
-                    self.interaction_output_tokens = completion.usage.completion_tokens  # noqa: E501  # pylint: disable=C0103
-                    if (hasattr(completion.usage, 'completion_tokens_details') and  # noqa: E501  # pylint: disable=C0103
-                            completion.usage.completion_tokens_details and
-                            hasattr(completion.usage.completion_tokens_details,
-                                    'reasoning_tokens') and
-                            completion.usage.completion_tokens_details.reasoning_tokens):  # noqa: E501  # pylint: disable=C0103
-                        self.interaction_reasoning_tokens = (
-                            completion.usage.completion_tokens_details.reasoning_tokens)  # noqa: E501  # pylint: disable=C0103
-                        self.total_reasoning_tokens += self.interaction_reasoning_tokens  # noqa: E501  # pylint: disable=C0103
-                    else:
-                        self.interaction_reasoning_tokens = 0
-
-                    self.total_input_tokens += self.interaction_input_tokens  # noqa: E501  # pylint: disable=C0103
-                    self.total_output_tokens += self.interaction_output_tokens  # noqa: E501  # pylint: disable=C0103
-
-                    # get new state
-                    message = completion.choices[0].message
-                    self.last_state = message.content
-                    message.sender = "state_agent"
-
-                    # update history
-                    # set back to initial prompt
-                    history = history[:self.init_len]
-                    # add state to history
-                    history.append(
-                        json.loads(message.model_dump_json()))
-
-                    # log
-                    debug_print(
-                        debug,
-                        "State: ",
-                        message,
-                        brief=self.brief)
-                    cli_print_state(self.state_agent.name,
-                                    message.content,
-                                    n_turn,
-                                    self.state_agent.model,
-                                    debug,
-                                    interaction_input_tokens=self.interaction_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
-                                    interaction_output_tokens=self.interaction_output_tokens,  # noqa: E501  # pylint: disable=line-too-long
-                                    interaction_reasoning_tokens=self.interaction_reasoning_tokens,  # noqa: E501  # pylint: disable=line-too-long
-                                    total_input_tokens=self.total_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
-                                    total_output_tokens=self.total_output_tokens,  # noqa: E501  # pylint: disable=line-too-long
-                                    total_reasoning_tokens=self.total_reasoning_tokens)  # noqa: E501  # pylint: disable=line-too-long
-
-                # reset counter regardless of timeout
-                self.state_interactions_count = 0
-
         # get completion with current history, agent
         completion = self.get_chat_completion(
             agent=active_agent,
@@ -555,31 +508,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             stream=stream,
             debug=debug,
         )
-        if completion.usage:
-            self.interaction_input_tokens = (
-                completion.usage.prompt_tokens
-            )
-            self.interaction_output_tokens = (
-                completion.usage.completion_tokens
-            )
-            if (hasattr(completion.usage, 'completion_tokens_details') and  # noqa: E501  # pylint: disable=C0103
-                    completion.usage.completion_tokens_details and
-                    hasattr(completion.usage.completion_tokens_details,
-                            'reasoning_tokens') and
-                    completion.usage.completion_tokens_details.reasoning_tokens):  # noqa: E501  # pylint: disable=C0103
-                self.interaction_reasoning_tokens = (
-                    completion.usage.completion_tokens_details.reasoning_tokens)  # noqa: E501  # pylint: disable=C0103
-                self.total_reasoning_tokens += self.interaction_reasoning_tokens  # noqa: E501  # pylint: disable=C0103
-            else:
-                self.interaction_reasoning_tokens = 0
-
-            self.total_input_tokens += (
-                self.interaction_input_tokens
-            )
-            self.total_output_tokens += (
-                self.interaction_output_tokens
-            )
-
         message = completion.choices[0].message
 
         debug_print(
@@ -587,17 +515,31 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             "Received completion:",
             message,
             brief=self.brief)
+
         message.sender = active_agent.name
         history.append(
             json.loads(message.model_dump_json())
         )  # to avoid OpenAI types (?)
 
         if not message.tool_calls or not execute_tools:
-            cli_print_agent_messages(active_agent.name,
-                                     message.content,
-                                     n_turn,
-                                     active_agent.model,
-                                     debug)
+            if not isinstance(active_agent, StateAgent):
+                cli_print_agent_messages(active_agent.name,
+                                         message.content,
+                                         n_turn,
+                                         active_agent.model,
+                                         debug)
+            else:
+                cli_print_state(active_agent.name,
+                                message.content,
+                                n_turn,
+                                active_agent.model,
+                                debug,
+                                interaction_input_tokens=self.interaction_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                interaction_output_tokens=self.interaction_output_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                interaction_reasoning_tokens=self.interaction_reasoning_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                total_input_tokens=self.total_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                total_output_tokens=self.total_output_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                total_reasoning_tokens=self.total_reasoning_tokens)  # noqa: E501  # pylint: disable=line-too-long
             debug_print(debug, "Ending turn.", brief=self.brief)
             return None
 
@@ -674,6 +616,26 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     n_turn
                 )
                 n_turn += 1
+
+                # Manually invoke state agent if stateful
+                if self.stateful:
+                    self.state_interactions_count += 1
+                    if self.state_interactions_count >= self.STATE_INTERACTIONS_INTERVAL:  # noqa: E501, pylint: disable=line-too-long
+                        prev_agent = active_agent
+                        active_agent = transfer_to_state_agent()
+                        self.process_interaction(
+                            active_agent,
+                            history,
+                            context_variables,
+                            model_override,
+                            stream,
+                            debug,
+                            execute_tools,
+                            n_turn
+                        )
+                        active_agent = prev_agent
+
+                        self.state_interactions_count = 0
 
                 # Generate intermediate report if interval is set and reached
                 if self.report and (self.report_interval > 0 and
