@@ -5,7 +5,7 @@ interacting with CAI agents.
 import json
 import os
 from wasabi import color  # pylint: disable=import-error
-from cai import CAI  # pylint: disable=import-error
+from cai.core import CAI  # pylint: disable=import-error
 
 
 def process_and_print_streaming_response(response):  # pylint: disable=inconsistent-return-statements  # noqa: E501

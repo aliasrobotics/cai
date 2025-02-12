@@ -50,16 +50,16 @@ from cai.tools.web.webshell_suit import (
     upload_webshell as upload_ftp_webshell
 )
 from cai.agents.mail import dns_smtp_agent
-# Prompts
 
 
-def transfer_to_dns_agent(**kwargs):
+def transfer_to_dns_agent():
     """
     Use THIS always for DNS scans and domain reconnaissance
     """
     return dns_smtp_agent
 
 
+# Prompts
 cli_agent_system_prompt = Template(  # nosec B702
     filename="cai/prompts/system_cli_pentest_expert.md"
 ).render()
@@ -143,7 +143,6 @@ def setup_ctf():
         ip_address=os.getenv('CTF_IP', "192.168.2.100"),
     )
     ctf.start_ctf()
-
     return ctf
 
 
