@@ -207,6 +207,30 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 os.environ["OLLAMA"] = "true"
                 os.environ["OPENAI_API_KEY"] = "Placeholder"
                 litellm_completion = litellm.completion(**create_params)
+            elif "must be followed by tool messages" in str(e):
+                # EDGE CASE: This fix CTRL C error when message list is incomplete
+                messages = create_params["messages"]
+                for msg in messages:
+                    if msg.get("role") == "assistant" and msg.get("tool_calls"):
+                        tool_calls = msg["tool_calls"]
+                        for tool_call in tool_calls:
+                            tool_call_id = tool_call["id"]
+                            # First check if any tool call has no response pair ID
+                            has_response = any(
+                                m.get("role") == "tool" and 
+                                m.get("tool_call_id") == tool_call_id
+                                for m in messages
+                            )
+                            if not has_response:
+                                # Then if tool call has no response pair, add it empty
+                                messages.append({
+                                    "role": "tool",
+                                    "tool_call_id": tool_call_id,
+                                    "name": tool_call["function"]["name"],
+                                    "content": "No response provided"
+                                })
+                # Finish just retry
+                litellm_completion = litellm.completion(**create_params)
             else:
                 raise e
 

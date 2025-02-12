@@ -1,0 +1,6 @@
+/.htaccess            (Status: 403) [Size: 278]
+/.htpasswd            (Status: 403) [Size: 278]
+/.hta                 (Status: 403) [Size: 278]
+/files                (Status: 301) [Size: 314] [--> http://192.168.2.100/files/]
+/index.html           (Status: 200) [Size: 11239]
+/server-status        (Status: 403) [Size: 278]

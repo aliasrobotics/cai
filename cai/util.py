@@ -874,7 +874,6 @@ def create_report_from_messages(history: List[dict]):
 
         return obj
 
-    # Initialize empty base report
     merged_report = {}
 
     # Parse and merge content from Report Agent messages
@@ -882,22 +881,18 @@ def create_report_from_messages(history: List[dict]):
         print(message)
         if message.get("sender") == "Report Agent":
             try:
-                # Try to parse the content as JSON
                 report_data = json.loads(message["content"])
             except json.JSONDecodeError:
-                # Fallback: store raw content under executive_summary
-                report_data = {"executive_summary": message["content"].strip()}
-
-            # Merge with existing report data
+                # Continue if because some times report 
+                # agent sends non-JSON content (plain text responses)
+                # and it's not a valid JSON
+                continue
             merged_report = merge_report_dicts(merged_report, report_data)
-    print(merged_report)
-    # Convert nested dictionaries to objects for attribute access in the Mako
-    # template
+
+    # To python variables
     report_data = {k: to_namespace(v) for k, v in merged_report.items()}
 
-    # Add full history to report data
     report_data["history"] = history
-    # Render the full report using the Mako template
     template = Template(filename="cai/report_agent/template.md")  # nosec: B702
     report_output = template.render(**report_data)
 
