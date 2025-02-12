@@ -662,11 +662,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     create_report_from_messages(history)
                     active_agent = prev_agent
 
-            except EOFError:
-                print("\nCtrl+D pressed, exiting current turn...")
-                if self.report:
-                    create_report_from_messages(history[-1]["content"])
-                break
             except KeyboardInterrupt:
                 print("\nCtrl+C pressed, exiting...")
 
