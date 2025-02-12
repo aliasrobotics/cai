@@ -39,13 +39,9 @@ from .util import (
     cli_print_state,
     get_ollama_api_base,
     check_flag,
-<<<<<<< HEAD
-    visualize_agent_graph
-=======
     create_report_from_messages,
     visualize_agent_graph,
     get_previous_memory
->>>>>>> e548222 (Add RAG)
 )
 from .types import (
     Agent,
@@ -116,8 +112,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         #
         if log_training_data:
             self.rec_training_data = DataRecorder()
-<<<<<<< HEAD
-=======
 
         # REPORT PARAMS
         # CTF_REPORT="True" CTF_REPORT_INTERVAL="3" (by def 0)
@@ -130,7 +124,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         self.rag = os.getenv("CTF_RAG_MEMORY", "false").lower() == "true"
         self.RAG_INTERVAL = int(os.getenv("CTF_RAG_MEMORY_INTERVAL", "5"))
->>>>>>> e548222 (Add RAG)
         self.force_until_flag = force_until_flag
 
         self.challenge = challenge
@@ -649,11 +642,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         while len(history) - self.init_len < max_turns and active_agent:
             try:
-                if self.rag and (n_turn != 0 and n_turn % self.RAG_INTERVAL == 0):
-                    prev_agent = active_agent
-                    active_agent = transfer_to_memory_agent()
-                    self.process_interaction(
-                        active_agent,
+                def agent_iteration(agent):
+                    return self.process_interaction(
+                        agent,
                         history,
                         context_variables,
                         model_override,
@@ -662,38 +653,29 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                         execute_tools,
                         n_turn
                     )
+
+                # MEMORY
+                # If RAG is active and the turn is at a RAG interval, process using the memory agent
+                if self.rag and (n_turn != 0 and n_turn % self.RAG_INTERVAL == 0):
+                    prev_agent = active_agent
+                    active_agent = transfer_to_memory_agent()
+                    agent_iteration(active_agent)
                     active_agent = prev_agent
 
-                active_agent = self.process_interaction(
-                    active_agent,
-                    history,
-                    context_variables,
-                    model_override,
-                    stream,
-                    debug,
-                    execute_tools,
-                    n_turn
-                )
+                # PENTESTING - STANDARD AGENT ITERATION
+                # Standard iteration
+                active_agent = agent_iteration(active_agent)
                 n_turn += 1
 
-                # Manually invoke state agent if stateful
+                # STATE
+                # If the session is stateful, invoke the memory agent at defined intervals
                 if self.stateful:
                     self.state_interactions_count += 1
-                    if self.state_interactions_count >= self.STATE_INTERACTIONS_INTERVAL:  # noqa: E501, pylint: disable=line-too-long
+                    if self.state_interactions_count >= self.STATE_INTERACTIONS_INTERVAL:
                         prev_agent = active_agent
                         active_agent = transfer_to_memory_agent()
-                        self.process_interaction(
-                            active_agent,
-                            history,
-                            context_variables,
-                            model_override,
-                            stream,
-                            debug,
-                            execute_tools,
-                            n_turn
-                        )
+                        agent_iteration(active_agent)
                         active_agent = prev_agent
-
                         self.state_interactions_count = 0
 
             except KeyboardInterrupt:

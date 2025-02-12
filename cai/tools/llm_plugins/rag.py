@@ -8,7 +8,7 @@ import os
 
 # CTF BASED MEMORY
 collection_name = os.getenv("CTF_NAME", "default")
-def query_memory(query: str, top_k: int = 3) -> str:
+def query_memory(query: str, top_k: int = 3, **kwargs) -> str:
     """
     Query memory to retrieve relevant context. From Previous CTFs executions.
 
@@ -40,7 +40,7 @@ def query_memory(query: str, top_k: int = 3) -> str:
     except Exception:
         return results
 
-def add_to_memory(texts: str) -> str:
+def add_to_memory(texts: str, **kwargs) -> str:
     """
     This is a persistent memory to add relevant context to our persistent memory.
     Use this function to add relevant context 
