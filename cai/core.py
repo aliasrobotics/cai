@@ -690,7 +690,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                         execute_tools,
                         n_turn
                     )
-                    create_report_from_messages(history)
                     active_agent = prev_agent
 
             except KeyboardInterrupt:
@@ -712,18 +711,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 flag_found, flag = check_flag(
                     history[-1]["content"], self.ctf, self.challenge)
 
-                if self.report:
-                    if flag_found:
-                        if history[-1]["sender"] == "Report Agent":
-                            create_report_from_messages(history[-1]["content"])
-                        break
-
-                    if history[-1]["sender"] == "Report Agent":
+                if flag_found:
+                    if self.report:
                         create_report_from_messages(history)
                     break
-                if history[-1]["sender"] == "Report Agent":
-                    create_report_from_messages(history)
-                    break
+
                 # # Check if flag is found anywhere in history
                 # for message in history:
                 #     flag_found, _ = check_flag(message["content"],
@@ -757,13 +749,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         execution_time = time.time() - start_time
 
-        if self.report and history[-1]["sender"] == "Report Agent":
-            return Response(
-                messages=history[self.init_len:],
-                agent=active_agent,
-                context_variables=context_variables,
-                time=execution_time,
-            )
         return Response(
             messages=history[self.init_len:],
             agent=active_agent,
