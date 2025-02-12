@@ -1,5 +1,5 @@
 import pytest
-from cai import CAI, Agent
+from cai.core import CAI, Agent
 from .mock_client import MockOpenAIClient, create_mock_response
 from unittest.mock import Mock
 import json
