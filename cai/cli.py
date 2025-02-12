@@ -35,21 +35,25 @@ Usage Examples:
     $ CAI_TRACING=False CAI_REPORTER=true CTF_MODEL="gpt-4o"
         python3 cai/cli.py
 """
+# Standard library imports
 import os
+
+# Third-party imports
 from mako.template import Template  # pylint: disable=import-error
 from wasabi import color  # pylint: disable=import-error
 import pentestperf as ptt  # pylint: disable=import-error
-from cai.repl import run_demo_loop
+
+# Local imports
 from cai import Agent
-# Codebase Tools
+from cai.agents.mail import dns_smtp_agent
+from cai.repl import run_demo_loop
+from cai.tools.llm_plugins.reasoning import thought
 from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa: E501
 from cai.tools.web.headers import web_request_framework
-from cai.tools.llm_plugins.reasoning import thought
 from cai.tools.web.webshell_suit import (
     generate_php_webshell,
     upload_webshell as upload_ftp_webshell
 )
-from cai.agents.mail import dns_smtp_agent
 
 
 def transfer_to_dns_agent():
