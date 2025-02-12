@@ -27,6 +27,7 @@ from cai.rag.memory.memory_manager import memory_agent
 from cai.datarecorder import DataRecorder
 from cai import (
     transfer_to_state_agent,
+    transfer_to_memory_agent
 )
 from cai.state.common import StateAgent
 from .util import (
@@ -48,7 +49,6 @@ from .types import (
     Response,
     Result,
 )
-from cai.tools.llm_plugins.rag import query_memory, add_to_memory
 
 __CTX_VARS_NAME__ = "context_variables"
 litellm.suppress_debug_info = True
@@ -111,6 +111,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         if log_training_data:
             self.rec_training_data = DataRecorder()
         self.force_until_flag = force_until_flag
+
         self.challenge = challenge
         load_dotenv()
 
@@ -599,6 +600,21 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         n_turn = 0
         while len(history) - self.init_len < max_turns and active_agent:
             try:
+                if self.rag and (n_turn % self.RAG_INTERVAL == 0):
+                    prev_agent = active_agent
+                    active_agent = transfer_to_memory_agent()
+                    self.process_interaction(
+                        active_agent,
+                        history,
+                        context_variables,
+                        model_override,
+                        stream,
+                        debug,
+                        execute_tools,
+                        n_turn
+                    )
+                    active_agent = prev_agent
+
                 active_agent = self.process_interaction(
                     active_agent,
                     history,
@@ -616,7 +632,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     self.state_interactions_count += 1
                     if self.state_interactions_count >= self.STATE_INTERACTIONS_INTERVAL:  # noqa: E501, pylint: disable=line-too-long
                         prev_agent = active_agent
-                        active_agent = transfer_to_state_agent()
+                        active_agent = transfer_to_memory_agent()
                         self.process_interaction(
                             active_agent,
                             history,

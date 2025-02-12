@@ -23,6 +23,7 @@ from cai.tools.reconnaissance.generic_linux_command import generic_linux_command
 
 # Extend the search path for namespace packages (allows merging)
 __path__ = pkgutil.extend_path(__path__, __name__)
+from cai.rag.memory.memory_manager import memory_agent
 
 # Import state transfer functions
 # NOTE: this, together with the logic in test_generic.py,
@@ -145,7 +146,7 @@ flag_discriminator = Agent(
 # TRANSFER FUNCTIONS
 def transfer_to_flag_discriminator(**kwargs):  # pylint: disable=W0613
     """Transfer flag discriminator.
-    Accepts any keyword arguments but ignores them."""
+    Accepts any keyword arguments but ign   ores them."""
     return flag_discriminator
 
 
@@ -176,6 +177,11 @@ def transfer_to_crypto_agent(**kwargs):  # pylint: disable=W0613
     Accepts any keyword arguments but ignores them."""
     return crypto_agent
 
+
+def transfer_to_memory_agent(**kwargs):  # pylint: disable=W0613
+    """ Transfer to memory agent.
+    Accepts any keyword arguments but ignores them."""
+    return memory_agent
 
 # controller agent
 controller_agent = Agent(

@@ -2,6 +2,15 @@
 Memory Manager module for handling RAG operations through an agent interface.
 """
 
+# CODE USAGE:
+#
+# from cai.rag.memory.memory_manager import memory_agent
+# active_agent = transfer_to_memory_agent()
+#
+#
+# CLI USAGE:
+#
+# CTF_NAME="hackableII" CTF_RAG_MEMORY="True" CTF_MODEL="o3-mini" CTF_INSIDE="False" CTF_HINTS="False" python3 cai/cli.py 
 import os
 from cai.types import Agent
 from cai.tools.llm_plugins.rag import query_memory, add_to_memory

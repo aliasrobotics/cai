@@ -3,6 +3,7 @@ import openai
 from qdrant_client import QdrantClient, models
 from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
+import uuid
 
 load_dotenv()
 
@@ -84,7 +85,7 @@ class QdrantConnector:
             vectors = self._get_embeddings(texts)
             points = []
             for idx, (vector, meta, text) in enumerate(zip(vectors, metadata, texts)):
-                point_id = ids[idx] if ids else idx
+                point_id = str(uuid.uuid4())
                 meta["text"] = text
                 points.append(
                     models.PointStruct(
@@ -102,6 +103,7 @@ class QdrantConnector:
         except Exception as e:
             print(f"Error adding points: {e}")
             return False
+        
     def search(
         self,
         collection_name: str,
