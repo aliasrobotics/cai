@@ -147,7 +147,6 @@ class QdrantConnector:
                 for point in results.points:
                     if hasattr(point, 'payload') and isinstance(point.payload, dict):
                         extracted_texts.append(point.payload.get("text", ""))
-            print(extracted_texts)
             return "\n".join(extracted_texts)
         except Exception as e:
             print(f"Error searching: {e}")

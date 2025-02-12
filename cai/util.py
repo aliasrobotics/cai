@@ -19,7 +19,16 @@ from rich.theme import Theme  # pylint: disable=import-error
 from rich.traceback import install  # pylint: disable=import-error
 from rich.pretty import install as install_pretty  # pylint: disable=import-error # noqa: 501
 from rich.tree import Tree  # pylint: disable=import-error
+from cai.rag.vector_db import QdrantConnector # pylint: disable=import-error # noqa: E501
 
+collection_name = os.getenv('CTF_NAME', 'default')
+
+def get_previous_memory(query: str, top_k: int = 10) -> str:
+    """
+    Get the previous memory from the vector database.
+    """
+    vector_db = QdrantConnector()
+    return vector_db.search(collection_name=collection_name, query_text=query, limit=top_k)
 
 def get_model_input_tokens(model):
     """

@@ -39,7 +39,13 @@ from .util import (
     cli_print_state,
     get_ollama_api_base,
     check_flag,
+<<<<<<< HEAD
     visualize_agent_graph
+=======
+    create_report_from_messages,
+    visualize_agent_graph,
+    get_previous_memory
+>>>>>>> e548222 (Add RAG)
 )
 from .types import (
     Agent,
@@ -110,6 +116,21 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         #
         if log_training_data:
             self.rec_training_data = DataRecorder()
+<<<<<<< HEAD
+=======
+
+        # REPORT PARAMS
+        # CTF_REPORT="True" CTF_REPORT_INTERVAL="3" (by def 0)
+
+        self.report = os.getenv("CAI_REPORT", "false").lower() == "true"
+        self.report_interval = int(os.getenv("CAI_REPORT_INTERVAL", "0"))
+
+        # MEMORY PARAMS
+        # CTF_RAG_MEMORY="True" CTF_RAG_MEMORY_INTERVAL="3" (by def 5)
+
+        self.rag = os.getenv("CTF_RAG_MEMORY", "false").lower() == "true"
+        self.RAG_INTERVAL = int(os.getenv("CTF_RAG_MEMORY_INTERVAL", "5"))
+>>>>>>> e548222 (Add RAG)
         self.force_until_flag = force_until_flag
 
         self.challenge = challenge
@@ -598,9 +619,26 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         context_variables = copy.deepcopy(context_variables)
         history = copy.deepcopy(messages)
         n_turn = 0
+        if self.rag:
+            # This will get the 10 first pieces of text from the vector database
+            # Each chunk represent a memory segment saved in a previous executions
+            # It will be used to answer the current user query
+            # top_k is the number of chunks to retrieve
+            # TO activate this feature, you need to set CTF_RAG_MEMORY="True"
+            # TO store the memory, you need to set CTF_RAG_MEMORY_INTERVAL="3" (by def 5)
+            results = get_previous_memory(history[-1]["content"], top_k=10)
+            print("Previous memory: " + results)
+            if history and history[-1]["role"] == "user":
+                existing_content = history[-1]["content"]
+                history[-1]["content"] = f"{existing_content}\n\n<previous_memory>\n{results}\n</previous_memory>"
+            else:
+                history.append({
+                    "role": "user", 
+                    "content": f"Context from vector database:\n{results}"
+                })
         while len(history) - self.init_len < max_turns and active_agent:
             try:
-                if self.rag and (n_turn % self.RAG_INTERVAL == 0):
+                if self.rag and (n_turn != 0 and n_turn % self.RAG_INTERVAL == 0):
                     prev_agent = active_agent
                     active_agent = transfer_to_memory_agent()
                     self.process_interaction(
