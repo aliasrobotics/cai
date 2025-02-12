@@ -660,7 +660,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     time.sleep(2)  # wait for user to press Ctrl+C again
                 except KeyboardInterrupt:
                     print("\nCtrl+C pressed again")
-                    if input("Want to create a report? (y/n)").lower() == "y":
+                    if self.report and input(
+                            "Want to create a report? (y/n)").lower() == "y":
                         active_agent = transfer_to_reporter_agent()
                         self.report = False
                         history[-1]["sender"] = "Report Agent"
