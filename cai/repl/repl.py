@@ -4,6 +4,7 @@ interacting with CAI agents.
 """
 import json
 import os
+from configparser import ConfigParser
 from wasabi import color  # pylint: disable=import-error
 from cai.core import CAI  # pylint: disable=import-error
 
@@ -95,7 +96,17 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
             'CTF_INSIDE',
             "true").lower() == "true" else None,
         state_agent=state_agent)
-    print("""
+
+    # Get version from setup.cfg
+    version = "unknown"
+    try:
+        config = ConfigParser()
+        config.read('setup.cfg')
+        version = config.get('metadata', 'version')
+    except Exception:  # pylint: disable=broad-except
+        version = 'unknown'
+
+    print(f"""
  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄
 ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌
 ▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌ ▀▀▀▀█░█▀▀▀▀
@@ -109,6 +120,7 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
  ▀▀▀▀▀▀▀▀▀▀▀  ▀         ▀  ▀▀▀▀▀▀▀▀▀▀▀
 
     Cybersecurity AI, by Alias Robotics
+    Version: {version}
 """)
 
     messages = []
