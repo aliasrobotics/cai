@@ -662,17 +662,19 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     create_report_from_messages(history)
                     active_agent = prev_agent
 
-            except KeyboardInterrupt:
-                print("\nCtrl+C pressed, exiting...")
+            except KeyboardInterrupt:  # Ctrl+C
 
+                # Create report if user wants to,
+                # otherwise, stop the execution
                 if self.report and input(
                         "Want to create a report? (y/n)").lower() == "y":
                     active_agent = transfer_to_reporter_agent()
-                    self.report = False
                     history[-1]["sender"] = "Report Agent"
                     continue
+                self.report = False
                 break
 
+            # Check if the flag is found in the last tool output
             if active_agent is None and self.force_until_flag:
                 # Check if the flag is found in the last tool output
                 flag_found, flag = check_flag(
@@ -708,6 +710,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 })
                 active_agent = agent
 
+            # Create report if user wants to
             elif active_agent is None and self.report:
                 active_agent = transfer_to_reporter_agent()
                 self.report = False
