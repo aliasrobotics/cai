@@ -1,13 +1,12 @@
 """
 This module contains utility functions for the CAI library.
 """
-# pylint: disable=cyclic-import
 import inspect
-from datetime import datetime
 import time
-from typing import Any, List
 import json
 import os
+from datetime import datetime
+from typing import Any, List
 from types import SimpleNamespace
 from mako.template import Template  # pylint: disable=import-error
 from wasabi import color  # pylint: disable=import-error
@@ -173,7 +172,7 @@ def visualize_agent_graph(start_agent):
                         if next_agent:
                             # Show bidirectional connection
                             transfer = transfers_node.add(
-                                f"[red]⟷[/red] [green]Handoff to {next_agent.name}[/green]")  # noqa: E501
+                                f"🤖 {next_agent.name}")  # noqa: E501
                             add_agent_node(next_agent, transfer, True)
                     except Exception:  # nosec: B112 # pylint: disable=broad-exception-caught # noqa: E501
                         continue
@@ -843,7 +842,8 @@ def merge_report_dicts(base_dict, new_dict):
                         f, dict) and "finding_id" in f}
                 for item in value:
                     if isinstance(  # noqa: E501
-                            item, dict) and "finding_id" in item and item["finding_id"] not in existing_ids:  # noqa: E501
+                            item, dict) and "finding_id" in item and \
+                                item["finding_id"] not in existing_ids:  # noqa: E501
                         base_dict[key].append(item)
                         existing_ids.add(item["finding_id"])
             else:

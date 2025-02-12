@@ -23,7 +23,9 @@ from wasabi import color  # pylint: disable=import-error
 from cai.logger import exploit_logger
 # Local imports
 from cai.datarecorder import DataRecorder
-import cai
+from cai import (
+    transfer_to_reporter_agent,
+)
 from .util import (
     function_to_json,
     debug_print,
@@ -139,7 +141,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             messages,
             brief=self.brief)
 
-        tools = [function_to_json(f) for f in agent.functions]
+        tools = [function_to_json(f) for f in agent.functions if callable(f)]
         # hide context_variables from model
         for tool in tools:
             params = tool["function"]["parameters"]
@@ -642,7 +644,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 # Generate intermediate report if interval is set and reached
                 if report_interval > 0 and n_turn % report_interval == 0:
                     prev_agent = active_agent
-                    active_agent = cai.transfer_to_reporter_agent()
+                    active_agent = transfer_to_reporter_agent()
                     self.process_interaction(
                         active_agent,
                         history,
@@ -665,7 +667,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 print("\nCtrl+C pressed, exiting...")
 
                 if input("Want to create a report? (y/n)").lower() == "y":
-                    active_agent = cai.transfer_to_reporter_agent()
+                    active_agent = transfer_to_reporter_agent()
                     self.report = False
                     history[-1]["sender"] = "Report Agent"
                     continue
@@ -704,7 +706,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 active_agent = agent
 
             elif active_agent is None and self.report:
-                active_agent = cai.transfer_to_reporter_agent()
+                active_agent = transfer_to_reporter_agent()
                 self.report = False
                 history[-1]["sender"] = "Report Agent"
 

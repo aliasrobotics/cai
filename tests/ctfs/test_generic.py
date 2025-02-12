@@ -55,6 +55,8 @@ Environment Variables:
                      - one_tool (default): one single agent with one tool
                      - single: one single agent with all the tools
                      - multi: all agents with all the tools
+                     - react: use ReAct agents
+                     - (see others in cai/__init__.py)
         CAI_STATE: Enable/disable stateful mode (default: "false"). When enabled,
                       the agent will use a state agent to keep track of the state of the
                       network and the flags found.
