@@ -67,10 +67,10 @@ class QdrantConnector:
 
     def add_points(
         self,
+        id: int,
         collection_name: str,
         texts: List[str],
         metadata: List[Dict],
-        ids: Optional[List[int]] = None
     ) -> bool:
         """
         Add points to collection.
@@ -85,7 +85,7 @@ class QdrantConnector:
             vectors = self._get_embeddings(texts)
             points = []
             for idx, (vector, meta, text) in enumerate(zip(vectors, metadata, texts)):
-                point_id = str(uuid.uuid4())
+                point_id = id
                 meta["text"] = text
                 points.append(
                     models.PointStruct(
@@ -109,7 +109,8 @@ class QdrantConnector:
         collection_name: str,
         query_text: str,
         filter_conditions: Optional[Dict] = None,
-        limit: int = 10
+        limit: int = 10,
+        sort_by_id: bool = False
     ) -> List[Dict]:
         """
         Search similar points with optional filtering.
@@ -119,20 +120,40 @@ class QdrantConnector:
             query_text: Query text to search for
             filter_conditions: Filter conditions for search
             limit: Maximum number of results to return
+            sort_by_id: Whether to sort results by ID instead of similarity
         
         Returns:
             List of dictionaries containing id, score, metadata and text for matching points
         """
         try:
-            # Get query embedding
+            if sort_by_id:
+                # Get first 10 points by ID
+                results = self.client.scroll(
+                    collection_name=collection_name,
+                    limit=10,  # Fixed limit of 10
+                    with_payload=True,
+                    with_vectors=False,
+                    offset=0  # Start from beginning
+                )[0]  # scroll returns (points, offset)
+                #print(results)
+                # Extract texts from ordered results
+                extracted_texts = []
+                if results:
+                    numeric_points = [p for p in results if isinstance(p.id, (int, float))]
+                    sorted_points = sorted(numeric_points, key=lambda x: x.id)
+                    for i, point in enumerate(sorted_points, 1):
+                        if hasattr(point, 'payload') and isinstance(point.payload, dict):
+                            text = point.payload.get("text", "")
+                            extracted_texts.append(f"Step: {i}. {text}")
+                return "\n".join(extracted_texts)
+            
+            # Original similarity search logic
             query_vector = self._get_embeddings([query_text])[0]
             
-            # Build search filter if conditions provided
             search_filter = None
             if filter_conditions:
                 search_filter = models.Filter(**filter_conditions)
             
-            # Execute search query
             results = self.client.query_points(
                 collection_name=collection_name,
                 query=query_vector,
@@ -141,7 +162,7 @@ class QdrantConnector:
                 with_payload=True,
                 with_vectors=False,
             )
-            # Convert results to list of dicts with metadata
+            
             extracted_texts = []
             if results and hasattr(results, 'points'):
                 for point in results.points:

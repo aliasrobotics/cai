@@ -40,14 +40,14 @@ def query_memory(query: str, top_k: int = 3, **kwargs) -> str:
     except Exception:
         return results
 
-def add_to_memory(texts: str, **kwargs) -> str:
+def add_to_memory(texts: str, step: int = 0, **kwargs) -> str:
     """
     This is a persistent memory to add relevant context to our persistent memory.
-    Use this function to add relevant context 
+    Use this function to add relevant context to the memory.
 
     Args:
         texts: relevant data to add to memory
-
+        step: step number of the current CTF
     Returns:
         str: Status message indicating success or failure
     """
@@ -59,9 +59,10 @@ def add_to_memory(texts: str, **kwargs) -> str:
             pass
         
         success = qdrant.add_points(
+            id=step,
             collection_name=collection_name,
             texts=[texts],
-            metadata=[{"CTF":"True"}]
+            metadata=[{"CTF":True}]
         )
         
         if success:

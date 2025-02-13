@@ -631,18 +631,18 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                                 0,
                                 "Python Code",
                                 debug)
-            if history and history[-1]["role"] == "user":
+            if history and history[-1]["role"] == "user"  and results:
                 existing_content = history[-1]["content"]
-                history[-1]["content"] = f"{existing_content}\n\n<previous_memory>\n{results}\n</previous_memory>"
-            else:
+                history[-1]["content"] = f"{existing_content} \n\n### Previous steps completed\n{results}\n remember that the CTF starts from 0 BUT ITS EXACTLY the same, meaning you'll need to reproduce the CTF or penetration test from scratch, the memory represents how to solve up to where indicated in the same scenario, network state and recon information remain same so dont repeat recon steps For example if you already find a flag in previous steps, reproduce the step to get the flag and use flag discriminator"
+            elif results:
                 history.append({
                     "role": "user", 
-                    "content": f"Context from vector database:\n{results}"
+                    "content": f"<previous_memory>\n{results}\n</previous_memory> Follow steps based in memory"
                 })
 
         while len(history) - self.init_len < max_turns and active_agent:
-            try:
-                def agent_iteration(agent):
+
+            def agent_iteration(agent): # Needs to be inside while loop to avoid using the same function for all iterations
                     return self.process_interaction(
                         agent,
                         history,
@@ -654,6 +654,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                         n_turn
                     )
 
+            try:
                 # MEMORY
                 # If RAG is active and the turn is at a RAG interval, process using the memory agent
                 if self.rag and (n_turn != 0 and n_turn % self.RAG_INTERVAL == 0):

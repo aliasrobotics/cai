@@ -23,12 +23,13 @@ from cai.rag.vector_db import QdrantConnector # pylint: disable=import-error # n
 
 collection_name = os.getenv('CTF_NAME', 'default')
 
-def get_previous_memory(query: str, top_k: int = 10) -> str:
+def get_previous_memory(query: str, top_k: int = 20) -> str:
     """
     Get the previous memory from the vector database.
+    Returns steps ordered by ID from 1 to top_k.
     """
     vector_db = QdrantConnector()
-    return vector_db.search(collection_name=collection_name, query_text=query, limit=top_k)
+    return vector_db.search(collection_name=collection_name, query_text=query, limit=top_k, sort_by_id=True)
 
 def get_model_input_tokens(model):
     """
