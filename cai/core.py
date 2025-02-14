@@ -657,7 +657,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             try:
                 # MEMORY
                 # If RAG is active and the turn is at a RAG interval, process using the memory agent
-                if self.rag and (n_turn != 0 and n_turn % self.RAG_INTERVAL == 0) and os.getenv("ONLINE_LEARNER", "False").lower() == "True":
+                if self.rag and (n_turn != 0 and n_turn % self.RAG_INTERVAL == 0) and os.getenv("ONLINE_LEARNER", "False").lower() == "true":
                     prev_agent = active_agent
                     active_agent = transfer_to_memory_agent()
                     agent_iteration(active_agent)

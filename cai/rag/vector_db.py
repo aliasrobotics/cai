@@ -38,7 +38,7 @@ import openai
 from qdrant_client import QdrantClient, models
 from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
-import uuid
+import os
 
 load_dotenv()
 
@@ -57,7 +57,7 @@ class QdrantConnector:
         
         if model_name.startswith("text"):
             # OpenAI model
-            self.openai_client = openai.Client()
+            self.openai_client = openai.Client(api_key=os.getenv("OPENAI_API_KEY"), base_url="https://api.openai.com/v1")
             self.vector_size = 3072  
         else:
             # Sentence transformers model

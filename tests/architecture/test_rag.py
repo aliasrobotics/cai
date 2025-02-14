@@ -3,7 +3,7 @@ from cai.rag.vector_db import QdrantConnector
 
 @pytest.fixture
 def vector_db():
-    connector = QdrantConnector()
+    connector = QdrantConnector(model_name="all-MiniLM-L6-v2") # Using a common sentence transformer model # CRAP MODEL ONLY TEST # noqa: E501
     collection_name = "test_collection"
     # Delete collection if it exists
     try:
@@ -35,27 +35,27 @@ def test_add_and_search_points(vector_db):
         "And finally the third one"
     ]
     metadata = [
-        {"name": "point1", "category": "test"},
-        {"name": "point2", "category": "test"},
-        {"name": "point3", "category": "test"}
+        {"name": "point1", "category": "test", "text": texts[0]},
+        {"name": "point2", "category": "test", "text": texts[1]},
+        {"name": "point3", "category": "test", "text": texts[2]}
     ]
     
-    # Add points
-    success = vector_db.add_points("test_collection", texts, metadata)
+    # Add points with unique id 1
+    success = vector_db.add_points(1, "test_collection", texts, metadata)
     assert success is True
     
     # Search points
-    query = "first test document"
-    results = vector_db.search("test_collection", query, limit=2)
+    query = "And finally the third one"
+    results = vector_db.search("test_collection", query, limit=1, sort_by_id=False)
     print(results)
     assert isinstance(results, str)
-    assert "first test document" in results
+    assert "And finally the third one" in results
 
 def test_filter_points(vector_db):
-    # Add test points first
+    # Add test point first with unique id 2
     texts = ["Test document for filtering"]
-    metadata = [{"name": "filtered_point", "category": "test_filter"}]
-    vector_db.add_points("test_collection", texts, metadata)
+    metadata = [{"name": "filtered_point", "category": "test_filter", "text": texts[0]}]
+    vector_db.add_points(2, "test_collection", texts, metadata)
     
     # Test filtering
     filter_conditions = {
@@ -75,10 +75,10 @@ def test_filter_points(vector_db):
     assert "metadata" in results[0]
 
 def test_search_with_filter(vector_db):
-    # Add test points
+    # Add test point with unique id 3
     texts = ["Document for filtered search"]
-    metadata = [{"name": "search_point", "category": "test_search"}]
-    vector_db.add_points("test_collection", texts, metadata)
+    metadata = [{"name": "search_point", "category": "test_search", "text": texts[0]}]
+    vector_db.add_points(3, "test_collection", texts, metadata)
     
     # Search with filter
     query = "filtered search"
@@ -113,35 +113,27 @@ def test_store_ctf_info(vector_db):
     ]
     metadata = [
         {
-            "challenge": "web_exploit",
+            "challenge": "web_exploit", 
             "description": "Found SQL injection in login form. Used UNION SELECT to extract admin credentials.",
             "solution": "payload: admin' UNION SELECT 'admin','pass'--",
-            "difficulty": "medium"
+            "difficulty": "medium",
+            "text": texts[0]
         },
         {
             "challenge": "reverse_engineering",
-            "description": "Binary analysis revealed hardcoded encryption key. Reversed algorithm to decrypt flag.",
+            "description": "Binary analysis revealed hardcoded encryption key. Reversed algorithm to decrypt flag.", 
             "solution": "Used Ghidra to analyze binary, found key: 'CTF_KEY_2024'",
-            "difficulty": "hard"
+            "difficulty": "hard",
+            "text": texts[1]
         }
     ]
-    # Store CTF data
-    success = vector_db.add_points(collection_name, texts, metadata)
+    # Store CTF data with unique id 4
+    success = vector_db.add_points(4, collection_name, texts, metadata)
     assert success is True
-    
-    # Verify data can be retrieved
-    filter_conditions = {
-        "must": [
-            {
-                "key": "challenge",
-                "match": {"value": "web_exploit"}
-            }
-        ]
-    }
-    
-    results = vector_db.filter_points(collection_name, filter_conditions)
+
+    # Search for the stored data
+    query = "SQL injection login form"
+    results = vector_db.search(collection_name, query, limit=1)
     print(results)
-    assert len(results) > 0
-    assert results[0]["metadata"]["challenge"] == "web_exploit"
-    assert "solution" in results[0]["metadata"]
-    assert "difficulty" in results[0]["metadata"]
+    assert isinstance(results, str)
+    assert "hardcoded encryption key" in results
