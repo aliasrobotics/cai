@@ -1,3 +1,38 @@
+"""
+Provides an interface to Qdrant vector database for storing and retrieving 
+embeddings used in the RAG (Retrieval Augmented Generation) system.
+
+Usage:
+    # Initialize connector
+    db = QdrantConnector(model_name="text-embedding-3-large")
+    
+    # Create collection
+    db.create_collection("my_collection")
+    
+    # Add points
+    db.add_points("my_collection", texts=["text1", "text2"], metadata=[{"key": "val1"}, {"key": "val2"}])
+    
+    # Search similar texts
+    results = db.search("my_collection", "query text", limit=10)
+
+The connector supports both OpenAI and sentence-transformer embedding models.
+For OpenAI models, use model names starting with "text-".
+For sentence-transformers, use any other model name. (Ensure is available and supported by sentence-transformers)
+
+Environment Variables Related to this class:
+    CTF_NAME: Name of the collection in Qdrant (required)
+    CTF_RAG_MEMORY: Retrieves CTF/Scenario memory from Qdrant on core.py when init a client.run
+    CTF_RAG_MEMORY_INTERVAL: Retrieves CTF/Scenario memory from Qdrant on core.py when init a client.run each X turns
+
+Key Features:
+- Automatic embedding generation using OpenAI or sentence-transformers
+- Collection management (create, delete, add points)
+- Similarity search with optional filtering
+- Metadata storage alongside vectors
+- Support for both cosine and euclidean distance metrics
+"""
+
+
 from typing import Dict, List, Optional, Union
 import openai
 from qdrant_client import QdrantClient, models

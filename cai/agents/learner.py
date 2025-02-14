@@ -3,10 +3,11 @@ Learner agent module for processing historical messages through memory managemen
 
 OFFLINE LEARNER:
 
-CTF_NAME="testctf" CTF_MODEL="qwen2.5:14b" python3 cai/agents/learner.py 
+JSONL_FILE_PATH="logs/test_20250209_191542.jsonl" CTF_NAME="testctf" CTF_MODEL="qwen2.5:14b" python3 cai/agents/learner.py 
 
-CTF_NAME equals to the name of collection in qdrant ESSENTIAL, use testctf for check working
-
+Environment Variables:
+    CTF_NAME: Name of the collection in Qdrant (required, e.g. "testctf")
+    JSONL_FILE_PATH: Path to JSONL file containing historical messages
 """
 
 import os
@@ -62,4 +63,9 @@ def run_learner(messages_file: str, max_iterations: int = 3) -> None:
         
     print("Completed learning from historical messages")
 
-run_learner(messages_file="logs/test_20250209_191542.jsonl")
+jsonl_file = os.getenv("JSONL_FILE_PATH")
+if not jsonl_file:
+    print("JSONL_FILE_PATH environment variable not set. Please set it to the path of your messages file.")
+    print("Example: export JSONL_FILE_PATH=path/to/messages.jsonl")
+    exit(1)
+run_learner(messages_file=jsonl_file)
