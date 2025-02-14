@@ -5,18 +5,17 @@ This is a graph that stores the Agent and its history
 at each step and allows reflecting on both, the reasoning
 and the execution approach.
 """
-
 # Standard library imports
 import logging
+from typing import List  # pylint: disable=import-error
 
 # Third party imports
-from typing import List  # pylint: disable=import-error
-import matplotlib.pyplot as plt  # pylint: disable=import-error
 import networkx as nx  # pylint: disable=import-error
 import requests  # pylint: disable=import-error
-from networkx.drawing.nx_pydot import graphviz_layout  # pylint: disable=import-error  # noqa
-
+from litellm.types.utils import Message  # pylint: disable=import-error
 from pydantic import BaseModel  # pylint: disable=import-error
+
+# Local imports
 from cai.types import Agent
 
 
@@ -26,7 +25,17 @@ class Node(BaseModel):  # pylint: disable=too-few-public-methods
     """
     name: str = "Node"
     agent: Agent = None
+    turn: int = 0
+    message: Message = None
     history: List = []
+
+    def __hash__(self):
+        # Convert history list to tuple for hashing
+        history_tuple = tuple(str(h) for h in self.history)
+        return hash((self.name, self.agent.name, self.turn, history_tuple))
+
+    def __str__(self):
+        return f"{self.name}"
 
 
 class Graph(nx.DiGraph):
@@ -130,46 +139,6 @@ class Graph(nx.DiGraph):
             verify=False,  # nosec B501
             timeout=30  # nosec B113
         ).text
-
-    def plot(self) -> None:
-        """
-        Plot the graph.
-        """
-        # node colors
-        node_color = []
-        for node in list(self.nodes):
-            node_color.append("white")
-
-        # labels
-        labels = {}
-        for node in list(self.nodes):
-            labels[node] = node.name
-
-        # rest of drawing
-        pos = graphviz_layout(self, prog="dot")  # top-down tree
-        nx.draw(
-            self,
-            node_color=node_color,
-            with_labels=True,
-            labels=labels,
-            pos=pos,
-            # connectionstyle="arc3,rad=0.2",
-        )
-
-        # # redraw (other than Ops) Exploits
-        # exploits = [
-        #     node
-        #     for node in list(self.nodes)
-        #     if isinstance(node, exploit.ConstantExploit)
-        #     or isinstance(node, exploit.BoolExploit)
-        # ]
-        # nx.draw_networkx_nodes(self, pos, nodelist=exploits, node_shape="^")
-
-        # draw edge labels
-        edge_labels = nx.get_edge_attributes(self, "label")
-        nx.draw_networkx_edge_labels(self, pos, edge_labels, font_size=5)
-
-        plt.show()
 
 
 if "DEFAULT_GRAPH" not in globals():
