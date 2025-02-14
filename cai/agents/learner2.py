@@ -10,57 +10,74 @@ Environment Variables:
 """
 
 import os
+import json
 from typing import List, Dict
 from cai.datarecorder import get_longest_messages
-from cai.rag.vector_db import QdrantConnector
 
 def run_learner(messages_file: str) -> None:
     """
-    Process historical messages and add directly to vector database.
+    Process historical messages and save them as a JSON file in a designated folder.
+    
+    The resulting JSON file, containing only the assistant and tool messages 
+    (i.e. excluding those with role 'system' and 'user'), can later be used 
+    as input for get_chat_comp@core.py.
     
     Args:
-        messages_file: Path to JSONL file containing historical messages
+        messages_file: Path to JSONL file containing historical messages.
     """
     ctf_name = os.getenv("CTF_NAME")
-    col_name = "raw_jsonl" # Collection name for raw JSONL files
     if not ctf_name:
         print("CTF_NAME environment variable not set")
         return
-
-    db = QdrantConnector()
-    
-    db.create_collection(col_name)
 
     messages = get_longest_messages(messages_file)
     if not messages:
         print("No messages found to learn from")
         return
 
-    filtered_messages = [m for m in messages if m["role"] not in ["system", "user"]]
+    # Remove messages with role 'system' and 'user'
+    filtered_messages = [m for m in messages if m.get("role") not in ["system", "user"]]
     if not filtered_messages:
         print("No assistant or tool messages found to learn from")
         return
-    # Combine all messages into one point
-    combined_text = "\n".join([m["content"] for m in filtered_messages])
+
+    # Create output folder for saving the JSON file
+    output_dir = "learner_output"
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, f"{ctf_name}_messages.json")
+
+    # Save the filtered messages into a JSON file
+    with open(output_file, "w", encoding="utf-8") as f:
+        json.dump(filtered_messages, f, ensure_ascii=False, indent=2)
+
+    print(f"Filtered messages saved to {output_file}")
+
+def get_json_messages(messages_file: str) -> List[Dict]:
+    """
+    Process historical messages and return them as a list of message objects
+    for appending to the history in get_chat_completion.
     
-    metadata = {
-        "challenge": f"{ctf_name}.jsonl",
-        "messages": filtered_messages
-    }
+    This function filters out 'system' and 'user' messages, returning only the
+    assistant and tool messages.
+    
+    Args:
+        messages_file: Path to JSONL file containing historical messages.
+        
+    Returns:
+        list: A list of message objects, each with keys 'role' and 'content'.
+              If no valid messages are found, returns an empty list.
+    """
+    messages = get_longest_messages(messages_file)
+    if not messages:
+        print("No messages found to learn from")
+        return []
 
-    success = db.add_points(
-        id=0, # Single point with id 0
-        collection_name=col_name,
-        texts=[combined_text],
-        metadata=[metadata]
-    )
+    filtered_messages = [m for m in messages if m.get("role") not in ["system", "user"]]
+    if not filtered_messages:
+        print("No assistant or tool messages found to learn from")
+        return []
 
-    if success:
-        print(f"Added combined messages to vector DB")
-    else:
-        print("Failed to add messages")
-
-    print("Completed adding messages to vector DB")
+    return filtered_messages
 
 jsonl_file = os.getenv("JSONL_FILE_PATH")
 if not jsonl_file:
@@ -69,5 +86,3 @@ if not jsonl_file:
     exit(1)
 
 run_learner(messages_file=jsonl_file)
-
-

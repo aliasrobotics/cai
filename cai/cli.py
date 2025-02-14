@@ -55,6 +55,7 @@ from cai.tools.reconnaissance.generic_linux_command import generic_linux_command
 if is_pentestperf_available():
     import pentestperf as ptt
 
+from cai.tools.command_and_control.sshpass import run_ssh_command_with_credentials
 
 def transfer_to_dns_agent():
     """
@@ -118,6 +119,7 @@ cli_agent = Agent(
     functions=[
         # execute_cli_command,  # does not support ctf context
         generic_linux_command,
+        run_ssh_command_with_credentials,
         # thought_agent_handoff,
         # Code_Executor_Expert,
     ],
