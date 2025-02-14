@@ -1,13 +1,13 @@
 <%
     import os
-    from cai.util import get_previous_memory
-    
+    from cai.util import get_previous_memory, cli_print_tool_call
+
     # Get system prompt from agent if provided
     system_prompt = agent.instructions if hasattr(agent, 'instructions') else ""
 
     # Get CTF_INSIDE environment variable
     ctf_inside = os.getenv('CTF_INSIDE')
-    
+
     # Get memory from vector db if RAG is enabled
     rag_enabled = os.getenv("CTF_RAG_MEMORY", "false").lower() == "true"
     memory = ""
@@ -26,7 +26,7 @@ ${system_prompt}
 % if ctf_inside is not None:
     % if ctf_inside.lower() == 'true':
 You are INSIDE the target machine in a docker container. Try not to use network commands unless necessary.
-    % elif ctf_inside.lower() == 'false': 
+    % elif ctf_inside.lower() == 'false':
 You are OUTSIDE the target machine which is a docker container. You may use network commands like nmap for initial reconnaissance.
     % endif
 % endif

@@ -148,7 +148,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             if callable(agent.instructions)
             else agent.instructions
         )
-        messages = [{"role": "system", "content": Template(filename="cai/prompts/master_template.md").render(agent=agent)}]
+        messages = [{"role": "system", "content": Template(
+            filename="cai/prompts/master_template.md").render(agent=agent)}]
         for msg in history:
             if msg.get("sender") != "Report Agent":
                 messages.append(msg)
@@ -615,22 +616,26 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         while len(history) - self.init_len < max_turns and active_agent:
 
-            def agent_iteration(agent): # Needs to be inside while loop to avoid using the same function for all iterations
-                    return self.process_interaction(
-                        agent,
-                        history,
-                        context_variables,
-                        model_override,
-                        stream,
-                        debug,
-                        execute_tools,
-                        n_turn
-                    )
+            # Needs to be inside while loop to avoid using the same function
+            # for all iterations
+            def agent_iteration(agent):
+                return self.process_interaction(
+                    agent,
+                    history,
+                    context_variables,
+                    model_override,
+                    stream,
+                    debug,
+                    execute_tools,
+                    n_turn
+                )
 
             try:
                 # MEMORY
-                # If RAG is active and the turn is at a RAG interval, process using the memory agent
-                if self.rag and (n_turn != 0 and n_turn % self.RAG_INTERVAL == 0) and os.getenv("ONLINE_LEARNER", "False").lower() == "true":
+                # If RAG is active and the turn is at a RAG interval, process
+                # using the memory agent
+                if self.rag and (n_turn != 0 and n_turn % self.RAG_INTERVAL == 0) and os.getenv(
+                        "ONLINE_LEARNER", "False").lower() == "true":
                     prev_agent = active_agent
                     active_agent = transfer_to_memory_agent()
                     agent_iteration(active_agent)
@@ -642,7 +647,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 n_turn += 1
 
                 # STATE
-                # If the session is stateful, invoke the memory agent at defined intervals
+                # If the session is stateful, invoke the memory agent at
+                # defined intervals
                 if self.stateful:
                     self.state_interactions_count += 1
                     if self.state_interactions_count >= self.STATE_INTERACTIONS_INTERVAL:
