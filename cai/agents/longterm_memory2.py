@@ -1,8 +1,8 @@
 """
-Learner module for directly adding historical messages to vector database.
+Longterm Memory module for directly adding historical messages to vector database.
 
 Usage:
-    JSONL_FILE_PATH="logs/test_20250209_191542.jsonl" CTF_NAME="testctf" python3 cai/agents/learner2.py
+    JSONL_FILE_PATH="logs/test_20250209_191542.jsonl" CTF_NAME="testctf" python3 cai/agents/longterm_memory2.py
 
 Environment Variables:
     CTF_NAME: Name of the collection in Qdrant (required, e.g. "testctf")
@@ -15,7 +15,7 @@ from typing import List, Dict
 from cai.datarecorder import get_longest_messages
 
 
-def run_learner(messages_file: str) -> None:
+def storage_run(messages_file: str) -> None:
     """
     Process historical messages and save them as a JSON file in a designated folder.
 
@@ -33,18 +33,18 @@ def run_learner(messages_file: str) -> None:
 
     messages = get_longest_messages(messages_file)
     if not messages:
-        print("No messages found to learn from")
+        print("No messages found to memorize from")
         return
 
     # Remove messages with role 'system' and 'user'
     filtered_messages = [m for m in messages if m.get("role") not in [
         "system", "user"]]
     if not filtered_messages:
-        print("No assistant or tool messages found to learn from")
+        print("No assistant or tool messages found to memorize from")
         return
 
     # Create output folder for saving the JSON file
-    output_dir = "learner_output"
+    output_dir = "longterm_memory_output"
     os.makedirs(output_dir, exist_ok=True)
     output_file = os.path.join(output_dir, f"{ctf_name}_messages.json")
 
@@ -72,17 +72,16 @@ def get_json_messages(messages_file: str) -> List[Dict]:
     """
     messages = get_longest_messages(messages_file)
     if not messages:
-        print("No messages found to learn from")
+        print("No messages found to memorize from")
         return []
 
     filtered_messages = [m for m in messages if m.get("role") not in [
         "system", "user"]]
     if not filtered_messages:
-        print("No assistant or tool messages found to learn from")
+        print("No assistant or tool messages found to memorize from")
         return []
 
     return filtered_messages
-
 
 jsonl_file = os.getenv("JSONL_FILE_PATH")
 if not jsonl_file:
@@ -90,4 +89,4 @@ if not jsonl_file:
     print("Example: export JSONL_FILE_PATH=path/to/messages.jsonl")
     exit(1)
 
-run_learner(messages_file=jsonl_file)
+storage_run(messages_file=jsonl_file)

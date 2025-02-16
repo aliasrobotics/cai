@@ -6,27 +6,27 @@ Usage:
     from cai.rag.memory.memory_manager import memory_agent
     active_agent = transfer_to_memory_agent()
 
-    # Run with online learning
-    # Executes memory learning every 5 turns:
+    # Run with online long_term_memory
+    # Executes memory long_term_memory every 5 turns:
     CTF_NAME="hackableII" CTF_RAG_MEMORY="True" CTF_MODEL="o3-mini" \
-    ONLINE_LEARNER="True" CTF_INSIDE="False" CTF_HINTS="False" python3 cai/cli.py
+    ONLINE_MEMORY="True" CTF_INSIDE="False" CTF_HINTS="False" python3 cai/cli.py
 
-    # Run with custom learning interval
-    # Executes memory learning every 3 turns:
+    # Run with custom long_term_memory interval
+    # Executes memory long_term_memory every 3 turns:
     CTF_NAME="hackableII" CTF_RAG_MEMORY="True" CTF_MODEL="o3-mini" \
-    CTF_RAG_MEMORY_INTERVAL="3" ONLINE_LEARNER="False" CTF_INSIDE="False" \
+    CTF_RAG_MEMORY_INTERVAL="3" ONLINE_MEMORY="False" CTF_INSIDE="False" \
     CTF_HINTS="False" python3 cai/cli.py
 
-    # Run offline learner
-    JSONL_FILE_PATH="logs/test_20250209_191542.jsonl" CTF_NAME="testctf" CTF_MODEL="qwen2.5:14b" python3 cai/agents/learner.py
+    # Run offline LONG TERM MEMORY
+    JSONL_FILE_PATH="logs/test_20250209_191542.jsonl" CTF_NAME="testctf" CTF_MODEL="qwen2.5:14b" python3 cai/agents/longterm_memory.py
 
 Environment Variables:
     CTF_NAME: Name of the collection in Qdrant (required)
     CTF_RAG_MEMORY: Enable RAG memory functionality
     CTF_MODEL: Model to use for embeddings (default: qwen2.5:14b)
-    ONLINE_LEARNER: Enable online learning mode
-    CTF_RAG_MEMORY_INTERVAL: Interval for memory learning (only works with ONLINE_LEARNER=False)
-    JSONL_FILE_PATH: Path to JSONL file containing historical messages (only works in `learner.py`)
+    ONLINE_MEMORY: Enable online memory mode
+    CTF_RAG_MEMORY_INTERVAL: Interval for memory long_term_memory (only works with ONLINE_MEMORY=False)
+    JSONL_FILE_PATH: Path to JSONL file containing historical messages (only works in `longterm_memory.py`)
 """
 
 import os
