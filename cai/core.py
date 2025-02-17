@@ -68,7 +68,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                  state_agent=None,
                  force_until_flag=False,
                  challenge=None,
-                 ctf_inside=True):
+                 ctf_inside=True,
+                 ):
         """
         Initialize the CAI object.
 
@@ -143,13 +144,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         and context variables.
         """
         context_variables = defaultdict(str, context_variables)
-        instructions = (
-            agent.instructions(context_variables)
-            if callable(agent.instructions)
-            else agent.instructions
-        )
         messages = [{"role": "system", "content": Template(
-            filename="cai/prompts/master_template.md").render(agent=agent)}]
+            filename="cai/prompts/master_template.md").render(agent=agent, ctf_instructions=history[0]["content"])}]
+        
         for msg in history:
             if msg.get("sender") != "Report Agent":
                 messages.append(msg)

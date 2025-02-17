@@ -29,13 +29,26 @@ def get_previous_memory(query: str, top_k: int = 20) -> str:
     Get the previous memory from the vector database.
     Returns steps ordered by ID from 1 to top_k.
     """
+    
+    if query != "":
+        collection_name = "_all_"
+    else:    
+        collection_name = os.getenv('CTF_NAME', 'default')
     vector_db = QdrantConnector()
-    collection_name = os.getenv('CTF_NAME', 'default')
-    results = vector_db.search(
-        collection_name=collection_name,
-        query_text=query,
-        limit=top_k,
-        sort_by_id=True)
+    
+    if collection_name == "_all_":
+        results = vector_db.search(
+            collection_name=collection_name,
+            query_text=query,
+            limit=top_k,
+            sort_by_id=False)
+    else:
+        results = vector_db.search(
+            collection_name=collection_name,
+            query_text=query,
+            limit=top_k,
+            sort_by_id=True)
+        
     cli_print_tool_call("Memory",
                         {"From": "Previous Findings"},
                         results,

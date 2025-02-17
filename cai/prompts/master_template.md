@@ -12,10 +12,14 @@
     rag_enabled = os.getenv("CTF_RAG_MEMORY", "false").lower() == "true"
     memory = ""
     if rag_enabled:
-        # Get collection name from environment, default to 'default' if not set
-        collection_name = os.getenv('CTF_NAME', 'default')
+        if ctf is not None:
+            query = ctf_instructions.split('\n')[0].replace('Instructions: ', '')
+        else:
+            query = ""
         try:
-            memory = get_previous_memory("", top_k=10)  # Use empty string as default query
+            print(f"Query: {query}")
+            memory = get_previous_memory(query, top_k=1)  # Use empty string as default query
+            print(f"Memory: {memory}")
         except Exception as e:
             print(f"Error retrieving memory: {e}")
             memory = ""  # Set empty memory on error

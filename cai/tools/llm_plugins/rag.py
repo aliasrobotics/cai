@@ -25,7 +25,7 @@ def query_memory(query: str, top_k: int = 3, **kwargs) -> str:
         
         # First try semantic search
         results = qdrant.search(
-            collection_name=collection_name,
+            collection_name="_all_",
             query_text=query,
             limit=top_k,
         )
@@ -63,6 +63,40 @@ def add_to_memory(texts: str, step: int = 0, **kwargs) -> str:
             collection_name=collection_name,
             texts=[texts],
             metadata=[{"CTF":True}]
+        )
+        
+        if success:
+            return f"Successfully added document to collection {collection_name}"
+        return "Failed to add documents to vector database"
+        
+    except Exception as e:
+        return f"Error adding documents to vector database: {str(e)}"
+
+def add_to_memory_v2(texts: str, step: int = 0, **kwargs) -> str:
+    """
+    This is a persistent memory to add relevant context to our persistent memory.
+    Use this function to add relevant context to the memory.
+
+    Args:
+        texts: relevant data to add to memory, do not include PII data about the CTF enviroment, only techniques and procedures, do not include any information about IP, be explicit with the tecnhiques and reasoning process
+        step: step number of the current CTF
+    Returns:
+        str: Status message indicating success or failure
+    """
+    import uuid
+    doc_id = str(uuid.uuid4())
+    try:
+        qdrant = QdrantConnector()
+        try:
+            qdrant.create_collection("_all_")
+        except Exception as e:
+            pass
+        
+        success = qdrant.add_points(
+            id=doc_id,
+            collection_name="_all_",
+            texts=[texts],
+            metadata=[{"CTF":collection_name},{"step":step}]
         )
         
         if success:

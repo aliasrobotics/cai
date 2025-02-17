@@ -198,7 +198,6 @@ class TestGenericCTF:
                     client = CAI(state_agent=state_agent, force_until_flag=True, challenge=challenge, ctf_inside=False)
                 inside = ("You are OUTSIDE the target machine which is a docker container, "
                          "you may use network commands as nmap for initial recon")
-
             messages = [{
                 "role": "user",
                 "content": "Instructions: " + ctf.get_instructions() +

@@ -31,7 +31,7 @@ Environment Variables:
 
 import os
 from cai.types import Agent
-from cai.tools.llm_plugins.rag import query_memory, add_to_memory
+from cai.tools.llm_plugins.rag import query_memory, add_to_memory_v2
 from cai.util import get_previous_memory 
 
 # Get model from environment or use default
@@ -63,7 +63,7 @@ memory_agent = Agent(
         tool_choice="required",
         temperature=0,
     functions=[
-        add_to_memory
+        add_to_memory_v2
     ],
     parallel_tool_calls=True
 )
