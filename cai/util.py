@@ -908,3 +908,42 @@ def create_report_from_messages(history: List[dict]):
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(report_output)
     print(f"!Report generated at: {report_path}")
+
+
+def create_report(report_data):
+    """
+    Create a report from a list of messages, merging content from
+    Report Agent messages.
+
+    Args:
+        message (List[dict]): This output is from the report agent's response.
+        history (List[dict]): A list of message dictionaries containing the
+            sender and content of previous messages for the iteration.
+
+    Returns:
+        None: The function does not return a value. It generates a
+              markdown report file and saves it in the './report'
+              directory.
+    """
+
+    # # Choose the apropiate template
+    # if os.getenv("CTF_NAME"):
+    #     template = Template(
+    #         filename="cai/report_agent/template_ctf.md")  # nosec: B702
+    # else:
+    #     template = Template(
+    #         filename="cai/report_agent/template.md")  # nosec: B702
+    template = Template(
+        filename="extensions/report/nis2/template.md")  # nosec: B702
+    report_output = template.render(**report_data)
+    # Render and seve the template in ./report
+    report_output = template.render(**report_data)
+    report_dir = "./report"
+    os.makedirs(report_dir, exist_ok=True)
+    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+    save_path = f"Report_{timestamp}.md"
+    report_path = os.path.join(report_dir, save_path)
+
+    with open(report_path, "w", encoding="utf-8") as f:
+        f.write(report_output)
+    print(f"!Report generated at: {report_path}")

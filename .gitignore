@@ -146,6 +146,7 @@ cai.png
 cai.dot
 cai*.png
 logs/
+report/
 
 # CI
 !ci/build/
