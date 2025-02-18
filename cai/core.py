@@ -301,7 +301,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 try:
                     return Result(value=str(result))
                 except Exception as e:
-                    error_message = f"Failed to cast response to string: {result}. Make sure agent functions return a string or Result object. Error: {str(e)}"  # noqa: E501 # pylint: disable=C0301
+                    error_message = (
+                        f"Failed to cast response to string: {result}. "
+                        "Make sure agent functions return a string or "
+                        f"Result object. Error: {str(e)}"
+                    )  # noqa: E501 # pylint: disable=C0301
                     debug_print(debug, error_message, brief=self.brief)
                     raise TypeError(error_message) from e
 

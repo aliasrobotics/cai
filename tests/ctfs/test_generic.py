@@ -73,7 +73,7 @@ from cai.core import CAI
 from cai import cai_initial_agent 
 from cai.util import check_flag
 from wasabi import color
-from extensions.report.ctf.ctf_reporter_agent import reporter_agent # pylint: disable=import-error  
+from extensions.report.ctf.ctf_reporter_agent import reporter_agent # pylint: disable=import-error
 from extensions.report.common import create_report  # pylint: disable=import-error # noqa: E501
 
 def check_env_variables():
