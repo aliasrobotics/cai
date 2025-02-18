@@ -3,7 +3,12 @@
     from cai.util import get_previous_memory, cli_print_tool_call
 
     # Get system prompt from agent if provided
-    system_prompt = agent.instructions if hasattr(agent, 'instructions') else ""
+    
+    system_prompt = (
+        agent.instructions(context_variables)
+        if callable(agent.instructions)
+        else agent.instructions
+    )
 
     # Get CTF_INSIDE environment variable
     ctf_inside = os.getenv('CTF_INSIDE')
@@ -12,7 +17,7 @@
     rag_enabled = os.getenv("CTF_RAG_MEMORY", "false").lower() == "true"
     memory = ""
     if rag_enabled:
-        if ctf is not None:
+        if os.getenv('AGNOSTIC_MEMORY', 'false').lower() == 'true':
             query = ctf_instructions.split('\n')[0].replace('Instructions: ', '')
         else:
             query = ""
