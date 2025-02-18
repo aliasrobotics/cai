@@ -16,7 +16,7 @@ Usage Examples:
     $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CTF_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
 
     # Run generating a report
-    $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_TRACING=True CAI_REPORTER=true CTF_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
+    $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_TRACING=True CAI_REPORT=true CTF_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
 
 
 CI/CD Pipeline Configuration:
