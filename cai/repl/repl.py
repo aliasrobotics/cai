@@ -7,6 +7,7 @@ import os
 from configparser import ConfigParser
 from wasabi import color  # pylint: disable=import-error
 from cai.core import CAI  # pylint: disable=import-error
+from extensions.report.common import create_report  # pylint: disable=import-error # noqa: E501
 
 
 def process_and_print_streaming_response(response):  # pylint: disable=inconsistent-return-statements  # noqa: E501
@@ -154,26 +155,46 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
     agent = starting_agent
 
     while True:
+        try:
+            # Skip input on first iteration if CTF is enabled
+            if ctf and len(messages) == 1:
+                pass
+            else:
+                user_input = input("\033[93mCAI\033[0m: ")
+                messages.append({"role": "user", "content": user_input})
 
-        # Skip input on first iteration if CTF is enabled
-        if ctf and len(messages) == 1:
-            pass
-        else:
-            user_input = input("\033[93mCAI\033[0m: ")
-            messages.append({"role": "user", "content": user_input})
+            response = client.run(
+                agent=agent,
+                messages=messages,
+                context_variables=context_variables or {},
+                stream=stream,
+                debug=debug,
+                max_turns=max_turns,
+            )
+            messages = response.messages
+            if response.agent:
+                agent = response.agent
+        except KeyboardInterrupt:
+            if os.getenv("CAI_REPORT", "false").lower() == "true":
+                if os.getenv("CTF_NAME"):
+                    from extensions.report.ctf.ctf_reporter_agent import reporter_agent  # pylint: disable=import-error # noqa: E501
+                    template = "extensions/report/ctf/template.md"
+                else:
+                    from extensions.report.pentesting.pentesting_agent import reporter_agent  # pylint: disable=import-error # noqa: E501
+                    template = "extensions/report/pentesting/template.md"
+            client = CAI(state_agent=state_agent, force_until_flag=False)
+            response_report = client.run(
+                agent=reporter_agent,
+                messages=[{"role": "user", "content": "Do a report from " +
+                           "\n".join(
+                               msg['content'] for msg in response.messages
+                               if msg.get('content') is not None
+                           )}],
+                debug=float(os.getenv('CAI_DEBUG', '2')),
+                max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
+            )
 
-        response = client.run(
-            agent=agent,
-            messages=messages,
-            context_variables=context_variables or {},
-            stream=stream,
-            debug=debug,
-            max_turns=max_turns,
-        )
-        messages = response.messages
-        if response.agent:
-            agent = response.agent
-        if response.report:
-            context_variables = {
-                "previous_reports": response.report
-            }
+            report_data = json.loads(response_report.messages[0]['content'])
+            report_data["history"] = json.dumps(response.messages, indent=4)
+            create_report(report_data, template)
+            break
