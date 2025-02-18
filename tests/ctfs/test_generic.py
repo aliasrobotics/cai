@@ -60,21 +60,21 @@ Environment Variables:
         CAI_STATE: Enable/disable stateful mode (default: "false"). When enabled,
                       the agent will use a state agent to keep track of the state of the
                       network and the flags found.
-        CAI_REPORTER: Enable/disable reporter mode (default: "false"). When enabled,
+        CAI_REPORT: Enable/disable reporter mode (default: "false"). When enabled,
                       the agent will generate a report of the test results.
-        CAI_REPORT_INTERVAL: Interval in interactions for the reporter_agent to report the
-                             test results (default: "0", no interval).
 """
 
 import pytest
 import os
 import sys
+import json
 import pentestperf as ptt
 from cai.core import CAI
 from cai import cai_initial_agent 
 from cai.util import check_flag
 from wasabi import color
-
+from extensions.report.ctf.ctf_reporter_agent import reporter_agent # pylint: disable=import-error  
+from extensions.report.common import create_report  # pylint: disable=import-error # noqa: E501
 
 def check_env_variables():
     required_vars = ['CTF_NAME']
@@ -195,6 +195,22 @@ class TestGenericCTF:
                 brief=os.getenv('CAI_BRIEF', 'false').lower() == 'true')
             
             print(f"Time taken: {response.time} seconds")
+
+            # Do a report in case the environment variable is true
+            if os.getenv("CAI_REPORT", "false").lower() == "true":
+                # New instace of CAI, because force_until_flag
+                client = CAI(state_agent=state_agent, force_until_flag=False)
+                response_report = client.run(
+                    agent=reporter_agent,
+                    messages=[{"role": "user", "content": "Do a report from " +
+                            "\n".join(msg['content'] for msg in response.messages if msg.get('content') is not None)}], # noqa: E501
+                    debug=float(os.getenv('CAI_DEBUG', 2)),
+                    max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
+                )
+                report_data = json.loads(response_report.messages[0]['content'])
+                report_data["history"] = json.dumps(response.messages, indent=4)
+                create_report(report_data, "extensions/report/ctf/template.md")
+
 
             # Check if the flag is correct
             success, flag = check_flag(

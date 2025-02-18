@@ -24,7 +24,6 @@ from cai.logger import exploit_logger
 # Local imports
 from cai.datarecorder import DataRecorder
 from cai import (
-    transfer_to_reporter_agent,
     transfer_to_state_agent,
 )
 from cai.state.common import StateAgent
@@ -36,7 +35,6 @@ from .util import (
     cli_print_state,
     get_ollama_api_base,
     check_flag,
-    create_report_from_messages,
     visualize_agent_graph
 )
 from .types import (
@@ -108,9 +106,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         #
         if log_training_data:
             self.rec_training_data = DataRecorder()
-
-        self.report = os.getenv("CAI_REPORTER", "false").lower() == "true"
-        self.report_interval = int(os.getenv("CAI_REPORT_INTERVAL", "0"))
         self.force_until_flag = force_until_flag
         self.challenge = challenge
         load_dotenv()
@@ -637,35 +632,12 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
                         self.state_interactions_count = 0
 
-                # Generate intermediate report if interval is set and reached
-                if self.report and (self.report_interval > 0 and
-                                    n_turn % self.report_interval == 0):
-                    prev_agent = active_agent
-                    active_agent = transfer_to_reporter_agent()
-                    self.process_interaction(
-                        active_agent,
-                        history,
-                        context_variables,
-                        model_override,
-                        stream,
-                        debug,
-                        execute_tools,
-                        n_turn
-                    )
-                    active_agent = prev_agent
-
             except KeyboardInterrupt:
                 print("\nCtrl+C pressed")
                 try:
                     time.sleep(2)  # wait for user to press Ctrl+C again
                 except KeyboardInterrupt:
                     print("\nCtrl+C pressed again")
-                    if self.report and input(
-                            "Want to create a report? (y/n)").lower() == "y":
-                        active_agent = transfer_to_reporter_agent()
-                        self.report = False
-                        history[-1]["sender"] = "Report Agent"
-                        continue
                     break
 
             # Check if the flag is found in the last tool output
@@ -675,8 +647,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     history[-1]["content"], self.ctf, self.challenge)
 
                 if flag_found:
-                    if self.report:
-                        create_report_from_messages(history)
                     break
 
                 # # Check if flag is found anywhere in history
@@ -699,15 +669,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 })
                 active_agent = agent
 
-            # Create report if user wants to
-            elif active_agent is None and self.report:
-                active_agent = transfer_to_reporter_agent()
-                self.report = False
-                history[-1]["sender"] = "Report Agent"
-
             elif active_agent is None:
-                if self.report and history[-1]["sender"] == "Report Agent":
-                    create_report_from_messages(history)
                 break
 
         execution_time = time.time() - start_time
