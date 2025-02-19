@@ -829,3 +829,28 @@ def transfer_to_state_agent():
     Transfer to the state agent
     """
     return state_agent
+
+
+########################################################
+# Extensions utilities
+########################################################
+def is_pentestperf_available():
+    """
+    Check if pentestperf is available
+    """
+    try:
+        from pentestperf.ctf import CTF  # pylint: disable=import-error,import-outside-toplevel,unused-import  # noqa: E501,F401
+    except ImportError:
+        return False
+    return True
+
+
+def is_caiextensions_report_available():
+    """
+    Check if caiextensions report is available
+    """
+    try:
+        from caiextensions.report.module import some_function  # pylint: disable=import-error,import-outside-toplevel,unused-import  # noqa: E501,F401
+    except ImportError:
+        return False
+    return True

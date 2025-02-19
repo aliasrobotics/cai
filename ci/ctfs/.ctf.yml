@@ -19,6 +19,10 @@ services:
     - unset DOCKER_HOST
     - pip3 uninstall pentestperf --yes  # remove old version
     - pip3 install -e .
+    # extensions
+    - pip3 install -e /workspace[pentestperf]  # install pentestperf
+    - pip3 install -e /workspace[caiextensions-report]  # install caiextensions-report
+    # start MSF
     - msfrpcd -P cai > /dev/null 2>&1 &
     - |
       # Set additional environment variables if defined

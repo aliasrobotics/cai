@@ -45,10 +45,9 @@ import os
 # Third-party imports
 from mako.template import Template  # pylint: disable=import-error
 from wasabi import color  # pylint: disable=import-error
-import pentestperf as ptt  # pylint: disable=import-error
 
 # Local imports
-from cai import Agent
+from cai import Agent, is_pentestperf_available
 from cai.agents.mail import dns_smtp_agent
 from cai.repl import run_demo_loop
 from cai.tools.llm_plugins.reasoning import thought
@@ -58,6 +57,8 @@ from cai.tools.web.webshell_suit import (
     generate_php_webshell,
     upload_webshell as upload_ftp_webshell
 )
+if is_pentestperf_available():
+    import pentestperf as ptt
 
 
 def transfer_to_dns_agent():
@@ -156,8 +157,10 @@ def setup_ctf():
 
 def run_with_env():
     """Run CAI with environment configuration"""
-    if os.getenv('CTF_NAME', None):  # pylint: disable=invalid-envvar-default  # noqa: E501
+    if is_pentestperf_available() and os.getenv('CTF_NAME', None):  # pylint: disable=invalid-envvar-default  # noqa: E501
         ctf = setup_ctf()
+    else:
+        ctf = None
 
     try:
         # Configure state agent if enabled
@@ -178,7 +181,7 @@ def run_with_env():
 
     finally:
         # Cleanup CTF if started
-        if os.getenv('CTF_NAME', None):  # pylint: disable=invalid-envvar-default  # noqa: E501
+        if is_pentestperf_available() and os.getenv('CTF_NAME', None):  # pylint: disable=invalid-envvar-default  # noqa: E501
             ctf.stop_ctf()
 
 

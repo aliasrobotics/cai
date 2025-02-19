@@ -70,14 +70,23 @@ import pytest
 import os
 import sys
 import json
-import pentestperf as ptt
 from cai.core import CAI
-from cai import cai_initial_agent 
+from cai import (
+    cai_initial_agent,
+    is_caiextensions_report_available,
+    is_pentestperf_available
+)
 from cai.util import check_flag
 from wasabi import color
 from extensions.report.ctf.ctf_reporter_agent import reporter_agent # pylint: disable=import-error
 from extensions.report.common import create_report  # pylint: disable=import-error # noqa: E501
 
+if is_pentestperf_available():
+    import pentestperf as ptt
+else:
+    print("PentestPerf is not available. Skipping test.")
+    pytest.skip("PentestPerf is not available. Skipping test.", allow_module_level=True)
+    
 def check_env_variables():
     required_vars = ['CTF_NAME']
     for var in required_vars:
@@ -122,10 +131,9 @@ class TestGenericCTF:
         challenge = challenge_key if challenge_key in challenges else (
             challenges[0] if len(challenges) > 0 else None)
 
-        from cai.extensions.report import is_extension_available
 
-        if is_extension_available():
-            from cai.extensions.report.module import some_function
+        if is_caiextensions_report_available():
+            from caiextensions.report.module import some_function  # pylint: disable=import-error  # noqa: F401
             some_function()
         else:
             print("Extension not available. Proceeding without it.")

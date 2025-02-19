@@ -139,7 +139,6 @@ tests/metasploit_function_calls.json
 other/playground/7_datascraper/pdfs
 cai/ins/rag/vectordb/msf/module_metadata.json
 cai/ins/rag/vectordb/msf/function_calls.json
-pentestperf
 /build/
 .history/
 cai.png
@@ -153,3 +152,4 @@ report/
 
 # extensions
 caiextensions*/
+pentestperf
