@@ -1,4 +1,4 @@
-exclude: ^(examples|tests)/
+exclude: ^(examples|tests|tools)/
 repos:
   - repo: https://github.com/hhatto/autopep8
     rev: v2.1.0
@@ -7,7 +7,7 @@ repos:
         args:
           - --in-place
           - --aggressive
-        exclude: ^(examples|tests)/
+        exclude: ^(examples|tests|tools)/
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
@@ -19,12 +19,12 @@ repos:
       - id: check-toml
       - id: end-of-file-fixer
       - id: trailing-whitespace
-        exclude: ^(examples|tests)/
+        exclude: ^(examples|tests|tools)/
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.16.0
     hooks:
       - id: pyupgrade
-        exclude: ^(examples|tests)/
+        exclude: ^(examples|tests|tools)/
   # - repo: https://github.com/astral-sh/ruff-pre-commit
   #   rev: v0.5.2
   #   hooks:
@@ -51,15 +51,15 @@ repos:
       - id: bandit
         additional_dependencies: ['.[toml]']
         args: ["-r", "-c", "pyproject.toml"]
-        exclude: ^(examples|tests)/
+        exclude: ^(examples|tests|tools)/
   - repo: https://github.com/PyCQA/flake8
     rev: 7.0.0
     hooks:
       - id: flake8
-        exclude: ^(examples|tests)/
+        exclude: ^(examples|tests|tools)/
   - repo: https://github.com/PyCQA/pylint
     rev: v3.1.0
     hooks:
       - id: pylint
         args: ["--rcfile=pyproject.toml"]
-        exclude: ^(examples|tests)/
+        exclude: ^(examples|tests|tools)/
