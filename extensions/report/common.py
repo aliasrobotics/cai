@@ -29,15 +29,15 @@ def get_base_instructions(previous_reports):
     IMPORTANT: Build a new report upon the previous report.
     Avoid duplicate information
     """
-def create_report(report_data, template):
+def create_report(report_data: dict, template: str):
     """
     Create a report from a list of messages, merging content from
     Report Agent messages.
 
     Args:
-        message (List[dict]): This output is from the report agent's response.
-        history (List[dict]): A list of message dictionaries containing the
-            sender and content of previous messages for the iteration.
+        report_data (dict): A dictionary containing the 
+                         report agent's response messages
+        template (str): path of the template.md
 
     Returns:
         None: The function does not return a value. It generates a
@@ -45,13 +45,6 @@ def create_report(report_data, template):
               directory.
     """
 
-    # # Choose the apropiate template
-    # if os.getenv("CTF_NAME"):
-    #     template = Template(
-    #         filename="cai/report_agent/template_ctf.md")  # nosec: B702
-    # else:
-    #     template = Template(
-    #         filename="cai/report_agent/template.md")  # nosec: B702
     template = Template(
         filename=template)  # nosec: B702
     report_output = template.render(**report_data)
