@@ -42,6 +42,61 @@ def get_model_input_tokens(model):
     return model_tokens["gpt"]
 
 
+def fix_message_list(messages):
+    """
+    This function is used to handle failures in the message list.
+
+    Edge cases:
+        - CTRL C: Message list may break when user interrupts during
+          tool call generation. Occurs due to incomplete tool execution.
+
+        - Failed tool call: Tool calls may fail and require adding error
+          messages to indicate failure.
+    """
+
+    messages_copy = messages.copy()
+
+    # First pass: collect all tool calls and their responses
+    tool_calls = {}  # Map of tool_call_id to (tool_call, has_response)
+
+    # Identify all tool calls and mark which ones have responses
+    for msg in messages_copy:
+        if msg.get("role") == "assistant" and msg.get("tool_calls"):
+            for tool_call in msg["tool_calls"]:
+                tool_call_id = tool_call["id"]
+                tool_calls[tool_call_id] = (tool_call, False)
+
+        elif msg.get("role") == "tool" and msg.get("tool_call_id"):
+            tool_call_id = msg["tool_call_id"]
+            if tool_call_id in tool_calls:
+                tool_calls[tool_call_id] = (tool_calls[tool_call_id][0], True)
+
+    # Second pass: add missing tool responses
+    for tool_call_id, (tool_call, has_response) in tool_calls.items():
+        if not has_response:
+            # Check if the last tool message already indicates an interruption
+            last_tool_msg = None
+            for msg in reversed(messages_copy):
+                if msg.get("role") == "tool":
+                    last_tool_msg = msg
+                    break
+
+            # Only append interruption message if last tool message wasn't
+            # already an interruption
+            if not (last_tool_msg and
+                    last_tool_msg.get("name") == "Command Interrupted by User" and  # noqa: E501
+                    "interrupted" in last_tool_msg.get("content", "") and
+                    last_tool_msg.get("role", "") != "user"):
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tool_call_id,
+                    "name": "Command Interrupted by User",
+                    "content": "No response provided - interrupted"
+                })
+
+    return messages
+
+
 theme = Theme({
     # Primary colors - Material Design inspired
     "timestamp": "#00BCD4",  # Cyan 500

@@ -32,6 +32,7 @@ from .util import (
     debug_print,
     cli_print_agent_messages,
     cli_print_tool_call,
+    fix_message_list,
     cli_print_state,
     get_ollama_api_base,
     check_flag,
@@ -207,37 +208,27 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 create_params["custom_llm_provider"] = "openai"
                 os.environ["OLLAMA"] = "true"
                 os.environ["OPENAI_API_KEY"] = "Placeholder"
-                litellm_completion = litellm.completion(**create_params)
-            elif "must be followed by tool messages" in str(e):
+                try:
+                    litellm_completion = litellm.completion(**create_params)
+                except litellm.exceptions.BadRequestError as e:  # pylint: disable=W0621,C0301 # noqa: E501
+                    #
+                    # CTRL C handler for ollama models
+                    #
+                    if "invalid message content type" in str(e):
+                        print(e)
+                        create_params["messages"] = fix_message_list(
+                            create_params["messages"])
+                        litellm_completion = litellm.completion(
+                            **create_params)
+                    else:
+                        raise e
+            elif "An assistant message with 'tool_calls'" in str(e) or "`tool_use` blocks must be followed by a user message with `tool_result`" in str(e):  # noqa: E501 # pylint: disable=C0301
+                print(f"Error: {str(e)}")
                 # EDGE CASE: Report Agent CTRL C error
                 # This fix CTRL C error when message list is incomplete
                 # When a tool is not finished but the LLM generates a tool call
-                messages = create_params["messages"]
-
-                messages_copy = messages.copy()
-                for msg in messages_copy:
-                    if msg.get("role") == "assistant" and msg.get(
-                            "tool_calls"):
-                        tool_calls = msg["tool_calls"]
-                        for tool_call in tool_calls:
-                            tool_call_id = tool_call["id"]
-                            # First check if any tool call has no response pair
-                            # ID
-                            has_response = any(
-                                m.get("role") == "tool" and
-                                m.get("tool_call_id") == tool_call_id
-                                for m in messages
-                            )
-                            if not has_response:
-                                # Then if tool call has no response pair, add
-                                # it empty
-                                messages.append({
-                                    "role": "tool",
-                                    "tool_call_id": tool_call_id,
-                                    "name": tool_call["function"]["name"],
-                                    "content": "No response provided"
-                                })
-                # Finish just retry
+                create_params["messages"] = fix_message_list(
+                    create_params["messages"])
                 litellm_completion = litellm.completion(**create_params)
             else:
                 raise e
