@@ -3,7 +3,7 @@ Longterm Memory agent module for processing historical messages through memory m
 
 OFFLINE LONG TERM MEMORY:
 
-JSONL_FILE_PATH="logs/test_20250209_191542.jsonl" CTF_NAME="testctf" CTF_MODEL="qwen2.5:14b" python3 cai/agents/longterm_memory.py 
+JSONL_FILE_PATH="logs/test_20250209_191542.jsonl" CTF_NAME="testctf" CTF_MODEL="qwen2.5:14b" python3 tools/2_JSONL_to_vectordb.py
 
 Environment Variables:
     CTF_NAME: Name of the collection in Qdrant (required, e.g. "testctf")

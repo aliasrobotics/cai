@@ -2,7 +2,7 @@
 Longterm Memory module for directly adding historical messages to vector database.
 
 Usage:
-    JSONL_FILE_PATH="logs/test_20250209_191542.jsonl" CTF_NAME="testctf" python3 cai/agents/longterm_memory2.py
+    JSONL_FILE_PATH="logs/test_20250209_191542.jsonl" CTF_NAME="testctf" python3 tools/3_JSONL_store.py
 
 Environment Variables:
     CTF_NAME: Name of the collection in Qdrant (required, e.g. "testctf")
@@ -44,7 +44,7 @@ def storage_run(messages_file: str) -> None:
         return
 
     # Create output folder for saving the JSON file
-    output_dir = "longterm_memory_output"
+    output_dir = "best_runs"
     os.makedirs(output_dir, exist_ok=True)
     output_file = os.path.join(output_dir, f"{ctf_name}_messages.json")
 
