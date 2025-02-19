@@ -215,7 +215,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     # CTRL C handler for ollama models
                     #
                     if "invalid message content type" in str(e):
-                        print(e)
                         create_params["messages"] = fix_message_list(
                             create_params["messages"])
                         litellm_completion = litellm.completion(
