@@ -69,6 +69,7 @@
 
 	// // Quadrant gen setup
 	"postCreateCommand": "pip3 install -e /workspace/",
+	"postCreateCommand": "pip3 install -e '/workspace[pentestperf]'",
 
 	// MSF setup, and RAG setup
 	"postStartCommand": [

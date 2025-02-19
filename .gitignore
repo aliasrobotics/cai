@@ -152,4 +152,4 @@ report/
 !ci/build/
 
 # extensions
-cai/extensions/*
+caiextensions*/
