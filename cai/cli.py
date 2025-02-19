@@ -28,11 +28,11 @@ Environment Variables:
 
 Usage Examples:
     # Run against a CTF
-    CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii"
+    CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" \
         CTF_MODEL="gpt-4o" CAI_TRACING="false" python3 cai/cli.py
 
     # Run without a target in human-in-the-loop mode, generating a report
-    $ CAI_TRACING=False CAI_REPORTER=true CTF_MODEL="gpt-4o"
+    $ CAI_TRACING=False CAI_REPORTER=true CTF_MODEL="gpt-4o" \
         python3 cai/cli.py
 """
 # Standard library imports
