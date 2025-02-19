@@ -71,3 +71,37 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
             f.write('\n')
             json.dump(completion_data, f)
             f.write('\n')
+
+
+def load_history_from_jsonl(file_path):
+    """
+    Load conversation history from a JSONL file and
+    return it as a list of messages.
+
+    Args:
+        file_path (str): The path to the JSONL file.
+            NOTE: file_path assumes it's either relative to the
+            current directory or absolute.
+
+    Returns:
+        list: A list of messages extracted from the JSONL file.
+    """
+    history = []
+    max_length = 0
+    with open(file_path, encoding='utf-8') as file:
+        for line in file:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                record = json.loads(line)
+            except Exception:  # pylint: disable=broad-except
+                print(f"Error loading line: {line}")
+                continue
+            if isinstance(record, dict) and "messages" \
+                in record and isinstance(
+                    record["messages"], list):
+                if len(record["messages"]) > max_length:
+                    max_length = len(record["messages"])
+                    history = record["messages"]
+    return history

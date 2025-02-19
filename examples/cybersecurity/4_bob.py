@@ -1,11 +1,14 @@
 """
 Advanced Boot2Root CTF Framework with CLI, Code Interpreter and Analysis Modes
 """
-import socket
 import sys
-import threading
-from cai.core import CAI, Agent
-import pentestperf as ptt
+from cai.core import CAI, Agent, is_pentestperf_available
+
+if is_pentestperf_available():
+    import pentestperf as ptt    
+else:
+    print("PentestPerf is not available. Skipping.")
+    sys.exit(1)
 
 # Codebase Tools
 from cai.tools.llm_plugins.code_interpreter import execute_python_code

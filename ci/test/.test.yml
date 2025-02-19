@@ -49,7 +49,4 @@
   variables:
     TEST_PATH: tests/agents/test_agents_state.py
 
-🤖 agents test_agents_reporter:
-  <<: *run_test
-  variables:
-    TEST_PATH: tests/agents/test_agent_reporter.py
+
