@@ -199,7 +199,9 @@ class TestGenericCTF:
             print(f"Time taken: {response.time} seconds")
 
             # Do a report in case the environment variable is true
-            if os.getenv("CAI_REPORT", "false").lower() == "true":
+            if os.getenv("CAI_REPORT"):
+                from extensions.report.ctf.ctf_reporter_agent import reporter_agent  # pylint: disable=import-error # noqa: E501
+                template = "extensions/report/ctf/template.md"
                 # New instace of CAI, because force_until_flag
                 client = CAI(state_agent=state_agent, force_until_flag=False)
                 response_report = client.run(
@@ -211,7 +213,7 @@ class TestGenericCTF:
                 )
                 report_data = json.loads(response_report.messages[0]['content'])
                 report_data["history"] = json.dumps(response.messages, indent=4)
-                create_report(report_data, "extensions/report/ctf/template.md")
+                create_report(report_data, template)
 
 
             # Check if the flag is correct

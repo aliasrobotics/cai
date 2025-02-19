@@ -49,7 +49,7 @@ if __name__ == "__main__":
             from extensions.report.pentesting.pentesting_agent import reporter_agent  # pylint: disable=import-error # noqa: E501
             template = "extensions/report/pentesting/template.md"
         elif os.getenv("CAI_REPORT", "ctf").lower() == "nis2":
-            from extensions.report.pentesting.pentesting_agent import reporter_agent  # pylint: disable=import-error # noqa: E501
+            from extensions.report.nis2.nis2_report_agent import reporter_agent  # pylint: disable=import-error # noqa: E501
             template = "extensions/report/nis2/template.md"
         else:
             from extensions.report.ctf.ctf_reporter_agent import reporter_agent  # pylint: disable=import-error # noqa: E501
