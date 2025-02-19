@@ -41,25 +41,25 @@ def get_model_input_tokens(model):
 
     return model_tokens["gpt"]
 
-
 def fix_message_list(messages):
     """
-    Ajusta la lista de mensajes para que cumpla las siguientes reglas:
-        1. Un tool call id no aparece más de dos veces.
-        2. Cada tool call id aparece como par, y en ambos mensajes debe haber contenido (content).
-        3. Si un tool call id aparece solo (sin par), se elimina.
-        4. No puede haber mensajes vacíos.
+    Adjusts the message list to comply with the following rules:
+        1. A tool call id appears no more than twice.
+        2. Each tool call id appears as a pair, and both messages must have content.
+        3. If a tool call id appears alone (without a pair), it is removed.
+        4. There cannot be empty messages.
     """
-    # Paso 1: Filtrar y descartar mensajes vacíos (se considera vacío si 'content' es ausente o solo espacios en blanco).
+    # Step 1: Filter and discard empty messages (considered empty if 'content' is None or only whitespace)
     cleaned_messages = []
     for msg in messages:
-        if msg.get("content", "").strip():
+        content = msg.get("content")
+        if content is not None and content.strip():
             cleaned_messages.append(msg)
     messages = cleaned_messages
 
-    # Paso 2: Recolectar las ocurrencias de tool call ids.
-    # En mensajes del asistente, se recorre la lista 'tool_calls'.
-    # En mensajes de tipo 'tool', se usa la clave 'tool_call_id'.
+    # Step 2: Collect tool call id occurrences.
+    # In assistant messages, iterate through 'tool_calls' list.
+    # In 'tool' type messages, use the 'tool_call_id' key.
     tool_calls_occurrences = {}
     for i, msg in enumerate(messages):
         if msg.get("role") == "assistant" and isinstance(msg.get("tool_calls"), list):
@@ -71,12 +71,12 @@ def fix_message_list(messages):
             tc_id = msg["tool_call_id"]
             tool_calls_occurrences.setdefault(tc_id, []).append((i, "tool", None))
 
-    # Paso 3: Marcar las ocurrencias inválidas o de más para eliminación.
-    removal_messages = set()  # Ínidices de mensajes (tipo 'tool') a eliminar.
-    removal_assistant_entries = {}  # Mapea índice de mensaje (asistente) a conjunto de índices (en tool_calls) a eliminar.
+    # Step 3: Mark invalid or extra occurrences for removal
+    removal_messages = set()  # Indices of messages (tool type) to remove
+    removal_assistant_entries = {}  # Maps message index (assistant) to set of indices (in tool_calls) to remove
 
     for tc_id, occurrences in tool_calls_occurrences.items():
-        # Solo se permiten 2 ocurrencias. Si hay más, se marcan las extra.
+        # Only 2 occurrences allowed. Mark extras for removal.
         valid_occurrences = occurrences[:2]
         extra_occurrences = occurrences[2:]
         for occ in extra_occurrences:
@@ -85,8 +85,8 @@ def fix_message_list(messages):
                 removal_assistant_entries.setdefault(msg_idx, set()).add(j)
             elif typ == "tool":
                 removal_messages.add(msg_idx)
-        # Si las ocurrencias válidas no son exactamente 2 (es decir, es un tool call solitario),
-        # se marcan para eliminación.
+        # If valid occurrences aren't exactly 2 (i.e., a lonely tool call),
+        # mark for removal
         if len(valid_occurrences) != 2:
             for occ in valid_occurrences:
                 msg_idx, typ, j = occ
@@ -95,11 +95,12 @@ def fix_message_list(messages):
                 elif typ == "tool":
                     removal_messages.add(msg_idx)
         else:
-            # Si hay exactamente 2 ocurrencias, asegurarse de que ambas tengan contenido.
+            # If exactly 2 occurrences, ensure both have content
             remove_pair = False
             for occ in valid_occurrences:
                 msg_idx, typ, _ = occ
-                if not messages[msg_idx].get("content", "").strip():
+                msg_content = messages[msg_idx].get("content")
+                if msg_content is None or not msg_content.strip():
                     remove_pair = True
                     break
             if remove_pair:
@@ -110,21 +111,22 @@ def fix_message_list(messages):
                     elif typ == "tool":
                         removal_messages.add(msg_idx)
 
-    # Paso 4: Construir la nueva lista de mensajes aplicando las eliminaciones.
+    # Step 4: Build new message list applying removals
     new_messages = []
     for i, msg in enumerate(messages):
-        # Si el mensaje (tipo 'tool') está marcado para eliminar, se omite.
+        # Skip if message (tool type) is marked for removal
         if i in removal_messages:
             continue
-        # Para mensajes del asistente, eliminar los tool_calls que fueron marcados.
+        # For assistant messages, remove marked tool_calls
         if msg.get("role") == "assistant" and "tool_calls" in msg:
             new_tool_calls = []
             for j, tc in enumerate(msg["tool_calls"]):
                 if j not in removal_assistant_entries.get(i, set()):
                     new_tool_calls.append(tc)
             msg["tool_calls"] = new_tool_calls
-        # Si, luego de la modificación, el mensaje queda sin contenido y sin tool_calls, se descarta.
-        if not msg.get("content", "").strip() and not msg.get("tool_calls"):
+        # If after modification message has no content and no tool_calls, discard it
+        msg_content = msg.get("content")
+        if (msg_content is None or not msg_content.strip()) and not msg.get("tool_calls"):
             continue
         new_messages.append(msg)
 
