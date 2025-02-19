@@ -2,35 +2,7 @@ import json
 import os
 from cai.core import CAI  # pylint: disable=import-error
 from extensions.report.common import create_report  # pylint: disable=import-error # noqa: E501
-
-def load_history_from_jsonl(file_path):
-    """
-    Load conversation history from a JSONL file and
-    return it as a list of messages.
-
-    Args:
-        file_path (str): The path to the JSONL file.
-
-    Returns:
-        list: A list of messages extracted from the JSONL file.
-    """
-    history = []
-    max_length = 0
-    with open(file_path, 'r', encoding='utf-8') as file:
-            for line in file:
-                line = line.strip()
-                if not line:
-                    continue
-                try:
-                    record = json.loads(line)
-                except Exception:
-                    continue
-                if isinstance(record, dict) and "messages" in record and isinstance(record["messages"], list):
-                    if len(record["messages"]) > max_length:
-                        max_length = len(record["messages"])
-                        history = record["messages"]
-    return history
-
+from cai.datarecorder import load_history_from_jsonl # pylint: disable=import-error # noqa: E501
 
 
 
