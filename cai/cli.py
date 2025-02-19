@@ -25,6 +25,10 @@ Environment Variables:
             (default: "true")
         CAI_AGENT_TYPE: Specify agent type (default: "one_tool")
         CAI_STATE: Enable/disable stateful mode (default: "false")
+        CAI_REPORT: Enable/disable reporter mode. It could take the value of: 
+            - ctf (default): do a report from a ctf resolution
+            - nis2: do a report for nis2
+            - pentesting: do a report from a pentesting 
 
 Usage Examples:
     # Run against a CTF

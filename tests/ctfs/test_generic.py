@@ -211,6 +211,10 @@ class TestGenericCTF:
                     debug=float(os.getenv('CAI_DEBUG', 2)),
                     max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
                 )
+                 # Add user message to history
+                response.messages.insert(0, messages[0])
+
+                # Render the report with function create_report
                 report_data = json.loads(response_report.messages[0]['content'])
                 report_data["history"] = json.dumps(response.messages, indent=4)
                 create_report(report_data, template)
