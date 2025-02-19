@@ -44,57 +44,57 @@ def get_model_input_tokens(model):
 
 def fix_message_list(messages):
     """
-    This function is used to handle failures in the message list.
-
-    Edge cases:
-        - CTRL C: Message list may break when user interrupts during
-          tool call generation. Occurs due to incomplete tool execution.
-
-        - Failed tool call: Tool calls may fail and require adding error
-          messages to indicate failure.
+    This function ensures message list consistency by:
+    1. Removing duplicate tool call IDs
+    2. Ensuring each tool call has a corresponding response
+    3. Removing orphaned tool call IDs
     """
-
     messages_copy = messages.copy()
-
-    # First pass: collect all tool calls and their responses
-    tool_calls = {}  # Map of tool_call_id to (tool_call, has_response)
-
-    # Identify all tool calls and mark which ones have responses
+    cleaned_messages = []
+    
+    # Track tool calls and their responses
+    tool_calls = {}  # Map of tool_call_id to (tool_call_msg, response_msg)
+    
+    # First pass: collect tool calls and responses
     for msg in messages_copy:
         if msg.get("role") == "assistant" and msg.get("tool_calls"):
             for tool_call in msg["tool_calls"]:
                 tool_call_id = tool_call["id"]
-                tool_calls[tool_call_id] = (tool_call, False)
-
+                if tool_call_id not in tool_calls:
+                    tool_calls[tool_call_id] = (msg, None)
+                    
         elif msg.get("role") == "tool" and msg.get("tool_call_id"):
             tool_call_id = msg["tool_call_id"]
             if tool_call_id in tool_calls:
-                tool_calls[tool_call_id] = (tool_calls[tool_call_id][0], True)
+                tool_calls[tool_call_id] = (tool_calls[tool_call_id][0], msg)
 
-    # Second pass: add missing tool responses
-    for tool_call_id, (tool_call, has_response) in tool_calls.items():
-        if not has_response:
-            # Check if the last tool message already indicates an interruption
-            last_tool_msg = None
-            for msg in reversed(messages_copy):
-                if msg.get("role") == "tool":
-                    last_tool_msg = msg
-                    break
+    # Second pass: build cleaned message list
+    for msg in messages_copy:
+        if msg.get("role") == "assistant" and msg.get("tool_calls"):
+            # Only keep tool calls that have responses
+            valid_tool_calls = []
+            for tool_call in msg["tool_calls"]:
+                if tool_call["id"] in tool_calls and tool_calls[tool_call["id"]][1] is not None:
+                    valid_tool_calls.append(tool_call)
+            
+            if valid_tool_calls:
+                msg_copy = msg.copy()
+                msg_copy["tool_calls"] = valid_tool_calls
+                cleaned_messages.append(msg_copy)
+            else:
+                # If no valid tool calls, keep message without tool_calls
+                msg_copy = msg.copy()
+                del msg_copy["tool_calls"]
+                cleaned_messages.append(msg_copy)
+                
+        elif msg.get("role") == "tool" and msg.get("tool_call_id"):
+            # Only keep tool responses that have a corresponding tool call
+            if msg["tool_call_id"] in tool_calls and tool_calls[msg["tool_call_id"]][1] == msg:
+                cleaned_messages.append(msg)
+        else:
+            cleaned_messages.append(msg)
 
-            # Only append interruption message if last tool message wasn't
-            # already an interruption
-            if not (last_tool_msg and
-                    last_tool_msg.get("name") == "Command Interrupted by User" and  # noqa: E501
-                    "interrupted" in last_tool_msg.get("content", "") and
-                    last_tool_msg.get("role", "") != "user"):
-                messages.append({
-                    "role": "tool",
-                    "tool_call_id": tool_call_id,
-                    "name": "Command Interrupted by User",
-                    "content": "No response provided - interrupted"
-                })
-
-    return messages
+    return cleaned_messages
 
 
 theme = Theme({
