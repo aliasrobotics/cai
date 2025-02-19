@@ -13,7 +13,7 @@ ${summary or "No executive summary provided."}
 % for step in (steps or []):
 <details>
   <summary>
-    <strong> ${step['identifier'] or "N/A"}: ${step['description'] or "No description provided."}</strong>
+     `${step['identifier'] or "N/A"}`: <strong>${step['description'] or "No description provided."}</strong>
   </summary>
 
 **💭LLM reasoning:**

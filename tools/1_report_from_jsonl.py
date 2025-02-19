@@ -1,50 +1,83 @@
+"""
+This script is used to generate a report from a JSONL file.
+
+Usage:
+    # Create a report from tests/agents/alias_pentesting.jsonl 
+    # pentesting JSONL file (defaults to this one)
+    CAI_REPORT=pentesting python3 tools/1_report_from_jsonl.py
+"""
+
 import json
 import os
-from cai.core import CAI  # pylint: disable=import-error
-from extensions.report.common import create_report  # pylint: disable=import-error # noqa: E501
-from cai.datarecorder import load_history_from_jsonl # pylint: disable=import-error # noqa: E501
+import sys
 
+# Set tracing to false by default - must be set before importing CAI
+os.environ['CAI_TRACING'] = 'false'
+
+from cai.core import CAI  # pylint: disable=import-error
+from cai.datarecorder import load_history_from_jsonl  # pylint: disable=import-error # noqa: E501
+from extensions.report.common import create_report  # pylint: disable=import-error # noqa: E501
 
 
 if __name__ == "__main__":
-    #user_input = input("Please enter the path to the JSONL fot the report" )
-    user_input="tests/agents/alias_pentesting.jsonl"
+    # Get input file from command line arg or use default
+    user_input = (
+        sys.argv[1]
+        if len(sys.argv) > 1
+        else os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__),
+                "..",
+                "tests",
+                "agents",
+                "alias_pentesting.jsonl"
+            )
+        )
+    )
+
     # Check if the file path exists
     if not os.path.isfile(user_input):
         print("The file does not exist. Exit ...")
-        exit(-1)
-  
-    history=load_history_from_jsonl(user_input)
+        sys.exit(1)  # Using sys.exit() instead of exit()
 
-    if os.getenv("CAI_REPORT"):
-        if os.getenv("CAI_REPORT", "ctf").lower() == "pentesting":
+    history = load_history_from_jsonl(user_input)
+
+    # Get the report type from the environment variable
+    # or use "ctf" by default
+    report_type = os.getenv("CAI_REPORT", "ctf").lower()
+    
+    if report_type:
+        if report_type == "pentesting":
+            # pylint: disable=import-outside-toplevel
             from extensions.report.pentesting.pentesting_agent import reporter_agent  # pylint: disable=import-error # noqa: E501
-            template = "extensions/report/pentesting/template.md"
-        elif os.getenv("CAI_REPORT", "ctf").lower() == "nis2":
+            TEMPLATE = "extensions/report/pentesting/template.md"
+        elif report_type == "nis2":
+            # pylint: disable=import-outside-toplevel
             from extensions.report.nis2.nis2_report_agent import reporter_agent  # pylint: disable=import-error # noqa: E501
-            template = "extensions/report/nis2/template.md"
+            TEMPLATE = "extensions/report/nis2/template.md"
         else:
+            # pylint: disable=import-outside-toplevel
             from extensions.report.ctf.ctf_reporter_agent import reporter_agent  # pylint: disable=import-error # noqa: E501
-            template = "extensions/report/ctf/template.md"
-        
-        model = os.getenv('CTF_MODEL', "qwen2.5:14b")
-        state_agent = None
-        stateful = os.getenv('CAI_STATE', "false").lower() == "true"
-        if stateful:
-            from cai.state.pydantic import state_agent  # pylint: disable=import-error,import-outside-toplevel # noqa: E501
-            state_agent.model = model  # set model 
-        client = CAI(state_agent=state_agent, force_until_flag=False)
+            TEMPLATE = "extensions/report/ctf/template.md"
+
+        client = CAI()
+
+        # Create message content by joining non-None messages
+        MESSAGE_CONTENT = "Do a report from " + "\n".join(
+            msg['content']
+            for msg in history
+            if msg.get('content') is not None
+        )
+
         response_report = client.run(
-                agent=reporter_agent,
-                 messages=[{"role": "user", "content": "Do a report from " +
-                            "\n".join(
-                                msg['content'] for msg in history
-                                if msg.get('content') is not None
-                            )}],
-                debug=float(os.getenv('CAI_DEBUG', '2')),
-                max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
-                )
+            agent=reporter_agent,
+            messages=[{
+                "role": "user",
+                "content": MESSAGE_CONTENT
+            }],
+            debug=0
+        )
 
         report_data = json.loads(response_report.messages[0]['content'])
         report_data["history"] = json.dumps(history, indent=4)
-        create_report(report_data, template)
+        create_report(report_data, TEMPLATE)

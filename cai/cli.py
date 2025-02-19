@@ -12,11 +12,11 @@ Environment Variables:
             container (default: "192.168.2.0/24")
         CTF_IP: IP address for the CTF
             container (default: "192.168.2.100")
-        CTF_MODEL: Model to use for agents
-            (default: "qwen2.5:14b")
         CTF_INSIDE: Whether to conquer the CTF from
             within container (default: "true")
 
+        CAI_MODEL: Model to use for agents
+            (default: "qwen2.5:14b")
         CAI_DEBUG: Set debug output level (default: "1")
         CAI_BRIEF: Enable/disable brief output mode (default: "false")
         CAI_MAX_TURNS: Maximum number of turns for
@@ -25,18 +25,18 @@ Environment Variables:
             (default: "true")
         CAI_AGENT_TYPE: Specify agent type (default: "one_tool")
         CAI_STATE: Enable/disable stateful mode (default: "false")
-        CAI_REPORT: Enable/disable reporter mode. It could take the value of: 
+        CAI_REPORT: Enable/disable reporter mode. It could take the value of:
             - ctf (default): do a report from a ctf resolution
             - nis2: do a report for nis2
-            - pentesting: do a report from a pentesting 
+            - pentesting: do a report from a pentesting
 
 Usage Examples:
     # Run against a CTF
     CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" \
-        CTF_MODEL="gpt-4o" CAI_TRACING="false" python3 cai/cli.py
+        CAI_MODEL="gpt-4o" CAI_TRACING="false" python3 cai/cli.py
 
     # Run without a target in human-in-the-loop mode, generating a report
-    $ CAI_TRACING=False CAI_REPORT=pentesting CTF_MODEL="gpt-4o" \
+    $ CAI_TRACING=False CAI_REPORT=pentesting CAI_MODEL="gpt-4o" \
         python3 cai/cli.py
 """
 # Standard library imports
@@ -108,7 +108,7 @@ def thought_agent_handoff(ctf=None):  # pylint: disable=unused-argument
 # Thought Process Agent for analysis and planning
 thought_agent = Agent(
     name="ThoughAgent",
-    model=os.getenv('CTF_MODEL', "qwen2.5:14b"),
+    model=os.getenv('CAI_MODEL', "qwen2.5:14b"),
     instructions=thought_agent_system_prompt,
     functions=[thought, cli_agent_handoff],
     parallel_tool_calls=False
@@ -118,7 +118,7 @@ thought_agent = Agent(
 cli_agent = Agent(
     name="Boot2Root CTF Tester",
     instructions=cli_agent_system_prompt + env_context,
-    model=os.getenv('CTF_MODEL', "qwen2.5:14b"),
+    model=os.getenv('CAI_MODEL', "qwen2.5:14b"),
     functions=[
         # execute_cli_command,  # does not support ctf context
         generic_linux_command,
@@ -165,7 +165,7 @@ def run_with_env():
         if os.getenv('CAI_STATE', "false").lower() == "true":
             from cai.state.pydantic import state_agent  # pylint: disable=import-outside-toplevel  # noqa: E501
             # from cai.state.free import state_agent  # pylint: disable=import-outside-toplevel  # noqa: E501
-            state_agent.model = os.getenv('CTF_MODEL', "qwen2.5:14b")
+            state_agent.model = os.getenv('CAI_MODEL', "qwen2.5:14b")
 
         # Run interactive loop with CTF and state agent if available
         run_demo_loop(

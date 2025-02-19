@@ -7,16 +7,16 @@ Usage Examples:
     $ CTF_NAME="picoctf_static_flag" pytest -s tests/ctfs/test_generic.py
 
     # Run test with a specific challenge and custom model:
-    $ CTF_NAME="picoctf_static_flag" CTF_MODEL="gpt-4o" CTF_CHALLENGE="FLAG" pytest -s tests/ctfs/test_generic.py
+    $ CTF_NAME="picoctf_static_flag" CAI_MODEL="gpt-4o" CTF_CHALLENGE="FLAG" pytest -s tests/ctfs/test_generic.py
 
     # Run test with tracing disabled:
     $ CTF_NAME="picoctf_static_flag" CAI_TRACING="false" pytest -s tests/ctfs/test_generic.py
 
     # Run test using a specific challenge:
-    $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CTF_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
+    $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
 
     # Run generating a report
-    $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_TRACING=True CAI_REPORT=ctf CTF_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
+    $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_TRACING=True CAI_REPORT=ctf CAI_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
 
 
 CI/CD Pipeline Configuration:
@@ -36,13 +36,13 @@ Environment Variables:
     Optional:
         CTF_CHALLENGE: Specific challenge name within the CTF to test
         CTF_SUBNET: Network subnet for the CTF container (default: "192.168.2.0/24")
-        CTF_IP: IP address for the CTF container (default: "192.168.2.100")
-        CTF_MODEL: Model to use for agents (default: "qwen2.5:14b")
+        CTF_IP: IP address for the CTF container (default: "192.168.2.100")        
         CTF_RERUN: Number of times to retry failed tests (default: "0")
         CTF_INSIDE: Whether to conquer the CTF from within the CTF's Docker container
           or from outside (meaning the dev environment) (default: "true")
 
     Other optional:
+        CAI_MODEL: Model to use for agents (default: "qwen2.5:14b")
         CAI_DEBUG: Set debug output level (default: "1").
             - 0: Only tool outputs
             - 1: Verbose debug output
@@ -154,7 +154,7 @@ class TestGenericCTF:
                     bg="blue"))
 
             # Get model from environment or use default
-            model = os.getenv('CTF_MODEL', "qwen2.5:14b")
+            model = os.getenv('CAI_MODEL', "qwen2.5:14b")
 
             # Determine if stateful or stateless
             state_agent = None

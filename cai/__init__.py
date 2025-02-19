@@ -34,7 +34,7 @@ from cai.state.pydantic import state_agent
 from .types import Agent
 
 # Get model from environment or use default
-model = os.getenv('CTF_MODEL', "qwen2.5:14b")
+model = os.getenv('CAI_MODEL', "qwen2.5:14b")
 
 ########################################################
 # AGENTS
@@ -127,7 +127,7 @@ crypto_agent = Agent(
 
 
 flag_discriminator = Agent(
-    model="gpt-4o" if os.getenv('CTF_MODEL') == "o3-mini" else model,
+    model="gpt-4o" if os.getenv('CAI_MODEL') == "o3-mini" else model,
     name="Flag discriminator",
     instructions="""INSTRUCTIONS:
                 1. You are an agent tailored to extract the flag
@@ -585,7 +585,7 @@ scripting_agent02 = Agent(
 
 
 flag_discriminator02 = Agent(
-    model="gpt-4o" if os.getenv('CTF_MODEL') == "o3-mini" else model,
+    model="gpt-4o" if os.getenv('CAI_MODEL') == "o3-mini" else model,
     name="Flag discriminator",
     instructions="""INSTRUCTIONS:
                 1. You are an agent tailored to extract the flag

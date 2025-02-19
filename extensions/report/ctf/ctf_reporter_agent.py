@@ -85,10 +85,11 @@ def instructions(context_variables):  # pylint: disable=unused-argument  # noqa:
 
 reporter_agent = Agent(
     name="Report Agent",
-    model=os.getenv("CTF_MODEL", "qwen2.5:14b"),
+    model=os.getenv("CAI_MODEL", "gpt-4o"),
     instructions=instructions,
     structured_output_class=CTFReport
 )
+
 
 def transfer_to_reporter_agent(**kwargs):  # pylint: disable=W0613
     """ Transfer to reporter agent.

@@ -7,6 +7,7 @@ import time
 import os
 from mako.template import Template  # pylint: disable=import-error
 
+
 def get_base_instructions(previous_reports):
     """
     Get base instructions for report agents.
@@ -29,13 +30,15 @@ def get_base_instructions(previous_reports):
     IMPORTANT: Build a new report upon the previous report.
     Avoid duplicate information
     """
+
+
 def create_report(report_data: dict, template: str):
     """
     Create a report from a list of messages, merging content from
     Report Agent messages.
 
     Args:
-        report_data (dict): A dictionary containing the 
+        report_data (dict): A dictionary containing the
                          report agent's response messages
         template (str): path of the template.md
 
@@ -58,5 +61,4 @@ def create_report(report_data: dict, template: str):
 
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(report_output)
-    print(f"!Report generated at: {report_path}")
-
+    print(f"Report generated at: {report_path}")
