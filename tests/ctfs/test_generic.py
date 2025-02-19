@@ -16,7 +16,7 @@ Usage Examples:
     $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CTF_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
 
     # Run generating a report
-    $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_TRACING=True CAI_REPORT=true CTF_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
+    $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_TRACING=True CAI_REPORT=ctf CTF_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
 
 
 CI/CD Pipeline Configuration:
@@ -60,8 +60,10 @@ Environment Variables:
         CAI_STATE: Enable/disable stateful mode (default: "false"). When enabled,
                       the agent will use a state agent to keep track of the state of the
                       network and the flags found.
-        CAI_REPORT: Enable/disable reporter mode (default: "false"). When enabled,
-                      the agent will generate a report of the test results.
+        CAI_REPORT: Enable/disable reporter mode. It could take the value of: 
+                      - ctf (default): do a report from a ctf resolution
+                      - nis2: do a report for nis2
+                      - pentesting: do a report from a pentesting 
 """
 
 import pytest
