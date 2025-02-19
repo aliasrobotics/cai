@@ -16,7 +16,7 @@ Usage Examples:
     $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
 
     # Run generating a report
-    $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_TRACING=True CAI_REPORT=ctf CAI_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
+    $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_TRACING=False CAI_REPORT=ctf CAI_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
 
 
 CI/CD Pipeline Configuration:
@@ -78,8 +78,14 @@ from cai import (
 )
 from cai.util import check_flag
 from wasabi import color
-from extensions.report.ctf.ctf_reporter_agent import reporter_agent # pylint: disable=import-error
-from extensions.report.common import create_report  # pylint: disable=import-error # noqa: E501
+from importlib.resources import files
+
+if is_caiextensions_report_available():
+    from caiextensions.report.ctf.ctf_reporter_agent import reporter_agent # pylint: disable=import-error
+    from caiextensions.report.common import create_report  # pylint: disable=import-error # noqa: E501
+else:
+    print("caiextensions-report is not available. Skipping test.")
+    pytest.skip("caiextensions-report is not available. Skipping test.", allow_module_level=True)
 
 if is_pentestperf_available():
     import pentestperf as ptt
@@ -131,12 +137,6 @@ class TestGenericCTF:
         challenge = challenge_key if challenge_key in challenges else (
             challenges[0] if len(challenges) > 0 else None)
 
-
-        if is_caiextensions_report_available():
-            from caiextensions.report.module import some_function  # pylint: disable=import-error  # noqa: F401
-            some_function()
-        else:
-            print("Extension not available. Proceeding without it.")
 
         print(
             color(
@@ -216,8 +216,7 @@ class TestGenericCTF:
 
             # Do a report in case the environment variable is true
             if os.getenv("CAI_REPORT"):
-                from extensions.report.ctf.ctf_reporter_agent import reporter_agent  # pylint: disable=import-error # noqa: E501
-                template = "extensions/report/ctf/template.md"
+                template = str(files('caiextensions.report.ctf') / 'template.md')
                 # New instace of CAI, because force_until_flag
                 client = CAI(state_agent=state_agent, force_until_flag=False)
                 response_report = client.run(

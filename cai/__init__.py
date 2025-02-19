@@ -850,7 +850,7 @@ def is_caiextensions_report_available():
     Check if caiextensions report is available
     """
     try:
-        from caiextensions.report.module import some_function  # pylint: disable=import-error,import-outside-toplevel,unused-import  # noqa: E501,F401
+        from caiextensions.report.common import get_base_instructions  # pylint: disable=import-error,import-outside-toplevel,unused-import  # noqa: E501,F401
     except ImportError:
         return False
     return True

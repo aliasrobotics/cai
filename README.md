@@ -415,3 +415,10 @@ Copy the key and add it to Gitlab under https://gitlab.com/-/user_settings/ssh_k
 ```bash
 cat ~/.ssh/id_ed25519.pub
 ```
+
+
+### How do I clear Python cache?
+
+```bash
+find . -name "*.pyc" -delete && find . -name "__pycache__" -delete
+```

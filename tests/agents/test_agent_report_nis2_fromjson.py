@@ -2,7 +2,7 @@ import pytest
 import os
 import json
 from cai.core import CAI
-from extensions.report.nis2.nis2_report_agent import reporter_agent  # pylint: disable=import-error
+from caiextensions.report.common.nis2.nis2_report_agent import reporter_agent  # pylint: disable=import-error
 from cai.datarecorder import load_history_from_jsonl # pylint: disable=import-error # noqa: E501
 
 # Set tracing to false by default

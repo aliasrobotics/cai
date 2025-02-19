@@ -8,6 +8,7 @@ import os
 from datetime import datetime
 from typing import Any, List
 from types import SimpleNamespace
+from importlib.resources import files
 from mako.template import Template  # pylint: disable=import-error
 from wasabi import color  # pylint: disable=import-error
 from rich.text import Text  # pylint: disable=import-error
@@ -896,7 +897,9 @@ def create_report_from_messages(history: List[dict]):
     report_data = {k: to_namespace(v) for k, v in merged_report.items()}
 
     report_data["history"] = history
-    template = Template(filename="cai/report_agent/template.md")  # nosec: B702
+    template = Template(
+        str(files('caiextensions.report.ctf') / 'template.md')  # nosec: B702
+    )
     report_output = template.render(**report_data)
 
     report_dir = "./report"

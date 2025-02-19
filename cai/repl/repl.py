@@ -5,9 +5,11 @@ interacting with CAI agents.
 import json
 import os
 from configparser import ConfigParser
+from importlib.resources import files
+
 from wasabi import color  # pylint: disable=import-error
+from caiextensions.report.common import create_report  # pylint: disable=import-error # noqa: E501
 from cai.core import CAI  # pylint: disable=import-error
-from extensions.report.common import create_report  # pylint: disable=import-error # noqa: E501
 
 
 def process_and_print_streaming_response(response):  # pylint: disable=inconsistent-return-statements  # noqa: E501
@@ -152,7 +154,7 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
             "\nTarget IP: " + ctf.get_ip() +
             "\n" + inside
         }]
-        messages_init=messages
+        messages_init = messages
     agent = starting_agent
 
     while True:
@@ -178,30 +180,38 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
         except KeyboardInterrupt:
             if os.getenv("CAI_REPORT"):
                 if os.getenv("CAI_REPORT", "ctf").lower() == "pentesting":
-                    from extensions.report.pentesting.pentesting_agent import reporter_agent  # pylint: disable=import-error # noqa: E501
-                    template = "extensions/report/pentesting/template.md"
+                    from caiextensions.report.pentesting.pentesting_agent import reporter_agent  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long # noqa: E501
+                    template = str(
+                        files('caiextensions.report.pentesting') /
+                        'template.md')
                 elif os.getenv("CAI_REPORT", "ctf").lower() == "nis2":
-                    from extensions.report.nis2.nis2_report_agent import reporter_agent  # pylint: disable=import-error # noqa: E501
-                    template = "extensions/report/nis2/template.md"
+                    from caiextensions.report.nis2.nis2_report_agent import reporter_agent  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long # noqa: E501
+                    template = str(
+                        files('caiextensions.report.nis2') /
+                        'template.md')
                 else:
-                    from extensions.report.ctf.ctf_reporter_agent import reporter_agent  # pylint: disable=import-error # noqa: E501
-                    template = "extensions/report/ctf/template.md"
-            
+                    from caiextensions.report.ctf.ctf_reporter_agent import reporter_agent  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long # noqa: E501
+                    template = str(
+                        files('caiextensions.report.ctf') /
+                        'template.md')
+
                 client = CAI(state_agent=state_agent, force_until_flag=False)
                 response_report = client.run(
                     agent=reporter_agent,
                     messages=[{"role": "user", "content": "Do a report from " +
-                            "\n".join(
-                                msg['content'] for msg in response.messages
-                                if msg.get('content') is not None
-                            )}],
+                               "\n".join(
+                                   msg['content'] for msg in response.messages
+                                   if msg.get('content') is not None
+                               )}],
                     debug=float(os.getenv('CAI_DEBUG', '2')),
                     max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
                 )
                 # Add user message to history in case of a ctf
                 if messages_init:
                     response.messages.insert(0, messages_init[0])
-                report_data = json.loads(response_report.messages[0]['content'])
-                report_data["history"] = json.dumps(response.messages, indent=4)
+                report_data = json.loads(
+                    response_report.messages[0]['content'])
+                report_data["history"] = json.dumps(
+                    response.messages, indent=4)
                 create_report(report_data, template)
             break
