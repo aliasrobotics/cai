@@ -124,6 +124,7 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
 """)
 
     messages = []
+    messages_init = []
     if ctf:
         # Get challenge
         challenge_key = os.getenv('CTF_CHALLENGE')
@@ -151,7 +152,7 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
             "\nTarget IP: " + ctf.get_ip() +
             "\n" + inside
         }]
-
+        messages_init=messages
     agent = starting_agent
 
     while True:
@@ -197,7 +198,9 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
                     debug=float(os.getenv('CAI_DEBUG', '2')),
                     max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
                 )
-
+                # Add user message to history in case of a ctf
+                if messages_init:
+                    response.messages.insert(0, messages_init[0])
                 report_data = json.loads(response_report.messages[0]['content'])
                 report_data["history"] = json.dumps(response.messages, indent=4)
                 create_report(report_data, template)
