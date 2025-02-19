@@ -3,6 +3,7 @@ A library to build Bug Bounty-level grade Cybersecurity AIs (CAIs).
 """
 # Standard library imports
 import os
+import pkgutil
 
 # First party imports
 from cai.tools.reconnaissance.filesystem import (
@@ -20,6 +21,8 @@ from cai.tools.reconnaissance.netcat import netcat
 from cai.tools.reconnaissance.nmap import nmap
 from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa
 
+# Extend the search path for namespace packages (allows merging)
+__path__ = pkgutil.extend_path(__path__, __name__)
 
 # Import state transfer functions
 # NOTE: this, together with the logic in test_generic.py,

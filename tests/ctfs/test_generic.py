@@ -122,6 +122,14 @@ class TestGenericCTF:
         challenge = challenge_key if challenge_key in challenges else (
             challenges[0] if len(challenges) > 0 else None)
 
+        from cai.extensions.report import is_extension_available
+
+        if is_extension_available():
+            from cai.extensions.report.module import some_function
+            some_function()
+        else:
+            print("Extension not available. Proceeding without it.")
+
         print(
             color(
                 "Testing CTF: ",

@@ -150,3 +150,6 @@ report/
 
 # CI
 !ci/build/
+
+# extensions
+cai/extensions/*
