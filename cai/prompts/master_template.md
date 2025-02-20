@@ -3,7 +3,7 @@
     from cai.util import get_previous_memory, cli_print_tool_call
 
     # Get system prompt from agent if provided
-    
+
     system_prompt = (
         agent.instructions(context_variables)
         if callable(agent.instructions)

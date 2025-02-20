@@ -17,13 +17,13 @@ from cai.tools.reconnaissance.crypto_tools import (
     strings_command,
     decode_hex_bytes
 )
+from cai.rag.memory.memory_manager import memory_agent
 from cai.tools.reconnaissance.netcat import netcat
 from cai.tools.reconnaissance.nmap import nmap
 from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa
 
 # Extend the search path for namespace packages (allows merging)
 __path__ = pkgutil.extend_path(__path__, __name__)
-from cai.rag.memory.memory_manager import memory_agent
 
 # Import state transfer functions
 # NOTE: this, together with the logic in test_generic.py,
@@ -33,7 +33,6 @@ from cai.rag.memory.memory_manager import memory_agent
 #
 # TODO: fix this  # pylint: disable=fixme
 from cai.state.pydantic import state_agent
-from cai.rag.memory.memory_manager import memory_agent
 
 # Local imports
 from .types import Agent
@@ -155,10 +154,6 @@ def transfer_to_ctf_agent(**kwargs):  # pylint: disable=W0613
     Accepts any keyword arguments but ignores them."""
     return ctf_agent
 
-def transfer_to_memory_agent(**kwargs):  # pylint: disable=W0613
-    """Transfer to memory agent.
-    Accepts any keyword arguments but ignores them."""
-    return memory_agent
 
 def transfer_to_network_agent(**kwargs):  # pylint: disable=W0613
     """ Transfer to network agent.
@@ -182,6 +177,7 @@ def transfer_to_memory_agent(**kwargs):  # pylint: disable=W0613
     """ Transfer to memory agent.
     Accepts any keyword arguments but ignores them."""
     return memory_agent
+
 
 # controller agent
 controller_agent = Agent(

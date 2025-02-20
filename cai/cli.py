@@ -25,22 +25,33 @@ Environment Variables:
             (default: "true")
         CAI_AGENT_TYPE: Specify agent type (default: "one_tool")
         CAI_STATE: Enable/disable stateful mode (default: "false")
+
+        (You should install extensions to use this feature)
+        |
         CAI_REPORT: Enable/disable reporter mode. It could take the value of:
             - ctf (default): do a report from a ctf resolution
             - nis2: do a report for nis2
             - pentesting: do a report from a pentesting
 
+
+        CTF_RAG_MEMORY: Retrieves CTF/Scenario memory from Qdrant on core.py
+            when init a client.run
+        CTF_RAG_MEMORY_INTERVAL: Retrieves CTF/Scenario memory from Qdrant on
+            core.py when init a client.run each X turns
+
 Usage Examples:
     # Run against a CTF
-    CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" \
+    CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" \\
         CAI_MODEL="gpt-4o" CAI_TRACING="false" python3 cai/cli.py
 
-    CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii"
+    CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" \\
         CAI_MODEL="gpt-4o" CAI_TRACING="false" python3 cai/cli.py
     # Run against a CTF with RAG memory
-    CTF_NAME="hackableII" CTF_RAG_MEMORY="True" CTF_RAG_MEMORY_INTERVAL=3 CAI_MODEL="o3-mini" CTF_INSIDE="False" CTF_CTF_HINTS="False" python3 cai/cli.py
+    CTF_NAME="hackableII" CTF_RAG_MEMORY="True" \\
+        CTF_RAG_MEMORY_INTERVAL=3 CAI_MODEL="o3-mini" \\
+        CTF_INSIDE="False" CTF_CTF_HINTS="False" python3 cai/cli.py
     # Run without a target in human-in-the-loop mode, generating a report
-    $ CAI_TRACING=False CAI_REPORT=pentesting CAI_MODEL="gpt-4o" \
+    $ CAI_TRACING=False CAI_REPORT=pentesting CAI_MODEL="gpt-4o" \\
         python3 cai/cli.py
 """
 # Standard library imports
@@ -49,17 +60,19 @@ import os
 # Third-party imports
 from mako.template import Template  # pylint: disable=import-error
 from wasabi import color  # pylint: disable=import-error
-
 # Local imports
 from cai import Agent, is_pentestperf_available
 from cai.agents.mail import dns_smtp_agent
 from cai.repl import run_demo_loop
+from cai.tools.command_and_control.sshpass import (
+    run_ssh_command_with_credentials
+)
 from cai.tools.llm_plugins.reasoning import thought
-from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa: E501
+from cai.tools.reconnaissance.generic_linux_command import (
+    generic_linux_command
+)
 if is_pentestperf_available():
-    import pentestperf as ptt
-
-from cai.tools.command_and_control.sshpass import run_ssh_command_with_credentials
+    import pentestperf as ptt  # pylint: disable=import-error
 
 
 def transfer_to_dns_agent():
@@ -155,32 +168,54 @@ def setup_ctf():
 
 
 def run_with_env():
-    """Run CAI with environment configuration"""
-    if is_pentestperf_available() and os.getenv('CTF_NAME', None):  # pylint: disable=invalid-envvar-default  # noqa: E501
+    """
+    Run the CAI CLI with environment variable configuration.
+
+    This function sets up and runs the CAI CLI with env-vars:
+
+    Environment Variables:
+        CTF_NAME: Name of CTF to set up and run
+        CTF_SUBNET: Subnet for CTF environment (default: 192.168.2.0/24)
+        CTF_IP: IP address for CTF target (default: 192.168.2.100)
+        CAI_STATE: Enable state tracking agent if "true" (default: "false")
+        CAI_MODEL: Model to use for agents (default: "qwen2.5:14b")
+        CAI_DEBUG: Debug level (default: 2)
+        CAI_MAX_TURNS: Maximum conversation turns (default: inf)
+
+    The function:
+    1. Sets up CTF environment if CTF_NAME is provided
+    2. Configures state tracking agent if CAI_STATE is enabled
+    3. Runs interactive conversation loop with specified parameters
+    4. Cleans up CTF environment on completion
+    """
+    from cai.state.pydantic import state_agent  # pylint: disable=import-outside-toplevel # noqa: E501
+
+    if (is_pentestperf_available() and
+            os.getenv('CTF_NAME', None)):
         ctf = setup_ctf()
     else:
         ctf = None
 
     try:
         # Configure state agent if enabled
-        state_agent = None
         if os.getenv('CAI_STATE', "false").lower() == "true":
-            from cai.state.pydantic import state_agent  # pylint: disable=import-outside-toplevel  # noqa: E501
-            # from cai.state.free import state_agent  # pylint: disable=import-outside-toplevel  # noqa: E501
             state_agent.model = os.getenv('CAI_MODEL', "qwen2.5:14b")
+        else:
+            state_agent = None
 
         # Run interactive loop with CTF and state agent if available
         run_demo_loop(
             cli_agent,
-            debug=float(os.getenv('CAI_DEBUG', 2)),  # pylint: disable=invalid-envvar-default  # noqa: E501
-            max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),  # pylint: disable=invalid-envvar-default  # noqa: E501
-            ctf=ctf if os.getenv('CTF_NAME', None) else None,  # pylint: disable=invalid-envvar-default  # noqa: E501
+            debug=float(os.getenv('CAI_DEBUG', '2')),
+            max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
+            ctf=ctf if os.getenv('CTF_NAME', None) else None,
             state_agent=state_agent
         )
 
     finally:
         # Cleanup CTF if started
-        if is_pentestperf_available() and os.getenv('CTF_NAME', None):  # pylint: disable=invalid-envvar-default  # noqa: E501
+        if (is_pentestperf_available() and
+                os.getenv('CTF_NAME', None)):
             ctf.stop_ctf()
 
 

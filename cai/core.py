@@ -18,6 +18,7 @@ from typing import List
 import time
 import os
 import litellm  # pylint: disable=import-error
+from mako.template import Template  # pylint: disable=import-error
 from dotenv import load_dotenv  # pylint: disable=import-error # noqa: E501
 from wasabi import color  # pylint: disable=import-error
 from cai.logger import exploit_logger
@@ -120,7 +121,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # CTF_RAG_MEMORY="True" CTF_RAG_MEMORY_INTERVAL="3" (by def 5)
 
         self.rag = os.getenv("CTF_RAG_MEMORY", "false").lower() == "true"
-        self.RAG_INTERVAL = int(os.getenv("CTF_RAG_MEMORY_INTERVAL", "5"))
+        self.rag_interval = int(os.getenv("CTF_RAG_MEMORY_INTERVAL", "5"))
         self.force_until_flag = force_until_flag
 
         self.challenge = challenge
@@ -630,8 +631,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 # Memory agent iteration
                 # If RAG is active and the turn is at a RAG interval, process
                 # using the memory agent
-                if self.rag and (n_turn != 0 and n_turn % self.RAG_INTERVAL == 0) and os.getenv(
-                        "ONLINE_MEMORY", "False").lower() == "true":
+                if (self.rag and
+                        (n_turn != 0 and n_turn % self.rag_interval == 0) and
+                        os.getenv("ONLINE_MEMORY", "False").lower() == "true"):
                     prev_agent = active_agent
                     active_agent = transfer_to_memory_agent()
                     agent_iteration(active_agent)
@@ -646,7 +648,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 # defined intervals
                 if self.stateful:
                     self.state_interactions_count += 1
-                    if self.state_interactions_count >= self.STATE_INTERACTIONS_INTERVAL:
+                    if (self.state_interactions_count
+                            >= self.STATE_INTERACTIONS_INTERVAL):
                         prev_agent = active_agent
                         active_agent = transfer_to_memory_agent()
                         agent_iteration(active_agent)
