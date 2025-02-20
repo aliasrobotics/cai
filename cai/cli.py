@@ -52,11 +52,6 @@ from cai.agents.mail import dns_smtp_agent
 from cai.repl import run_demo_loop
 from cai.tools.llm_plugins.reasoning import thought
 from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa: E501
-from cai.tools.web.headers import web_request_framework
-from cai.tools.web.webshell_suit import (
-    generate_php_webshell,
-    upload_webshell as upload_ftp_webshell
-)
 if is_pentestperf_available():
     import pentestperf as ptt
 
@@ -125,9 +120,6 @@ cli_agent = Agent(
         generic_linux_command,
         # thought_agent_handoff,
         # Code_Executor_Expert,
-        web_request_framework,
-        generate_php_webshell,
-        upload_ftp_webshell
     ],
     parallel_tool_calls=False,
 )
