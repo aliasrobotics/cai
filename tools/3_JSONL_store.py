@@ -70,7 +70,7 @@ def get_json_messages(messages_file: str) -> List[Dict]:
         list: A list of message objects, each with keys 'role' and 'content'.
               If no valid messages are found, returns an empty list.
     """
-    messages = get_longest_messages(messages_file)
+    messages = load_history_from_jsonl(messages_file)
     if not messages:
         print("No messages found to memorize from")
         return []
