@@ -146,7 +146,7 @@ flag_discriminator = Agent(
 # TRANSFER FUNCTIONS
 def transfer_to_flag_discriminator(**kwargs):  # pylint: disable=W0613
     """Transfer flag discriminator.
-    Accepts any keyword arguments but ign   ores them."""
+    Accepts any keyword arguments but ignores them."""
     return flag_discriminator
 
 
