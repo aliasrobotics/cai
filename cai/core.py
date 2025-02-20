@@ -21,12 +21,9 @@ import litellm  # pylint: disable=import-error
 from dotenv import load_dotenv  # pylint: disable=import-error # noqa: E501
 from wasabi import color  # pylint: disable=import-error
 from cai.logger import exploit_logger
-from cai.rag.vector_db import QdrantConnector
-from cai.rag.memory.memory_manager import memory_agent
 # Local imports
 from cai.datarecorder import DataRecorder
 from cai import (
-    transfer_to_state_agent,
     transfer_to_memory_agent
 )
 from cai.state.common import StateAgent
@@ -39,9 +36,7 @@ from .util import (
     cli_print_state,
     get_ollama_api_base,
     check_flag,
-    create_report_from_messages,
     visualize_agent_graph,
-    get_previous_memory
 )
 from .types import (
     Agent,
@@ -52,6 +47,7 @@ from .types import (
     Result,
 )
 from mako.template import Template
+
 __CTX_VARS_NAME__ = "context_variables"
 litellm.suppress_debug_info = True
 
@@ -145,8 +141,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         """
         context_variables = defaultdict(str, context_variables)
         messages = [{"role": "system", "content": Template(
-            filename="cai/prompts/master_template.md").render(agent=agent, ctf_instructions=history[0]["content"], context_variables=context_variables)}]
-        
+            filename="cai/prompts/master_template.md").render(
+                agent=agent,
+                ctf_instructions=history[0]["content"],
+                context_variables=context_variables)}]
+
         for msg in history:
             if msg.get("sender") != "Report Agent":
                 messages.append(msg)
@@ -628,7 +627,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 )
 
             try:
-                # MEMORY
+                # Memory agent iteration
                 # If RAG is active and the turn is at a RAG interval, process
                 # using the memory agent
                 if self.rag and (n_turn != 0 and n_turn % self.RAG_INTERVAL == 0) and os.getenv(
@@ -638,12 +637,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     agent_iteration(active_agent)
                     active_agent = prev_agent
 
-                # PENTESTING - STANDARD AGENT ITERATION
-                # Standard iteration
+                # Standard agent iteration
                 active_agent = agent_iteration(active_agent)
                 n_turn += 1
 
-                # STATE
+                # Stateful agent iteration
                 # If the session is stateful, invoke the memory agent at
                 # defined intervals
                 if self.stateful:
