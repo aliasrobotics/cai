@@ -8,22 +8,22 @@ Usage:
 
     # Run with online long_term_memory
     # Executes memory long_term_memory every 5 turns:
-    CTF_NAME="hackableII" CTF_RAG_MEMORY="True" CTF_MODEL="o3-mini" \
+    CTF_NAME="hackableII" CTF_RAG_MEMORY="True" CAI_MODEL="o3-mini" \
     ONLINE_MEMORY="True" CTF_INSIDE="False" CTF_HINTS="False" python3 cai/cli.py
 
     # Run with custom long_term_memory interval
     # Executes memory long_term_memory every 3 turns:
-    CTF_NAME="hackableII" CTF_RAG_MEMORY="True" CTF_MODEL="o3-mini" \
+    CTF_NAME="hackableII" CTF_RAG_MEMORY="True" CAI_MODEL="o3-mini" \
     CTF_RAG_MEMORY_INTERVAL="3" ONLINE_MEMORY="False" CTF_INSIDE="False" \
     CTF_HINTS="False" python3 cai/cli.py
 
     # Run offline LONG TERM MEMORY
-    JSONL_FILE_PATH="logs/test_20250209_191542.jsonl" CTF_NAME="testctf" CTF_MODEL="qwen2.5:14b" python3 cai/agents/longterm_memory.py
+    JSONL_FILE_PATH="logs/test_20250209_191542.jsonl" CTF_NAME="testctf" CAI_MODEL="qwen2.5:14b" python3 cai/agents/longterm_memory.py
 
 Environment Variables:
     CTF_NAME: Name of the collection in Qdrant (required)
     CTF_RAG_MEMORY: Enable RAG memory functionality
-    CTF_MODEL: Model to use for embeddings (default: qwen2.5:14b)
+    CAI_MODEL: Model to use for embeddings (default: qwen2.5:14b)
     ONLINE_MEMORY: Enable online memory mode
     CTF_RAG_MEMORY_INTERVAL: Interval for memory long_term_memory (only works with ONLINE_MEMORY=False)
     JSONL_FILE_PATH: Path to JSONL file containing historical messages (only works in `longterm_memory.py`)
@@ -35,7 +35,7 @@ from cai.tools.llm_plugins.rag import query_memory, add_to_memory_v2
 from cai.util import get_previous_memory 
 
 # Get model from environment or use default
-model = os.getenv('CTF_MODEL', "qwen2.5:14b")
+model = os.getenv('CAI_MODEL', "qwen2.5:14b")
 
 def get_previous_steps(query: str) -> str:
     """
