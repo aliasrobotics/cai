@@ -15,7 +15,7 @@ from typing import List, Dict
 from cai.types import Agent
 from cai.core import CAI
 from cai.rag.memory.memory_manager import memory_agent
-from cai.datarecorder import get_longest_messages
+from cai.datarecorder import load_history_from_jsonl
 
 def JSONL_to_VectorDB(messages_file: str, max_iterations: int = 3) -> None:
     """
@@ -26,7 +26,7 @@ def JSONL_to_VectorDB(messages_file: str, max_iterations: int = 3) -> None:
         max_iterations: Maximum number of message chunks to process per inference
     """
 
-    messages = get_longest_messages(messages_file)
+    messages = load_history_from_jsonl(messages_file)
     if not messages:
         print("No messages found to memorize from")
         return

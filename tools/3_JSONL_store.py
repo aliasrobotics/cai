@@ -12,7 +12,7 @@ Environment Variables:
 import os
 import json
 from typing import List, Dict
-from cai.datarecorder import get_longest_messages
+from cai.datarecorder import load_history_from_jsonl
 
 
 def storage_run(messages_file: str) -> None:
@@ -31,7 +31,7 @@ def storage_run(messages_file: str) -> None:
         print("CTF_NAME environment variable not set")
         return
 
-    messages = get_longest_messages(messages_file)
+    messages = load_history_from_jsonl(messages_file)
     if not messages:
         print("No messages found to memorize from")
         return
