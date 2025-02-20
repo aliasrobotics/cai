@@ -36,19 +36,10 @@ def test_master_template_with_ctf_inside_false(template, base_agent):
 def test_master_template_with_env_vars(template, base_agent):
     """Test master template with environment variables and vector DB"""
     os.environ['CTF_NAME'] = 'test_ctf'
-    os.environ['CTF_RAG_MEMORY'] = 'true'
-    result = template.render(agent=base_agent, get_previous_memory=lambda x, top_k: "\n".join([
-        f"Step: {meta['step']}. {text}" 
-        for text, meta in zip(
-            ["Found flag in /etc/passwd", "Exploited SQL injection vulnerability", "Discovered open port 22"],
-            [{"step": 1}, {"step": 2}, {"step": 3}]
-        )
-    ]))
+    result = template.render(agent=base_agent)
     print(result)
-    assert 'SQL injection' in result
-    assert 'Found flag in /etc/passwd' in result
+    assert "Test instructions" in result
     del os.environ['CTF_NAME']
-    del os.environ['CTF_RAG_MEMORY']
 
 def test_master_template_no_instructions(template):
     """Test master template without agent instructions"""

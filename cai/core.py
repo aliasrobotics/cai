@@ -145,7 +145,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         """
         context_variables = defaultdict(str, context_variables)
         messages = [{"role": "system", "content": Template(
-            filename="cai/prompts/master_template.md").render(agent=agent, ctf_instructions=history[0]["content"])}]
+            filename="cai/prompts/master_template.md").render(agent=agent, ctf_instructions=history[0]["content"], context_variables=context_variables)}]
         
         for msg in history:
             if msg.get("sender") != "Report Agent":
