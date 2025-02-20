@@ -1,7 +1,6 @@
 import os
 import pytest
 from mako.template import Template
-from cai.rag.vector_db import QdrantConnector
 
 @pytest.fixture
 def template():
@@ -10,25 +9,6 @@ def template():
 @pytest.fixture
 def base_agent():
     return type('Agent', (), {'instructions': 'Test instructions'})()
-
-@pytest.fixture
-def vector_db():
-    db = QdrantConnector()
-    db.create_collection("test_ctf")
-    # Add some test data
-    texts = [
-        "Found flag in /etc/passwd",
-        "Exploited SQL injection vulnerability",
-        "Discovered open port 22"
-    ]
-    metadata = [
-        {"step": 1},
-        {"step": 2}, 
-        {"step": 3}
-    ]
-    for i, (text, meta) in enumerate(zip(texts, metadata)):
-        db.add_points(i, "test_ctf", [text], [meta])
-    return db
 
 def test_master_template_basic(template, base_agent):
     """Test basic master template rendering without optional components"""
@@ -53,7 +33,7 @@ def test_master_template_with_ctf_inside_false(template, base_agent):
     assert 'You are OUTSIDE the target machine' in result
     del os.environ['CTF_INSIDE']
 
-def test_master_template_with_env_vars(template, base_agent, vector_db):
+def test_master_template_with_env_vars(template, base_agent):
     """Test master template with environment variables and vector DB"""
     os.environ['CTF_NAME'] = 'test_ctf'
     os.environ['CTF_RAG_MEMORY'] = 'true'
@@ -72,7 +52,7 @@ def test_master_template_with_env_vars(template, base_agent, vector_db):
 
 def test_master_template_no_instructions(template):
     """Test master template without agent instructions"""
-    agent = type('Agent', (), {})()
+    agent = type('Agent', (), {'instructions': ''})()
     result = template.render(agent=agent)
     print(result)
     assert result.strip().startswith('')
