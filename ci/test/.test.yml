@@ -54,7 +54,7 @@
   variables:
     TEST_PATH: tests/agents/test_agents_state.py
 
- 💭 prompts test_prompts_master_template:
+💭 prompts test_prompts_master_template:
   <<: *run_test
   variables:
     TEST_PATH: tests/agents/prompts/test_master_prompt.py
