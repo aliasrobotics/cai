@@ -2,14 +2,10 @@
 This module contains utility functions for the CAI library.
 """
 import inspect
-import time
 import json
 import os
 from datetime import datetime
-from typing import Any, List
-from types import SimpleNamespace
-from importlib.resources import files
-from mako.template import Template  # pylint: disable=import-error
+from typing import Any
 from wasabi import color  # pylint: disable=import-error
 from rich.text import Text  # pylint: disable=import-error
 from rich.panel import Panel  # pylint: disable=import-error
@@ -795,98 +791,6 @@ def check_flag(output, ctf, challenge=None):
     else:
         print(color("CTF environment not found or provided", fg="yellow"))
     return False, None
-
-
-def merge_report_dicts(base_dict, new_dict):
-    """
-    Merge two report dictionaries recursively,
-    handling lists and nested structures.
-
-    Args:
-        base_dict: The base dictionary to merge into
-        new_dict: The new dictionary with values to merge
-
-    Returns:
-        dict: The merged dictionary
-    """
-    if not isinstance(base_dict, dict) or not isinstance(new_dict, dict):
-        return new_dict
-    for key, value in new_dict.items():
-        if key not in base_dict:
-            base_dict[key] = value
-        elif isinstance(value, list) and isinstance(base_dict[key], list):
-            # Merge lists, avoiding duplicates for findings
-            if key == "findings":
-                existing_ids = {
-                    f.get("finding_id") for f in base_dict[key] if isinstance(
-                        f, dict) and "finding_id" in f}
-                for item in value:
-                    if isinstance(  # noqa: E501
-                            item, dict) and "finding_id" in item and \
-                                item["finding_id"] not in existing_ids:  # noqa: E501
-                        base_dict[key].append(item)
-                        existing_ids.add(item["finding_id"])
-            else:
-                base_dict[key].extend(value)
-        elif isinstance(value, dict) and isinstance(base_dict[key], dict):
-            base_dict[key] = merge_report_dicts(base_dict[key], value)
-        else:
-            # For scalar values, prefer non-empty new values
-            if value is not None and value != "":
-                base_dict[key] = value
-    return base_dict
-
-
-def create_report_from_messages(history: List[dict]):
-    """
-    Create a report from a list of messages,
-    merging content from Report Agent messages.
-
-    Args:
-        history: List of message dictionaries containing sender and content
-    """
-    report_data = {}  # last JSON message from Report Agent
-    merged_report = {}  # merged JSON messages from Report Agent
-
-    def to_namespace(obj):
-        if isinstance(obj, dict):
-            return SimpleNamespace(**{k: to_namespace(v)
-                                   for k, v in obj.items()})
-        if isinstance(obj, list):
-            return [to_namespace(item) for item in obj]
-        return obj
-    # NOTE: Generic.py dont return a list of messages, it returns a string
-    # so we need to handle it differently
-    #
-    for message in history:
-        if message.get("sender") == "Report Agent":
-            try:
-                report_data = json.loads(message["content"])
-                merged_report = merge_report_dicts(merged_report, report_data)
-            except json.JSONDecodeError:
-                # Continue if because some times report
-                # agent sends non-JSON content (plain text responses)
-                # and it's not a valid JSON
-                continue
-        merged_report = merge_report_dicts(merged_report, report_data)
-
-    # To python variables
-    report_data = {k: to_namespace(v) for k, v in merged_report.items()}
-    report_data["history"] = history
-    template = Template(
-        str(files('caiextensions.report.ctf') / 'template.md')  # nosec: B702
-    )
-    report_output = template.render(**report_data)
-
-    report_dir = "./report"
-    os.makedirs(report_dir, exist_ok=True)
-    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
-    save_path = f"Report_{timestamp}.md"
-    report_path = os.path.join(report_dir, save_path)
-
-    with open(report_path, "w", encoding="utf-8") as f:
-        f.write(report_output)
-    print(f"!Report generated at: {report_path}")
 
 
 def fix_message_list(messages):  # pylint: disable=R0914,R0915,R0912

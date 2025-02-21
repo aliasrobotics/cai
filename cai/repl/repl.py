@@ -10,6 +10,9 @@ from importlib.resources import files
 from wasabi import color  # pylint: disable=import-error
 from caiextensions.report.common import create_report  # pylint: disable=import-error # noqa: E501
 from cai.core import CAI  # pylint: disable=import-error
+from cai import (
+    is_caiextensions_report_available,
+)
 
 
 def process_and_print_streaming_response(response):  # pylint: disable=inconsistent-return-statements  # noqa: E501
@@ -178,7 +181,7 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
             if response.agent:
                 agent = response.agent
         except KeyboardInterrupt:
-            if os.getenv("CAI_REPORT"):
+            if is_caiextensions_report_available and os.getenv("CAI_REPORT"):
                 if os.getenv("CAI_REPORT", "ctf").lower() == "pentesting":
                     from caiextensions.report.pentesting.pentesting_agent import reporter_agent  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long # noqa: E501
                     template = str(
