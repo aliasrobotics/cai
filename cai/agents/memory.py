@@ -23,6 +23,22 @@ memory systems, utilizing two complementary mechanisms:
    experiences, leveraging dense vector embeddings
    and approximate nearest neighbor search
 
+The system supports two distinct learning approaches:
+
+1. Offline Learning: Processes historical data from JSONL files
+   in batch mode (@2_jsonl_to_memory.py), enabling efficient
+   bulk ingestion of past experiences and their transformation
+   into vector embeddings without real-time constraints and
+   interference with the current CTF pentesting process.
+   This allows for comprehensive analysis and optimization
+   of the memory corpus.
+
+2. Online Learning: Incrementally updates memory during live
+   interactions (@core.py), incorporating new experiences
+   in real-time at defined intervals (rag_interval). This
+   enables continuous adaptation and immediate integration
+   of new knowledge while maintaining system responsiveness.
+
 Memory Architecture Diagrams
 ----------------------------
 
@@ -60,13 +76,16 @@ Environment Variables enabling the episodic memory store
     - all: for all memory stores
    CAI_MEMORY_COLLECTION: Name of the collection in Qdrant
     (required if CAI_MEMORY=episodic)
+   CAI_MEMORY_ONLINE: Enables online learning (incremental updates)
+   CAI_MEMORY_OFFLINE: Trigger offline learning (@2_jsonl_to_memory.py) when
+    cai.client.run() finishes
 
     TODO: add the other variables (CAI_MEMORY_ONLINE and CAI_MEMORY_OFFLINE)
 """
 
 import os
 from cai.types import Agent
-from cai.tools.misc.rag import add_to_memory_semantic
+from cai.tools.misc.rag import add_to_memory_semantic, add_to_memory_episodic
 from cai.rag.vector_db import get_previous_memory
 
 # Get model from environment or use default
@@ -80,30 +99,77 @@ def get_previous_steps(query: str) -> str:
     return get_previous_memory(query=query)
 
 
-memory_agent = Agent(
+ADD_MEMORY_PROMPT = f"""INSTRUCTIONS:
+    1. You are a specialized agent for resume CTF and managing the RAG
+    2. Adding new information to the persistent memory
+    3. When adding information, ensure it is relevant and formatted
+    4. Always verify the success of memory operations
+    5. Include all information from previous tool execution
+    6. Be verbose with useful context and very detailed
+    7. Include all ports, services and network information
+
+    Consider the current CTF pentesting process step.
+    Overwrite step if you find a better solution.
+    Do not overwrite if not more conclusive than existing.
+
+    Add only facts, not next steps or assumptions.
+    Add evidential information from previous CTF steps.
+    For conflicts, determine if memory update needed.
+
+    {get_previous_steps("")}
+    """
+
+QUERY_PROMPT = """INSTRUCTIONS:
+    You are a specialized agent for CTF exercises and security assessments,
+    managing the RAG system.
+
+    Your role is to:
+    1. Retrieve and analyze relevant historical information from memory
+    2. Focus on security-critical details like:
+        - Discovered vulnerabilities and exploits
+        - Network topology and exposed services
+        - Credentials and access patterns
+        - System configurations and versions
+        - Previous successful attack vectors
+    3. Prioritize technical details that could be useful for exploitation
+    4. Consider the full context of the security assessment
+    5. Maintain operational security by handling sensitive data appropriately
+
+    When processing queries:
+    - Extract specific technical indicators
+    - Identify relationships between different findings
+    - Highlight potential security implications
+    - Provide actionable intelligence for further exploitation
+
+    Format responses to emphasize critical security information
+    while maintaining clarity and precision.
+    """
+
+semantic_builder = Agent(
     model=model,
-    name="Memory Manager",
-    instructions=f"""INSTRUCTIONS:
-        1. You are a specialized agent for resume CTF and managing the RAG
-        2. Adding new information to the persistent memory
-        3. When adding information, ensure it is relevant and formatted
-        4. Always verify the success of memory operations
-        5. Include all information from previous tool execution
-        6. Be verbose with useful context and very detailed
-        7. Include all ports, services and network information
-
-        Consider the current CTF pentesting process step.
-        Overwrite step if you find a better solution.
-        Do not overwrite if not more conclusive than existing.
-
-        Add only facts, not next steps or assumptions.
-        Add evidential information from previous CTF steps.
-        For conflicts, determine if memory update needed.
-
-        {get_previous_steps("")}
-        """,
+    name="Semantic_Builder",
+    instructions=ADD_MEMORY_PROMPT,
     tool_choice="required",
     temperature=0,
     functions=[add_to_memory_semantic],
     parallel_tool_calls=True
+)
+
+
+episodic_builder = Agent(
+    model=model,
+    name="Episodic_Builder",
+    instructions=ADD_MEMORY_PROMPT,
+    tool_choice="required",
+    temperature=0,
+    functions=[add_to_memory_episodic],
+    parallel_tool_calls=True
+)
+
+query_agent = Agent(
+    model=model,
+    name="Query_Agent",
+    instructions=QUERY_PROMPT,
+    tool_choice="required",
+    temperature=0,
 )

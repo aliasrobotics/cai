@@ -30,11 +30,9 @@ Environment Variables
         CAI_AGENT_TYPE: Specify agent type (default: "one_tool")
         CAI_STATE: Enable/disable stateful mode (default: "false")
 
-
-        CAI_MEMORY: Retrieves CTF/Scenario memory from Qdrant on core.py
-            when init a client.run
-        CTF_RAG_MEMORY_INTERVAL: Retrieves CTF/Scenario memory from Qdrant on
-            core.py when init a client.run each X turns
+        CAI_MEMORY: Enable/disable memory mode (default: "false")
+        CAI_MEMORY_ONLINE: Enable/disable online memory mode (default: "false")
+        CAI_MEMORY_OFFLINE: Enable/disable offline memory (default: "false")
 
     Extensions (only applicable if the right extension is installed):
 
@@ -55,7 +53,7 @@ Usage Examples:
         CAI_MODEL="gpt-4o" CAI_TRACING="false" python3 cai/cli.py
     # Run against a CTF with RAG memory
     CTF_NAME="hackableII" CAI_MEMORY="True" \
-        CTF_RAG_MEMORY_INTERVAL=3 CAI_MODEL="o3-mini" \
+        CAI_MEMORY_ONLINE_INTERVAL=3 CAI_MODEL="o3-mini" \
         CTF_INSIDE="False" CTF_CTF_HINTS="False" python3 cai/cli.py
     # Run without a target in human-in-the-loop mode, generating a report
     $ CAI_TRACING=False CAI_REPORT=pentesting CAI_MODEL="gpt-4o" \
@@ -70,7 +68,7 @@ Usage Examples:
     # Run with custom long_term_memory interval
     # Executes memory long_term_memory every 3 turns:
     CTF_NAME="hackableII" CAI_MEMORY="True" \
-        CAI_MODEL="o3-mini" CTF_RAG_MEMORY_INTERVAL="3" \
+        CAI_MODEL="o3-mini" CAI_MEMORY_ONLINE_INTERVAL="3" \
         ONLINE_MEMORY="False" CTF_INSIDE="False" \
         CTF_HINTS="False" python3 cai/cli.py
 """

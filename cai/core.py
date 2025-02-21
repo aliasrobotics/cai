@@ -112,7 +112,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         # memory attributes
         self.rag = os.getenv("CAI_MEMORY", "false").lower() == "true"
-        self.rag_interval = int(os.getenv("CTF_RAG_MEMORY_INTERVAL", "5"))
+        self.rag_interval = int(os.getenv("CAI_MEMORY_ONLINE_INTERVAL", "5"))
         self.force_until_flag = force_until_flag
 
         self.challenge = challenge
