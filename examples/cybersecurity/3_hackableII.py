@@ -4,9 +4,9 @@ Advanced Boot2Root CTF Framework with CLI, Code Interpreter and Analysis Modes
 import sys
 from cai.core import CAI, Agent, is_pentestperf_available
 # Codebase Tools
-from cai.tools.llm_plugins.cli_utils import execute_cli_command
+from cai.tools.misc.cli_utils import execute_cli_command
 from cai.tools.web.headers import web_request_framework 
-from cai.tools.llm_plugins.reasoning import thought
+from cai.tools.misc.reasoning import thought
 from mako.template import Template
 from cai.tools.web.webshell_suit import generate_php_webshell, upload_webshell as upload_ftp_webshell
 

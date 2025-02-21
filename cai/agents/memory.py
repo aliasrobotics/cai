@@ -1,0 +1,109 @@
+"""
+Memory agent for CAI.
+
+Leverages Retrieval Augmented Generation (RAG) to
+store long-term memory experiences across security
+exercises and re-utilizes such experiences as input
+in other security exercises. Memories are stored in
+a vector database and retrieved using a RAG pipeline.
+
+The implementation follows established research in
+Retrieval Augmented Generation (RAG) and episodic
+memory systems, utilizing two complementary mechanisms:
+
+1. Episodic Memory Store (episodic): Maintains chronological
+   records of past interactions and their summaries,
+   organized by distinct security exercises (CTFs)
+   or targets within a document-oriented collection
+   structure
+
+2. Semantic Memory Store (semantic): Enables cross-exercise
+   knowledge transfer through similarity-based
+   retrieval across the full corpus of historical
+   experiences, leveraging dense vector embeddings
+   and approximate nearest neighbor search
+
+Memory Architecture Diagrams
+----------------------------
+
+Episodic Memory (Per Security Target_n "Collection"):
++----------------+     +-------------------+    +------------------+     +----------------+  # noqa: E501  # pylint: disable=line-too-long
+|   Raw Events   |     |       LLM        |     |     Vector       |     |   Collection   |  # noqa: E501  # pylint: disable=line-too-long
+|  from Target   | --> | Summarization    | --> |   Embeddings     | --> |   "Target_1"   |  # noqa: E501  # pylint: disable=line-too-long
+|                |     |                  |     |                  |     |                |  # noqa: E501  # pylint: disable=line-too-long
+| [Event 1]      |     | Condenses and    |     | Converts text    |     | Summary 1      |  # noqa: E501  # pylint: disable=line-too-long
+| [Event 2]      |     | extracts key     |     | into dense       |     | Summary 2      |  # noqa: E501  # pylint: disable=line-too-long
+| [Event 3]      |     | information      |     | vectors          |     | Summary 3      |  # noqa: E501  # pylint: disable=line-too-long
++----------------+     +------------------+     +------------------+     +----------------+  # noqa: E501  # pylint: disable=line-too-long
+
+Semantic Memory (Single Global Collection "_all_"):
++---------------+    +--------------+    +------------------+
+| Target_1 Data |--->|              |    |"_all_" collection|
++---------------+    |              |    |                  |
+                     |    Vector    |    | [Vector 1] CTF_A |
++---------------+    |  Embeddings  |--->| [Vector 2] CTF_B |
+| Target_2 Data |--->|              |    | [Vector 3] CTF_A |
++---------------+    |              |    | [Vector 4] CTF_C |
+                     |              |    |        ...       |
++---------------+    |              |    |                  |
+| Target_N Data |--->|              |    |                  |
++---------------+    +--------------+    +------------------+
+
+
+Environment Variables enabling the episodic memory store
+--------------------------------------------------------
+
+   CAI_MEMORY: Enables the use of memory functionality in CAI
+    can adopt values:
+    - episodic: for episodic memory store
+    - semantic: for semantic memory store
+    - all: for all memory stores
+   CAI_MEMORY_COLLECTION: Name of the collection in Qdrant
+    (required if CAI_MEMORY=episodic)
+
+    TODO: add the other variables (CAI_MEMORY_ONLINE and CAI_MEMORY_OFFLINE)
+"""
+
+import os
+from cai.types import Agent
+from cai.tools.misc.rag import add_to_memory_semantic
+from cai.rag.vector_db import get_previous_memory
+
+# Get model from environment or use default
+model = os.getenv('CAI_MODEL', "qwen2.5:14b")
+
+
+def get_previous_steps(query: str) -> str:
+    """
+    Get the previous memory from the vector database.
+    """
+    return get_previous_memory(query=query)
+
+
+memory_agent = Agent(
+    model=model,
+    name="Memory Manager",
+    instructions=f"""INSTRUCTIONS:
+        1. You are a specialized agent for resume CTF and managing the RAG
+        2. Adding new information to the persistent memory
+        3. When adding information, ensure it is relevant and formatted
+        4. Always verify the success of memory operations
+        5. Include all information from previous tool execution
+        6. Be verbose with useful context and very detailed
+        7. Include all ports, services and network information
+
+        Consider the current CTF pentesting process step.
+        Overwrite step if you find a better solution.
+        Do not overwrite if not more conclusive than existing.
+
+        Add only facts, not next steps or assumptions.
+        Add evidential information from previous CTF steps.
+        For conflicts, determine if memory update needed.
+
+        {get_previous_steps("")}
+        """,
+    tool_choice="required",
+    temperature=0,
+    functions=[add_to_memory_semantic],
+    parallel_tool_calls=True
+)

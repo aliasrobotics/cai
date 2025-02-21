@@ -4,7 +4,6 @@
     from cai.rag.vector_db import get_previous_memory
 
     # Get system prompt from agent if provided
-
     system_prompt = (
         agent.instructions(context_variables)
         if callable(agent.instructions)
@@ -15,7 +14,7 @@
     ctf_inside = os.getenv('CTF_INSIDE')
 
     # Get memory from vector db if RAG is enabled
-    rag_enabled = os.getenv("CTF_RAG_MEMORY", "false").lower() == "true"
+    rag_enabled = os.getenv("CAI_MEMORY", "false").lower() == "true"
     memory = ""
     if rag_enabled:
         if os.getenv('AGNOSTIC_MEMORY', 'false').lower() == 'true':

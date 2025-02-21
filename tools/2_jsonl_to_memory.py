@@ -2,22 +2,20 @@
 Longterm Memory agent module for processing historical messages through memory management.
 
 Usage:
-    JSONL_FILE_PATH="jsonl_path" COLLECTION_NAME="CTF_NAME|Target_Name" CAI_MODEL="qwen2.5:14b" python3 tools/2_agent_memory_offline.py
+    JSONL_FILE_PATH="jsonl_path" CAI_MEMORY_COLLECTION="CTF_NAME|Target_Name" CAI_MODEL="qwen2.5:14b" python3 tools/2_agent_memory_offline.py
 
 Example:
-    JSONL_FILE_PATH="tests/agents/kiddoctf.jsonl" COLLECTION_NAME="kiddoctf" CAI_MODEL="qwen2.5:14b" python3 tools/2_agent_memory_offline.py
+    JSONL_FILE_PATH="tests/agents/kiddoctf.jsonl" CAI_MEMORY_COLLECTION="kiddoctf" CAI_MODEL="qwen2.5:14b" python3 tools/2_agent_memory_offline.py
 
 Environment Variables:
-    COLLECTION_NAME: Name of the collection in Qdrant in CTFs
+    CAI_MEMORY_COLLECTION: Name of the collection in Qdrant in CTFs
      is equal to the CTF_NAME (required, e.g. "bob", "172.16.0.14")
     JSONL_FILE_PATH: Path to JSONL file containing historical messages
 """
 
 import os
-from typing import List, Dict
-from cai.types import Agent
 from cai.core import CAI
-from cai.rag.memory.memory_manager import memory_agent
+from cai.agents.memory import memory_agent
 from cai.datarecorder import load_history_from_jsonl
 
 def memory_loop(messages_file: str, max_iterations: int = 3) -> None:
@@ -63,7 +61,6 @@ def memory_loop(messages_file: str, max_iterations: int = 3) -> None:
         )
         
         print(f"Processed messages {i} to {i + len(chunk)}")
-        
     print("Completed memorizeing from historical messages")
 
 jsonl_file = os.getenv("JSONL_FILE_PATH")

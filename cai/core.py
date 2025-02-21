@@ -117,9 +117,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.report_interval = int(os.getenv("CAI_REPORT_INTERVAL", "0"))
 
         # MEMORY PARAMS
-        # CTF_RAG_MEMORY="True" CTF_RAG_MEMORY_INTERVAL="3" (by def 5)
+        # CAI_MEMORY="True" CTF_RAG_MEMORY_INTERVAL="3" (by def 5)
 
-        self.rag = os.getenv("CTF_RAG_MEMORY", "false").lower() == "true"
+        self.rag = os.getenv("CAI_MEMORY", "false").lower() == "true"
         self.rag_interval = int(os.getenv("CTF_RAG_MEMORY_INTERVAL", "5"))
         self.force_until_flag = force_until_flag
 
@@ -611,7 +611,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         n_turn = 0
 
         while len(history) - self.init_len < max_turns and active_agent:
-
             # Needs to be inside while loop to avoid using the same function
             # for all iterations
             def agent_iteration(agent):

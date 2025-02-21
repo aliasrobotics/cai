@@ -1,15 +1,10 @@
 """
 Mail Agent module for checking email configuration security.
 
-Usage:
-    # Import and use mail agent
-    from cai.agents.mail import dns_smtp_agent
-    active_agent = transfer_to_mail_agent()
-
 """
 import dns.resolver  # pylint: disable=import-error
 from cai import Agent
-from cai.tools.llm_plugins.cli_utils import execute_cli_command
+from cai.tools.misc.cli_utils import execute_cli_command
 
 
 def get_txt_record(domain, record_type='TXT'):

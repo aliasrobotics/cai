@@ -19,10 +19,10 @@ Usage Examples:
     $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_TRACING=False CAI_REPORT=ctf CAI_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
 
     # Run against a CTF with RAG memory
-    CTF_NAME="hackableII" CTF_RAG_MEMORY="True" CAI_MODEL="o3-mini" CTF_INSIDE="False" CTF_CTF_HINTS="False" python3 cai/cli.py
+    CTF_NAME="hackableII" CAI_MEMORY="True" CAI_MODEL="o3-mini" CTF_INSIDE="False" CTF_CTF_HINTS="False" python3 cai/cli.py
 
     # Run against a CTF with RAG memory and store in memory every 3 interactions
-    CTF_NAME="hackableII" CTF_RAG_MEMORY="True" CTF_RAG_MEMORY_INTERVAL=3 CAI_MODEL="o3-mini" CTF_INSIDE="False" CTF_CTF_HINTS="False" python3 cai/cli.py            
+    CTF_NAME="hackableII" CAI_MEMORY="True" CTF_RAG_MEMORY_INTERVAL=3 CAI_MODEL="o3-mini" CTF_INSIDE="False" CTF_CTF_HINTS="False" python3 cai/cli.py            
 
 CI/CD Pipeline Configuration:
     Add the following structure to .ctf.yml file:

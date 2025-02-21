@@ -17,7 +17,7 @@ from cai.tools.reconnaissance.crypto_tools import (
     strings_command,
     decode_hex_bytes
 )
-from cai.rag.memory.memory_manager import memory_agent
+from cai.agents.memory import memory_agent
 from cai.tools.reconnaissance.netcat import netcat
 from cai.tools.reconnaissance.nmap import nmap
 from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa

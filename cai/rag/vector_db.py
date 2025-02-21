@@ -295,7 +295,7 @@ def get_previous_memory(query: str, top_k: int = 20) -> str:
     if query != "":
         collection_name = "_all_"  # pylint: disable=W0621
     else:
-        collection_name = os.getenv('COLLECTION_NAME', 'default')
+        collection_name = os.getenv('CAI_MEMORY_COLLECTION', 'default')
     vector_db = QdrantConnector()
 
     if collection_name == "_all_":

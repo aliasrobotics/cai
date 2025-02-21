@@ -34,7 +34,7 @@ Environment Variables:
             - pentesting: do a report from a pentesting
 
 
-        CTF_RAG_MEMORY: Retrieves CTF/Scenario memory from Qdrant on core.py
+        CAI_MEMORY: Retrieves CTF/Scenario memory from Qdrant on core.py
             when init a client.run
         CTF_RAG_MEMORY_INTERVAL: Retrieves CTF/Scenario memory from Qdrant on
             core.py when init a client.run each X turns
@@ -47,7 +47,7 @@ Usage Examples:
     CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" \\
         CAI_MODEL="gpt-4o" CAI_TRACING="false" python3 cai/cli.py
     # Run against a CTF with RAG memory
-    CTF_NAME="hackableII" CTF_RAG_MEMORY="True" \\
+    CTF_NAME="hackableII" CAI_MEMORY="True" \\
         CTF_RAG_MEMORY_INTERVAL=3 CAI_MODEL="o3-mini" \\
         CTF_INSIDE="False" CTF_CTF_HINTS="False" python3 cai/cli.py
     # Run without a target in human-in-the-loop mode, generating a report
@@ -56,13 +56,13 @@ Usage Examples:
 
     # Run with online long_term_memory
     # Executes memory long_term_memory every 5 turns:
-    $ CTF_NAME="hackableII" CTF_RAG_MEMORY="True" \\
+    $ CTF_NAME="hackableII" CAI_MEMORY="True" \\
     CAI_MODEL="o3-mini" ONLINE_MEMORY="True" \\
     CTF_INSIDE="False" CTF_HINTS="False" python3 cai/cli.py
 
     # Run with custom long_term_memory interval
     # Executes memory long_term_memory every 3 turns:
-    CTF_NAME="hackableII" CTF_RAG_MEMORY="True" \\
+    CTF_NAME="hackableII" CAI_MEMORY="True" \\
     CAI_MODEL="o3-mini" CTF_RAG_MEMORY_INTERVAL="3" \\
     ONLINE_MEMORY="False" CTF_INSIDE="False" \\
     CTF_HINTS="False" python3 cai/cli.py
@@ -80,7 +80,7 @@ from cai.repl import run_demo_loop
 from cai.tools.command_and_control.sshpass import (
     run_ssh_command_with_credentials
 )
-from cai.tools.llm_plugins.reasoning import thought
+from cai.tools.misc.reasoning import thought
 from cai.tools.reconnaissance.generic_linux_command import (
     generic_linux_command
 )

@@ -2,7 +2,7 @@
 SSH Pass tool for executing remote commands via SSH using password authentication.
 
 Example of generalization: to execute a local command we use a bash wrapper
-in `generic_linux_command` and in `execute_cli_command` -> `cai.tools.llm_plugins.cli_utils`
+in `generic_linux_command` and in `execute_cli_command` -> `cai.tools.misc.cli_utils`
 Using these wrappers, commands like `ssh` or `netcat` usually get trapped
 by the LLM, so prompt engineering is used to execute the command locally
 and return the result. Another solution is to implement interactive CLIs, for now this command
@@ -12,7 +12,7 @@ It handles privilege escalation very well and is autonomous regarding SSH passwo
 something that hasn't been seen in other cybersecurity frameworks yet (Feb 2025)
 """  # noqa: E501
 
-from cai.tools.llm_plugins.cli_utils import execute_cli_command  # pylint: disable=E0401 # noqa: E501
+from cai.tools.misc.cli_utils import execute_cli_command  # pylint: disable=E0401 # noqa: E501
 
 
 def run_ssh_command_with_credentials(
