@@ -47,7 +47,6 @@ from .types import (
     Response,
     Result,
 )
-from mako.template import Template
 
 __CTX_VARS_NAME__ = "context_variables"
 litellm.suppress_debug_info = True
@@ -141,7 +140,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         and context variables.
         """
         context_variables = defaultdict(str, context_variables)
-        messages = [{"role": "system", "content": Template(
+        messages = [{"role": "system", "content": Template(  # nosec: B702
             filename="cai/prompts/master_template.md").render(
                 agent=agent,
                 ctf_instructions=history[0]["content"],

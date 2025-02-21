@@ -40,7 +40,7 @@ from sentence_transformers import (  # pylint: disable=import-error
     SentenceTransformer
 )
 from dotenv import load_dotenv  # pylint: disable=import-error
-
+from cai.util import cli_print_tool_call  # pylint: disable=import-error
 load_dotenv()
 
 
@@ -284,3 +284,42 @@ class QdrantConnector:
         except Exception as e:  # pylint: disable=broad-exception-caught
             print(f"Error filtering: {e}")
             return []
+
+
+def get_previous_memory(query: str, top_k: int = 20) -> str:
+    """
+    Get the previous memory from the vector database.
+    Returns steps ordered by ID from 1 to top_k.
+    """
+
+    if query != "":
+        collection_name = "_all_"  # pylint: disable=W0621
+    else:
+        collection_name = os.getenv('COLLECTION_NAME', 'default')
+    vector_db = QdrantConnector()
+
+    if collection_name == "_all_":
+        results = vector_db.search(
+            collection_name=collection_name,
+            query_text=query,
+            limit=top_k,
+            sort_by_id=False)
+    else:
+        results = vector_db.search(
+            collection_name=collection_name,
+            query_text=query,
+            limit=top_k,
+            sort_by_id=True)
+
+    cli_print_tool_call("Memory",
+                        {"From": "Previous Findings"},
+                        results,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        "Python Code",
+                        0)
+    return results

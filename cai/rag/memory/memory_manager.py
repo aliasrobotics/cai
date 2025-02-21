@@ -6,19 +6,6 @@ Usage:
     from cai.rag.memory.memory_manager import memory_agent
     active_agent = transfer_to_memory_agent()
 
-    # Run with online long_term_memory
-    # Executes memory long_term_memory every 5 turns:
-    CTF_NAME="hackableII" CTF_RAG_MEMORY="True" \\
-    CAI_MODEL="o3-mini" ONLINE_MEMORY="True" \\
-    CTF_INSIDE="False" CTF_HINTS="False" python3 cai/cli.py
-
-    # Run with custom long_term_memory interval
-    # Executes memory long_term_memory every 3 turns:
-    CTF_NAME="hackableII" CTF_RAG_MEMORY="True" \\
-    CAI_MODEL="o3-mini" CTF_RAG_MEMORY_INTERVAL="3" \\
-    ONLINE_MEMORY="False" CTF_INSIDE="False" \\
-    CTF_HINTS="False" python3 cai/cli.py
-
     # Run offline LONG TERM MEMORY
     JSONL_FILE_PATH="logs/test_20250209_191542.jsonl" \\
     CTF_NAME="testctf" CAI_MODEL="qwen2.5:14b" \\
@@ -36,7 +23,7 @@ Environment Variables:
 import os
 from cai.types import Agent
 from cai.tools.llm_plugins.rag import add_to_memory_v2
-from cai.util import get_previous_memory
+from cai.rag.vector_db import get_previous_memory
 
 # Get model from environment or use default
 model = os.getenv('CAI_MODEL', "qwen2.5:14b")

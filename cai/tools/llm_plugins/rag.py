@@ -8,7 +8,7 @@ from cai.rag.vector_db import QdrantConnector
 
 
 # CTF BASED MEMORY
-collection_name = os.getenv("CTF_NAME", "default")
+collection_name = os.getenv('COLLECTION_NAME', "default")
 
 
 def query_memory(query: str, top_k: int = 3, **kwargs) -> str:  # pylint: disable=unused-argument,line-too-long # noqa: E501

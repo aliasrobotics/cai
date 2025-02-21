@@ -53,6 +53,19 @@ Usage Examples:
     # Run without a target in human-in-the-loop mode, generating a report
     $ CAI_TRACING=False CAI_REPORT=pentesting CAI_MODEL="gpt-4o" \\
         python3 cai/cli.py
+
+    # Run with online long_term_memory
+    # Executes memory long_term_memory every 5 turns:
+    $ CTF_NAME="hackableII" CTF_RAG_MEMORY="True" \\
+    CAI_MODEL="o3-mini" ONLINE_MEMORY="True" \\
+    CTF_INSIDE="False" CTF_HINTS="False" python3 cai/cli.py
+
+    # Run with custom long_term_memory interval
+    # Executes memory long_term_memory every 3 turns:
+    CTF_NAME="hackableII" CTF_RAG_MEMORY="True" \\
+    CAI_MODEL="o3-mini" CTF_RAG_MEMORY_INTERVAL="3" \\
+    ONLINE_MEMORY="False" CTF_INSIDE="False" \\
+    CTF_HINTS="False" python3 cai/cli.py
 """
 # Standard library imports
 import os

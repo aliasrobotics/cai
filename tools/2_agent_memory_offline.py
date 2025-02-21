@@ -1,12 +1,15 @@
 """
 Longterm Memory agent module for processing historical messages through memory management.
 
-OFFLINE LONG TERM MEMORY:
+Usage:
+    JSONL_FILE_PATH="jsonl_path" COLLECTION_NAME="CTF_NAME|Target_Name" CAI_MODEL="qwen2.5:14b" python3 tools/2_agent_memory_offline.py
 
-JSONL_FILE_PATH="logs/test_20250209_191542.jsonl" CTF_NAME="testctf" CAI_MODEL="qwen2.5:14b" python3 tools/2_JSONL_to_vectordb.py
+Example:
+    JSONL_FILE_PATH="tests/agents/kiddoctf.jsonl" COLLECTION_NAME="kiddoctf" CAI_MODEL="qwen2.5:14b" python3 tools/2_agent_memory_offline.py
 
 Environment Variables:
-    CTF_NAME: Name of the collection in Qdrant (required, e.g. "testctf")
+    COLLECTION_NAME: Name of the collection in Qdrant in CTFs
+     is equal to the CTF_NAME (required, e.g. "bob", "172.16.0.14")
     JSONL_FILE_PATH: Path to JSONL file containing historical messages
 """
 
@@ -17,7 +20,7 @@ from cai.core import CAI
 from cai.rag.memory.memory_manager import memory_agent
 from cai.datarecorder import load_history_from_jsonl
 
-def JSONL_to_VectorDB(messages_file: str, max_iterations: int = 3) -> None:
+def memory_loop(messages_file: str, max_iterations: int = 3) -> None:
     """
     Run the memory processor agent to process historical messages through memory management.
     
@@ -68,4 +71,4 @@ if not jsonl_file:
     print("JSONL_FILE_PATH environment variable not set. Please set it to the path of your messages file.")
     print("Example: export JSONL_FILE_PATH=path/to/messages.jsonl")
     exit(1)
-JSONL_to_VectorDB(messages_file=jsonl_file)
+memory_loop(messages_file=jsonl_file)

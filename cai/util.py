@@ -19,48 +19,6 @@ from rich.theme import Theme  # pylint: disable=import-error
 from rich.traceback import install  # pylint: disable=import-error
 from rich.pretty import install as install_pretty  # pylint: disable=import-error # noqa: 501
 from rich.tree import Tree  # pylint: disable=import-error
-from cai.rag.vector_db import QdrantConnector  # pylint: disable=import-error # noqa: E501
-
-collection_name = os.getenv('CTF_NAME', 'default')
-
-
-def get_previous_memory(query: str, top_k: int = 20) -> str:
-    """
-    Get the previous memory from the vector database.
-    Returns steps ordered by ID from 1 to top_k.
-    """
-
-    if query != "":
-        collection_name = "_all_"  # pylint: disable=W0621
-    else:
-        collection_name = os.getenv('CTF_NAME', 'default')
-    vector_db = QdrantConnector()
-
-    if collection_name == "_all_":
-        results = vector_db.search(
-            collection_name=collection_name,
-            query_text=query,
-            limit=top_k,
-            sort_by_id=False)
-    else:
-        results = vector_db.search(
-            collection_name=collection_name,
-            query_text=query,
-            limit=top_k,
-            sort_by_id=True)
-
-    cli_print_tool_call("Memory",
-                        {"From": "Previous Findings"},
-                        results,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        "Python Code",
-                        0)
-    return results
 
 
 def get_model_input_tokens(model):
