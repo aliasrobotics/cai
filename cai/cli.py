@@ -2,7 +2,11 @@
 This module provides a CLI interface for testing and
 interacting with CAI agents.
 
-Environment Variables:
+Environment Variables
+---------------------
+    Required:
+        N/A
+
     Optional:
         CTF_NAME: Name of the CTF challenge to
             run (e.g. "picoctf_static_flag")
@@ -26,46 +30,49 @@ Environment Variables:
         CAI_AGENT_TYPE: Specify agent type (default: "one_tool")
         CAI_STATE: Enable/disable stateful mode (default: "false")
 
-        (You should install extensions to use this feature)
-        |
-        CAI_REPORT: Enable/disable reporter mode. It could take the value of:
-            - ctf (default): do a report from a ctf resolution
-            - nis2: do a report for nis2
-            - pentesting: do a report from a pentesting
-
 
         CAI_MEMORY: Retrieves CTF/Scenario memory from Qdrant on core.py
             when init a client.run
         CTF_RAG_MEMORY_INTERVAL: Retrieves CTF/Scenario memory from Qdrant on
             core.py when init a client.run each X turns
 
+    Extensions (only applicable if the right extension is installed):
+
+        "report"
+            CAI_REPORT: Enable/disable reporter mode. Possible values:
+                - ctf (default): do a report from a ctf resolution
+                - nis2: do a report for nis2
+                - pentesting: do a report from a pentesting
+
+
 Usage Examples:
+
     # Run against a CTF
-    CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" \\
+    CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" \
         CAI_MODEL="gpt-4o" CAI_TRACING="false" python3 cai/cli.py
 
-    CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" \\
+    CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" \
         CAI_MODEL="gpt-4o" CAI_TRACING="false" python3 cai/cli.py
     # Run against a CTF with RAG memory
-    CTF_NAME="hackableII" CAI_MEMORY="True" \\
-        CTF_RAG_MEMORY_INTERVAL=3 CAI_MODEL="o3-mini" \\
+    CTF_NAME="hackableII" CAI_MEMORY="True" \
+        CTF_RAG_MEMORY_INTERVAL=3 CAI_MODEL="o3-mini" \
         CTF_INSIDE="False" CTF_CTF_HINTS="False" python3 cai/cli.py
     # Run without a target in human-in-the-loop mode, generating a report
-    $ CAI_TRACING=False CAI_REPORT=pentesting CAI_MODEL="gpt-4o" \\
+    $ CAI_TRACING=False CAI_REPORT=pentesting CAI_MODEL="gpt-4o" \
         python3 cai/cli.py
 
     # Run with online long_term_memory
     # Executes memory long_term_memory every 5 turns:
-    $ CTF_NAME="hackableII" CAI_MEMORY="True" \\
-    CAI_MODEL="o3-mini" ONLINE_MEMORY="True" \\
-    CTF_INSIDE="False" CTF_HINTS="False" python3 cai/cli.py
+    CTF_NAME="hackableII" CAI_MEMORY="True" \
+        CAI_MODEL="o3-mini" ONLINE_MEMORY="True" \
+        CTF_INSIDE="False" CTF_HINTS="False" python3 cai/cli.py
 
     # Run with custom long_term_memory interval
     # Executes memory long_term_memory every 3 turns:
-    CTF_NAME="hackableII" CAI_MEMORY="True" \\
-    CAI_MODEL="o3-mini" CTF_RAG_MEMORY_INTERVAL="3" \\
-    ONLINE_MEMORY="False" CTF_INSIDE="False" \\
-    CTF_HINTS="False" python3 cai/cli.py
+    CTF_NAME="hackableII" CAI_MEMORY="True" \
+        CAI_MODEL="o3-mini" CTF_RAG_MEMORY_INTERVAL="3" \
+        ONLINE_MEMORY="False" CTF_INSIDE="False" \
+        CTF_HINTS="False" python3 cai/cli.py
 """
 # Standard library imports
 import os

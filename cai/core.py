@@ -110,15 +110,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         if log_training_data:
             self.rec_training_data = DataRecorder()
 
-        # REPORT PARAMS
-        # CTF_REPORT="True" CTF_REPORT_INTERVAL="3" (by def 0)
-
-        self.report = os.getenv("CAI_REPORT", "false").lower() == "true"
-        self.report_interval = int(os.getenv("CAI_REPORT_INTERVAL", "0"))
-
-        # MEMORY PARAMS
-        # CAI_MEMORY="True" CTF_RAG_MEMORY_INTERVAL="3" (by def 5)
-
+        # memory attributes
         self.rag = os.getenv("CAI_MEMORY", "false").lower() == "true"
         self.rag_interval = int(os.getenv("CTF_RAG_MEMORY_INTERVAL", "5"))
         self.force_until_flag = force_until_flag
