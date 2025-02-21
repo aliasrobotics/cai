@@ -642,34 +642,26 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 flag_found, flag = check_flag(
                     history[-1]["content"], self.ctf, self.challenge)
 
-                if flag_found:
-                    break
-
                 # # Check if flag is found anywhere in history
                 # for message in history:
                 #     flag_found, _ = check_flag(message["content"],
                 #                                self.ctf,
                 #                                self.challenge)
-                #     if flag_found:
-                #         break
+
+                if flag_found:
+                    break
 
                 # If flag is not found, continue with the next turn
                 # adding to the history that the flag was not found
-                if history[-1]["sender"] == "Flag discriminator":
-                    history.append({
-                        "role": "user",
-                        "content": (
-                            f"Detected flag {flag} is not the expected one. "
-                            "Keep looking for it and reflect on your "
-                            "previous steps."
-                        )
-                    })
-                else:
-                    history.append({
-                        "role": "user",
-                        "content":
-                                "Continue solving the CTF"
-                    })
+                history.append({
+                    "role": "user",
+                    "content": (
+                        "Turn finished, checking whether flag is found. "
+                        f"Flag detected: {flag} is not the expected one.\n"
+                        "Keep looking for it and reflect on your previous "
+                        "steps."
+                    )
+                })
                 active_agent = agent
 
             elif active_agent is None:
