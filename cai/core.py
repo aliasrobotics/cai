@@ -655,14 +655,21 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
                 # If flag is not found, continue with the next turn
                 # adding to the history that the flag was not found
-                history.append({
-                    "role": "user",
-                    "content": (
-                        f"Detected flag {flag} is not the expected one. "
-                        "Keep looking for it and reflect on your "
-                        "previous steps."
-                    )
-                })
+                if history[-1]["sender"] == "Flag discriminator":
+                    history.append({
+                        "role": "user",
+                        "content": (
+                            f"Detected flag {flag} is not the expected one. "
+                            "Keep looking for it and reflect on your "
+                            "previous steps."
+                        )
+                    })
+                else:
+                    history.append({
+                        "role": "user",
+                        "content":
+                                "Continue solving the CTF"
+                    })
                 active_agent = agent
 
             elif active_agent is None:
