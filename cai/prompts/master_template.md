@@ -1,6 +1,7 @@
 <%
     import os
-    from cai.util import get_previous_memory, cli_print_tool_call
+    from cai.util import cli_print_tool_call
+    from cai.rag.vector_db import get_previous_memory
 
     # Get system prompt from agent if provided
 
