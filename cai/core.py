@@ -25,7 +25,9 @@ from cai.logger import exploit_logger
 # Local imports
 from cai.datarecorder import DataRecorder
 from cai import (
-    transfer_to_memory_agent
+    transfer_to_episodic_memory_agent,
+    transfer_to_semantic_memory_agent,
+    transfer_to_state_agent
 )
 from cai.state.common import StateAgent
 from .util import (
@@ -111,8 +113,17 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             self.rec_training_data = DataRecorder()
 
         # memory attributes
-        self.rag = os.getenv("CAI_MEMORY", "false").lower() == "true"
+        self.episodic_rag = (os.getenv("CAI_MEMORY", "?").lower() == "episodic"
+                             or os.getenv("CAI_MEMORY", "?").lower() == "all")
+
+        self.semantic_rag = (os.getenv("CAI_MEMORY", "?").lower() == "semantic"
+                             or os.getenv("CAI_MEMORY", "?").lower() == "all")
+
+        self.rag_online = os.getenv(
+            "CAI_MEMORY_ONLINE",
+            "false").lower() == "true"
         self.rag_interval = int(os.getenv("CAI_MEMORY_ONLINE_INTERVAL", "5"))
+
         self.force_until_flag = force_until_flag
 
         self.challenge = challenge
@@ -139,7 +150,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 context_variables=context_variables)}]
 
         for msg in history:
-            if msg.get("sender") != "Report Agent":
+            if msg.get("sender") not in ["Report Agent", "Episodic_Builder"]:
                 messages.append(msg)
 
         debug_print(
@@ -621,18 +632,24 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 # Memory agent iteration
                 # If RAG is active and the turn is at a RAG interval, process
                 # using the memory agent
-                if (self.rag and
-                        (n_turn != 0 and n_turn % self.rag_interval == 0) and
-                        os.getenv("ONLINE_MEMORY", "False").lower() == "true"):
+                if (self.episodic_rag and
+                        (n_turn != 0 and n_turn % self.rag_interval == 0)
+                        and self.rag_online):
                     prev_agent = active_agent
-                    active_agent = transfer_to_memory_agent()
+                    active_agent = transfer_to_episodic_memory_agent()
                     agent_iteration(active_agent)
                     active_agent = prev_agent
 
                 # Standard agent iteration
                 active_agent = agent_iteration(active_agent)
                 n_turn += 1
-
+                if (self.semantic_rag and
+                        (n_turn != 0 and n_turn % self.rag_interval == 0)
+                        and self.rag_online):
+                    prev_agent = active_agent
+                    active_agent = transfer_to_semantic_memory_agent()
+                    agent_iteration(active_agent)
+                    active_agent = prev_agent
                 # Stateful agent iteration
                 # If the session is stateful, invoke the memory agent at
                 # defined intervals
@@ -641,7 +658,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     if (self.state_interactions_count
                             >= self.STATE_INTERACTIONS_INTERVAL):
                         prev_agent = active_agent
-                        active_agent = transfer_to_memory_agent()
+                        active_agent = transfer_to_state_agent()
                         agent_iteration(active_agent)
                         active_agent = prev_agent
                         self.state_interactions_count = 0

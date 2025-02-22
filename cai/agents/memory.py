@@ -79,8 +79,6 @@ Environment Variables enabling the episodic memory store
    CAI_MEMORY_ONLINE: Enables online learning (incremental updates)
    CAI_MEMORY_OFFLINE: Trigger offline learning (@2_jsonl_to_memory.py) when
     cai.client.run() finishes
-
-    TODO: add the other variables (CAI_MEMORY_ONLINE and CAI_MEMORY_OFFLINE)
 """
 
 import os

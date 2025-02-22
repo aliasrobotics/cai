@@ -12,12 +12,12 @@
 
     # Get CTF_INSIDE environment variable
     ctf_inside = os.getenv('CTF_INSIDE')
-
+    env_context = os.getenv('CAI_VM_CONTEXT', 'true').lower()
     # Get memory from vector db if RAG is enabled
     rag_enabled = os.getenv("CAI_MEMORY", "false").lower() == "true"
     memory = ""
     if rag_enabled:
-        if os.getenv('AGNOSTIC_MEMORY', 'false').lower() == 'true':
+        if os.getenv('CAI_MEMORY', 'false').lower() == 'true':
             query = ctf_instructions.split('\n')[0].replace('Instructions: ', '')
         else:
             query = ""
@@ -46,4 +46,49 @@ ${memory}
 </memory>
 
 Remember that you must follow an iterative process of executing tools and commands autonomously based on the memory provided. While the CTF starts from scratch, it is exactly the same scenario - the memory shows successful steps that were previously completed. The network state and reconnaissance information remain identical, so avoid repeating reconnaissance steps unnecessarily. Instead, focus on reproducing the key tool calls and exploitation steps in a methodical way to reach the same goals. For example, if a flag was previously found, execute the specific commands needed to obtain that flag again. Always use the flag discriminator to validate flags. Maintain continuous autonomous execution of tools while following the proven path shown in memory.
+% endif
+
+% if env_context.lower() == 'true':
+<%
+    import platform
+    import socket
+    import os
+    from pathlib import Path
+
+    # Get system info
+    os_name = platform.system()
+    hostname = socket.gethostname()
+    ip_addr = socket.gethostbyname(hostname)
+
+    # Get wordlist directories
+    wordlist_path = Path('/usr/share/wordlists')
+    wordlist_files = []
+    if wordlist_path.exists():
+        wordlist_files = [f.name for f in wordlist_path.iterdir() if f.is_file()]
+
+    seclists_path = wordlist_path / 'seclists'
+    seclist_dirs = []
+    if seclists_path.exists():
+        seclist_dirs = [d.name for d in seclists_path.iterdir() if d.is_dir()]
+%>
+
+Environment context:
+- OS: ${os_name}
+- IP Attacker: ${ip_addr}
+- Role: Attacker
+
+% if wordlist_files:
+- Wordlists available:
+    % for file in wordlist_files:
+    - ${file}
+    % endfor
+% endif
+
+% if seclist_dirs:
+- SecLists categories:
+    % for dir in seclist_dirs:
+    - ${dir}
+    % endfor
+% endif
+
 % endif

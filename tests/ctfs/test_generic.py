@@ -72,7 +72,8 @@ Environment Variables:
         
          CAI_MEMORY: Enable/disable memory mode (default: "false")
         CAI_MEMORY_ONLINE: Enable/disable online memory mode (default: "false")
-        CAI_MEMORY_OFFLINE: Enable/disable offline memory mode (default: "false")              
+        CAI_MEMORY_OFFLINE: Enable/disable offline memory mode (default: "false")  
+        CAI_VM_CONTEXT: Add enviroment context, dirs and current env available (default: "true")            
 """
 
 import pytest
