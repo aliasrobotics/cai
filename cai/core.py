@@ -141,6 +141,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         and context variables.
         """
         context_variables = defaultdict(str, context_variables)
+
         messages = [{"role": "system", "content": Template(  # nosec: B702
             filename="cai/prompts/core/system_master_template.md").render(
                 agent=agent,

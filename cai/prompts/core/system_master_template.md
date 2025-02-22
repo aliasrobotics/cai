@@ -14,20 +14,31 @@
     ctf_inside = os.getenv('CTF_INSIDE')
     env_context = os.getenv('CAI_VM_CONTEXT', 'true').lower()
     # Get memory from vector db if RAG is enabled
-    rag_enabled = os.getenv("CAI_MEMORY", "false").lower() == "true"
+    rag_enabled = os.getenv("CAI_MEMORY", "?").lower() in ["episodic", "semantic", "all"]
     memory = ""
     if rag_enabled:
-        if os.getenv('CAI_MEMORY', 'false').lower() == 'true':
+        if os.getenv("CAI_MEMORY", "?").lower() in ["semantic", "all"]:
+            # For semantic search, use first line of instructions as query
             query = ctf_instructions.split('\n')[0].replace('Instructions: ', '')
         else:
+            # For episodic memory, use empty query to get chronological steps
             query = ""
         try:
-            print(f"Query: {query}")
-            memory = get_previous_memory(query, top_k=1)  # Use empty string as default query
-            print(f"Memory: {memory}")
+            memory = get_previous_memory(query)
         except Exception as e:
-            print(f"Error retrieving memory: {e}")
             memory = ""  # Set empty memory on error
+
+        cli_print_tool_call(tool_name="Memory",
+                       tool_args={"From": "Previous Findings"},
+                       tool_output=memory,
+                       interaction_input_tokens=0,
+                       interaction_output_tokens=0,
+                       interaction_reasoning_tokens=0,
+                       total_input_tokens=0,
+                       total_output_tokens=0,
+                       total_reasoning_tokens=0,
+                       model="Python Code",
+                       debug=False)
 %>
 
 ${system_prompt}

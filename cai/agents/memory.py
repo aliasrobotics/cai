@@ -94,7 +94,8 @@ def get_previous_steps(query: str) -> str:
     """
     Get the previous memory from the vector database.
     """
-    return get_previous_memory(query=query)
+    results = get_previous_memory(query=query)
+    return results
 
 
 ADD_MEMORY_PROMPT = f"""INSTRUCTIONS:

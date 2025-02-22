@@ -109,10 +109,6 @@ thought_agent_system_prompt = Template(  # nosec B702
     filename="cai/prompts/system_thought_router.md"
 ).render()
 
-env_context = Template(  # nosec B702
-    filename="cai/prompts/ctx/env_context.md"
-).render()
-
 exploit_agent_system_prompt = Template(  # nosec B702
     filename="cai/prompts/system_exploit_expert.md"
 ).render()
@@ -150,7 +146,7 @@ thought_agent = Agent(
 
 cli_agent = Agent(
     name="Boot2Root CTF Tester",
-    instructions=cli_agent_system_prompt + env_context,
+    instructions=cli_agent_system_prompt,
     model=os.getenv('CAI_MODEL', "qwen2.5:14b"),
     functions=[
         # execute_cli_command,  # does not support ctf context

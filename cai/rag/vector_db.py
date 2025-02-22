@@ -40,7 +40,6 @@ from sentence_transformers import (  # pylint: disable=import-error
     SentenceTransformer
 )
 from dotenv import load_dotenv  # pylint: disable=import-error
-from cai.util import cli_print_tool_call  # pylint: disable=import-error
 load_dotenv()
 
 
@@ -292,9 +291,9 @@ def get_previous_memory(query: str, top_k: int = 20) -> str:
     Returns steps ordered by ID from 1 to top_k.
     """
 
-    if query != "":
+    if query != "":  # Semantic
         collection_name = "_all_"  # pylint: disable=W0621
-    else:
+    else:  # Episodic
         collection_name = os.getenv('CAI_MEMORY_COLLECTION', 'default')
     vector_db = QdrantConnector()
 
@@ -311,15 +310,4 @@ def get_previous_memory(query: str, top_k: int = 20) -> str:
             limit=top_k,
             sort_by_id=True)
 
-    cli_print_tool_call("Memory",
-                        {"From": "Previous Findings"},
-                        results,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        "Python Code",
-                        0)
     return results
