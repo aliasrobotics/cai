@@ -4,7 +4,7 @@ from mako.template import Template
 
 @pytest.fixture
 def template():
-    return Template(filename="cai/prompts/master_template.md")
+    return Template(filename="cai/prompts/core/system_master_template.md")
 
 @pytest.fixture
 def base_agent():

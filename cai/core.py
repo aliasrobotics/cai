@@ -115,10 +115,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # memory attributes
         self.episodic_rag = (os.getenv("CAI_MEMORY", "?").lower() == "episodic"
                              or os.getenv("CAI_MEMORY", "?").lower() == "all")
-
         self.semantic_rag = (os.getenv("CAI_MEMORY", "?").lower() == "semantic"
                              or os.getenv("CAI_MEMORY", "?").lower() == "all")
-
         self.rag_online = os.getenv(
             "CAI_MEMORY_ONLINE",
             "false").lower() == "true"
@@ -144,13 +142,26 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         """
         context_variables = defaultdict(str, context_variables)
         messages = [{"role": "system", "content": Template(  # nosec: B702
-            filename="cai/prompts/master_template.md").render(
+            filename="cai/prompts/core/system_master_template.md").render(
                 agent=agent,
                 ctf_instructions=history[0]["content"],
-                context_variables=context_variables)}]
+                context_variables=context_variables)
+        }]
+        # TODO: uncomment this when user_master_template.md is ready # pylint: disable=fixme  # noqa: E501
+        # TODO: Delete all user prompts from @(cai/cli.py) and (cai/core.py) # pylint: disable=fixme  # noqa: E501
+
+        # messages.append({"role": "user", "content": Template(  # nosec: B702
+        #    filename="cai/prompts/core/user_master_template.md").render(
+        #        agent=agent,
+        #        ctf_instructions=history[0]["content"],
+        #        user_prompt=next((msg["content"] for msg in reversed(history) # noqa: E501
+        #        if msg["role"] == "user"), ""),
+        #        context_variables=context_variables)})
 
         for msg in history:
-            if msg.get("sender") not in ["Report Agent", "Episodic_Builder"]:
+            if msg.get("sender") not in ["Report Agent",
+                                         "Episodic_Builder",
+                                         "Semantic_Builder"]:
                 messages.append(msg)
 
         debug_print(
