@@ -5,13 +5,17 @@ Usage:
     JSONL_FILE_PATH="jsonl_path" CAI_MEMORY_COLLECTION="CTF_NAME|Target_Name" CAI_MODEL="qwen2.5:14b" python3 tools/2_jsonl_to_memory.py
 
 Example:
-    JSONL_FILE_PATH="tests/agents/kiddoctf.jsonl" CAI_MEMORY_COLLECTION="kiddoctf" CAI_MEMORY="Episodic" CAI_MODEL="qwen2.5:14b" python3 tools/2_jsonl_to_memory.py
+    # 1. Process historical messages from a JSONL file and store them in episodic memory
+    JSONL_FILE_PATH="tests/agents/kiddoctf.jsonl" CAI_MEMORY_COLLECTION="kiddoctf" CAI_MEMORY="episodic" CAI_MODEL="gpt-4o" python3 tools/2_jsonl_to_memory.py
+    # 2. Solve same CTF enabling episodic memory
+    CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_MEMORY="episodic" CAI_MODEL="gpt-4o" CTF_INSIDE="True" CAI_MEMORY_COLLECTION="kiddoctf" python3 cai/cli.py
+
 
 Environment Variables:
     CAI_MEMORY_COLLECTION: Name of the collection in Qdrant in CTFs
      is equal to the CTF_NAME (required, e.g. "bob", "172.16.0.14")
     JSONL_FILE_PATH: Path to JSONL file containing historical messages
-    CAI_MEMORY: Memory type to use, either "Episodic" or "Semantic" (all not supported in this case)
+    CAI_MEMORY: Memory type to use, either "episodic" or "semantic" (all not supported in this case)
     CAI_MEMORY_INTERVAL: Number of messages to process per inference
 """
 
@@ -20,13 +24,31 @@ from cai.core import CAI
 from cai import episodic_builder, semantic_builder
 from cai.datarecorder import load_history_from_jsonl
 
-def memory_loop(messages_file: str, max_iterations: int = 10    ) -> None:
+def memory_loop(messages_file: str, max_iterations: int = 10) -> None:
     """
-    Run the memory processor agent to process historical messages through memory management.
-    
+    Process historical messages through memory management by 
+    chunking them into batches and storing them in either 
+    episodic or semantic memory via a memory processor agent.
+
+    The function loads messages from a JSONL file, 
+    filters out system/user messages, and processes 
+    the remaining assistant/tool messages in chunks. 
+    For each chunk, it runs a memory agent that either:
+    - Stores chronological records in episodic memory collections
+    - Creates semantic embeddings for cross-exercise knowledge transfer
+
     Args:
-        messages_file: Path to JSONL file containing historical messages
-        max_iterations: Maximum number of message chunks to process per inference
+        messages_file: Path to JSONL file containing historical messages to process
+        max_iterations: Maximum number of messages to process per memory agent inference.
+                       Messages are chunked into batches of this size to avoid 
+                       overwhelming the agent. Defaults to 10.
+
+    Environment Variables Used:
+        CAI_MEMORY: Type of memory to use - must be either "episodic" or "semantic"
+        CAI_MEMORY_COLLECTION: Name of collection to store memories in (e.g. CTF name)
+
+    Returns:
+        None. Messages are processed and stored in the configured memory store.
     """
 
     messages = load_history_from_jsonl(messages_file)
@@ -39,13 +61,13 @@ def memory_loop(messages_file: str, max_iterations: int = 10    ) -> None:
         print("No assistant or tool messages found to memorize from")
         return
 
-    memory_type = os.getenv("CAI_MEMORY", "Episodic")
-    if memory_type == "Episodic":
+    memory_type = os.getenv("CAI_MEMORY", "episodic")
+    if memory_type == "episodic":
         memory_agent = episodic_builder
-    elif memory_type == "Semantic":
+    elif memory_type == "semantic":
         memory_agent = semantic_builder
     else:
-        print(f"Invalid memory type: {memory_type}. Must be either 'Episodic' or 'Semantic'")
+        print(f"Invalid memory type: {memory_type}. Must be either 'episodic' or 'semantic'")
         return
         
     client = CAI(

@@ -12,7 +12,7 @@
 
     # Get CTF_INSIDE environment variable
     ctf_inside = os.getenv('CTF_INSIDE')
-    env_context = os.getenv('CAI_VM_CONTEXT', 'true').lower()
+    env_context = os.getenv('CAI_ENV_CONTEXT', 'true').lower()
     # Get memory from vector db if RAG is enabled
     rag_enabled = os.getenv("CAI_MEMORY", "?").lower() in ["episodic", "semantic", "all"]
     memory = ""

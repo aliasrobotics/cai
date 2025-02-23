@@ -19,10 +19,10 @@ Usage Examples:
     $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_TRACING=False CAI_REPORT=ctf CAI_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
 
     # Run against a CTF with RAG memory
-    CTF_NAME="hackableII" CAI_MEMORY="True" CAI_MODEL="o3-mini" CTF_INSIDE="False" CTF_CTF_HINTS="False" python3 cai/cli.py
+    CTF_NAME="hackableII" CAI_MEMORY="True" CAI_MODEL="o3-mini" CTF_INSIDE="False" python3 cai/cli.py
 
     # Run against a CTF with RAG memory and store in memory every 3 interactions
-    CTF_NAME="hackableII" CAI_MEMORY="True" CAI_MEMORY_ONLINE_INTERVAL=3 CAI_MODEL="o3-mini" CTF_INSIDE="False" CTF_CTF_HINTS="False" python3 cai/cli.py            
+    CTF_NAME="hackableII" CAI_MEMORY="True" CAI_MEMORY_ONLINE_INTERVAL=3 CAI_MODEL="o3-mini" CTF_INSIDE="False" python3 cai/cli.py            
 
 CI/CD Pipeline Configuration:
     Add the following structure to .ctf.yml file:
@@ -74,9 +74,16 @@ Environment Variables:
             - episodic: use episodic memory
             - semantic: use semantic memory
             - all: use both episodic and semantic memorys
-        CAI_MEMORY_ONLINE: Enable/disable online memory mode (default: "false")
-        CAI_MEMORY_OFFLINE: Enable/disable offline memory mode (default: "false")  
-        CAI_VM_CONTEXT: Add enviroment context, dirs and current env available (default: "true")            
+        CAI_MEMORY_ONLINE: Enable/disable online memory mode 
+            (default: "false")
+        CAI_MEMORY_OFFLINE: Enable/disable offline memory mode 
+            (default: "false")
+        CAI_MEMORY_COLLECTION: Name of the collection in Qdrant
+            in exercises (required if CAI_MEMORY=episodic)
+        CAI_ENV_CONTEXT: Add enviroment context, dirs and current 
+            env available (default: "true")
+        CAI_MEMORY_ONLINE_INTERVAL: Number of turns between 
+            online memory updates (default: "5")
 """
 
 import pytest

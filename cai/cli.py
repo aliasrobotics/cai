@@ -29,13 +29,18 @@ Environment Variables
             (default: "true")
         CAI_AGENT_TYPE: Specify agent type (default: "one_tool")
         CAI_STATE: Enable/disable stateful mode (default: "false")
-
         CAI_MEMORY: Enable/disable memory mode (default: "false")
             - episodic: use episodic memory
             - semantic: use semantic memory
             - all: use both episodic and semantic memorys
-        CAI_MEMORY_ONLINE: Enable/disable online memory mode (default: "false")
-        CAI_MEMORY_OFFLINE: Enable/disable offline memory (default: "false")
+        CAI_MEMORY_ONLINE: Enable/disable online memory mode
+            (default: "false")
+        CAI_MEMORY_OFFLINE: Enable/disable offline memory
+            (default: "false")
+        CAI_ENV_CONTEXT: Add enviroment context, dirs and
+            current env available (default: "true")
+        CAI_MEMORY_ONLINE_INTERVAL: Number of turns between
+            online memory updates (default: "5")
 
     Extensions (only applicable if the right extension is installed):
 
@@ -54,10 +59,7 @@ Usage Examples:
 
     CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" \
         CAI_MODEL="gpt-4o" CAI_TRACING="false" python3 cai/cli.py
-    # Run against a CTF with RAG memory
-    CTF_NAME="hackableII" CAI_MEMORY="True" \
-        CAI_MEMORY_ONLINE_INTERVAL=3 CAI_MODEL="o3-mini" \
-        CTF_INSIDE="False" CTF_CTF_HINTS="False" python3 cai/cli.py
+
     # Run without a target in human-in-the-loop mode, generating a report
     $ CAI_TRACING=False CAI_REPORT=pentesting CAI_MODEL="gpt-4o" \
         python3 cai/cli.py
