@@ -70,7 +70,10 @@ Environment Variables:
                       - nis2: do a report for nis2
                       - pentesting: do a report from a pentesting 
         
-         CAI_MEMORY: Enable/disable memory mode (default: "false")
+        CAI_MEMORY: Enable/disable memory mode (default: "false")
+            - episodic: use episodic memory
+            - semantic: use semantic memory
+            - all: use both episodic and semantic memorys
         CAI_MEMORY_ONLINE: Enable/disable online memory mode (default: "false")
         CAI_MEMORY_OFFLINE: Enable/disable offline memory mode (default: "false")  
         CAI_VM_CONTEXT: Add enviroment context, dirs and current env available (default: "true")            
