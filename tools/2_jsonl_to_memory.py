@@ -4,11 +4,19 @@ Longterm Memory agent module for processing historical messages through memory m
 Usage:
     JSONL_FILE_PATH="jsonl_path" CAI_MEMORY_COLLECTION="CTF_NAME|Target_Name" CAI_MODEL="qwen2.5:14b" python3 tools/2_jsonl_to_memory.py
 
-Example:
-    # 1. Process historical messages from a JSONL file and store them in episodic memory
-    JSONL_FILE_PATH="tests/agents/kiddoctf.jsonl" CAI_MEMORY_COLLECTION="kiddoctf" CAI_MEMORY="episodic" CAI_MODEL="gpt-4o" python3 tools/2_jsonl_to_memory.py
-    # 2. Solve same CTF enabling episodic memory
-    CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_MEMORY="episodic" CAI_MODEL="gpt-4o" CTF_INSIDE="True" CAI_MEMORY_COLLECTION="kiddoctf" python3 cai/cli.py
+Examples:
+    ## episodic memory
+        # Process historical messages from a JSONL file and store them in episodic memory
+        JSONL_FILE_PATH="tests/agents/kiddoctf.jsonl" CAI_MEMORY_COLLECTION="kiddoctf" CAI_MEMORY="episodic" CAI_MODEL="gpt-4o" python3 tools/2_jsonl_to_memory.py
+        # Solve same CTF enabling episodic memory
+        CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_MEMORY="episodic" CAI_MODEL="gpt-4o" CTF_INSIDE="True" CAI_MEMORY_COLLECTION="kiddoctf" python3 cai/cli.py
+    
+    ## semantic memory
+        # Process historical messages from a JSONL file and store them in semantic memory
+        JSONL_FILE_PATH="tests/agents/kiddoctf.jsonl" CAI_MEMORY="semantic" CAI_MODEL="gpt-4o" python3 tools/2_jsonl_to_memory.py
+        
+        # Solve same CTF enabling semantic memory
+        CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_MEMORY="semantic" CAI_MODEL="gpt-4o" CTF_INSIDE="True" python3 cai/cli.py
 
 
 Environment Variables:
