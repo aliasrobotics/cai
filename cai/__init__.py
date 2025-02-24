@@ -42,17 +42,6 @@ if cai_agent == "one_tool":
         transfer_to_flag_discriminator
     )
     flag_discriminator.functions.append(transfer_to_ctf_agent_one_tool)
-
-elif cai_agent == "react":
-    from cai.agents.react import react_reason_agent, transfer_to_react_reason_agent
-    cai_initial_agent = react_reason_agent
-    flag_discriminator.functions.append(transfer_to_react_reason_agent)
-
-elif cai_agent == "proto02":
-    from cai.agents.proto02 import controller_agent02, transfer_to_controller_agent02
-    cai_initial_agent = controller_agent02
-    cai_initial_agent.functions.append(transfer_to_flag_discriminator)
-    flag_discriminator.functions.append(transfer_to_controller_agent02)
 else:
     # stop and raise error
     raise ValueError(f"Invalid CAI agent type: {cai_agent}")

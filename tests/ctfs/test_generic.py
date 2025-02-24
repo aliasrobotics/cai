@@ -58,8 +58,6 @@ Environment Variables:
                     traces execution flow and agent interactions for debugging and analysis.
         CAI_AGENT_TYPE: Specify the agents to use it could take the value of: 
                      - one_tool (default): one single agent with one tool
-                     - proto02: multiple agents with generic linux command + scripting (commented)
-                     - react: use ReAct agents
                      - (see others in cai/__init__.py)
                      - (for creating new agents, see cai/agents/ folder)
         CAI_STATE: Enable/disable stateful mode (default: "false"). When enabled,
