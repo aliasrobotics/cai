@@ -66,15 +66,15 @@ Usage Examples:
 
     # Run with online long_term_memory
     # Executes memory long_term_memory every 5 turns:
-    CTF_NAME="hackableII" CAI_MEMORY="True" \
-        CAI_MODEL="o3-mini" ONLINE_MEMORY="True" \
+    CTF_NAME="hackableII" CAI_MEMORY="episodic" \
+        CAI_MODEL="o3-mini" CAI_MEMORY_ONLINE="True" \
         CTF_INSIDE="False" CTF_HINTS="False" python3 cai/cli.py
 
     # Run with custom long_term_memory interval
     # Executes memory long_term_memory every 3 turns:
-    CTF_NAME="hackableII" CAI_MEMORY="True" \
+    CTF_NAME="hackableII" CAI_MEMORY="episodic" \
         CAI_MODEL="o3-mini" CAI_MEMORY_ONLINE_INTERVAL="3" \
-        ONLINE_MEMORY="False" CTF_INSIDE="False" \
+        CAI_MEMORY_ONLINE="False" CTF_INSIDE="False" \
         CTF_HINTS="False" python3 cai/cli.py
 """
 # Standard library imports

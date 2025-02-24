@@ -160,9 +160,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         #        context_variables=context_variables)})
 
         for msg in history:
-            if msg.get("sender") not in ["Report Agent",
-                                         "Episodic_Builder",
-                                         "Semantic_Builder"]:
+            if (msg.get("sender") not in ["Report Agent"] and
+                not any("add_memory" in call.get("function", {}).get("name", "")  # noqa: E501
+                        for call in msg.get("tool_calls", []))):
                 messages.append(msg)
 
         debug_print(
