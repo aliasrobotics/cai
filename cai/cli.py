@@ -41,6 +41,8 @@ Environment Variables
             current env available (default: "true")
         CAI_MEMORY_ONLINE_INTERVAL: Number of turns between
             online memory updates (default: "5")
+        CAI_MEMORY_MODEL: Model to use for memory 
+            (default: "text-embedding-3-large")
 
     Extensions (only applicable if the right extension is installed):
 
@@ -63,7 +65,7 @@ Usage Examples:
     # Run without a target in human-in-the-loop mode, generating a report
     $ CAI_TRACING=False CAI_REPORT=pentesting CAI_MODEL="gpt-4o" \
         python3 cai/cli.py
-
+    
     # Run with online long_term_memory
     # Executes memory long_term_memory every 5 turns:
     CTF_NAME="hackableII" CAI_MEMORY="episodic" \
