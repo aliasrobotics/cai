@@ -590,7 +590,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             turn=n_turn,
             message=message,
             history=history
-        ))
+        ), action=message.tool_calls)
 
         # update context variables
         context_variables.update(partial_response.context_variables)

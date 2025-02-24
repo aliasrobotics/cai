@@ -6,6 +6,7 @@ at each step and allows reflecting on both, the reasoning
 and the execution approach.
 """
 # Standard library imports
+import json
 import logging
 from typing import List  # pylint: disable=import-error
 
@@ -16,7 +17,10 @@ from litellm.types.utils import Message  # pylint: disable=import-error
 from pydantic import BaseModel  # pylint: disable=import-error
 
 # Local imports
-from cai.types import Agent
+from .types import (
+    Agent,
+    ChatCompletionMessageToolCall
+)
 
 
 class Node(BaseModel):  # pylint: disable=too-few-public-methods
@@ -53,6 +57,7 @@ class Graph(nx.DiGraph):
         self._name_op_map = {}
         self._trainable_variables_collection = {}
         self.reward = 0  # Initialize reward attribute
+        self.previous_node = None
 
     def get_name_op_map(self):
         """
@@ -94,14 +99,49 @@ class Graph(nx.DiGraph):
             unique_name = f"{base_name}_{index}"
         return unique_name
 
-    def add_to_graph(self, node):
-        """
-        Adds a node to the graph
+    def add_to_graph(
+            self,
+            node: object,
+            action: List[ChatCompletionMessageToolCall] | None = None
+    ) -> None:
+        """Add a node to the graph and connect it to previous node.
+
+        This method adds the given node to the graph and creates an edge from
+        the previous node if one exists. It generates a unique name for the
+        node, updates its name attribute, adds it to the name-operation mapping
+        and the graph itself. If a previous node exists, it creates an edge
+        between them.
+
+        Args:
+            node: Node object to add. Must have a settable 'name' attribute.
+            action: Optional list of ChatCompletionMessageToolCall objects for
+                labeling the edge from previous node. If None, edge has no
+                label.
+
+        Returns:
+            None
         """
         unique_name = self.get_unique_name(node)
         node.name = unique_name
         self._name_op_map[node.name] = node
         self.add_node(node)
+
+        # edge
+        action_label = None
+        if action:
+            # Convert list of tool calls to readable format
+            action_labels = []
+            for tool_call in action:
+                args_dict = json.loads(tool_call.function.arguments)
+                args_str = ", ".join(f"{k}={v}" for k, v in args_dict.items())
+                action_labels.append(f"{tool_call.function.name}({args_str})")
+            action_label = "\n".join(action_labels)
+
+        if self.previous_node:
+            self.add_edge(self.previous_node, node, label=action_label)
+
+        # update previous node
+        self.previous_node = node
 
     def add_reward_graph(self, reward):
         """Adds a reward to the graph"""
