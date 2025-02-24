@@ -649,6 +649,15 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                       fg="white", bg="pink")
             )
 
+        if self.rec_training_data:
+            print(
+                color(
+                    "Logging at " + self.rec_training_data.filename,
+                    fg="white",
+                    bg="yellow"
+                )
+            )
+
         active_agent = agent
         context_variables = copy.deepcopy(context_variables)
         history = copy.deepcopy(messages)

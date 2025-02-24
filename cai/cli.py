@@ -57,15 +57,12 @@ Usage Examples:
     CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" \
         CAI_MODEL="gpt-4o" CAI_TRACING="false" python3 cai/cli.py
 
-    CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" \
-        CAI_MODEL="gpt-4o" CAI_TRACING="false" python3 cai/cli.py
-
     # Run without a target in human-in-the-loop mode, generating a report
-    $ CAI_TRACING=False CAI_REPORT=pentesting CAI_MODEL="gpt-4o" \
+    CAI_TRACING=False CAI_REPORT=pentesting CAI_MODEL="gpt-4o" \
         python3 cai/cli.py
 
-    # Run with online long_term_memory
-    # Executes memory long_term_memory every 5 turns:
+    # Run with online episodic memory
+    #   registers memory every 5 turns:
     CTF_NAME="hackableII" CAI_MEMORY="episodic" \
         CAI_MODEL="o3-mini" CAI_MEMORY_ONLINE="True" \
         CTF_INSIDE="False" CTF_HINTS="False" python3 cai/cli.py
