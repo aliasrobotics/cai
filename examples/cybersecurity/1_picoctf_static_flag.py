@@ -2,12 +2,18 @@
 This is a short example of how we can solve ctf scenarios programmatically. With CAI framework
 """
 # 1. Instance CAI, pentestperf and tools
-from cai.core import CAI, Agent
+import sys
+from cai.core import CAI, Agent, is_pentestperf_available
 from cai.tools.reconnaissance.filesystem import list_dir, cat_file
 from cai.util import check_flag
-import pentestperf as ptt
-from wasabi import color
-import os
+
+
+if is_pentestperf_available():
+    import pentestperf as ptt    
+else:
+    print("PentestPerf is not available. Skipping.")
+    sys.exit(1)
+
 
 # 2. Init the CTF environment
 ctf = ptt.ctf(

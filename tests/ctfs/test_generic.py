@@ -7,17 +7,22 @@ Usage Examples:
     $ CTF_NAME="picoctf_static_flag" pytest -s tests/ctfs/test_generic.py
 
     # Run test with a specific challenge and custom model:
-    $ CTF_NAME="picoctf_static_flag" CTF_MODEL="gpt-4o" CTF_CHALLENGE="FLAG" pytest -s tests/ctfs/test_generic.py
+    $ CTF_NAME="picoctf_static_flag" CAI_MODEL="gpt-4o" CTF_CHALLENGE="FLAG" pytest -s tests/ctfs/test_generic.py
 
     # Run test with tracing disabled:
     $ CTF_NAME="picoctf_static_flag" CAI_TRACING="false" pytest -s tests/ctfs/test_generic.py
 
     # Run test using a specific challenge:
-    $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CTF_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
+    $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
 
     # Run generating a report
-    $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_TRACING=True CAI_REPORTER=true CTF_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
+    $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_TRACING=False CAI_REPORT=ctf CAI_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
 
+    # Run against a CTF with RAG memory
+    CTF_NAME="hackableII" CAI_MEMORY="True" CAI_MODEL="o3-mini" CTF_INSIDE="False" python3 cai/cli.py
+
+    # Run against a CTF with RAG memory and store in memory every 3 interactions
+    CTF_NAME="hackableII" CAI_MEMORY="True" CAI_MEMORY_ONLINE_INTERVAL=3 CAI_MODEL="o3-mini" CTF_INSIDE="False" python3 cai/cli.py            
 
 CI/CD Pipeline Configuration:
     Add the following structure to .ctf.yml file:
@@ -36,13 +41,13 @@ Environment Variables:
     Optional:
         CTF_CHALLENGE: Specific challenge name within the CTF to test
         CTF_SUBNET: Network subnet for the CTF container (default: "192.168.2.0/24")
-        CTF_IP: IP address for the CTF container (default: "192.168.2.100")
-        CTF_MODEL: Model to use for agents (default: "qwen2.5:14b")
+        CTF_IP: IP address for the CTF container (default: "192.168.2.100")        
         CTF_RERUN: Number of times to retry failed tests (default: "0")
         CTF_INSIDE: Whether to conquer the CTF from within the CTF's Docker container
           or from outside (meaning the dev environment) (default: "true")
 
     Other optional:
+        CAI_MODEL: Model to use for agents (default: "qwen2.5:14b")
         CAI_DEBUG: Set debug output level (default: "1").
             - 0: Only tool outputs
             - 1: Verbose debug output
@@ -60,22 +65,54 @@ Environment Variables:
         CAI_STATE: Enable/disable stateful mode (default: "false"). When enabled,
                       the agent will use a state agent to keep track of the state of the
                       network and the flags found.
-        CAI_REPORTER: Enable/disable reporter mode (default: "false"). When enabled,
-                      the agent will generate a report of the test results.
-        CAI_REPORT_INTERVAL: Interval in interactions for the reporter_agent to report the
-                             test results (default: "0", no interval).
+        CAI_REPORT: Enable/disable reporter mode. It could take the value of: 
+                      - ctf (default): do a report from a ctf resolution
+                      - nis2: do a report for nis2
+                      - pentesting: do a report from a pentesting 
+        
+        CAI_MEMORY: Enable/disable memory mode (default: "false")
+            - episodic: use episodic memory
+            - semantic: use semantic memory
+            - all: use both episodic and semantic memorys
+        CAI_MEMORY_ONLINE: Enable/disable online memory mode 
+            (default: "false")
+        CAI_MEMORY_OFFLINE: Enable/disable offline memory mode 
+            (default: "false")
+        CAI_MEMORY_COLLECTION: Name of the collection in Qdrant
+            in exercises (required if CAI_MEMORY=episodic)
+        CAI_ENV_CONTEXT: Add enviroment context, dirs and current 
+            env available (default: "true")
+        CAI_MEMORY_ONLINE_INTERVAL: Number of turns between 
+            online memory updates (default: "5")
 """
 
 import pytest
 import os
 import sys
-import pentestperf as ptt
+import json
 from cai.core import CAI
-from cai import cai_initial_agent 
+from cai import (
+    cai_initial_agent,
+    is_caiextensions_report_available,
+    is_pentestperf_available
+)
 from cai.util import check_flag
 from wasabi import color
+from importlib.resources import files
 
+if is_caiextensions_report_available():
+    from caiextensions.report.ctf.ctf_reporter_agent import reporter_agent # pylint: disable=import-error
+    from caiextensions.report.common import create_report  # pylint: disable=import-error # noqa: E501
+else:
+    print("caiextensions-report is not available. Skipping test.")
+    pytest.skip("caiextensions-report is not available. Skipping test.", allow_module_level=True)
 
+if is_pentestperf_available():
+    import pentestperf as ptt
+else:
+    print("PentestPerf is not available. Skipping test.")
+    pytest.skip("PentestPerf is not available. Skipping test.", allow_module_level=True)
+    
 def check_env_variables():
     required_vars = ['CTF_NAME']
     for var in required_vars:
@@ -120,6 +157,7 @@ class TestGenericCTF:
         challenge = challenge_key if challenge_key in challenges else (
             challenges[0] if len(challenges) > 0 else None)
 
+
         print(
             color(
                 "Testing CTF: ",
@@ -152,7 +190,7 @@ class TestGenericCTF:
                     bg="blue"))
 
             # Get model from environment or use default
-            model = os.getenv('CTF_MODEL', "qwen2.5:14b")
+            model = os.getenv('CAI_MODEL', "qwen2.5:14b")
 
             # Determine if stateful or stateless
             state_agent = None
@@ -175,7 +213,6 @@ class TestGenericCTF:
                     client = CAI(state_agent=state_agent, force_until_flag=True, challenge=challenge, ctf_inside=False)
                 inside = ("You are OUTSIDE the target machine which is a docker container, "
                          "you may use network commands as nmap for initial recon")
-
             messages = [{
                 "role": "user",
                 "content": "Instructions: " + ctf.get_instructions() +
@@ -195,6 +232,27 @@ class TestGenericCTF:
                 brief=os.getenv('CAI_BRIEF', 'false').lower() == 'true')
             
             print(f"Time taken: {response.time} seconds")
+
+            # Do a report in case the environment variable is true
+            if os.getenv("CAI_REPORT"):
+                template = str(files('caiextensions.report.ctf') / 'template.md')
+                # New instace of CAI, because force_until_flag
+                client = CAI(state_agent=state_agent, force_until_flag=False)
+                response_report = client.run(
+                    agent=reporter_agent,
+                    messages=[{"role": "user", "content": "Do a report from " +
+                            "\n".join(msg['content'] for msg in response.messages if msg.get('content') is not None)}], # noqa: E501
+                    debug=float(os.getenv('CAI_DEBUG', 2)),
+                    max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
+                )
+                 # Add user message to history
+                response.messages.insert(0, messages[0])
+
+                # Render the report with function create_report
+                report_data = json.loads(response_report.messages[0]['content'])
+                report_data["history"] = json.dumps(response.messages, indent=4)
+                create_report(report_data, template)
+
 
             # Check if the flag is correct
             success, flag = check_flag(

@@ -27,12 +27,6 @@ Requires Python 3.10+
 pip install git+https://gitlab.com/aliasrobotics/alias_research/cai.git
 ```
 
-### Re-install PentestPerf
-
-```shell
-pip3 uninstall -y pentestperf && pip3 install git+https://gitlab:gldt-1NfZ2XRWdHNip4K45auL@gitlab.com/aliasrobotics/alias_research/pentestperf
-```
-
 ## Usage
 
 ```python
@@ -394,3 +388,37 @@ run_demo_loop(agent, stream=True)
 # Acknowledgements
 
 CAI is developed by [Alias Robotics](https://aliasrobotics.com) and funded as part of the project XXXXX. The original agentic principles are inspired from OpenAI's [swarm](https://github.com/openai/swarm) library.
+
+
+## FAQ
+
+### How do I install the report extension?
+
+```bash
+pip install cai[report]
+```
+
+### How do I set up SSH access for Gitlab?
+
+Generate a new SSH key
+```bash
+ssh-keygen -t ed25519
+```
+
+Add the key to the SSH agent
+```bash
+ssh-add ~/.ssh/id_ed25519
+```
+
+Add the public key to Gitlab
+Copy the key and add it to Gitlab under https://gitlab.com/-/user_settings/ssh_keys
+```bash
+cat ~/.ssh/id_ed25519.pub
+```
+
+
+### How do I clear Python cache?
+
+```bash
+find . -name "*.pyc" -delete && find . -name "__pycache__" -delete
+```

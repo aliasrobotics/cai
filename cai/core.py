@@ -18,6 +18,7 @@ from typing import List
 import time
 import os
 import litellm  # pylint: disable=import-error
+from mako.template import Template  # pylint: disable=import-error
 from dotenv import load_dotenv  # pylint: disable=import-error # noqa: E501
 from wasabi import color  # pylint: disable=import-error
 from cai.logger import exploit_logger
@@ -25,8 +26,9 @@ from cai import graph
 # Local imports
 from cai.datarecorder import DataRecorder
 from cai import (
-    transfer_to_reporter_agent,
-    transfer_to_state_agent,
+    transfer_to_episodic_memory_agent,
+    transfer_to_semantic_memory_agent,
+    transfer_to_state_agent
 )
 from cai.state.common import StateAgent
 from .util import (
@@ -34,11 +36,11 @@ from .util import (
     debug_print,
     cli_print_agent_messages,
     cli_print_tool_call,
+    fix_message_list,
     cli_print_state,
     get_ollama_api_base,
     check_flag,
-    create_report_from_messages,
-    visualize_agent_graph
+    visualize_agent_graph,
 )
 from .types import (
     Agent,
@@ -65,7 +67,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                  state_agent=None,
                  force_until_flag=False,
                  challenge=None,
-                 ctf_inside=True):
+                 ctf_inside=True,
+                 ):
         """
         Initialize the CAI object.
 
@@ -117,12 +120,18 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         if log_training_data:
             self.rec_training_data = DataRecorder()
 
-        # report
-        self.report = os.getenv("CAI_REPORTER", "false").lower() == "true"
-        self.report_interval = int(os.getenv("CAI_REPORT_INTERVAL", "0"))
+        # memory attributes
+        self.episodic_rag = (os.getenv("CAI_MEMORY", "?").lower() == "episodic"
+                             or os.getenv("CAI_MEMORY", "?").lower() == "all")
+        self.semantic_rag = (os.getenv("CAI_MEMORY", "?").lower() == "semantic"
+                             or os.getenv("CAI_MEMORY", "?").lower() == "all")
+        self.rag_online = os.getenv(
+            "CAI_MEMORY_ONLINE",
+            "false").lower() == "true"
+        self.rag_interval = int(os.getenv("CAI_MEMORY_ONLINE_INTERVAL", "5"))
 
-        # force until flag
         self.force_until_flag = force_until_flag
+
         self.challenge = challenge
 
         # load env variables
@@ -142,14 +151,28 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         and context variables.
         """
         context_variables = defaultdict(str, context_variables)
-        instructions = (
-            agent.instructions(context_variables)
-            if callable(agent.instructions)
-            else agent.instructions
-        )
-        messages = [{"role": "system", "content": instructions}]
+
+        messages = [{"role": "system", "content": Template(  # nosec: B702
+            filename="cai/prompts/core/system_master_template.md").render(
+                agent=agent,
+                ctf_instructions=history[0]["content"],
+                context_variables=context_variables)
+        }]
+        # TODO: uncomment this when user_master_template.md is ready # pylint: disable=fixme  # noqa: E501
+        # TODO: Delete all user prompts from @(cai/cli.py) and (cai/core.py) # pylint: disable=fixme  # noqa: E501
+
+        # messages.append({"role": "user", "content": Template(  # nosec: B702
+        #    filename="cai/prompts/core/user_master_template.md").render(
+        #        agent=agent,
+        #        ctf_instructions=history[0]["content"],
+        #        user_prompt=next((msg["content"] for msg in reversed(history) # noqa: E501
+        #        if msg["role"] == "user"), ""),
+        #        context_variables=context_variables)})
+
         for msg in history:
-            if msg.get("sender") != "Report Agent":
+            if (msg.get("sender") not in ["Report Agent"] and
+                not any("add_memory" in call.get("function", {}).get("name", "")  # noqa: E501
+                        for call in msg.get("tool_calls", []))):
                 messages.append(msg)
 
         debug_print(
@@ -225,37 +248,26 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 create_params["custom_llm_provider"] = "openai"
                 os.environ["OLLAMA"] = "true"
                 os.environ["OPENAI_API_KEY"] = "Placeholder"
-                litellm_completion = litellm.completion(**create_params)
-            elif "must be followed by tool messages" in str(e):
+                try:
+                    litellm_completion = litellm.completion(**create_params)
+                except litellm.exceptions.BadRequestError as e:  # pylint: disable=W0621,C0301 # noqa: E501
+                    #
+                    # CTRL C handler for ollama models
+                    #
+                    if "invalid message content type" in str(e):
+                        create_params["messages"] = fix_message_list(
+                            create_params["messages"])
+                        litellm_completion = litellm.completion(
+                            **create_params)
+                    else:
+                        raise e
+            elif "An assistant message with 'tool_calls'" in str(e) or "`tool_use` blocks must be followed by a user message with `tool_result`" in str(e):  # noqa: E501 # pylint: disable=C0301
+                print(f"Error: {str(e)}")
                 # EDGE CASE: Report Agent CTRL C error
                 # This fix CTRL C error when message list is incomplete
                 # When a tool is not finished but the LLM generates a tool call
-                messages = create_params["messages"]
-
-                messages_copy = messages.copy()
-                for msg in messages_copy:
-                    if msg.get("role") == "assistant" and msg.get(
-                            "tool_calls"):
-                        tool_calls = msg["tool_calls"]
-                        for tool_call in tool_calls:
-                            tool_call_id = tool_call["id"]
-                            # First check if any tool call has no response pair
-                            # ID
-                            has_response = any(
-                                m.get("role") == "tool" and
-                                m.get("tool_call_id") == tool_call_id
-                                for m in messages
-                            )
-                            if not has_response:
-                                # Then if tool call has no response pair, add
-                                # it empty
-                                messages.append({
-                                    "role": "tool",
-                                    "tool_call_id": tool_call_id,
-                                    "name": tool_call["function"]["name"],
-                                    "content": "No response provided"
-                                })
-                # Finish just retry
+                create_params["messages"] = fix_message_list(
+                    create_params["messages"])
                 litellm_completion = litellm.completion(**create_params)
             else:
                 raise e
@@ -321,7 +333,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 try:
                     return Result(value=str(result))
                 except Exception as e:
-                    error_message = f"Failed to cast response to string: {result}. Make sure agent functions return a string or Result object. Error: {str(e)}"  # noqa: E501 # pylint: disable=C0301
+                    error_message = (
+                        f"Failed to cast response to string: {result}. "
+                        "Make sure agent functions return a string or "
+                        f"Result object. Error: {str(e)}"
+                    )  # noqa: E501 # pylint: disable=C0301
                     debug_print(debug, error_message, brief=self.brief)
                     raise TypeError(error_message) from e
 
@@ -637,10 +653,13 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         context_variables = copy.deepcopy(context_variables)
         history = copy.deepcopy(messages)
         n_turn = 0
+
         while len(history) - self.init_len < max_turns and active_agent:
-            try:
-                active_agent = self.process_interaction(
-                    active_agent,
+            # Needs to be inside while loop to avoid using the same function
+            # for all iterations
+            def agent_iteration(agent):
+                return self.process_interaction(
+                    agent,
                     history,
                     context_variables,
                     model_override,
@@ -649,43 +668,41 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     execute_tools,
                     n_turn
                 )
-                n_turn += 1
 
-                # Manually invoke state agent if stateful
+            try:
+                # Memory agent iteration
+                # If RAG is active and the turn is at a RAG interval, process
+                # using the memory agent
+                if (self.episodic_rag and
+                        (n_turn != 0 and n_turn % self.rag_interval == 0)
+                        and self.rag_online):
+                    prev_agent = active_agent
+                    active_agent = transfer_to_episodic_memory_agent()
+                    agent_iteration(active_agent)
+                    active_agent = prev_agent
+
+                # Standard agent iteration
+                active_agent = agent_iteration(active_agent)
+                n_turn += 1
+                if (self.semantic_rag and
+                        (n_turn != 0 and n_turn % self.rag_interval == 0)
+                        and self.rag_online):
+                    prev_agent = active_agent
+                    active_agent = transfer_to_semantic_memory_agent()
+                    agent_iteration(active_agent)
+                    active_agent = prev_agent
+                # Stateful agent iteration
+                # If the session is stateful, invoke the memory agent at
+                # defined intervals
                 if self.stateful:
                     self.state_interactions_count += 1
-                    if self.state_interactions_count >= self.STATE_INTERACTIONS_INTERVAL:  # noqa: E501, pylint: disable=line-too-long
+                    if (self.state_interactions_count
+                            >= self.STATE_INTERACTIONS_INTERVAL):
                         prev_agent = active_agent
                         active_agent = transfer_to_state_agent()
-                        self.process_interaction(
-                            active_agent,
-                            history,
-                            context_variables,
-                            model_override,
-                            stream,
-                            debug,
-                            execute_tools,
-                            n_turn
-                        )
+                        agent_iteration(active_agent)
                         active_agent = prev_agent
                         self.state_interactions_count = 0
-
-                # Generate intermediate report if interval is set and reached
-                if self.report and (self.report_interval > 0 and
-                                    n_turn % self.report_interval == 0):
-                    prev_agent = active_agent
-                    active_agent = transfer_to_reporter_agent()
-                    self.process_interaction(
-                        active_agent,
-                        history,
-                        context_variables,
-                        model_override,
-                        stream,
-                        debug,
-                        execute_tools,
-                        n_turn
-                    )
-                    active_agent = prev_agent
 
             except KeyboardInterrupt:
                 print("\nCtrl+C pressed")
@@ -693,12 +710,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     time.sleep(2)  # wait for user to press Ctrl+C again
                 except KeyboardInterrupt:
                     print("\nCtrl+C pressed again")
-                    if self.report and input(
-                            "Want to create a report? (y/n)").lower() == "y":
-                        active_agent = transfer_to_reporter_agent()
-                        self.report = False
-                        history[-1]["sender"] = "Report Agent"
-                        continue
                     break
 
             # Check if the flag is found in the last tool output
@@ -707,40 +718,29 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 flag_found, flag = check_flag(
                     history[-1]["content"], self.ctf, self.challenge)
 
-                if flag_found:
-                    if self.report:
-                        create_report_from_messages(history)
-                    break
-
                 # # Check if flag is found anywhere in history
                 # for message in history:
                 #     flag_found, _ = check_flag(message["content"],
                 #                                self.ctf,
                 #                                self.challenge)
-                #     if flag_found:
-                #         break
+
+                if flag_found:
+                    break
 
                 # If flag is not found, continue with the next turn
                 # adding to the history that the flag was not found
                 history.append({
                     "role": "user",
                     "content": (
-                        f"Detected flag {flag} is not the expected one. "
-                        "Keep looking for it and reflect on your "
-                        "previous steps."
+                        "Turn finished, checking whether flag is found. "
+                        f"Flag detected: {flag} is not the expected one.\n"
+                        "Keep looking for it and reflect on your previous "
+                        "steps."
                     )
                 })
                 active_agent = agent
 
-            # Create report if user wants to
-            elif active_agent is None and self.report:
-                active_agent = transfer_to_reporter_agent()
-                self.report = False
-                history[-1]["sender"] = "Report Agent"
-
             elif active_agent is None:
-                if self.report and history[-1]["sender"] == "Report Agent":
-                    create_report_from_messages(history)
                 break
 
             # Plot the graph on every turn for debugging

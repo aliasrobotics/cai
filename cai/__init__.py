@@ -3,6 +3,7 @@ A library to build Bug Bounty-level grade Cybersecurity AIs (CAIs).
 """
 # Standard library imports
 import os
+import pkgutil
 
 # First party imports
 from cai.tools.reconnaissance.filesystem import (
@@ -16,10 +17,19 @@ from cai.tools.reconnaissance.crypto_tools import (
     strings_command,
     decode_hex_bytes
 )
+
+from cai.agents.memory import (
+    episodic_builder,
+    query_agent,
+    semantic_builder
+)
+
 from cai.tools.reconnaissance.netcat import netcat
 from cai.tools.reconnaissance.nmap import nmap
 from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa
-from cai.report_agent.pentesting_web import reporter_agent
+
+# Extend the search path for namespace packages (allows merging)
+__path__ = pkgutil.extend_path(__path__, __name__)
 
 # Import state transfer functions
 # NOTE: this, together with the logic in test_generic.py,
@@ -34,7 +44,7 @@ from cai.state.pydantic import state_agent
 from .types import Agent
 
 # Get model from environment or use default
-model = os.getenv('CTF_MODEL', "qwen2.5:14b")
+model = os.getenv('CAI_MODEL', "qwen2.5:14b")
 
 ########################################################
 # AGENTS
@@ -127,7 +137,7 @@ crypto_agent = Agent(
 
 
 flag_discriminator = Agent(
-    model="gpt-4o" if os.getenv('CTF_MODEL') == "o3-mini" else model,
+    model="gpt-4o" if os.getenv('CAI_MODEL') == "o3-mini" else model,
     name="Flag discriminator",
     instructions="""INSTRUCTIONS:
                 1. You are an agent tailored to extract the flag
@@ -169,10 +179,22 @@ def transfer_to_crypto_agent(**kwargs):  # pylint: disable=W0613
     return crypto_agent
 
 
-def transfer_to_reporter_agent(**kwargs):  # pylint: disable=W0613
-    """ Transfer to reporter agent.
+def transfer_to_episodic_memory_agent(**kwargs):  # pylint: disable=W0613
+    """ Transfer to episodic memory agent.
     Accepts any keyword arguments but ignores them."""
-    return reporter_agent
+    return episodic_builder
+
+
+def transfer_to_semantic_memory_agent(**kwargs):  # pylint: disable=W0613
+    """ Transfer to semantic memory agent.
+    Accepts any keyword arguments but ignores them."""
+    return semantic_builder
+
+
+def transfer_to_query_memory_agent(**kwargs):  # pylint: disable=W0613
+    """ Transfer to query memory agent.
+    Accepts any keyword arguments but ignores them."""
+    return query_agent
 
 
 # controller agent
@@ -591,7 +613,7 @@ scripting_agent02 = Agent(
 
 
 flag_discriminator02 = Agent(
-    model="gpt-4o" if os.getenv('CTF_MODEL') == "o3-mini" else model,
+    model="gpt-4o" if os.getenv('CAI_MODEL') == "o3-mini" else model,
     name="Flag discriminator",
     instructions="""INSTRUCTIONS:
                 1. You are an agent tailored to extract the flag
@@ -832,3 +854,28 @@ def transfer_to_state_agent():
     Transfer to the state agent
     """
     return state_agent
+
+
+########################################################
+# Extensions utilities
+########################################################
+def is_pentestperf_available():
+    """
+    Check if pentestperf is available
+    """
+    try:
+        from pentestperf.ctf import CTF  # pylint: disable=import-error,import-outside-toplevel,unused-import  # noqa: E501,F401
+    except ImportError:
+        return False
+    return True
+
+
+def is_caiextensions_report_available():
+    """
+    Check if caiextensions report is available
+    """
+    try:
+        from caiextensions.report.common import get_base_instructions  # pylint: disable=import-error,import-outside-toplevel,unused-import  # noqa: E501,F401
+    except ImportError:
+        return False
+    return True

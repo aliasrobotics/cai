@@ -11,6 +11,7 @@ report
 # Windows
 Thumbs.db
 
+
 # Source for the following rules: https://raw.githubusercontent.com/github/gitignore/master/Python.gitignore
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -109,6 +110,8 @@ ENV/
 env.bak/
 venv.bak/
 
+# SSH keys
+.devcontainer/.ssh_keys
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -139,13 +142,17 @@ tests/metasploit_function_calls.json
 other/playground/7_datascraper/pdfs
 cai/ins/rag/vectordb/msf/module_metadata.json
 cai/ins/rag/vectordb/msf/function_calls.json
-pentestperf
 /build/
 .history/
 cai.png
 cai.dot
 cai*.png
 logs/
+report/
 
 # CI
 !ci/build/
+
+# extensions
+caiextensions*/
+pentestperf

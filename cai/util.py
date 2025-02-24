@@ -2,13 +2,10 @@
 This module contains utility functions for the CAI library.
 """
 import inspect
-import time
 import json
 import os
 from datetime import datetime
-from typing import Any, List
-from types import SimpleNamespace
-from mako.template import Template  # pylint: disable=import-error
+from typing import Any
 from wasabi import color  # pylint: disable=import-error
 from rich.text import Text  # pylint: disable=import-error
 from rich.panel import Panel  # pylint: disable=import-error
@@ -33,11 +30,9 @@ def get_model_input_tokens(model):
         "llama3.1": 32000,  # https://ollama.com/library/llama3.1, 128K input  # noqa: E501  # pylint: disable=C0301
         "deepseek": 128000  # https://api-docs.deepseek.com/quick_start/pricing  # noqa: E501  # pylint: disable=C0301
     }
-
     for model_type, tokens in model_tokens.items():
         if model_type in model:
             return tokens
-
     return model_tokens["gpt"]
 
 
@@ -69,7 +64,6 @@ theme = Theme({
 })
 
 console = Console(theme=theme)
-_message_counters = {}
 install()
 install_pretty()
 
@@ -146,7 +140,6 @@ def visualize_agent_graph(start_agent):
         else:
             node = parent.add(
                 f"[green]{agent.name} (#{position_counter})[/green]") if parent else tree  # noqa: E501 pylint: disable=line-too-long
-
         agent_nodes[id(agent)] = node
 
         # Add tools as children
@@ -176,9 +169,7 @@ def visualize_agent_graph(start_agent):
                             add_agent_node(next_agent, transfer, True)
                     except Exception:  # nosec: B112 # pylint: disable=broad-exception-caught # noqa: E501
                         continue
-
         return node
-
     # Start recursive traversal from root agent
     add_agent_node(start_agent)
     console.print(tree)
@@ -563,9 +554,8 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
                 model
             )
 
-        # If title text is too long for panel width, show it in the group
-        # instead
-        # Convert Text object to string to get length
+        # If title text is too long for panel width, show it in the groups
+        # instead, Convert Text object to string to get length
         title_width = len(str(text))
         max_title_width = console.width - 4  # Account for panel borders
 
@@ -601,10 +591,8 @@ def debug_print(debug: int, intro: str, *args: Any, brief: bool = False, colours
     """
     if not debug:
         return
-
     if debug != 1:  # debug level 1
         return
-
     if brief:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if colours:
@@ -631,15 +619,12 @@ def debug_print(debug: int, intro: str, *args: Any, brief: bool = False, colours
         return
 
     global _message_history  # pylint: disable=global-variable-not-assigned
-
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     header = f"{COLORS['bracket']}[{COLORS['timestamp']}{
         timestamp}{COLORS['bracket']}]{COLORS['reset']}"
-
     # Generate a unique key for this message based on the intro
     msg_key = intro
     prev_args = _message_history.get(msg_key)
-
     # Special handling for tool call processing messages
     if "Processing tool call" in intro:
         if len(args) >= 2:
@@ -681,7 +666,6 @@ def debug_print(debug: int, intro: str, *args: Any, brief: bool = False, colours
 
     # Update history
     _message_history[msg_key] = args
-
     print(message)
 
 
@@ -702,7 +686,6 @@ def merge_chunk(final_response: dict, delta: dict) -> None:
     """
     delta.pop("role", None)
     merge_fields(final_response, delta)
-
     tool_calls = delta.get("tool_calls")
     if tool_calls and len(tool_calls) > 0:
         index = tool_calls[0].pop("index")
@@ -730,20 +713,17 @@ def function_to_json(func) -> dict:
         dict: "object",
         type(None): "null",
     }
-
     try:
         signature = inspect.signature(func)
     except ValueError as e:
         raise ValueError(
             f"Failed to get signature for function {func.__name__}: {str(e)}"
         ) from e
-
     parameters = {}
     for param in signature.parameters.values():
         # Skip the ctf parameter
         if param.name == "ctf":
             continue
-
         try:
             param_type = type_map.get(param.annotation, "string")
         except KeyError as e:
@@ -757,7 +737,6 @@ def function_to_json(func) -> dict:
         for param in signature.parameters.values()
         if param.default == inspect._empty and param.name != "ctf"  # pylint: disable=protected-access # noqa: E501
     ]
-
     return {
         "type": "function",
         "function": {
@@ -786,7 +765,6 @@ def check_flag(output, ctf, challenge=None):
         tuple: A tuple containing a boolean indicating if the flag was
             found and the flag itself if found, otherwise None.
     """
-
     # Get the challenge from the environment variable or default to the first
     # challenge
     challenge_key = os.getenv("CTF_CHALLENGE")
@@ -796,7 +774,6 @@ def check_flag(output, ctf, challenge=None):
         if challenge_key in challenges
         else (challenges[0] if len(challenges) > 0 else None)
     )
-
     if ctf:
         if ctf.check_flag(
             output, challenge
@@ -816,95 +793,111 @@ def check_flag(output, ctf, challenge=None):
     return False, None
 
 
-def merge_report_dicts(base_dict, new_dict):
+def fix_message_list(messages):  # pylint: disable=R0914,R0915,R0912
     """
-    Merge two report dictionaries recursively,
-    handling lists and nested structures.
+    Sanitizes the message list passed as a parameter to align with the
+    OpenAI API message format.
+
+    Adjusts the message list to comply with the following rules:
+        1. A tool call id appears no more than twice.
+        2. Each tool call id appears as a pair, and both messages
+            must have content.
+        3. If a tool call id appears alone (without a pair), it is removed.
+        4. There cannot be empty messages.
 
     Args:
-        base_dict: The base dictionary to merge into
-        new_dict: The new dictionary with values to merge
+        messages (List[dict]): List of message dictionaries containing
+                            role, content, and optionally tool_calls or
+                            tool_call_id fields.
 
     Returns:
-        dict: The merged dictionary
+        List[dict]: Sanitized list of messages with invalid tool calls
+                   and empty messages removed.
     """
-    if not isinstance(base_dict, dict) or not isinstance(new_dict, dict):
-        return new_dict
-
-    for key, value in new_dict.items():
-        if key not in base_dict:
-            base_dict[key] = value
-        elif isinstance(value, list) and isinstance(base_dict[key], list):
-            # Merge lists, avoiding duplicates for findings
-            if key == "findings":
-                existing_ids = {
-                    f.get("finding_id") for f in base_dict[key] if isinstance(
-                        f, dict) and "finding_id" in f}
-                for item in value:
-                    if isinstance(  # noqa: E501
-                            item, dict) and "finding_id" in item and \
-                                item["finding_id"] not in existing_ids:  # noqa: E501
-                        base_dict[key].append(item)
-                        existing_ids.add(item["finding_id"])
-            else:
-                base_dict[key].extend(value)
-        elif isinstance(value, dict) and isinstance(base_dict[key], dict):
-            base_dict[key] = merge_report_dicts(base_dict[key], value)
+    # Step 1: Filter and discard empty messages (considered empty if 'content'
+    # is None or only whitespace)
+    cleaned_messages = []
+    for msg in messages:
+        content = msg.get("content")
+        if content is not None and content.strip():
+            cleaned_messages.append(msg)
+    messages = cleaned_messages
+    # Step 2: Collect tool call id occurrences.
+    # In assistant messages, iterate through 'tool_calls' list.
+    # In 'tool' type messages, use the 'tool_call_id' key.
+    tool_calls_occurrences = {}
+    for i, msg in enumerate(messages):
+        if msg.get("role") == "assistant" and isinstance(
+                msg.get("tool_calls"), list):
+            for j, tool_call in enumerate(msg["tool_calls"]):
+                tc_id = tool_call.get("id")
+                if tc_id:
+                    tool_calls_occurrences.setdefault(
+                        tc_id, []).append((i, "assistant", j))
+        elif msg.get("role") == "tool" and msg.get("tool_call_id"):
+            tc_id = msg["tool_call_id"]
+            tool_calls_occurrences.setdefault(
+                tc_id, []).append(
+                (i, "tool", None))
+    # Step 3: Mark invalid or extra occurrences for removal
+    removal_messages = set()  # Indices of messages (tool type) to remove
+    # Maps message index (assistant) to set of indices (in tool_calls) to
+    # remove
+    removal_assistant_entries = {}
+    for tc_id, occurrences in tool_calls_occurrences.items():
+        # Only 2 occurrences allowed. Mark extras for removal.
+        valid_occurrences = occurrences[:2]
+        extra_occurrences = occurrences[2:]
+        for occ in extra_occurrences:
+            msg_idx, typ, j = occ
+            if typ == "assistant":
+                removal_assistant_entries.setdefault(msg_idx, set()).add(j)
+            elif typ == "tool":
+                removal_messages.add(msg_idx)
+        # If valid occurrences aren't exactly 2 (i.e., a lonely tool call),
+        # mark for removal
+        if len(valid_occurrences) != 2:
+            for occ in valid_occurrences:
+                msg_idx, typ, j = occ
+                if typ == "assistant":
+                    removal_assistant_entries.setdefault(msg_idx, set()).add(j)
+                elif typ == "tool":
+                    removal_messages.add(msg_idx)
         else:
-            # For scalar values, prefer non-empty new values
-            if value is not None and value != "":
-                base_dict[key] = value
-    return base_dict
-
-
-def create_report_from_messages(history: List[dict]):
-    """
-    Create a report from a list of messages,
-    merging content from Report Agent messages.
-
-    Args:
-        history: List of message dictionaries containing sender and content
-    """
-    report_data = {}  # last JSON message from Report Agent
-    merged_report = {}  # merged JSON messages from Report Agent
-
-    def to_namespace(obj):
-        if isinstance(obj, dict):
-            return SimpleNamespace(**{k: to_namespace(v)
-                                   for k, v in obj.items()})
-        if isinstance(obj, list):
-            return [to_namespace(item) for item in obj]
-
-        return obj
-
-    # NOTE: Generic.py dont return a list of messages, it returns a string
-    # so we need to handle it differently
-    #
-    for message in history:
-        if message.get("sender") == "Report Agent":
-            try:
-                report_data = json.loads(message["content"])
-                merged_report = merge_report_dicts(merged_report, report_data)
-            except json.JSONDecodeError:
-                # Continue if because some times report
-                # agent sends non-JSON content (plain text responses)
-                # and it's not a valid JSON
-                continue
-        merged_report = merge_report_dicts(merged_report, report_data)
-
-    # To python variables
-    report_data = {k: to_namespace(v) for k, v in merged_report.items()}
-
-    report_data["history"] = history
-    template = Template(filename="cai/report_agent/template.md")  # nosec: B702
-    report_output = template.render(**report_data)
-
-    report_dir = "./report"
-    os.makedirs(report_dir, exist_ok=True)
-    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
-    save_path = f"Report_{timestamp}.md"
-    report_path = os.path.join(report_dir, save_path)
-
-    with open(report_path, "w", encoding="utf-8") as f:
-        f.write(report_output)
-    print(f"!Report generated at: {report_path}")
+            # If exactly 2 occurrences, ensure both have content
+            remove_pair = False
+            for occ in valid_occurrences:
+                msg_idx, typ, _ = occ
+                msg_content = messages[msg_idx].get("content")
+                if msg_content is None or not msg_content.strip():
+                    remove_pair = True
+                    break
+            if remove_pair:
+                for occ in valid_occurrences:
+                    msg_idx, typ, j = occ
+                    if typ == "assistant":
+                        removal_assistant_entries.setdefault(
+                            msg_idx, set()).add(j)
+                    elif typ == "tool":
+                        removal_messages.add(msg_idx)
+    # Step 4: Build new message list applying removals
+    new_messages = []
+    for i, msg in enumerate(messages):
+        # Skip if message (tool type) is marked for removal
+        if i in removal_messages:
+            continue
+        # For assistant messages, remove marked tool_calls
+        if msg.get("role") == "assistant" and "tool_calls" in msg:
+            new_tool_calls = []
+            for j, tc in enumerate(msg["tool_calls"]):
+                if j not in removal_assistant_entries.get(i, set()):
+                    new_tool_calls.append(tc)
+            msg["tool_calls"] = new_tool_calls
+        # If after modification message has no content and no tool_calls,
+        # discard it
+        msg_content = msg.get("content")
+        if ((msg_content is None or not msg_content.strip()) and
+                not msg.get("tool_calls")):
+            continue
+        new_messages.append(msg)
+    return new_messages
