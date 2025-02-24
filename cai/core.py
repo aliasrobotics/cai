@@ -18,13 +18,16 @@ from typing import List
 import time
 import os
 import litellm  # pylint: disable=import-error
+from mako.template import Template  # pylint: disable=import-error
 from dotenv import load_dotenv  # pylint: disable=import-error # noqa: E501
 from wasabi import color  # pylint: disable=import-error
 from cai.logger import exploit_logger
 # Local imports
 from cai.datarecorder import DataRecorder
 from cai import (
-    transfer_to_state_agent,
+    transfer_to_episodic_memory_agent,
+    transfer_to_semantic_memory_agent,
+    transfer_to_state_agent
 )
 from cai.state.common import StateAgent
 from .util import (
@@ -36,7 +39,7 @@ from .util import (
     cli_print_state,
     get_ollama_api_base,
     check_flag,
-    visualize_agent_graph
+    visualize_agent_graph,
 )
 from .types import (
     Agent,
@@ -63,7 +66,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                  state_agent=None,
                  force_until_flag=False,
                  challenge=None,
-                 ctf_inside=True):
+                 ctf_inside=True,
+                 ):
         """
         Initialize the CAI object.
 
@@ -107,7 +111,19 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         #
         if log_training_data:
             self.rec_training_data = DataRecorder()
+
+        # memory attributes
+        self.episodic_rag = (os.getenv("CAI_MEMORY", "?").lower() == "episodic"
+                             or os.getenv("CAI_MEMORY", "?").lower() == "all")
+        self.semantic_rag = (os.getenv("CAI_MEMORY", "?").lower() == "semantic"
+                             or os.getenv("CAI_MEMORY", "?").lower() == "all")
+        self.rag_online = os.getenv(
+            "CAI_MEMORY_ONLINE",
+            "false").lower() == "true"
+        self.rag_interval = int(os.getenv("CAI_MEMORY_ONLINE_INTERVAL", "5"))
+
         self.force_until_flag = force_until_flag
+
         self.challenge = challenge
         load_dotenv()
 
@@ -125,14 +141,28 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         and context variables.
         """
         context_variables = defaultdict(str, context_variables)
-        instructions = (
-            agent.instructions(context_variables)
-            if callable(agent.instructions)
-            else agent.instructions
-        )
-        messages = [{"role": "system", "content": instructions}]
+
+        messages = [{"role": "system", "content": Template(  # nosec: B702
+            filename="cai/prompts/core/system_master_template.md").render(
+                agent=agent,
+                ctf_instructions=history[0]["content"],
+                context_variables=context_variables)
+        }]
+        # TODO: uncomment this when user_master_template.md is ready # pylint: disable=fixme  # noqa: E501
+        # TODO: Delete all user prompts from @(cai/cli.py) and (cai/core.py) # pylint: disable=fixme  # noqa: E501
+
+        # messages.append({"role": "user", "content": Template(  # nosec: B702
+        #    filename="cai/prompts/core/user_master_template.md").render(
+        #        agent=agent,
+        #        ctf_instructions=history[0]["content"],
+        #        user_prompt=next((msg["content"] for msg in reversed(history) # noqa: E501
+        #        if msg["role"] == "user"), ""),
+        #        context_variables=context_variables)})
+
         for msg in history:
-            if msg.get("sender") != "Report Agent":
+            if (msg.get("sender") not in ["Report Agent"] and
+                not any("add_memory" in call.get("function", {}).get("name", "")  # noqa: E501
+                        for call in msg.get("tool_calls", []))):
                 messages.append(msg)
 
         debug_print(
@@ -594,10 +624,13 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         context_variables = copy.deepcopy(context_variables)
         history = copy.deepcopy(messages)
         n_turn = 0
+
         while len(history) - self.init_len < max_turns and active_agent:
-            try:
-                active_agent = self.process_interaction(
-                    active_agent,
+            # Needs to be inside while loop to avoid using the same function
+            # for all iterations
+            def agent_iteration(agent):
+                return self.process_interaction(
+                    agent,
                     history,
                     context_variables,
                     model_override,
@@ -606,26 +639,40 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     execute_tools,
                     n_turn
                 )
-                n_turn += 1
 
-                # Manually invoke state agent if stateful
+            try:
+                # Memory agent iteration
+                # If RAG is active and the turn is at a RAG interval, process
+                # using the memory agent
+                if (self.episodic_rag and
+                        (n_turn != 0 and n_turn % self.rag_interval == 0)
+                        and self.rag_online):
+                    prev_agent = active_agent
+                    active_agent = transfer_to_episodic_memory_agent()
+                    agent_iteration(active_agent)
+                    active_agent = prev_agent
+
+                # Standard agent iteration
+                active_agent = agent_iteration(active_agent)
+                n_turn += 1
+                if (self.semantic_rag and
+                        (n_turn != 0 and n_turn % self.rag_interval == 0)
+                        and self.rag_online):
+                    prev_agent = active_agent
+                    active_agent = transfer_to_semantic_memory_agent()
+                    agent_iteration(active_agent)
+                    active_agent = prev_agent
+                # Stateful agent iteration
+                # If the session is stateful, invoke the memory agent at
+                # defined intervals
                 if self.stateful:
                     self.state_interactions_count += 1
-                    if self.state_interactions_count >= self.STATE_INTERACTIONS_INTERVAL:  # noqa: E501, pylint: disable=line-too-long
+                    if (self.state_interactions_count
+                            >= self.STATE_INTERACTIONS_INTERVAL):
                         prev_agent = active_agent
                         active_agent = transfer_to_state_agent()
-                        self.process_interaction(
-                            active_agent,
-                            history,
-                            context_variables,
-                            model_override,
-                            stream,
-                            debug,
-                            execute_tools,
-                            n_turn
-                        )
+                        agent_iteration(active_agent)
                         active_agent = prev_agent
-
                         self.state_interactions_count = 0
 
             except KeyboardInterrupt:

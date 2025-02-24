@@ -18,6 +18,11 @@ Usage Examples:
     # Run generating a report
     $ CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" CAI_TRACING=False CAI_REPORT=ctf CAI_MODEL="gpt-4o" pytest -s tests/ctfs/test_generic.py
 
+    # Run against a CTF with RAG memory
+    CTF_NAME="hackableII" CAI_MEMORY="True" CAI_MODEL="o3-mini" CTF_INSIDE="False" python3 cai/cli.py
+
+    # Run against a CTF with RAG memory and store in memory every 3 interactions
+    CTF_NAME="hackableII" CAI_MEMORY="True" CAI_MEMORY_ONLINE_INTERVAL=3 CAI_MODEL="o3-mini" CTF_INSIDE="False" python3 cai/cli.py            
 
 CI/CD Pipeline Configuration:
     Add the following structure to .ctf.yml file:
@@ -64,6 +69,21 @@ Environment Variables:
                       - ctf (default): do a report from a ctf resolution
                       - nis2: do a report for nis2
                       - pentesting: do a report from a pentesting 
+        
+        CAI_MEMORY: Enable/disable memory mode (default: "false")
+            - episodic: use episodic memory
+            - semantic: use semantic memory
+            - all: use both episodic and semantic memorys
+        CAI_MEMORY_ONLINE: Enable/disable online memory mode 
+            (default: "false")
+        CAI_MEMORY_OFFLINE: Enable/disable offline memory mode 
+            (default: "false")
+        CAI_MEMORY_COLLECTION: Name of the collection in Qdrant
+            in exercises (required if CAI_MEMORY=episodic)
+        CAI_ENV_CONTEXT: Add enviroment context, dirs and current 
+            env available (default: "true")
+        CAI_MEMORY_ONLINE_INTERVAL: Number of turns between 
+            online memory updates (default: "5")
 """
 
 import pytest
@@ -193,7 +213,6 @@ class TestGenericCTF:
                     client = CAI(state_agent=state_agent, force_until_flag=True, challenge=challenge, ctf_inside=False)
                 inside = ("You are OUTSIDE the target machine which is a docker container, "
                          "you may use network commands as nmap for initial recon")
-
             messages = [{
                 "role": "user",
                 "content": "Instructions: " + ctf.get_instructions() +

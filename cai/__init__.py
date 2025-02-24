@@ -17,6 +17,13 @@ from cai.tools.reconnaissance.crypto_tools import (
     strings_command,
     decode_hex_bytes
 )
+
+from cai.agents.memory import (
+    episodic_builder,
+    query_agent,
+    semantic_builder
+)
+
 from cai.tools.reconnaissance.netcat import netcat
 from cai.tools.reconnaissance.nmap import nmap
 from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa
@@ -170,6 +177,24 @@ def transfer_to_crypto_agent(**kwargs):  # pylint: disable=W0613
     """ Transfer to crypto agent.
     Accepts any keyword arguments but ignores them."""
     return crypto_agent
+
+
+def transfer_to_episodic_memory_agent(**kwargs):  # pylint: disable=W0613
+    """ Transfer to episodic memory agent.
+    Accepts any keyword arguments but ignores them."""
+    return episodic_builder
+
+
+def transfer_to_semantic_memory_agent(**kwargs):  # pylint: disable=W0613
+    """ Transfer to semantic memory agent.
+    Accepts any keyword arguments but ignores them."""
+    return semantic_builder
+
+
+def transfer_to_query_memory_agent(**kwargs):  # pylint: disable=W0613
+    """ Transfer to query memory agent.
+    Accepts any keyword arguments but ignores them."""
+    return query_agent
 
 
 # controller agent

@@ -11,10 +11,10 @@ else:
     sys.exit(1)
 
 # Codebase Tools
-from cai.tools.llm_plugins.code_interpreter import execute_python_code
-from cai.tools.llm_plugins.cli_utils import execute_cli_command
+from cai.tools.misc.code_interpreter import execute_python_code
+from cai.tools.misc.cli_utils import execute_cli_command
 from cai.tools.web.headers import web_request_framework
-from cai.tools.llm_plugins.reasoning import thought
+from cai.tools.misc.reasoning import thought
 from cai.tools.command_and_control.command_and_control import ReverseShellClient
 from mako.template import Template
 
