@@ -209,7 +209,9 @@ class TestGenericCTF:
                 "role": "user", 
                 "content": Template(
                     filename="cai/prompts/core/user_master_template.md").render(
-                        ctf=ctf
+                        ctf=ctf,
+                        challenge=challenge,
+                        ip=ctf.get_ip() if ctf else None,
                         )
             }]
             # Run the CAI
