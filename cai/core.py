@@ -152,7 +152,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         for msg in history:
             if (msg.get("sender") not in ["Report Agent"] and
                 not any("add_memory" in call.get("function", {}).get("name", "")  # noqa: E501
-                        for call in msg.get("tool_calls", []))):
+                        for call in (msg.get("tool_calls") if msg.get("tool_calls")  # noqa: E501
+                                     else []))):
                 messages.append(msg)
 
         debug_print(
