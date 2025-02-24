@@ -80,7 +80,7 @@ def scripting_tool(command: str = "", args: str = "", ctf=None) -> str:
         return output if output else "Code executed successfully (no output)"
     except Exception as e:
         return f"Error during execution: {str(e)}"
-    finally
+    finally:
         sys.stdout = old_stdout # restore
 
 class SecurityError(Exception): # to be filled
