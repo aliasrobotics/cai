@@ -6,7 +6,7 @@ import json
 import os
 from configparser import ConfigParser
 from importlib.resources import files
-
+from mako.template import Template
 from wasabi import color  # pylint: disable=import-error
 from caiextensions.report.common import create_report  # pylint: disable=import-error # noqa: E501
 from cai.core import CAI  # pylint: disable=import-error
@@ -142,21 +142,15 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
                   color(f"'{challenge}'", fg="white", bg="blue"))
 
         # Get initial messages aligned with CTF
-        inside = ""
-        if os.getenv('CTF_INSIDE', "true").lower() == "true":
-            inside = ("You are INSIDE the target machine in a docker container, "  # noqa: E501  # pylint: disable=line-too-long
-                      "try not to do network commands unless it were necesary")
-        else:
-            inside = ("You are OUTSIDE the target machine which is a docker container, "  # noqa: E501  # pylint: disable=line-too-long
-                      "you may use network commands as nmap for initial recon")
+        
         messages += [{
-            "role": "user",
-            "content": "Instructions: " + ctf.get_instructions() +
-            "\nChallenge: " + ctf.get_challenges()[challenge] +
-            # "\nTechniques: " + ctf.get_techniques() +
-            "\nTarget IP: " + ctf.get_ip() +
-            "\n" + inside
-        }]
+                "role": "user", 
+                "content": Template(
+                    filename="cai/prompts/core/user_master_template.md").render(
+                        ctf=ctf
+                        )
+            }]
+        
         messages_init = messages
     agent = starting_agent
 
