@@ -3,7 +3,7 @@ Mail Agent module for checking email configuration security.
 
 """
 import dns.resolver  # pylint: disable=import-error
-from cai import Agent
+from cai.types import Agent
 from cai.tools.misc.cli_utils import execute_cli_command
 
 
