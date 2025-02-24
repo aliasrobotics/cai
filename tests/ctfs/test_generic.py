@@ -58,10 +58,8 @@ Environment Variables:
                     traces execution flow and agent interactions for debugging and analysis.
         CAI_AGENT_TYPE: Specify the agents to use it could take the value of: 
                      - one_tool (default): one single agent with one tool
-                     - single: one single agent with all the tools
-                     - multi: all agents with all the tools
-                     - react: use ReAct agents
                      - (see others in cai/__init__.py)
+                     - (for creating new agents, see cai/agents/ folder)
         CAI_STATE: Enable/disable stateful mode (default: "false"). When enabled,
                       the agent will use a state agent to keep track of the state of the
                       network and the flags found.
@@ -99,7 +97,7 @@ from cai import (
 from cai.util import check_flag
 from wasabi import color
 from importlib.resources import files
-
+from mako.template import Template  # pylint: disable=import-error
 if is_caiextensions_report_available():
     from caiextensions.report.ctf.ctf_reporter_agent import reporter_agent # pylint: disable=import-error
     from caiextensions.report.common import create_report  # pylint: disable=import-error # noqa: E501
@@ -142,8 +140,6 @@ def basic_ctf():
 #
 # That's why this class inherits from object and not unittest.TestCase
 #
-
-
 class TestGenericCTF:
     @pytest.mark.flaky(reruns=int(os.getenv('CTF_RERUN', '0')), reruns_delay=1)
     def test_ctf_solver(self, basic_ctf):
@@ -156,7 +152,6 @@ class TestGenericCTF:
         challenges = list(ctf.get_challenges().keys())
         challenge = challenge_key if challenge_key in challenges else (
             challenges[0] if len(challenges) > 0 else None)
-
 
         print(
             color(
@@ -201,27 +196,22 @@ class TestGenericCTF:
                 state_agent.model = model  # set model
 
             # Instance the cybersecurity AI Framework client
-            inside =""
-            if os.getenv('CTF_INSIDE', "true").lower() == "true":
-                client = CAI(ctf=ctf, state_agent=state_agent, force_until_flag=True, challenge=challenge)
-                inside = ("You are INSIDE the target machine in a docker container, "
-                         "try not to do network commands unless it were necesary")
-            else:
-                if ctf:
-                    client = CAI(ctf=ctf, state_agent=state_agent, force_until_flag=True, challenge=challenge, ctf_inside=False)
+            if ctf: 
+                if os.getenv('CTF_INSIDE', "true").lower() == "true":
+                    client = CAI(ctf=ctf, state_agent=state_agent, force_until_flag=True, challenge=challenge)
                 else:
-                    client = CAI(state_agent=state_agent, force_until_flag=True, challenge=challenge, ctf_inside=False)
-                inside = ("You are OUTSIDE the target machine which is a docker container, "
-                         "you may use network commands as nmap for initial recon")
-            messages = [{
-                "role": "user",
-                "content": "Instructions: " + ctf.get_instructions() +
-                "\nChallenge: " + ctf.get_challenges()[challenge] +
-                #"\nTechniques: " + ctf.get_techniques() +
-                "\nTarget IP: " + ctf.get_ip() +
-                "\n" + inside
-            }]
+                    client = CAI(ctf=ctf, state_agent=state_agent, force_until_flag=True, challenge=challenge, ctf_inside=False)
+            else:
+                client = CAI(state_agent=state_agent, force_until_flag=True, challenge=challenge, ctf_inside=False)
 
+            # Use the user master template
+            messages = [{
+                "role": "user", 
+                "content": Template(
+                    filename="cai/prompts/core/user_master_template.md").render(
+                        ctf=ctf
+                        )
+            }]
             # Run the CAI
             response = client.run(
                 # cli=True,
@@ -252,7 +242,6 @@ class TestGenericCTF:
                 report_data = json.loads(response_report.messages[0]['content'])
                 report_data["history"] = json.dumps(response.messages, indent=4)
                 create_report(report_data, template)
-
 
             # Check if the flag is correct
             success, flag = check_flag(

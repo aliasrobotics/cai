@@ -158,21 +158,12 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 ctf_instructions=history[0]["content"],
                 context_variables=context_variables)
         }]
-        # TODO: uncomment this when user_master_template.md is ready # pylint: disable=fixme  # noqa: E501
-        # TODO: Delete all user prompts from @(cai/cli.py) and (cai/core.py) # pylint: disable=fixme  # noqa: E501
-
-        # messages.append({"role": "user", "content": Template(  # nosec: B702
-        #    filename="cai/prompts/core/user_master_template.md").render(
-        #        agent=agent,
-        #        ctf_instructions=history[0]["content"],
-        #        user_prompt=next((msg["content"] for msg in reversed(history) # noqa: E501
-        #        if msg["role"] == "user"), ""),
-        #        context_variables=context_variables)})
 
         for msg in history:
             if (msg.get("sender") not in ["Report Agent"] and
                 not any("add_memory" in call.get("function", {}).get("name", "")  # noqa: E501
-                        for call in msg.get("tool_calls", []))):
+                        for call in (msg.get("tool_calls") if msg.get("tool_calls")  # noqa: E501
+                                     else []))):
                 messages.append(msg)
 
         debug_print(
