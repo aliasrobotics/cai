@@ -337,7 +337,7 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
                     debug=float(os.getenv('CAI_DEBUG', '2')),
                     max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
                 )
-                # Añadir el mensaje del usuario al historial en caso de CTF
+
                 if messages_init:
                     response.messages.insert(0, messages_init[0])
                 report_data = json.loads(
