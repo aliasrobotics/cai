@@ -17,11 +17,6 @@ from cai.core import CAI  # pylint: disable=import-error
 from cai.rag.vector_db import QdrantConnector
 
 COMMANDS = {
-    "/agents": [
-        "list",
-        "switch",
-        "info"
-    ],
     "/memory": [
         "list",
         "load",
@@ -31,9 +26,6 @@ COMMANDS = {
         "memory",
         "agents"
     ],
-    "/model": [
-        "set"
-    ]
 }
 
 
@@ -100,15 +92,19 @@ def handle_memory_load(collection_name):
         return False
 
 
-def handle_model_set(model_name):
-    """Handle /model set command"""
-    try:
-        os.environ['CAI_MODEL'] = model_name
-        print(f"\nModel set to: {color(model_name, fg='green', bold=True)}\n")
-        return True
-    except Exception as e:  # pylint: disable=broad-except
-        print(f"Error setting model: {e}")
-        return False
+def handle_help():
+    """Handle /help command"""
+    print("""
+Memory Commands:
+/memory list - List all memory collections
+/memory load <collection> - Load a memory collection
+/memory delete <collection> - Delete a memory collection
+
+Collections:
+- <CTF_NAME> - Episodic memory for a specific CTF
+- _all_ - Semantic memory across all CTFs
+""")
+    return True
 
 
 def handle_command(command, args=None):
@@ -120,11 +116,8 @@ def handle_command(command, args=None):
             print("Error: Collection name required")
             return False
         return handle_memory_load(args[0])
-    if command.startswith("/model set"):
-        if not args:
-            print("Error: Model name required")
-            return False
-        return handle_model_set(args[0])
+    if command.startswith("/help"):
+        return handle_help()
     return False
 
 
@@ -133,8 +126,8 @@ class FuzzyCommandCompleter(Completer):  # pylint: disable=too-many-branches,too
     A command completer that provides fuzzy completion for the REPL commands.
 
     This class implements command completion functionality for the CLI:
-    - Main command completion (e.g. /memory, /model)
-    - Subcommand completion (e.g. /memory list, /model set)
+    - Main command completion (e.g. /memory)
+    - Subcommand completion (e.g. /memory list)
     - Fuzzy matching for more flexible completion
     - Color-coded suggestions using ANSI colors
 
