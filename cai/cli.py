@@ -50,7 +50,6 @@ Environment Variables
                 - nis2: do a report for nis2
                 - pentesting: do a report from a pentesting
 
-
 Usage Examples:
 
     # Run against a CTF
@@ -81,17 +80,17 @@ Usage Examples:
 import os
 
 # Third-party imports
-from mako.template import Template  # pylint: disable=import-error
 from wasabi import color  # pylint: disable=import-error
+
 # Local imports
 
 from cai import is_pentestperf_available
 from cai.repl import run_demo_loop
+from cai.agents.cli_basic import cli_agent
 
 if is_pentestperf_available():
     import pentestperf as ptt  # pylint: disable=import-error
 
-from cai.agents.cli_basic import cli_agent
 
 def setup_ctf():
     """Setup CTF environment if CTF_NAME is provided"""
