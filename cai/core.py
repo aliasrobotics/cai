@@ -26,8 +26,6 @@ from cai import graph
 # Local imports
 from cai.datarecorder import DataRecorder
 from cai import (
-    transfer_to_episodic_memory_agent,
-    transfer_to_semantic_memory_agent,
     transfer_to_state_agent
 )
 from cai.state.common import StateAgent
@@ -131,7 +129,16 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.rag_interval = int(os.getenv("CAI_MEMORY_ONLINE_INTERVAL", "5"))
 
         self.force_until_flag = force_until_flag
-
+        if self.episodic_rag:
+            from cai.agents.memory import (
+                episodic_builder,
+            )
+            self.episodic_builder = episodic_builder
+        if self.semantic_rag:
+            from cai.agents.memory import (
+                semantic_builder,
+            )
+            self.semantic_builder = semantic_builder
         self.challenge = challenge
 
         # load env variables
@@ -676,8 +683,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 if (self.episodic_rag and
                         (n_turn != 0 and n_turn % self.rag_interval == 0)
                         and self.rag_online):
+
                     prev_agent = active_agent
-                    active_agent = transfer_to_episodic_memory_agent()
+                    active_agent = self.episodic_builder
                     agent_iteration(active_agent)
                     active_agent = prev_agent
 
@@ -688,7 +696,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                         (n_turn != 0 and n_turn % self.rag_interval == 0)
                         and self.rag_online):
                     prev_agent = active_agent
-                    active_agent = transfer_to_semantic_memory_agent()
+                    active_agent = self.semantic_builder
                     agent_iteration(active_agent)
                     active_agent = prev_agent
                 # Stateful agent iteration

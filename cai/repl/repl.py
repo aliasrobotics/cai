@@ -2,77 +2,191 @@
 This module provides a REPL interface for testing and
 interacting with CAI agents.
 """
+# Standard library imports
 import json
 import os
 from configparser import ConfigParser
 from importlib.resources import files
+
+# Third party imports
 from mako.template import Template  # pylint: disable=import-error
-from wasabi import color  # pylint: disable=import-error
-from caiextensions.report.common import create_report  # pylint: disable=import-error # noqa: E501
-from cai.core import CAI  # pylint: disable=import-error
-from cai import (
-    is_caiextensions_report_available,
+from prompt_toolkit import prompt  # pylint: disable=import-error
+from prompt_toolkit.completion import (  # pylint: disable=import-error # noqa: E501
+    Completer,
+    Completion
 )
+from prompt_toolkit.styles import Style  # pylint: disable=import-error
+from wasabi import color  # pylint: disable=import-error
+
+# Local imports
+from caiextensions.report.common import create_report  # pylint: disable=import-error,no-name-in-module # noqa: E501
+from cai import is_caiextensions_report_available
+from cai.core import CAI  # pylint: disable=import-error
+from cai.rag.vector_db import QdrantConnector
+
+COMMANDS = {
+    "/memory": [
+        "list",
+        "load",
+        "delete"  # Added delete command
+    ],
+    "/help": [
+        "memory",
+        "agents"
+    ],
+}
 
 
-def process_and_print_streaming_response(response):  # pylint: disable=inconsistent-return-statements  # noqa: E501
+def handle_memory_list():
+    """Handle /memory list command"""
+    try:
+        db = QdrantConnector()
+        collections = db.client.get_collections()
+
+        print("\nAvailable Memory Collections:")
+        print("-----------------------------")
+
+        for collection in collections.collections:
+            name = collection.name
+            info = db.client.get_collection(name)
+            points_count = db.client.count(collection_name=name).count
+
+            print(f"\nCollection: {color(name, fg='green', bold=True)}")
+            print(f"Vectors: {points_count}")
+            print(f"Vector Size: {info.config.params.vectors.size}")
+            print(f"Distance: {info.config.params.vectors.distance}")
+
+        print("\n")
+        return True
+    except Exception as e:  # pylint: disable=broad-except
+        print(f"Error listing collections: {e}")
+        return False
+
+
+def handle_memory_delete(collection_name):
+    """Handle /memory delete command"""
+    try:
+        db = QdrantConnector()
+        db.client.delete_collection(collection_name=collection_name)
+        print(
+            f"\nDeleted collection: {
+                color(
+                    collection_name,
+                    fg='red',
+                    bold=True)}\n")
+        return True
+    except Exception as e:  # pylint: disable=broad-except
+        print(f"Error deleting collection: {e}")
+        return False
+
+
+def handle_memory_load(collection_name):
+    """Handle /memory load command"""
+    try:
+        os.environ['CAI_MEMORY_COLLECTION'] = collection_name
+        if collection_name != "_all_":
+            os.environ['CAI_MEMORY'] = "episodic"
+        elif collection_name == "_all_":
+            os.environ['CAI_MEMORY'] = "semantic"
+        print(
+            f"\nMemory collection set to: {
+                color(
+                    collection_name,
+                    fg='green',
+                    bold=True)}\n")
+        return True
+    except Exception as e:  # pylint: disable=broad-except
+        print(f"Error setting memory collection: {e}")
+        return False
+
+
+def handle_help():
+    """Handle /help command"""
+    print("""
+Memory Commands:
+/memory list - List all memory collections
+/memory load <collection> - Load a memory collection
+/memory delete <collection> - Delete a memory collection
+
+Collections:
+- <CTF_NAME> - Episodic memory for a specific CTF
+- _all_ - Semantic memory across all CTFs
+""")
+    return True
+
+
+def handle_command(command, args=None):
+    """Handle CLI commands"""
+    if command == "/memory list":
+        return handle_memory_list()
+    if command.startswith("/memory load"):
+        if not args:
+            print("Error: Collection name required")
+            return False
+        return handle_memory_load(args[0])
+    if command.startswith("/help"):
+        return handle_help()
+    return False
+
+
+class FuzzyCommandCompleter(Completer):  # pylint: disable=too-many-branches,too-many-statements,too-few-public-methods,line-too-long # noqa: E501
     """
-    Process and print streaming responses from CAI.
+    A command completer that provides fuzzy completion for the REPL commands.
+
+    This class implements command completion functionality for the CLI:
+    - Main command completion (e.g. /memory)
+    - Subcommand completion (e.g. /memory list)
+    - Fuzzy matching for more flexible completion
+    - Color-coded suggestions using ANSI colors
+
+    The completer enhances the user experience by providing real-time
+    suggestions as users type commands, making the CLI more intuitive and
+    user-friendly.
     """
-    content = ""
-    last_sender = ""
 
-    for chunk in response:
-        if "sender" in chunk:
-            last_sender = chunk["sender"]
+    def get_completions(self, document, complete_event):  # pylint: disable=unused-argument # noqa: E501
+        """
+        Predicts the next command based on the current text in the document.
 
-        if "content" in chunk and chunk["content"] is not None:
-            if not content and last_sender:
-                print(f"\033[94m{last_sender}:\033[0m", end=" ", flush=True)
-                last_sender = ""
-            print(chunk["content"], end="", flush=True)
-            content += chunk["content"]
+        Args:
+            document: The current document state
+            complete_event: The event that triggered the completion
+        """
+        text = document.text_before_cursor.strip()
+        words = text.split()
 
-        if "tool_calls" in chunk and chunk["tool_calls"] is not None:
-            for tool_call in chunk["tool_calls"]:
-                f = tool_call["function"]
-                name = f["name"]
-                if not name:
-                    continue
-                print(f"\033[94m{last_sender}: \033[95m{name}\033[0m()")
+        # Si no hay texto, mostrar todos los comandos principales
+        if not text:
+            for cmd in COMMANDS:
+                yield Completion(cmd,
+                                 start_position=0,
+                                 style="fg:ansicyan bold")
+            return
 
-        if "delim" in chunk and chunk["delim"] == "end" and content:
-            print()  # End of response message
-            content = ""
+        # Si el texto empieza con /, procesar comandos
+        if text.startswith('/'):
+            current_word = words[-1]
 
-        if "response" in chunk:
-            return chunk["response"]
+            # Si solo hay una palabra, mostrar comandos principales que
+            # coincidan
+            if len(words) == 1:
+                for cmd in COMMANDS:
+                    if cmd[1:].startswith(
+                            current_word[1:]):  # Ignorar el / inicial
+                        yield Completion(cmd,
+                                         start_position=-len(current_word),
+                                         style="fg:ansicyan bold")
 
-
-def pretty_print_messages(messages) -> None:
-    """
-    Pretty print messages from CAI.
-    """
-    for message in messages:
-        if message["role"] != "assistant":
-            continue
-
-        # print agent name in blue
-        print(f"\033[94m{message['sender']}\033[0m:", end=" ")
-
-        # print response, if any
-        if message["content"]:
-            print(message["content"])
-
-        # print tool calls in purple, if any
-        tool_calls = message.get("tool_calls") or []
-        if len(tool_calls) > 1:
-            print()
-        for tool_call in tool_calls:
-            f = tool_call["function"]
-            name, args = f["name"], f["arguments"]
-            arg_str = json.dumps(json.loads(args)).replace(":", "=")
-            print(f"\033[95m{name}\033[0m({arg_str[1:-1]})")
+            # Si hay dos palabras, mostrar subcomandos del comando
+            # principal
+            elif len(words) == 2:
+                cmd = words[0]
+                if cmd in COMMANDS:
+                    for subcmd in COMMANDS[cmd]:
+                        if subcmd.startswith(current_word):
+                            yield Completion(subcmd,
+                                             start_position=-len(current_word),
+                                             style="fg:ansiyellow bold")
 
 
 def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too-many-arguments,too-many-branches,too-many-statements  # noqa: E501
@@ -138,8 +252,8 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
             challenges[0] if len(challenges) > 0 else None)
 
         if challenge:
-            print(color("Testing challenge: ", fg="white", bg="blue") +
-                  color(f"'{challenge}'", fg="white", bg="blue"))
+            print(color("Testing challenge: ", fg="white", bg="blue")
+                  + color(f"'{challenge}'", fg="white", bg="blue"))
 
         # Get initial messages aligned with CTF
 
@@ -156,13 +270,33 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
         messages_init = messages
     agent = starting_agent
 
+    cli_style = Style.from_dict({
+        'prompt': '#ff0066 bold',
+        '': '#ffcc00',
+    })
+
+    command_completer = FuzzyCommandCompleter()
+
     while True:
         try:
-            # Skip input on first iteration if CTF is enabled
             if ctf and len(messages) == 1:
                 pass
             else:
-                user_input = input("\033[93mCAI\033[0m: ")
+                user_input = prompt([('class:prompt', 'CAI> ')],
+                                    completer=command_completer,
+                                    style=cli_style)
+
+                # Handle commands
+                if user_input.startswith('/'):
+                    parts = user_input.strip().split()
+                    command = parts[0]
+                    if len(parts) > 1:
+                        command += f" {parts[1]}"
+                    args = parts[2:] if len(parts) > 2 else None
+
+                    if handle_command(command, args):
+                        continue
+
                 messages.append({"role": "user", "content": user_input})
 
             response = client.run(
@@ -179,17 +313,17 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
         except KeyboardInterrupt:
             if is_caiextensions_report_available and os.getenv("CAI_REPORT"):
                 if os.getenv("CAI_REPORT", "ctf").lower() == "pentesting":
-                    from caiextensions.report.pentesting.pentesting_agent import reporter_agent  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long # noqa: E501
+                    from caiextensions.report.pentesting.pentesting_agent import reporter_agent  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
                     template = str(
                         files('caiextensions.report.pentesting') /
                         'template.md')
                 elif os.getenv("CAI_REPORT", "ctf").lower() == "nis2":
-                    from caiextensions.report.nis2.nis2_report_agent import reporter_agent  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long # noqa: E501
+                    from caiextensions.report.nis2.nis2_report_agent import reporter_agent  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
                     template = str(
                         files('caiextensions.report.nis2') /
                         'template.md')
                 else:
-                    from caiextensions.report.ctf.ctf_reporter_agent import reporter_agent  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long # noqa: E501
+                    from caiextensions.report.ctf.ctf_reporter_agent import reporter_agent  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module   # noqa: E501
                     template = str(
                         files('caiextensions.report.ctf') /
                         'template.md')
@@ -205,7 +339,7 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
                     debug=float(os.getenv('CAI_DEBUG', '2')),
                     max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
                 )
-                # Add user message to history in case of a ctf
+
                 if messages_init:
                     response.messages.insert(0, messages_init[0])
                 report_data = json.loads(
