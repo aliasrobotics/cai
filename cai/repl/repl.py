@@ -2,21 +2,27 @@
 This module provides a REPL interface for testing and
 interacting with CAI agents.
 """
+# Standard library imports
 import json
 import os
 from configparser import ConfigParser
 from importlib.resources import files
 
+# Third party imports
 from mako.template import Template  # pylint: disable=import-error
 from prompt_toolkit import prompt  # pylint: disable=import-error
-from prompt_toolkit.completion import (Completer,  # pylint: disable=import-error # noqa: E501
-                                       Completion)
+from prompt_toolkit.completion import (  # pylint: disable=import-error # noqa: E501
+    Completer,
+    Completion
+)
 from prompt_toolkit.styles import Style  # pylint: disable=import-error
 from wasabi import color  # pylint: disable=import-error
 
+# Local imports
+from caiextensions.report.common import create_report  # pylint: disable=import-error,no-name-in-module # noqa: E501
+from cai import is_caiextensions_report_available
 from cai.core import CAI  # pylint: disable=import-error
 from cai.rag.vector_db import QdrantConnector
-from caiextensions.report.common import create_report  # pylint: disable=import-error,no-name-in-module # noqa: E501
 
 COMMANDS = {
     "/memory": [
