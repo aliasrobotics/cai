@@ -32,8 +32,12 @@ COMMANDS = {
     ],
     "/help": [
         "memory",
-        "agents"
+        "agents",
+        "graph"
     ],
+    "/graph": [
+        "show"
+    ]
 }
 
 
@@ -102,20 +106,36 @@ def handle_memory_load(collection_name):
 
 def handle_help():
     """Handle /help command"""
-    print("""
-Memory Commands:
-/memory list - List all memory collections
-/memory load <collection> - Load a memory collection
-/memory delete <collection> - Delete a memory collection
+    print(f"""
+{color('Memory Commands:', fg='yellow', bold=True, underline=True)}
+{color('/memory list', fg='yellow')}
+    List all memory collections
+{color('/memory load <collection>', fg='yellow')}
+    Load a memory collection
+{color('/memory delete <collection>', fg='yellow')}
+    Delete a memory collection
 
-Collections:
-- <CTF_NAME> - Episodic memory for a specific CTF
-- _all_ - Semantic memory across all CTFs
+    <collection>:
+    - {color('<CTF_NAME>', fg='yellow')}
+        Episodic memory for a specific CTF
+    - {color('_all_', fg='yellow')}
+        Semantic memory across all CTFs
+
+{color('Graph Commands:', fg='blue', bold=True, underline=True)}
+{color('/graph show', fg='blue')}
+    Show the graph of the current memory collection
 """)
     return True
 
 
-def handle_command(command, args=None):
+def handle_graph_show():
+    """Handle /graph show command"""
+    print("TODO: Maintain a global history/messages list and "
+          "build a graph from it")
+    return True
+
+
+def handle_command(command, args=None):  # pylint: disable=too-many-return-statements # noqa: E501
     """Handle CLI commands"""
     if command == "/memory list":
         return handle_memory_list()
@@ -124,6 +144,10 @@ def handle_command(command, args=None):
             print("Error: Collection name required")
             return False
         return handle_memory_load(args[0])
+    if command.startswith("/graph"):
+        if command.startswith("/graph show"):
+            return handle_graph_show()
+        return handle_help()
     if command.startswith("/help"):
         return handle_help()
     return False
@@ -261,7 +285,6 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
                   + color(f"'{challenge}'", fg="white", bg="blue"))
 
         # Get initial messages aligned with CTF
-
         messages += [{
             "role": "user",
             "content": Template(  # nosec B702 - Template content is trusted
@@ -279,7 +302,6 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
         'prompt': '#ff0066 bold',
         '': '#ffcc00',
     })
-
     command_completer = FuzzyCommandCompleter()
 
     while True:
