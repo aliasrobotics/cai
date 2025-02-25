@@ -74,3 +74,14 @@ def is_caiextensions_report_available():
     except ImportError:
         return False
     return True
+
+
+def is_caiextensions_memory_available():
+    """
+    Check if caiextensions memory is available
+    """
+    try:
+        from caiextensions.memory import is_memory_installed  # pylint: disable=import-error,import-outside-toplevel,unused-import  # noqa: E501,F401
+    except ImportError:
+        return False
+    return True

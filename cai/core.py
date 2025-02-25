@@ -22,6 +22,7 @@ from mako.template import Template  # pylint: disable=import-error
 from dotenv import load_dotenv  # pylint: disable=import-error # noqa: E501
 from wasabi import color  # pylint: disable=import-error
 from cai.logger import exploit_logger
+from cai import graph
 # Local imports
 from cai.datarecorder import DataRecorder
 from cai import (
@@ -93,12 +94,18 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.ctf_inside = ctf_inside
         self.brief = False
         self.init_len = 0  # initial length of history
+
+        # graph
+        self._graph = graph.get_default_graph()
+
+        # state
         self.state_agent = state_agent
         self.stateful = self.state_agent is not None
         if self.stateful:
             self.state_interactions_count = 0
             self.last_state = None
-        #
+
+        # metrics
         self.total_input_tokens = 0
         self.total_output_tokens = 0
         self.total_reasoning_tokens = 0
@@ -106,7 +113,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.interaction_output_tokens = 0
         self.interaction_reasoning_tokens = 0
         self.max_chars_per_message = 5000  # number of characters
-        #
+
+        # training data
         if log_training_data:
             self.rec_training_data = DataRecorder()
 
@@ -122,16 +130,18 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         self.force_until_flag = force_until_flag
         if self.episodic_rag:
-            from cai.agents.memory import (
+            from cai.agents.memory import (  # pylint: disable=import-outside-toplevel # noqa: E501
                 episodic_builder,
             )
             self.episodic_builder = episodic_builder
         if self.semantic_rag:
-            from cai.agents.memory import (
+            from cai.agents.memory import (  # pylint: disable=import-outside-toplevel # noqa: E501
                 semantic_builder,
             )
             self.semantic_builder = semantic_builder
         self.challenge = challenge
+
+        # load env variables
         load_dotenv()
 
     def get_chat_completion(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,line-too-long,too-many-statements # noqa: E501
@@ -337,8 +347,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         debug: bool,
         agent: Agent,
         n_turn: int = 0,
-        message: str = "",
-
+        message: str = ""
     ) -> Response:
         """
         Execute and handle tool calls made by the AI agent.
@@ -560,6 +569,15 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                                 total_output_tokens=self.total_output_tokens,  # noqa: E501  # pylint: disable=line-too-long
                                 total_reasoning_tokens=self.total_reasoning_tokens)  # noqa: E501  # pylint: disable=line-too-long
             debug_print(debug, "Ending turn.", brief=self.brief)
+
+            # Register in the graph
+            self._graph.add_to_graph(graph.Node(
+                name=active_agent.name,
+                agent=active_agent,
+                turn=n_turn,
+                message=message,
+                history=history
+            ))
             return None
 
         # handle function calls, updating context_variables, and switching
@@ -571,6 +589,17 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         )
 
         history.extend(partial_response.messages)
+
+        # Register in the graph
+        self._graph.add_to_graph(graph.Node(
+            name=active_agent.name,
+            agent=active_agent,
+            turn=n_turn,
+            message=message,
+            history=history
+        ), action=message.tool_calls)
+
+        # update context variables
         context_variables.update(partial_response.context_variables)
         return (partial_response.agent
                 if partial_response.agent
@@ -616,6 +645,15 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 color("Logging URL: " +
                       exploit_logger.get_logger_url(),
                       fg="white", bg="pink")
+            )
+
+        if self.rec_training_data:
+            print(
+                color(
+                    "Logging at " + self.rec_training_data.filename,
+                    fg="white",
+                    bg="yellow"
+                )
             )
 
         active_agent = agent

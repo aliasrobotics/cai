@@ -16,6 +16,13 @@ from rich.traceback import install  # pylint: disable=import-error
 from rich.pretty import install as install_pretty  # pylint: disable=import-error # noqa: 501
 from rich.tree import Tree  # pylint: disable=import-error
 
+from litellm.types.utils import Message  # pylint: disable=import-error
+from cai.graph import Node, get_default_graph
+from cai.types import (
+    Agent,
+    ChatCompletionMessageToolCall
+)
+
 
 def get_model_input_tokens(model):
     """
@@ -901,3 +908,92 @@ def fix_message_list(messages):  # pylint: disable=R0914,R0915,R0912
             continue
         new_messages.append(msg)
     return new_messages
+
+
+def create_graph_from_history(history):
+    """
+    Creates a graph from a history of messages, emulating how CAI creates
+    it during interactions.
+
+    Args:
+        history (list): List of messages loaded from JSONL file
+
+    Returns:
+        Graph: The constructed graph object
+    """
+    # Initialize graph
+    graph = get_default_graph()
+
+    # Track turn number
+    turn = 0
+
+    # Process each message in history
+    i = 0
+    while i < len(history):
+        message = history[i]
+
+        # Skip system messages as they don't need to be in the graph
+        if message.get("role") == "system":
+            i += 1
+            continue
+
+        # Create a basic agent object for the sender
+        agent = Agent(
+            name=message.get("sender", message.get("role", "unknown")),
+            model=message.get("model", "unknown"),
+            functions=[]  # We don't have access to original functions
+        )
+
+        # Create node for this interaction
+        node = Node(
+            name=agent.name,
+            agent=agent,
+            turn=turn,
+            message=Message(**message),
+            history=history[:i + 1],
+            # NOTE: Include all history up to this point
+            # but NOT the related tool responses, as that
+            # doing so will affect the resulting network
+            # state, if computed. These tool responses
+            # will be handled in the next Node
+        )
+
+        # Handle tool calls and their responses
+        if (message.get("role") == "assistant" and
+            "tool_calls" in message and
+                message["tool_calls"]):
+            tool_responses = []
+            num_tool_calls = len(message["tool_calls"])
+
+            # Collect the corresponding tool responses
+            for j in range(num_tool_calls):
+                if (i + j + 1 < len(history) and
+                        history[i + j + 1].get("role") == "tool"):
+                    tool_response = history[i + j + 1]
+                    tool_responses.append({
+                        "tool_call_id": tool_response.get("tool_call_id"),
+                        "name": tool_response.get("tool_name"),
+                        "content": tool_response.get("content")
+                    })
+
+            # Add node with tool calls and their responses as action
+            # by converting dict tool calls to ChatCompletionMessageToolCall
+            # objects
+            tool_calls = [
+                ChatCompletionMessageToolCall(
+                    id=tool_call["id"],
+                    type=tool_call["type"],
+                    function=tool_call["function"],
+                    index=tool_call["index"] if "index" in tool_call else None
+                ) for tool_call in message["tool_calls"]
+            ]
+            graph.add_to_graph(node, action=tool_calls)
+
+            # Skip the tool response messages since we've processed them
+            i += num_tool_calls + 1
+        else:
+            # Add node without action for non-tool-call messages
+            graph.add_to_graph(node)
+            i += 1
+        turn += 1
+    return graph

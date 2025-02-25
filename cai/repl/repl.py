@@ -5,6 +5,7 @@ interacting with CAI agents.
 # Standard library imports
 import json
 import os
+import sys
 from configparser import ConfigParser
 from importlib.resources import files
 
@@ -24,6 +25,9 @@ from cai import is_caiextensions_report_available
 from cai.core import CAI  # pylint: disable=import-error
 from cai.rag.vector_db import QdrantConnector
 
+# Global variables
+client = None  # pylint: disable=invalid-name
+
 COMMANDS = {
     "/memory": [
         "list",
@@ -32,8 +36,11 @@ COMMANDS = {
     ],
     "/help": [
         "memory",
-        "agents"
+        "agents",
+        "graph"
     ],
+    "/graph": [],
+    "/exit": []
 }
 
 
@@ -102,20 +109,50 @@ def handle_memory_load(collection_name):
 
 def handle_help():
     """Handle /help command"""
-    print("""
-Memory Commands:
-/memory list - List all memory collections
-/memory load <collection> - Load a memory collection
-/memory delete <collection> - Delete a memory collection
+    print(f"""
+{color('Memory Commands:', fg='yellow', bold=True, underline=True)}
+{color('/memory list', fg='yellow')}
+    List all memory collections
+{color('/memory load <collection>', fg='yellow')}
+    Load a memory collection
+{color('/memory delete <collection>', fg='yellow')}
+    Delete a memory collection
 
-Collections:
-- <CTF_NAME> - Episodic memory for a specific CTF
-- _all_ - Semantic memory across all CTFs
+    <{color('collection', bold=True)}>:
+    - {color('<CTF_NAME>', fg='yellow')}
+        Episodic memory for a specific CTF
+        (e.g. {color('baby_first', bold=True)})
+    - {color('_all_', fg='yellow')}
+        Semantic memory across all CTFs
+
+{color('Graph Commands:', fg='blue', bold=True, underline=True)}
+{color('/graph', fg='blue')}
+    Show the graph of the current memory collection
+
+{color('/exit', fg='red')}
+    Exit CAI.
 """)
     return True
 
 
-def handle_command(command, args=None):
+def handle_graph_show():
+    """Handle /graph show command"""
+    if not client or not client._graph:  # pylint: disable=protected-access # noqa: E501
+        print("No conversation graph available.")
+        return True
+
+    try:
+        print("\nConversation Graph:")
+        print("------------------")
+        print(client._graph.ascii())  # pylint: disable=protected-access # noqa: E501
+        print()
+        return True
+    except Exception as e:  # pylint: disable=broad-except
+        print(f"Error displaying graph: {e}")
+        return False
+
+
+def handle_command(command, args=None):  # pylint: disable=too-many-return-statements # noqa: E501
     """Handle CLI commands"""
     if command == "/memory list":
         return handle_memory_list()
@@ -124,8 +161,12 @@ def handle_command(command, args=None):
             print("Error: Collection name required")
             return False
         return handle_memory_load(args[0])
+    if command.startswith("/graph"):
+        return handle_graph_show()
     if command.startswith("/help"):
         return handle_help()
+    if command.startswith("/exit"):
+        sys.exit(0)
     return False
 
 
@@ -210,6 +251,7 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
         ctf: Optional CTF instance to use
         state_agent: Optional state agent to use
     """
+    global client  # pylint: disable=global-statement
     # Initialize CAI with CTF and state agent if provided
     client = CAI(
         ctf=ctf if os.getenv(
@@ -227,19 +269,24 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
         version = 'unknown'
 
     print(f"""
- ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄
-▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌
-▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌ ▀▀▀▀█░█▀▀▀▀
-▐░▌          ▐░▌       ▐░▌     ▐░▌
-▐░▌          ▐░█▄▄▄▄▄▄▄█░▌     ▐░▌
-▐░▌          ▐░░░░░░░░░░░▌     ▐░▌
-▐░▌          ▐░█▀▀▀▀▀▀▀█░▌     ▐░▌
-▐░▌          ▐░▌       ▐░▌     ▐░▌
-▐░█▄▄▄▄▄▄▄▄▄ ▐░▌       ▐░▌ ▄▄▄▄█░█▄▄▄▄
-▐░░░░░░░░░░░▌▐░▌       ▐░▌▐░░░░░░░░░░░▌
- ▀▀▀▀▀▀▀▀▀▀▀  ▀         ▀  ▀▀▀▀▀▀▀▀▀▀▀
+                CCCCCCCCCCCCC      ++++++++   ++++++++      IIIIIIIIII
+             CCC::::::::::::C  ++++++++++       ++++++++++  I::::::::I
+           CC:::::::::::::::C ++++++++++         ++++++++++ I::::::::I
+          C:::::CCCCCCCC::::C +++++++++    ++     +++++++++ II::::::II
+         C:::::C       CCCCCC +++++++     +++++     +++++++   I::::I
+        C:::::C                +++++     +++++++     +++++    I::::I
+        C:::::C                ++++                   ++++    I::::I
+        C:::::C                 ++                     ++     I::::I
+        C:::::C                  +   +++++++++++++++   +      I::::I
+        C:::::C                    +++++++++++++++++++        I::::I
+        C:::::C                     +++++++++++++++++         I::::I
+         C:::::C       CCCCCC        +++++++++++++++          I::::I
+          C:::::CCCCCCCC::::C         +++++++++++++         II::::::II
+           CC:::::::::::::::C           +++++++++           I::::::::I
+             CCC::::::::::::C             +++++             I::::::::I
+                CCCCCCCCCCCCC               ++              IIIIIIIIII
 
-    Cybersecurity AI (CAI) v{version}
+                              Cybersecurity AI (CAI) v{version}
 """)
 
     messages = []
@@ -256,7 +303,6 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
                   + color(f"'{challenge}'", fg="white", bg="blue"))
 
         # Get initial messages aligned with CTF
-
         messages += [{
             "role": "user",
             "content": Template(  # nosec B702 - Template content is trusted
@@ -274,7 +320,6 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
         'prompt': '#ff0066 bold',
         '': '#ffcc00',
     })
-
     command_completer = FuzzyCommandCompleter()
 
     while True:
