@@ -5,7 +5,7 @@ A library to build Bug Bounty-level grade Cybersecurity AIs (CAIs).
 import os
 import pkgutil
 
-from cai.agents.flag_discriminator import (flag_discriminator, 
+from cai.agents.flag_discriminator import (flag_discriminator,
                                            transfer_to_flag_discriminator)
 
 
