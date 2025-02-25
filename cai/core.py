@@ -130,12 +130,12 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         self.force_until_flag = force_until_flag
         if self.episodic_rag:
-            from cai.agents.memory import (
+            from cai.agents.memory import (  # pylint: disable=import-outside-toplevel # noqa: E501
                 episodic_builder,
             )
             self.episodic_builder = episodic_builder
         if self.semantic_rag:
-            from cai.agents.memory import (
+            from cai.agents.memory import (  # pylint: disable=import-outside-toplevel # noqa: E501
                 semantic_builder,
             )
             self.semantic_builder = semantic_builder
@@ -750,9 +750,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
             elif active_agent is None:
                 break
-
-            # Plot the graph on every turn for debugging
-            print(self._graph.ascii())
 
         execution_time = time.time() - start_time
 

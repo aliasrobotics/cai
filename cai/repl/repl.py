@@ -244,7 +244,7 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
              CCC::::::::::::C             +++++             I::::::::I
                 CCCCCCCCCCCCC               ++              IIIIIIIIII
 
-                            Cybersecurity AI (CAI) v{version}
+                              Cybersecurity AI (CAI) v{version}
 """)
 
     messages = []

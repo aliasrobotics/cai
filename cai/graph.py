@@ -11,13 +11,14 @@ import logging
 from typing import List  # pylint: disable=import-error
 
 # Third party imports
+from litellm.types.utils import Message  # pylint: disable=import-error
 import networkx as nx  # pylint: disable=import-error
+from pydantic import BaseModel  # pylint: disable=import-error
 import requests  # pylint: disable=import-error
 import urllib3  # pylint: disable=import-error
-from litellm.types.utils import Message  # pylint: disable=import-error
-from pydantic import BaseModel  # pylint: disable=import-error
 
 # Local imports
+from cai.state.pydantic import state_agent
 from .types import (
     Agent,
     ChatCompletionMessageToolCall
@@ -33,6 +34,7 @@ class Node(BaseModel):  # pylint: disable=too-few-public-methods
     turn: int = 0
     message: Message = None
     history: List = []
+    strout: str = None
 
     def __hash__(self):
         # Convert history list to tuple for hashing
@@ -40,7 +42,58 @@ class Node(BaseModel):  # pylint: disable=too-few-public-methods
         return hash((self.name, self.agent.name, self.turn, history_tuple))
 
     def __str__(self):
-        return f"{self.name}"
+        """
+        Format node label to be concise and
+        readable within 80 chars width
+        """
+        if not self.strout:
+            return self.name
+
+        # NOTE: Review this part and consider using a more
+        # efficient way to parse the strout and to format it
+        # nicely
+        try:  # pylint: disable=too-many-nested-blocks,too-many-branches,too-many-statements # noqa: E501
+            # Parse JSON content after first double newline
+            content = json.loads(self.strout.split('\n\n', 1)[1])
+
+            # Special handling for network state
+            if isinstance(content, dict) and 'network' in content:
+                lines = [self.name, "\n"]
+                for node in content['network']:
+                    # Build endpoint summary line
+                    summary = []
+                    if 'ip' in node:
+                        summary.append(f"{node['ip']}")
+                    if node.get('ports'):
+                        summary.append(f"{len(node['ports'])} ports")
+                    if node.get('exploits'):
+                        exploits = [e['name'] for e in node['exploits']]
+                        summary.append(f"exploits: {', '.join(exploits)}")
+                    if node.get('users'):
+                        summary.append(f"users: {', '.join(node['users'])}")
+
+                    # Add endpoint summary
+                    lines.append(" - " + " | ".join(summary))
+
+                    # Add files indented if present
+                    if node.get('files'):
+                        for file in node['files'][:10]:  # Limit to 10 files
+                            if len(file) > 60:
+                                file = file[:57] + "..."
+                            lines.append("   ├─ " + file)
+                        if len(node['files']) > 10:
+                            lines.append("   └─ ...")
+
+                    lines.append("\n")
+
+                return "\n".join(lines)
+
+            # For non-network state, format normally
+            return f"{self.name}\n\n{json.dumps(content, indent=2)[:300]}"
+
+        except (json.JSONDecodeError, IndexError):
+            # Fallback for non-JSON content
+            return f"{self.name}\n\n{self.strout}"
 
 
 class Graph(nx.DiGraph):
@@ -59,6 +112,21 @@ class Graph(nx.DiGraph):
         self._trainable_variables_collection = {}
         self.reward = 0  # Initialize reward attribute
         self.previous_node = None
+
+        # state, NOTE: each agent is stateless, and so is the default CAI
+        # instance
+        self.state = state_agent
+        # self.state.model = "gpt-4o"  # NOTE: override the default model
+        # self.state.model = "qwen2.5:72b"
+        self._cai = None
+
+    @property
+    def cai(self):
+        """Lazily initialize CAI instance"""
+        if self._cai is None:
+            from .core import CAI  # pylint: disable=import-outside-toplevel # noqa: E501
+            self._cai = CAI(state_agent=self.state)
+        return self._cai
 
     def get_name_op_map(self):
         """
@@ -99,6 +167,35 @@ class Graph(nx.DiGraph):
             base_name = unique_name.split("_")[0]
             unique_name = f"{base_name}_{index}"
         return unique_name
+        #
+        # return node.name  # NOTE: avoid re-naming the node
+
+    def calculate_node_strout(self, history, node_name):
+        """
+        Calculates the strout for the given node
+        """
+        # calculate node's state
+        completion = self.cai.get_chat_completion(
+            agent=self.state,  # force to use the state agent
+            history=history[1:],
+            context_variables={},
+            model_override=None,
+            stream=False,
+            debug=False
+        )
+        message = completion.choices[0].message
+
+        # Parse the JSON content and format it nicely
+        try:
+            content_json = json.loads(message.content)
+            formatted_json = json.dumps(content_json, indent=2)
+            strout = f"{node_name}\n\n{formatted_json}"
+        except json.JSONDecodeError:
+            # Fallback if content is not valid JSON
+            strout = f"{node_name}\n\n{message.content}"
+            print("ERROR:")
+            print(strout)
+        return strout
 
     def add_to_graph(
             self,
@@ -124,7 +221,12 @@ class Graph(nx.DiGraph):
         """
         unique_name = self.get_unique_name(node)
         node.name = unique_name
-        self._name_op_map[node.name] = node
+
+        # calculate strout via state agent inference
+        # node.strout = self.calculate_node_strout(node.history, node.name)
+
+        # map and add the node to the graph
+        self._name_op_map[str(node)] = node
         self.add_node(node)
 
         # edge
@@ -174,6 +276,32 @@ class Graph(nx.DiGraph):
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
         dot = self.to_pydot()
+
+        # Configure the graph attributes for better formatting
+        dot.set_rankdir('TB')  # Top to bottom layout
+        dot.set_nodesep(0.75)  # Increased node separation
+        dot.set_ranksep(0.75)  # Increased rank separation
+
+        # Configure node attributes
+        for node in dot.get_nodes():
+            node.set_shape('box')
+            node.set_fontname('monospace')
+            node.set_margin('0.3,0.2')  # Increased margins
+            # Left-align text in nodes
+            label = node.get_label()
+            if label:
+                # Strip quotes that may be present
+                label = label.strip('"')
+                # Add left alignment and padding
+                node.set_label(f'"{{\\l{label}\\l}}"')
+
+        # Configure edge attributes
+        for edge in dot.get_edges():
+            edge.set_arrowsize('0.5')
+            # Left-align edge labels
+            label = edge.get_label()
+            edge.set_label(label)
+
         return requests.get(
             "https://dot-to-ascii.ggerganov.com/dot-to-ascii.php",
             params={
