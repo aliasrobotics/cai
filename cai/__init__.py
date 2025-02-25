@@ -5,14 +5,10 @@ A library to build Bug Bounty-level grade Cybersecurity AIs (CAIs).
 import os
 import pkgutil
 
-from cai.agents.flag_discriminator import flag_discriminator, transfer_to_flag_discriminator
+from cai.agents.flag_discriminator import (flag_discriminator,
+                                           transfer_to_flag_discriminator)
 
-# RAG memory
-from cai.agents.memory import (
-    episodic_builder,
-    query_agent,
-    semantic_builder
-)
+
 # Extend the search path for namespace packages (allows merging)
 __path__ = pkgutil.extend_path(__path__, __name__)
 
@@ -53,28 +49,11 @@ def transfer_to_state_agent():
     """
     return state_agent
 
-
-
-def transfer_to_episodic_memory_agent(**kwargs):  # pylint: disable=W0613
-    """ Transfer to episodic memory agent.
-    Accepts any keyword arguments but ignores them."""
-    return episodic_builder
-
-
-def transfer_to_semantic_memory_agent(**kwargs):  # pylint: disable=W0613
-    """ Transfer to semantic memory agent.
-    Accepts any keyword arguments but ignores them."""
-    return semantic_builder
-
-
-def transfer_to_query_memory_agent(**kwargs):  # pylint: disable=W0613
-    """ Transfer to query memory agent.
-    Accepts any keyword arguments but ignores them."""
-    return query_agent
-
 ########################################################
 # Extensions utilities
 ########################################################
+
+
 def is_pentestperf_available():
     """
     Check if pentestperf is available
