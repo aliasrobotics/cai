@@ -5,6 +5,7 @@ interacting with CAI agents.
 # Standard library imports
 import json
 import os
+import sys
 from configparser import ConfigParser
 from importlib.resources import files
 
@@ -24,6 +25,9 @@ from cai import is_caiextensions_report_available
 from cai.core import CAI  # pylint: disable=import-error
 from cai.rag.vector_db import QdrantConnector
 
+# Global variables
+client = None  # pylint: disable=invalid-name
+
 COMMANDS = {
     "/memory": [
         "list",
@@ -35,9 +39,8 @@ COMMANDS = {
         "agents",
         "graph"
     ],
-    "/graph": [
-        "show"
-    ]
+    "/graph": [],
+    "/exit": []
 }
 
 
@@ -115,24 +118,38 @@ def handle_help():
 {color('/memory delete <collection>', fg='yellow')}
     Delete a memory collection
 
-    <collection>:
+    <{color('collection', bold=True)}>:
     - {color('<CTF_NAME>', fg='yellow')}
         Episodic memory for a specific CTF
+        (e.g. {color('baby_first', bold=True)})
     - {color('_all_', fg='yellow')}
         Semantic memory across all CTFs
 
 {color('Graph Commands:', fg='blue', bold=True, underline=True)}
-{color('/graph show', fg='blue')}
+{color('/graph', fg='blue')}
     Show the graph of the current memory collection
+
+{color('/exit', fg='red')}
+    Exit CAI.
 """)
     return True
 
 
 def handle_graph_show():
     """Handle /graph show command"""
-    print("TODO: Maintain a global history/messages list and "
-          "build a graph from it")
-    return True
+    if not client or not client._graph:  # pylint: disable=protected-access # noqa: E501
+        print("No conversation graph available.")
+        return True
+
+    try:
+        print("\nConversation Graph:")
+        print("------------------")
+        print(client._graph.ascii())  # pylint: disable=protected-access # noqa: E501
+        print()
+        return True
+    except Exception as e:  # pylint: disable=broad-except
+        print(f"Error displaying graph: {e}")
+        return False
 
 
 def handle_command(command, args=None):  # pylint: disable=too-many-return-statements # noqa: E501
@@ -145,11 +162,11 @@ def handle_command(command, args=None):  # pylint: disable=too-many-return-state
             return False
         return handle_memory_load(args[0])
     if command.startswith("/graph"):
-        if command.startswith("/graph show"):
-            return handle_graph_show()
-        return handle_help()
+        return handle_graph_show()
     if command.startswith("/help"):
         return handle_help()
+    if command.startswith("/exit"):
+        sys.exit(0)
     return False
 
 
@@ -234,6 +251,7 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
         ctf: Optional CTF instance to use
         state_agent: Optional state agent to use
     """
+    global client  # pylint: disable=global-statement
     # Initialize CAI with CTF and state agent if provided
     client = CAI(
         ctf=ctf if os.getenv(
