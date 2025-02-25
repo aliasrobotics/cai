@@ -29,7 +29,7 @@ Environment Variables:
 
 import os
 from cai.core import CAI
-from cai import episodic_builder, semantic_builder
+from cai.agents.memory import episodic_builder, semantic_builder
 from cai.datarecorder import load_history_from_jsonl
 
 def memory_loop(messages_file: str, max_iterations: int = 10) -> None:
