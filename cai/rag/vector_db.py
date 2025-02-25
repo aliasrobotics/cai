@@ -81,8 +81,7 @@ class QdrantConnector:
             port: Qdrant server port
         """
         self.client = QdrantClient(host=host, port=port)
-        self.model_name = os.getenv("CAI_MEMORY_MODEL", model_name)
-
+        self.model_name = model_name
 
         if model_name.startswith("text"):
             # OpenAI model

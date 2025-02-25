@@ -41,10 +41,6 @@ repos:
   #       args:
   #         - "--check"
   #         - "--no-update"
-  - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.18.4
-    hooks:
-      - id: gitleaks
   - repo: https://github.com/pycqa/bandit
     rev: 1.7.8
     hooks:

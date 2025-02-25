@@ -41,8 +41,6 @@ Environment Variables
             current env available (default: "true")
         CAI_MEMORY_ONLINE_INTERVAL: Number of turns between
             online memory updates (default: "5")
-        CAI_MEMORY_MODEL: Model to use for memory 
-            (default: "text-embedding-3-large")
 
     Extensions (only applicable if the right extension is installed):
 
@@ -51,7 +49,6 @@ Environment Variables
                 - ctf (default): do a report from a ctf resolution
                 - nis2: do a report for nis2
                 - pentesting: do a report from a pentesting
-
 
 Usage Examples:
 
@@ -65,7 +62,7 @@ Usage Examples:
     # Run without a target in human-in-the-loop mode, generating a report
     $ CAI_TRACING=False CAI_REPORT=pentesting CAI_MODEL="gpt-4o" \
         python3 cai/cli.py
-    
+
     # Run with online long_term_memory
     # Executes memory long_term_memory every 5 turns:
     CTF_NAME="hackableII" CAI_MEMORY="episodic" \
@@ -83,17 +80,17 @@ Usage Examples:
 import os
 
 # Third-party imports
-from mako.template import Template  # pylint: disable=import-error
 from wasabi import color  # pylint: disable=import-error
+
 # Local imports
 
 from cai import is_pentestperf_available
 from cai.repl import run_demo_loop
+from cai.agents.cli_basic import cli_agent
 
 if is_pentestperf_available():
     import pentestperf as ptt  # pylint: disable=import-error
 
-from cai.agents.cli_basic import cli_agent
 
 def setup_ctf():
     """Setup CTF environment if CTF_NAME is provided"""

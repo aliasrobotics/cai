@@ -4,17 +4,19 @@ interacting with CAI agents.
 """
 import json
 import os
+from configparser import ConfigParser
+from importlib.resources import files
+
 from mako.template import Template  # pylint: disable=import-error
-from configparser import ConfigParser  # pylint: disable=import-error
-from importlib.resources import files  # pylint: disable=import-error
 from prompt_toolkit import prompt  # pylint: disable=import-error
 from prompt_toolkit.completion import (Completer,  # pylint: disable=import-error # noqa: E501
                                        Completion)
 from prompt_toolkit.styles import Style  # pylint: disable=import-error
 from wasabi import color  # pylint: disable=import-error
-from caiextensions.report.common import create_report  # pylint: disable=import-error,no-name-in-module # noqa: E501
+
 from cai.core import CAI  # pylint: disable=import-error
 from cai.rag.vector_db import QdrantConnector
+from caiextensions.report.common import create_report  # pylint: disable=import-error,no-name-in-module # noqa: E501
 
 COMMANDS = {
     "/memory": [
@@ -204,9 +206,10 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
     """
     # Initialize CAI with CTF and state agent if provided
     client = CAI(
-        ctf=ctf if os.getenv('CTF_INSIDE', "true").lower() == "true" else None,
-        state_agent=state_agent
-    )
+        ctf=ctf if os.getenv(
+            'CTF_INSIDE',
+            "true").lower() == "true" else None,
+        state_agent=state_agent)
 
     # Get version from setup.cfg
     version = "unknown"
@@ -302,7 +305,7 @@ def run_demo_loop(  # pylint: disable=too-many-locals,too-many-nested-blocks,too
             if response.agent:
                 agent = response.agent
         except KeyboardInterrupt:
-            if os.getenv("CAI_REPORT"):
+            if is_caiextensions_report_available and os.getenv("CAI_REPORT"):
                 if os.getenv("CAI_REPORT", "ctf").lower() == "pentesting":
                     from caiextensions.report.pentesting.pentesting_agent import reporter_agent  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
                     template = str(
