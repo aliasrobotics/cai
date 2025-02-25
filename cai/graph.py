@@ -13,6 +13,7 @@ from typing import List  # pylint: disable=import-error
 # Third party imports
 import networkx as nx  # pylint: disable=import-error
 import requests  # pylint: disable=import-error
+import urllib3  # pylint: disable=import-error
 from litellm.types.utils import Message  # pylint: disable=import-error
 from pydantic import BaseModel  # pylint: disable=import-error
 
@@ -169,6 +170,9 @@ class Graph(nx.DiGraph):
 
         NOTE: uses https://github.com/ggerganov/dot-to-ascii
         """
+        # Disable warnings for unverified HTTPS requests
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
         dot = self.to_pydot()
         return requests.get(
             "https://dot-to-ascii.ggerganov.com/dot-to-ascii.php",
