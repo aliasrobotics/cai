@@ -8,6 +8,7 @@ import os
 import sys
 from configparser import ConfigParser
 from importlib.resources import files
+from typing import Optional, List
 
 # Third party imports
 from mako.template import Template  # pylint: disable=import-error
@@ -19,40 +20,45 @@ from prompt_toolkit.completion import (  # pylint: disable=import-error # noqa: 
 from prompt_toolkit.styles import Style  # pylint: disable=import-error
 from wasabi import color  # pylint: disable=import-error
 from rich.console import Console  # pylint: disable=import-error
+from rich.panel import Panel  # pylint: disable=import-error
 # Local imports
 from caiextensions.report.common import create_report  # pylint: disable=import-error,no-name-in-module # noqa: E501
 from cai import is_caiextensions_report_available
 from cai.core import CAI  # pylint: disable=import-error
 from cai.rag.vector_db import QdrantConnector
+from caiextensions.platforms.base import platform_manager  # pylint: disable=ungrouped-imports # noqa: E501
 
 # Global variables
 client = None  # pylint: disable=invalid-name
 console = Console()
 
+
+def get_platform_commands():
+    """Get commands for all registered platforms."""
+    platforms = platform_manager.list_platforms()
+    return [
+        "list",  # Para listar plataformas disponibles
+        *[f"{platform} {cmd}"
+          for platform in platforms
+          for cmd in platform_manager.get_platform(platform).get_commands()]
+    ]
+
+
 COMMANDS = {
     "/memory": [
         "list",
         "load",
-        "delete"  # Added delete command
+        "delete"
     ],
     "/help": [
         "memory",
         "agents",
-        "graph"
+        "graph",
+        "platform"
     ],
     "/graph": [],
     "/exit": [],
-    "/htb": [
-        "list",
-        "list retired",
-        "list starting",
-        "info",
-        "spawn",
-        "stop",
-        "connect",
-        "disconnect",
-        "status"
-    ],
+    "/platform": get_platform_commands()
 }
 
 
@@ -164,9 +170,57 @@ def handle_graph_show():
         return False
 
 
+def handle_platform_command(
+        command: str, args: Optional[List[str]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
+    """Handle platform specific commands."""
+    if not args:
+        # Mostrar plataformas disponibles
+        platforms = platform_manager.list_platforms()
+        console.print(Panel(
+            "\n".join(f"[green]{p}[/green]" for p in platforms),
+            title="Available Platforms",
+            border_style="blue"
+        ))
+        return True
+
+    platform_name = args[0].lower()
+    platform = platform_manager.get_platform(platform_name)
+
+    if not platform:
+        console.print(f"[red]Unknown platform: {platform_name}[/red]")
+        return False
+
+    if len(args) == 1:
+        # Mostrar ayuda de la plataforma
+        console.print(Panel(
+            platform.get_help(),
+            title=f"{platform_name.upper()} Help",
+            border_style="blue"
+        ))
+        return True
+
+    # Pasar el comando a la plataforma (sin el nombre de la plataforma)
+    platform.handle_command(args[1:])
+    return True
+
+
 def handle_command(command, args=None):  # pylint: disable=too-many-branches,too-many-return-statements,too-many-statements,too-many-locals,too-many-nested-blocks,too-many-arguments,too-many-branches,too-many-statements  # noqa: E501
     """Handle CLI commands"""
     if command.startswith("/htb"):
+        def is_platform_enabled(platform_name: str) -> bool:
+            """Check if a platform is enabled as an extension."""
+            try:
+                if platform_name == "htb":
+                    from caiextensions.platforms.htb.cli import handle_htb_command  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501, F401
+                    return True
+                # Add more platforms here as needed
+            except ImportError:
+                return False
+            return False
+        if not is_platform_enabled("htb"):
+            console.print(
+                "[red]HTB extension not installed or properly configured[/red]")  # noqa: E501 # pylint: disable=line-too-long
+            return False
         try:
             from caiextensions.platforms.htb.cli import handle_htb_command  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
             from caiextensions.platforms.htb.api import HTBClient  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
@@ -203,6 +257,11 @@ def handle_command(command, args=None):  # pylint: disable=too-many-branches,too
         return handle_help()
     if command.startswith("/exit"):
         sys.exit(0)
+    if command.startswith("/platform"):
+        # Extract all parts after /platform as arguments
+        full_command = command.split() + (args if args else [])
+        platform_args = full_command[1:]  # Remove '/platform'
+        return handle_platform_command(command, platform_args)
     return False
 
 
