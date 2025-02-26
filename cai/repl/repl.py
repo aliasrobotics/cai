@@ -23,12 +23,17 @@ from rich.console import Console  # pylint: disable=import-error
 from rich.panel import Panel  # pylint: disable=import-error
 # Local imports
 from caiextensions.report.common import create_report  # pylint: disable=import-error,no-name-in-module # noqa: E501
-from cai import is_caiextensions_report_available
+from cai import (
+    is_caiextensions_report_available,
+    is_caiextensions_platform_available
+)
 from cai.core import CAI  # pylint: disable=import-error
 from cai.rag.vector_db import QdrantConnector
-from caiextensions.platform.base import platform_manager  # pylint: disable=ungrouped-imports # noqa: E501
-from caiextensions.platform.htb.cli import handle_htb_command  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501, F401
-from caiextensions.platform.htb.api import HTBClient  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
+
+if is_caiextensions_platform_available():
+    from caiextensions.platform.base import platform_manager  # pylint: disable=ungrouped-imports # noqa: E501
+    from caiextensions.platform.htb.cli import handle_htb_command  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501, F401
+    from caiextensions.platform.htb.api import HTBClient  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
 
 # Global variables
 client = None  # pylint: disable=invalid-name
@@ -37,6 +42,8 @@ console = Console()
 
 def get_platform_commands():
     """Get commands for all registered platforms."""
+    if not is_caiextensions_platform_available():
+        return ["No platform extensions installed"]
     platforms = platform_manager.list_platforms()
     return [
         "list",  # Para listar plataformas disponibles
@@ -60,7 +67,8 @@ COMMANDS = {
     ],
     "/graph": [],
     "/exit": [],
-    "/platform": get_platform_commands()
+    "/platform": 
+        get_platform_commands()
 }
 
 
