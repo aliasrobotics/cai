@@ -26,7 +26,9 @@ from caiextensions.report.common import create_report  # pylint: disable=import-
 from cai import is_caiextensions_report_available
 from cai.core import CAI  # pylint: disable=import-error
 from cai.rag.vector_db import QdrantConnector
-from caiextensions.platforms.base import platform_manager  # pylint: disable=ungrouped-imports # noqa: E501
+from caiextensions.platform.base import platform_manager  # pylint: disable=ungrouped-imports # noqa: E501
+from caiextensions.platform.htb.cli import handle_htb_command  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501, F401
+from caiextensions.platform.htb.api import HTBClient  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
 
 # Global variables
 client = None  # pylint: disable=invalid-name
