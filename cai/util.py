@@ -1,6 +1,8 @@
+# pylint: disable=too-many-lines
 """
 This module contains utility functions for the CAI library.
 """
+
 import inspect
 import json
 import os
@@ -15,8 +17,8 @@ from rich.theme import Theme  # pylint: disable=import-error
 from rich.traceback import install  # pylint: disable=import-error
 from rich.pretty import install as install_pretty  # pylint: disable=import-error # noqa: 501
 from rich.tree import Tree  # pylint: disable=import-error
-
 from litellm.types.utils import Message  # pylint: disable=import-error
+from cai.accountability.llm_cost import calculate_conversation_cost
 from cai.graph import Node, get_default_graph
 from cai.types import (
     Agent,
@@ -484,7 +486,16 @@ def _create_token_display(interaction_input_tokens, interaction_output_tokens,  
         f"R:{interaction_reasoning_tokens} ",
         style="current_token_count")
 
-    # Total tokens
+    # Calculate current interaction cost
+    current_costs = calculate_conversation_cost(
+        interaction_input_tokens,
+        interaction_output_tokens,
+        model
+    )
+    tokens_text.append(
+        f"(${current_costs['total_cost']:.4f}) ",
+        style="cost")
+
     tokens_text.append("| Total: ", style="total_token_count")
     tokens_text.append(
         f"I:{total_input_tokens} ",
@@ -495,6 +506,15 @@ def _create_token_display(interaction_input_tokens, interaction_output_tokens,  
     tokens_text.append(
         f"R:{total_reasoning_tokens} ",
         style="total_token_count")
+
+    total_costs = calculate_conversation_cost(
+        total_input_tokens,
+        total_output_tokens,
+        model
+    )
+    tokens_text.append(
+        f"(${total_costs['total_cost']:.4f}) ",
+        style="cost")
 
     # Context usage
     context_pct = interaction_input_tokens / \
