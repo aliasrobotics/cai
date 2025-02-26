@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 
+"""
+Local Python Interpreter
+
+This module provides a local Python interpreter that
+can execute Python code. It includes functionality
+for evaluating Python expressions, executing code blocks,
+and handling errors that may occur during code execution.
+"""
+
 # Copyright 2024 The HuggingFace Inc. team. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,15 +64,16 @@ def truncate_content(
     else:
         return (
             content[: max_length // 2]
-            + f"\n..._This content has been truncated to stay below {max_length} characters_...\n"
+            + (f"\n..._This content has been truncated to stay below "
+               f"{max_length} characters_...\n")
             + content[-max_length // 2:]
         )
 
 
 class InterpreterError(ValueError):
     """
-    An error raised when the interpreter cannot evaluate a Python expression, due to syntax error or unsupported
-    operations.
+    An error raised when the interpreter cannot evaluate a Python
+    expression, due to syntax error or unsupported operations.
     """
     pass
 
@@ -71,7 +81,10 @@ class InterpreterError(ValueError):
 ERRORS = {
     name: getattr(builtins, name)
     for name in dir(builtins)
-    if isinstance(getattr(builtins, name), type) and issubclass(getattr(builtins, name), BaseException)
+    if (
+        isinstance(getattr(builtins, name), type)
+        and issubclass(getattr(builtins, name), BaseException)
+    )
 }
 
 DEFAULT_MAX_LEN_OUTPUT = 50000
@@ -209,8 +222,10 @@ def get_iterable(obj):
 
 def fix_final_answer_code(code: str) -> str:
     """
-    Sometimes an LLM can try to assign a variable to final_answer, which would break the final_answer() tool.
-    This function fixes this behaviour by replacing variable assignments to final_answer with final_answer_variable,
+    Sometimes an LLM can try to assign a variable to final_answer,
+    which would break the final_answer() tool.
+    This function fixes this behaviour by replacing variable assignments
+    to final_answer with final_answer_variable,
     while preserving function calls to final_answer().
     """
     # First, find if there's a direct assignment to final_answer
@@ -218,7 +233,10 @@ def fix_final_answer_code(code: str) -> str:
     # attribute
     assignment_pattern = r"(?<!\.)(?<!\w)\bfinal_answer\s*="
     if "final_answer(" not in code or not re.search(assignment_pattern, code):
-        # If final_answer tool is not called in this blob, then doing the replacement is hazardous because it could false the model's memory for next steps.
+        # If final_answer tool is not called in this blob, then doing
+        # the replacement is hazardous because it could false the model's
+        # memory for next steps.
+        #
         # Let's not modify the code and leave the subsequent assignment error
         # happen.
         return code
@@ -314,7 +332,9 @@ def evaluate_while(
         iterations += 1
         if iterations > MAX_WHILE_ITERATIONS:
             raise InterpreterError(
-                f"Maximum number of {MAX_WHILE_ITERATIONS} iterations in While loop exceeded")
+                f"Maximum number of {MAX_WHILE_ITERATIONS} iterations in "
+                "While loop exceeded"
+            )
     return None
 
 
@@ -329,7 +349,13 @@ def create_function(
         func_state = state.copy()
         arg_names = [arg.arg for arg in func_def.args.args]
         default_values = [
-            evaluate_ast(d, state, static_tools, custom_tools, authorized_imports) for d in func_def.args.defaults
+            evaluate_ast(
+                d,
+                state,
+                static_tools,
+                custom_tools,
+                authorized_imports)
+            for d in func_def.args.defaults
         ]
 
         # Apply default values
@@ -1637,7 +1663,7 @@ def evaluate_ast(
         return evaluate_with(expression, *common_params)
     elif isinstance(expression, ast.Set):
         return {evaluate_ast(elt, *common_params)
-                   for elt in expression.elts}
+                for elt in expression.elts}
     elif isinstance(expression, ast.Return):
         raise ReturnException(
             evaluate_ast(
