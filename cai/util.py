@@ -474,7 +474,7 @@ def _create_token_display(interaction_input_tokens, interaction_output_tokens,  
     tokens_text = Text(justify="right")
     # Current interaction tokens
     tokens_text.append(
-        "\n(tokens) Current: ",
+        "\n(tokens) Interaction: ",
         style="current_token_count")
     tokens_text.append(
         f"I:{interaction_input_tokens} ",
