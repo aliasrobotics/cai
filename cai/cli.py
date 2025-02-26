@@ -42,7 +42,7 @@ Environment Variables
         CAI_MEMORY_ONLINE_INTERVAL: Number of turns between
             online memory updates (default: "5")
         CAI_PRICE_LIMIT: Price limit for the conversation in dollars
-            (default: "100")
+            (default: "1")
     Extensions (only applicable if the right extension is installed):
 
         "report"
