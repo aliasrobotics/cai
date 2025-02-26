@@ -18,7 +18,7 @@ from rich.traceback import install  # pylint: disable=import-error
 from rich.pretty import install as install_pretty  # pylint: disable=import-error # noqa: 501
 from rich.tree import Tree  # pylint: disable=import-error
 from litellm.types.utils import Message  # pylint: disable=import-error
-from cai.accountability.llm_cost import calculate_conversation_cost
+from cai.cost.llm_cost import calculate_conversation_cost
 from cai.graph import Node, get_default_graph
 from cai.types import (
     Agent,
