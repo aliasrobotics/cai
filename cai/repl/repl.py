@@ -18,7 +18,7 @@ from prompt_toolkit.completion import (  # pylint: disable=import-error # noqa: 
 )
 from prompt_toolkit.styles import Style  # pylint: disable=import-error
 from wasabi import color  # pylint: disable=import-error
-
+from rich.console import Console  # pylint: disable=import-error
 # Local imports
 from caiextensions.report.common import create_report  # pylint: disable=import-error,no-name-in-module # noqa: E501
 from cai import is_caiextensions_report_available
@@ -27,6 +27,7 @@ from cai.rag.vector_db import QdrantConnector
 
 # Global variables
 client = None  # pylint: disable=invalid-name
+console = Console()
 
 COMMANDS = {
     "/memory": [
@@ -40,7 +41,18 @@ COMMANDS = {
         "graph"
     ],
     "/graph": [],
-    "/exit": []
+    "/exit": [],
+    "/htb": [
+        "list",
+        "list retired",
+        "list starting",
+        "info",
+        "spawn",
+        "stop",
+        "connect",
+        "disconnect",
+        "status"
+    ],
 }
 
 
@@ -152,8 +164,32 @@ def handle_graph_show():
         return False
 
 
-def handle_command(command, args=None):  # pylint: disable=too-many-return-statements # noqa: E501
+def handle_command(command, args=None):  # pylint: disable=too-many-branches,too-many-return-statements,too-many-statements,too-many-locals,too-many-nested-blocks,too-many-arguments,too-many-branches,too-many-statements  # noqa: E501
     """Handle CLI commands"""
+    if command.startswith("/htb"):
+        try:
+            from caiextensions.platforms.htb.cli import handle_htb_command  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
+            from caiextensions.platforms.htb.api import HTBClient  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
+
+            token = os.getenv("HTB_TOKEN")
+            if not token:
+                console.print(
+                    "[red]No HTB token found. Please set HTB_TOKEN environment variable.[/red]")  # noqa: E501 # pylint: disable=line-too-long
+                return False
+
+            # Extract all parts after /htb as arguments
+            full_command = command.split() + (args if args else [])
+            htb_args = full_command[1:]  # Remove '/htb'
+
+            htb_client = HTBClient(
+                token=token, debug=os.getenv(
+                    'CAI_HTB_DEBUG', 'false').lower() == 'true')  # noqa: E501 # pylint: disable=line-too-long
+            handle_htb_command(htb_client, htb_args)
+            return True
+        except ImportError:
+            console.print(
+                "[red]HTB extension not installed or properly configured[/red]")  # noqa: E501 # pylint: disable=line-too-long
+            return False
     if command == "/memory list":
         return handle_memory_list()
     if command.startswith("/memory load"):
@@ -196,7 +232,6 @@ class FuzzyCommandCompleter(Completer):  # pylint: disable=too-many-branches,too
         text = document.text_before_cursor.strip()
         words = text.split()
 
-        # Si no hay texto, mostrar todos los comandos principales
         if not text:
             for cmd in COMMANDS:
                 yield Completion(cmd,
@@ -204,22 +239,16 @@ class FuzzyCommandCompleter(Completer):  # pylint: disable=too-many-branches,too
                                  style="fg:ansicyan bold")
             return
 
-        # Si el texto empieza con /, procesar comandos
         if text.startswith('/'):
             current_word = words[-1]
 
-            # Si solo hay una palabra, mostrar comandos principales que
-            # coincidan
             if len(words) == 1:
                 for cmd in COMMANDS:
-                    if cmd[1:].startswith(
-                            current_word[1:]):  # Ignorar el / inicial
+                    if cmd[1:].startswith(current_word[1:]):
                         yield Completion(cmd,
                                          start_position=-len(current_word),
                                          style="fg:ansicyan bold")
 
-            # Si hay dos palabras, mostrar subcomandos del comando
-            # principal
             elif len(words) == 2:
                 cmd = words[0]
                 if cmd in COMMANDS:
