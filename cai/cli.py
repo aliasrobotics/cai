@@ -41,7 +41,8 @@ Environment Variables
             current env available (default: "true")
         CAI_MEMORY_ONLINE_INTERVAL: Number of turns between
             online memory updates (default: "5")
-
+        CAI_PRICE_LIMIT: Price limit for the conversation in dollars
+            (default: "1")
     Extensions (only applicable if the right extension is installed):
 
         "report"
@@ -62,9 +63,11 @@ Usage Examples:
 
     # Run with online episodic memory
     #   registers memory every 5 turns:
+    #   limits the cost to 5 dollars
     CTF_NAME="hackableII" CAI_MEMORY="episodic" \
         CAI_MODEL="o3-mini" CAI_MEMORY_ONLINE="True" \
-        CTF_INSIDE="False" CTF_HINTS="False" python3 cai/cli.py
+        CTF_INSIDE="False" CTF_HINTS="False"  \
+        CAI_PRICE_LIMIT="5" python3 cai/cli.py
 
     # Run with custom long_term_memory interval
     # Executes memory long_term_memory every 3 turns:

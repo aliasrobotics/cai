@@ -29,6 +29,9 @@ from cai import (
     transfer_to_state_agent
 )
 from cai.state.common import StateAgent
+from cai.accountability.llm_cost import (
+    calculate_conversation_cost
+)
 from .util import (
     function_to_json,
     debug_print,
@@ -140,7 +143,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             )
             self.semantic_builder = semantic_builder
         self.challenge = challenge
-
+        self.total_cost = 0
         # load env variables
         load_dotenv()
 
@@ -661,7 +664,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         history = copy.deepcopy(messages)
         n_turn = 0
 
-        while len(history) - self.init_len < max_turns and active_agent:
+        while len(history) - self.init_len < max_turns and active_agent and self.total_cost < float(  # noqa: E501 # pylint: disable=line-too-long
+                os.getenv("CAI_PRICE_LIMIT", "100")):
             # Needs to be inside while loop to avoid using the same function
             # for all iterations
             def agent_iteration(agent):
@@ -721,7 +725,13 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     break
 
             # Check if the flag is found in the last tool output
-            if active_agent is None and self.force_until_flag:
+            # Accountability
+            all_costs = calculate_conversation_cost(
+                self.total_input_tokens, self.total_output_tokens, agent.model
+            )
+            self.total_cost = all_costs["total_cost"]
+            if active_agent is None and self.force_until_flag and self.total_cost < float(  # noqa: E501 # pylint: disable=line-too-long
+                    os.getenv("CAI_PRICE_LIMIT", "1")):
                 # Check if the flag is found in the last tool output
                 flag_found, flag = check_flag(
                     history[-1]["content"], self.ctf, self.challenge)

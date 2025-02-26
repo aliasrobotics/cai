@@ -22,7 +22,10 @@ Usage Examples:
     CTF_NAME="hackableII" CAI_MEMORY="True" CAI_MODEL="o3-mini" CTF_INSIDE="False" python3 cai/cli.py
 
     # Run against a CTF with RAG memory and store in memory every 3 interactions
-    CTF_NAME="hackableII" CAI_MEMORY="True" CAI_MEMORY_ONLINE_INTERVAL=3 CAI_MODEL="o3-mini" CTF_INSIDE="False" python3 cai/cli.py            
+    CTF_NAME="hackableII" CAI_MEMORY="True" CAI_MEMORY_ONLINE_INTERVAL=3 CAI_MODEL="o3-mini" CTF_INSIDE="False" python3 cai/cli.py    
+
+    # Run against a CTF with RAG memory and limit the cost to 5 dollars
+    CTF_NAME="hackableII" CAI_MODEL="o3-mini" CTF_INSIDE="False" CAI_PRICE_LIMIT="5" python3 cai/cli.py
 
 CI/CD Pipeline Configuration:
     Add the following structure to .ctf.yml file:
@@ -82,6 +85,8 @@ Environment Variables:
             env available (default: "true")
         CAI_MEMORY_ONLINE_INTERVAL: Number of turns between 
             online memory updates (default: "5")
+        CAI_PRICE_LIMIT: Price limit for the conversation in dollars
+            (default: "1")    
 """
 
 import pytest
