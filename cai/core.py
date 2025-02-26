@@ -731,7 +731,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             )
             self.total_cost = all_costs["total_cost"]
             if active_agent is None and self.force_until_flag and self.total_cost < float(  # noqa: E501 # pylint: disable=line-too-long
-                    os.getenv("CAI_PRICE_LIMIT", "100")):
+                    os.getenv("CAI_PRICE_LIMIT", "1")):
                 # Check if the flag is found in the last tool output
                 flag_found, flag = check_flag(
                     history[-1]["content"], self.ctf, self.challenge)
