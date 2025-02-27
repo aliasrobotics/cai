@@ -61,7 +61,8 @@ COMMAND_ALIASES = {
     "/s": "/shell",
     "/g": "/graph",
     "/m": "/memory",
-    "/p": "/platform"
+    "/p": "/platform",
+    "/k": "/kill"
 }
 
 
@@ -98,7 +99,8 @@ COMMANDS = {
     "/shell": [],
     "/env": [],
     "/platform":
-        get_platform_commands()
+        get_platform_commands(),
+    "/kill": []
 }
 
 
@@ -300,35 +302,54 @@ def handle_shell_command(command_args: List[str]) -> bool:
 
         signal.signal(signal.SIGINT, shell_sigint_handler)
 
-        # Execute command
-        process = subprocess.Popen(  # nosec B602
-            shell_command,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            universal_newlines=True,
-            bufsize=1
-        )
+        # Check if this is a command that should run asynchronously
+        async_commands = [
+            'nc',
+            'netcat',
+            'ncat',
+            'telnet',
+            'ssh',
+            'python -m http.server']
+        is_async = any(cmd in shell_command for cmd in async_commands)
 
-        # Show output in real time
-        for line in iter(process.stdout.readline, ''):
-            print(line, end='')
-
-        # Wait for process to finish
-        process.wait()
-
-        if process.returncode == 0:
-            console.print("[green]Command completed successfully[/green]")
-        else:
+        if is_async:
+            # For async commands, use os.system to allow terminal interaction
             console.print(
-                f"[yellow]Command exited with code {process.returncode}"
-                f"[/yellow]")
+                "[yellow]Running in async mode (Ctrl+C to return to REPL)[/yellow]")
+            os.system(shell_command)  # nosec B605
+            console.print("[green]Async command completed or detached[/green]")
+            return True
+        else:
+            # For regular commands, use the standard approach
+            process = subprocess.Popen(  # nosec B602
+                shell_command,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
+                bufsize=1
+            )
 
-        return True
+            # Show output in real time
+            for line in iter(process.stdout.readline, ''):
+                print(line, end='')
+
+            # Wait for process to finish
+            process.wait()
+
+            if process.returncode == 0:
+                console.print("[green]Command completed successfully[/green]")
+            else:
+                console.print(
+                    f"[yellow]Command exited with code {process.returncode}"
+                    f"[/yellow]")
+
+            return True
     except KeyboardInterrupt:
         # Handle CTRL+C only for this command
         try:
-            process.terminate()
+            if not is_async:
+                process.terminate()
             console.print("\n[yellow]Command interrupted by user[/yellow]")
         except Exception:  # nosec B110
             pass
@@ -339,6 +360,45 @@ def handle_shell_command(command_args: List[str]) -> bool:
     finally:
         # Restore original signal handler
         signal.signal(signal.SIGINT, original_sigint_handler)
+
+
+def handle_kill_command(args: List[str]) -> bool:
+    """Kill a background process by PID.
+
+    Args:
+        args: List containing the PID to kill
+
+    Returns:
+        bool: True if the process was killed successfully
+    """
+    if not args:
+        console.print("[red]Error: No PID specified[/red]")
+        return False
+
+    try:
+        pid = int(args[0])
+        import os
+        import signal
+
+        # Try to kill the process group
+        try:
+            os.killpg(pid, signal.SIGTERM)
+            console.print(f"[green]Process group {pid} terminated[/green]")
+        except BaseException:
+            # If killing the process group fails, try killing just the process
+            os.kill(pid, signal.SIGTERM)
+            console.print(f"[green]Process {pid} terminated[/green]")
+
+        return True
+    except ValueError:
+        console.print("[red]Error: Invalid PID format[/red]")
+        return False
+    except ProcessLookupError:
+        console.print(f"[yellow]No process with PID {args[0]} found[/yellow]")
+        return False
+    except Exception as e:
+        console.print(f"[red]Error killing process: {str(e)}[/red]")
+        return False
 
 
 def handle_env_command() -> bool:
@@ -395,6 +455,10 @@ def handle_command(command, args=None):  # pylint: disable=too-many-branches,too
             console.print("[red]Error: No command specified[/red]")
             return False
         return handle_shell_command(args)
+
+    # Handle kill command
+    if command == "/kill":
+        return handle_kill_command(args)
 
     if command.startswith("/htb"):
         def is_platform_enabled(platform_name: str) -> bool:
@@ -750,14 +814,14 @@ def run_demo_loop(
                     description="Thinking",
                     total=None)
 
-                response = client.run(
-                    agent=agent,
-                    messages=messages,
-                    context_variables=context_variables or {},
-                    stream=stream,
-                    debug=debug,
-                    max_turns=max_turns,
-                )
+            response = client.run(
+                agent=agent,
+                messages=messages,
+                context_variables=context_variables or {},
+                stream=stream,
+                debug=debug,
+                max_turns=max_turns,
+            )
 
             messages = response.messages
 
@@ -782,57 +846,47 @@ def run_demo_loop(
                         description="Generating report...", total=None)
 
                     from caiextensions.report.common import create_report
-                    if os.environ.get("CAI_REPORT",
-                                      "ctf").lower() == "pentesting":
-                        from caiextensions.report.pentesting.pentesting_agent import (  # noqa: E501
-                            reporter_agent
-                        )
+                    report_type = os.environ.get("CAI_REPORT", "ctf").lower()
+
+                    if report_type == "pentesting":
+                        from caiextensions.report.pentesting.pentesting_agent import reporter_agent
                         template = str(
-                            files('caiextensions.report.pentesting')
-                            /
-                            'template.md')
-                    elif os.environ.get("CAI_REPORT", "ctf").lower() == "nis2":
-                        from caiextensions.report.nis2.nis2_report_agent import (  # noqa: E501
-                            reporter_agent
-                        )
+                            files('caiextensions.report.pentesting') / 'template.md')
+                    elif report_type == "nis2":
+                        from caiextensions.report.nis2.nis2_report_agent import reporter_agent
                         template = str(
-                            files('caiextensions.report.nis2')
-                            /
-                            'template.md')
+                            files('caiextensions.report.nis2') / 'template.md')
                     else:
-                        from caiextensions.report.ctf.ctf_reporter_agent import (  # noqa: E501
-                            reporter_agent
-                        )
+                        from caiextensions.report.ctf.ctf_reporter_agent import reporter_agent
                         template = str(
-                            files('caiextensions.report.ctf') /
-                            'template.md')
+                            files('caiextensions.report.ctf') / 'template.md')
 
                     client = CAI(
                         state_agent=state_agent,
                         force_until_flag=False)
-                    response_report = client.run(
-                        agent=reporter_agent,
-                        messages=[{
-                            "role": "user",
-                            "content": "Do a report from " +
-                            "\n".join(
+                response_report = client.run(
+                    agent=reporter_agent,
+                    messages=[{
+                        "role": "user",
+                        "content": "Do a report from " +
+                        "\n".join(
                                 msg['content'] for msg in response.messages
                                 if msg.get('content') is not None
-                            )
-                        }],
-                        debug=float(os.environ.get('CAI_DEBUG', '2')),
-                        max_turns=float(
-                            os.environ.get(
-                                'CAI_MAX_TURNS', 'inf')),
-                    )
+                        )
+                    }],
+                    debug=float(os.environ.get('CAI_DEBUG', '2')),
+                    max_turns=float(
+                        os.environ.get(
+                            'CAI_MAX_TURNS', 'inf')),
+                )
 
-                    if messages_init:
-                        response.messages.insert(0, messages_init[0])
-                    report_data = json.loads(
-                        response_report.messages[0]['content'])
-                    report_data["history"] = json.dumps(
-                        response.messages, indent=4)
-                    report_path = create_report(report_data, template)
+                if messages_init:
+                    response.messages.insert(0, messages_init[0])
+                report_data = json.loads(
+                    response_report.messages[0]['content'])
+                report_data["history"] = json.dumps(
+                    response.messages, indent=4)
+                report_path = create_report(report_data, template)
 
                 console.print(
                     f"[green]Report generated successfully: {report_path}"
