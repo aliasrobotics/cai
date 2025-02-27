@@ -54,15 +54,17 @@ console = Console()
 
 # Command aliases for convenience
 COMMAND_ALIASES = {
-    "/h": "/help",
-    "/q": "/exit",
-    "/quit": "/exit",
-    "/e": "/env",
-    "/s": "/shell",
-    "/g": "/graph",
-    "/m": "/memory",
-    "/p": "/platform",
-    "/k": "/kill"
+    "/h": "/help",      # Display help information
+    "/q": "/exit",      # Exit the application
+    "/quit": "/exit",   # Exit the application
+    "/k": "/kill",      # Terminate active sessions
+    "/e": "/env",       # Show environment variables
+    "/g": "/graph",     # Display graph
+    "/m": "/memory",    # Access memory
+    "/p": "/platform",  # Interact with platform/s
+    # shell commands
+    "/s": "/shell",     # Execute shell commands
+    "$": "/shell",      # Execute shell commands  # NOTE: research why this doesn't work
 }
 
 
@@ -199,11 +201,18 @@ def handle_help():
 {color('/env', fg='cyan')} or {color('/e', fg='cyan')}
     Display environment variables (CAI_* and CTF_*)
 
-{color('Other Commands:', fg='magenta', bold=True, underline=True)}
-{color('/help aliases', fg='magenta')} or {color('/h aliases', fg='magenta')}
-    Show all command aliases
+{color('Exit Commands:', fg='red', bold=True, underline=True)}
 {color('/exit', fg='red')} or {color('/q', fg='red')}
     Exit CAI.
+
+{color('Other Commands:', fg='grey', bold=True, underline=True)}
+{color('/help aliases', fg='grey')} or {color('/h aliases', fg='grey')}
+    Show all command aliases
+""")
+    if is_caiextensions_platform_available:
+        print(f"""{color('Platform Commands:', fg='grey', bold=True, underline=True)}
+{color('/platform', fg='grey')} or {color('/p', fg='grey')}
+    Show all available platforms
 """)
     return True
 
@@ -621,14 +630,6 @@ def run_demo_loop(
     except Exception:  # pylint: disable=broad-except
         version = 'unknown'
 
-    # Setup signal handler for clean exit
-    def signal_handler(sig, frame):  # pylint: disable=unused-argument
-        console.print("\n[yellow]Exiting CAI...[/yellow]")
-        sys.exit(0)
-
-    # Register signal handler
-    signal.signal(signal.SIGINT, signal_handler)
-
     print(f"""
                 CCCCCCCCCCCCC      ++++++++   ++++++++      IIIIIIIIII
              CCC::::::::::::C  ++++++++++       ++++++++++  I::::::::I
@@ -785,15 +786,15 @@ def run_demo_loop(
                 log_interaction("user", user_input)
 
                 # Handle commands
-                if user_input.startswith('/'):
+                if user_input.startswith('/') or user_input.startswith('$'):
                     parts = user_input.strip().split()
                     command = parts[0]
                     args = parts[1:] if len(parts) > 1 else None
 
                     # Handle the command
                     if handle_command(command, args):
-                        # Ensure global handler is active after any command
-                        signal.signal(signal.SIGINT, signal_handler)
+                        # # Ensure global handler is active after any command
+                        # signal.signal(signal.SIGINT, signal_handler)
                         continue
 
                     # If we get here, command wasn't handled correctly
@@ -891,8 +892,6 @@ def run_demo_loop(
                 console.print(
                     f"[green]Report generated successfully: {report_path}"
                     f"[/green]")
-            else:
-                console.print("\n[yellow]Exiting CAI...[/yellow]")
 
             # Log end of session
             with open(session_log, "a", encoding="utf-8") as f:

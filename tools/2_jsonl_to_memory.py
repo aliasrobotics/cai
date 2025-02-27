@@ -109,4 +109,4 @@ if not jsonl_file:
     print("JSONL_FILE_PATH environment variable not set. Please set it to the path of your messages file.")
     print("Example: export JSONL_FILE_PATH=path/to/messages.jsonl")
     exit(1)
-memory_loop(messages_file=jsonl_file, max_iterations=os.getenv("CAI_MEMORY_INTERVAL", 5))
+memory_loop(messages_file=jsonl_file, max_iterations=os.getenv("CAI_MEMORY_INTERVAL", 10))

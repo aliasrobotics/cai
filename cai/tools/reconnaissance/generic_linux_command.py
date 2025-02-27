@@ -4,20 +4,45 @@ This is used to create a generic linux command.
 from cai.tools.common import run_command, list_shell_sessions, get_session_output, terminate_session  # pylint: disable=import-error
 
 
-def generic_linux_command(command: str = "", args: str = "", ctf=None,
-                          async_mode: bool = False, session_id: str = None) -> str:
+def generic_linux_command(
+        command: str = "",
+        args: str = "",
+        ctf=None,  # type: ignore
+        async_mode: bool = False,
+        session_id: str = None) -> str:  # pylint: disable=too-many-arguments
     """
-    A simple tool to do a linux command.
+    Execute a Linux command with support for both synchronous and 
+    asynchronous operation.
+
+    This function provides a flexible interface to run Linux commands, 
+    with special handling for long-running network commands and 
+    session management. It can execute commands directly or
+    within an existing session context.
 
     Args:
-        command: The name of the command
-        args: Additional arguments to pass to the command
-        ctf: CTF environment object (if running in CTF)
-        async_mode: Whether to run the command asynchronously
-        session_id: ID of an existing session to send the command to
+        command (str, optional): The Linux command to execute. 
+            Defaults to "".
+        args (str, optional): Command line arguments to pass to the command. 
+            Defaults to "".
+        ctf (object, optional): CTF environment object for specialized execution contexts.
+            Defaults to None.
+        async_mode (bool, optional): Force asynchronous execution mode. Some network commands
+            (nc, ssh, telnet, etc.) automatically run asynchronously. 
+            Defaults to False.
+        session_id (str, optional): ID of an existing session to execute the command in.
+            If provided, the command runs in that session's context. 
+            Defaults to None.
 
     Returns:
-        str: The output of running the linux command or status message for async commands
+        str: For synchronous commands, returns the command output.
+            For asynchronous commands, returns a status message with session information.
+            For session management commands, returns session status or listing information.
+
+    Note:
+        Special 'session' commands are available:
+        - 'session list': Shows all active sessions
+        - 'session output <id>': Gets output from a specific session
+        - 'session kill <id>': Terminates a specific session
     """
     # Special commands for session management
     if command == "session":
