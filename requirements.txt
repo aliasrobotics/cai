@@ -1,0 +1,17 @@
+# Core dependencies
+mako>=1.2.4
+prompt_toolkit>=3.0.36
+rich>=13.3.5
+wasabi>=1.1.2
+litellm>=1.0.0
+python-dotenv>=1.0.0
+qdrant-client>=1.6.0
+
+# System monitoring
+psutil>=5.9.5
+
+# HTTP requests
+requests>=2.31.0
+
+# For platform extensions
+pydantic>=2.0.0 
