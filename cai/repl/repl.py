@@ -218,8 +218,10 @@ def handle_memory_create(collection_name, distance="Cosine"):
     """Handle /memory create command"""
     try:
         db = QdrantConnector()
-        success = db.create_collection(collection_name=collection_name, distance=distance)
-        
+        success = db.create_collection(
+            collection_name=collection_name,
+            distance=distance)
+
         if success:
             print(
                 f"\nCreated collection: {
@@ -241,48 +243,73 @@ def handle_help_memory():
     from rich.table import Table
     from rich.panel import Panel
     from rich.text import Text
-    
+
     # Create a styled header
     header = Text("Memory Command Help", style="bold yellow")
     console.print(Panel(header, border_style="yellow"))
-    
+
     # Usage table
-    usage_table = Table(title="Usage", show_header=True, header_style="bold white")
+    usage_table = Table(
+        title="Usage",
+        show_header=True,
+        header_style="bold white")
     usage_table.add_column("Command", style="yellow")
     usage_table.add_column("Description", style="white")
-    
-    usage_table.add_row("/memory list", "Display all available memory collections")
-    usage_table.add_row("/memory load <collection>", "Set the active memory collection")
-    usage_table.add_row("/memory delete <collection>", "Delete a memory collection")
-    usage_table.add_row("/memory create <collection>", "Create a new memory collection")
+
+    usage_table.add_row(
+        "/memory list",
+        "Display all available memory collections")
+    usage_table.add_row(
+        "/memory load <collection>",
+        "Set the active memory collection")
+    usage_table.add_row(
+        "/memory delete <collection>",
+        "Delete a memory collection")
+    usage_table.add_row(
+        "/memory create <collection>",
+        "Create a new memory collection")
     usage_table.add_row("/m", "Alias for /memory")
-    
+
     console.print(usage_table)
-    
+
     # Examples table
-    examples_table = Table(title="Examples", show_header=True, header_style="bold cyan")
+    examples_table = Table(
+        title="Examples",
+        show_header=True,
+        header_style="bold cyan")
     examples_table.add_column("Example", style="cyan")
     examples_table.add_column("Description", style="white")
-    
+
     examples_table.add_row("/memory list", "List all available collections")
-    examples_table.add_row("/memory load _all_", "Load the semantic memory collection")
-    examples_table.add_row("/memory load my_ctf", "Load the episodic memory for 'my_ctf'")
-    examples_table.add_row("/memory create new_collection", "Create a new collection named 'new_collection'")
-    examples_table.add_row("/memory delete old_collection", "Delete the collection named 'old_collection'")
-    
+    examples_table.add_row(
+        "/memory load _all_",
+        "Load the semantic memory collection")
+    examples_table.add_row(
+        "/memory load my_ctf",
+        "Load the episodic memory for 'my_ctf'")
+    examples_table.add_row(
+        "/memory create new_collection",
+        "Create a new collection named 'new_collection'")
+    examples_table.add_row(
+        "/memory delete old_collection",
+        "Delete the collection named 'old_collection'")
+
     console.print(examples_table)
-    
+
     # Collection types table
-    types_table = Table(title="Collection Types", show_header=True, header_style="bold green")
+    types_table = Table(
+        title="Collection Types",
+        show_header=True,
+        header_style="bold green")
     types_table.add_column("Type", style="green")
     types_table.add_column("Description", style="white")
-    
+
     types_table.add_row("_all_", "Semantic memory across all CTFs")
     types_table.add_row("<CTF_NAME>", "Episodic memory for a specific CTF")
     types_table.add_row("<custom_name>", "Custom memory collection")
-    
+
     console.print(types_table)
-    
+
     # Notes panel
     notes = Panel(
         Text.from_markup(
@@ -296,7 +323,7 @@ def handle_help_memory():
         border_style="yellow"
     )
     console.print(notes)
-    
+
     return True
 
 
@@ -305,125 +332,201 @@ def handle_help():
     from rich.table import Table
     from rich.panel import Panel
     from rich.text import Text
-    
+
     # Create a styled header
     header = Text("CAI Command Reference", style="bold cyan")
     console.print(Panel(header, border_style="cyan"))
-    
+
     # Memory Commands Table
-    memory_table = Table(title="Memory Commands", show_header=True, header_style="bold yellow")
+    memory_table = Table(
+        title="Memory Commands",
+        show_header=True,
+        header_style="bold yellow")
     memory_table.add_column("Command", style="yellow")
     memory_table.add_column("Alias", style="green")
     memory_table.add_column("Description", style="white")
-    
-    memory_table.add_row("/memory list", "/m list", "List all memory collections")
-    memory_table.add_row("/memory load <collection>", "/m load <collection>", "Load a memory collection")
-    memory_table.add_row("/memory delete <collection>", "/m delete <collection>", "Delete a memory collection")
-    memory_table.add_row("/memory create <collection>", "/m create <collection>", "Create a new memory collection")
-    
+
+    memory_table.add_row(
+        "/memory list",
+        "/m list",
+        "List all memory collections")
+    memory_table.add_row(
+        "/memory load <collection>",
+        "/m load <collection>",
+        "Load a memory collection")
+    memory_table.add_row(
+        "/memory delete <collection>",
+        "/m delete <collection>",
+        "Delete a memory collection")
+    memory_table.add_row(
+        "/memory create <collection>",
+        "/m create <collection>",
+        "Create a new memory collection")
+
     # Collection types info
     collection_info = Text()
     collection_info.append("\nCollection Types:\n", style="bold")
     collection_info.append("• CTF_NAME", style="yellow")
-    collection_info.append(" - Episodic memory for a specific CTF (e.g. ", style="white")
+    collection_info.append(
+        " - Episodic memory for a specific CTF (e.g. ", style="white")
     collection_info.append("baby_first", style="bold white")
     collection_info.append(")\n", style="white")
     collection_info.append("• _all_", style="yellow")
     collection_info.append(" - Semantic memory across all CTFs", style="white")
-    
+
     console.print(memory_table)
     console.print(collection_info)
-    
+
     # Graph Commands Table
-    graph_table = Table(title="Graph Commands", show_header=True, header_style="bold blue")
+    graph_table = Table(
+        title="Graph Commands",
+        show_header=True,
+        header_style="bold blue")
     graph_table.add_column("Command", style="blue")
     graph_table.add_column("Alias", style="green")
     graph_table.add_column("Description", style="white")
-    
-    graph_table.add_row("/graph", "/g", "Show the graph of the current memory collection")
+
+    graph_table.add_row(
+        "/graph",
+        "/g",
+        "Show the graph of the current memory collection")
     console.print(graph_table)
-    
+
     # Shell Commands Table
-    shell_table = Table(title="Shell Commands", show_header=True, header_style="bold green")
+    shell_table = Table(
+        title="Shell Commands",
+        show_header=True,
+        header_style="bold green")
     shell_table.add_column("Command", style="green")
     shell_table.add_column("Alias", style="green")
     shell_table.add_column("Description", style="white")
-    
-    shell_table.add_row("/shell <command>", "/s <command>", "Execute a shell command (can be interrupted with CTRL+C)")
+
+    shell_table.add_row(
+        "/shell <command>",
+        "/s <command>",
+        "Execute a shell command (can be interrupted with CTRL+C)")
     console.print(shell_table)
-    
+
     # Environment Commands Table
-    env_table = Table(title="Environment Commands", show_header=True, header_style="bold cyan")
+    env_table = Table(
+        title="Environment Commands",
+        show_header=True,
+        header_style="bold cyan")
     env_table.add_column("Command", style="cyan")
     env_table.add_column("Alias", style="green")
     env_table.add_column("Description", style="white")
-    
-    env_table.add_row("/env", "/e", "Display environment variables (CAI_* and CTF_*)")
+
+    env_table.add_row(
+        "/env",
+        "/e",
+        "Display environment variables (CAI_* and CTF_*)")
     console.print(env_table)
-    
+
     # Model Commands Table
-    model_table = Table(title="Model Commands", show_header=True, header_style="bold magenta")
+    model_table = Table(
+        title="Model Commands",
+        show_header=True,
+        header_style="bold magenta")
     model_table.add_column("Command", style="magenta")
     model_table.add_column("Alias", style="green")
     model_table.add_column("Description", style="white")
-    
-    model_table.add_row("/model", "/mod", "Display current model and list available models")
-    model_table.add_row("/model <model_name>", "/mod <model_name>", "Change the model to <model_name>")
+
+    model_table.add_row(
+        "/model",
+        "/mod",
+        "Display current model and list available models")
+    model_table.add_row(
+        "/model <model_name>",
+        "/mod <model_name>",
+        "Change the model to <model_name>")
     console.print(model_table)
-    
+
     # Turns Commands Table
-    turns_table = Table(title="Turns Commands", show_header=True, header_style="bold magenta")
+    turns_table = Table(
+        title="Turns Commands",
+        show_header=True,
+        header_style="bold magenta")
     turns_table.add_column("Command", style="magenta")
     turns_table.add_column("Alias", style="green")
     turns_table.add_column("Description", style="white")
-    
-    turns_table.add_row("/turns", "/t", "Display current maximum number of turns")
-    turns_table.add_row("/turns <number>", "/t <number>", "Change the maximum number of turns")
+
+    turns_table.add_row(
+        "/turns",
+        "/t",
+        "Display current maximum number of turns")
+    turns_table.add_row(
+        "/turns <number>",
+        "/t <number>",
+        "Change the maximum number of turns")
     turns_table.add_row("/turns inf", "/t inf", "Set unlimited turns")
     console.print(turns_table)
-    
+
     # Exit Commands Table
-    exit_table = Table(title="Exit Commands", show_header=True, header_style="bold red")
+    exit_table = Table(
+        title="Exit Commands",
+        show_header=True,
+        header_style="bold red")
     exit_table.add_column("Command", style="red")
     exit_table.add_column("Alias", style="green")
     exit_table.add_column("Description", style="white")
-    
+
     exit_table.add_row("/exit", "/q", "Exit CAI")
     exit_table.add_row("", "/quit", "Exit CAI (alias)")
     console.print(exit_table)
-    
+
     # Help Commands Table
-    help_table = Table(title="Help Commands", show_header=True, header_style="bold grey70")
+    help_table = Table(
+        title="Help Commands",
+        show_header=True,
+        header_style="bold grey70")
     help_table.add_column("Command", style="grey70")
     help_table.add_column("Alias", style="green")
     help_table.add_column("Description", style="white")
-    
+
     help_table.add_row("/help", "/h", "Display this help information")
-    help_table.add_row("/help aliases", "/h aliases", "Show all command aliases")
-    help_table.add_row("/help model", "/h model", "Show detailed help for model selection")
-    help_table.add_row("/help turns", "/h turns", "Show detailed help for managing turns")
+    help_table.add_row(
+        "/help aliases",
+        "/h aliases",
+        "Show all command aliases")
+    help_table.add_row(
+        "/help model",
+        "/h model",
+        "Show detailed help for model selection")
+    help_table.add_row(
+        "/help turns",
+        "/h turns",
+        "Show detailed help for managing turns")
     console.print(help_table)
-    
+
     # Platform Commands Table (if available)
     if is_caiextensions_platform_available():
-        platform_table = Table(title="Platform Commands", show_header=True, header_style="bold grey70")
+        platform_table = Table(
+            title="Platform Commands",
+            show_header=True,
+            header_style="bold grey70")
         platform_table.add_column("Command", style="grey70")
         platform_table.add_column("Alias", style="green")
         platform_table.add_column("Description", style="white")
-        
-        platform_table.add_row("/platform", "/p", "Show all available platforms")
-        platform_table.add_row("/platform list", "/p list", "List available platforms")
-        
+
+        platform_table.add_row(
+            "/platform", "/p", "Show all available platforms")
+        platform_table.add_row(
+            "/platform list",
+            "/p list",
+            "List available platforms")
+
         # Add platform-specific commands if available
-        platforms = platform_manager.list_platforms() if is_caiextensions_platform_available() else []
+        platforms = platform_manager.list_platforms(
+        ) if is_caiextensions_platform_available() else []
         for platform in platforms:
-            platform_cmds = platform_manager.get_platform(platform).get_commands()
+            platform_cmds = platform_manager.get_platform(
+                platform).get_commands()
             for cmd in platform_cmds:
-                platform_table.add_row(f"/platform {platform} {cmd}", f"/p {platform} {cmd}", 
-                                      f"Execute '{cmd}' command on {platform} platform")
-        
+                platform_table.add_row(f"/platform {platform} {cmd}", f"/p {platform} {cmd}",
+                                       f"Execute '{cmd}' command on {platform} platform")
+
         console.print(platform_table)
-    
+
     # Tips section
     tips = Panel(
         Text.from_markup(
@@ -437,7 +540,7 @@ def handle_help():
         border_style="cyan"
     )
     console.print(tips)
-    
+
     return True
 
 
@@ -445,27 +548,33 @@ def handle_help_aliases():
     """Show all command aliases in a well-formatted table."""
     from rich.table import Table
     from rich.panel import Panel
-    
+
     # Create a styled header
-    console.print(Panel("Command Aliases Reference", border_style="magenta", title="Aliases"))
-    
+    console.print(
+        Panel(
+            "Command Aliases Reference",
+            border_style="magenta",
+            title="Aliases"))
+
     # Create a table for aliases
     alias_table = Table(show_header=True, header_style="bold magenta")
     alias_table.add_column("Alias", style="green")
     alias_table.add_column("Command", style="yellow")
     alias_table.add_column("Description", style="white")
-    
+
     # Add rows for each alias
     for alias, command in sorted(COMMAND_ALIASES.items()):
         description = COMMAND_DESCRIPTIONS.get(command, "")
         alias_table.add_row(alias, command, description)
-    
+
     console.print(alias_table)
-    
+
     # Add a tip about using aliases
-    console.print("\n[cyan]Tip:[/cyan] Aliases can be used anywhere the full command would be used.")
-    console.print("[cyan]Example:[/cyan] [green]/m list[/green] instead of [yellow]/memory list[/yellow]")
-    
+    console.print(
+        "\n[cyan]Tip:[/cyan] Aliases can be used anywhere the full command would be used.")
+    console.print(
+        "[cyan]Example:[/cyan] [green]/m list[/green] instead of [yellow]/memory list[/yellow]")
+
     return True
 
 
@@ -767,9 +876,9 @@ def handle_model_command(args: List[str]) -> bool:
         
         # Ollama models (if available)
         try:
-            # Get Ollama models
+            # Get Ollama models with a short timeout to prevent hanging
             api_base = get_ollama_api_base()
-            response = requests.get(f"{api_base.replace('/v1', '')}/api/tags", timeout=2)
+            response = requests.get(f"{api_base.replace('/v1', '')}/api/tags", timeout=1)
             
             if response.status_code == 200:
                 data = response.json()
@@ -832,7 +941,7 @@ def handle_model_command(args: List[str]) -> bool:
         if 0 <= model_index < len(ALL_MODELS):
             model_name = ALL_MODELS[model_index]["name"]
         else:
-            # Permitir cualquier número, usando el modelo como nombre directamente
+            # Si el número está fuera de rango, usamos el número directamente como nombre del modelo
             model_name = model_arg
     else:
         model_name = model_arg
@@ -865,13 +974,15 @@ def handle_turns_command(args: List[str]) -> bool:
         # Display current max turns
         max_turns_info = os.getenv("CAI_MAX_TURNS", "inf")
         console.print(Panel(
-            f"Current maximum turns: [bold green]{max_turns_info}[/bold green]",
+            f"Current maximum turns: [bold green]{
+                max_turns_info}[/bold green]",
             border_style="green",
             title="Max Turns Setting"
         ))
-        
+
         # Usage instructions
-        console.print("\n[cyan]Usage:[/cyan] [bold]/turns <number_of_turns>[/bold]")
+        console.print(
+            "\n[cyan]Usage:[/cyan] [bold]/turns <number_of_turns>[/bold]")
         console.print("[cyan]Examples:[/cyan]")
         console.print("  [bold]/turns 10[/bold]    - Limit to 10 turns")
         console.print("  [bold]/turns inf[/bold]   - Unlimited turns")
@@ -910,49 +1021,80 @@ def handle_help_model():
     from rich.table import Table
     from rich.panel import Panel
     from rich.text import Text
-    
+
     # Create a styled header
     header = Text("Model Command Help", style="bold magenta")
     console.print(Panel(header, border_style="magenta"))
-    
+
     # Usage table
-    usage_table = Table(title="Usage", show_header=True, header_style="bold white")
+    usage_table = Table(
+        title="Usage",
+        show_header=True,
+        header_style="bold white")
     usage_table.add_column("Command", style="magenta")
     usage_table.add_column("Description", style="white")
-    
-    usage_table.add_row("/model", "Display current model and list available models")
-    usage_table.add_row("/model <model_name>", "Change the model to <model_name>")
-    usage_table.add_row("/model <number>", "Change the model using its number from the list")
+
+    usage_table.add_row(
+        "/model",
+        "Display current model and list available models")
+    usage_table.add_row(
+        "/model <model_name>",
+        "Change the model to <model_name>")
+    usage_table.add_row(
+        "/model <number>",
+        "Change the model using its number from the list")
     usage_table.add_row("/mod", "Alias for /model")
-    
+
     console.print(usage_table)
-    
+
     # Examples table
-    examples_table = Table(title="Examples", show_header=True, header_style="bold cyan")
+    examples_table = Table(
+        title="Examples",
+        show_header=True,
+        header_style="bold cyan")
     examples_table.add_column("Example", style="cyan")
     examples_table.add_column("Description", style="white")
-    
-    examples_table.add_row("/model 1", "Switch to the first model in the list (Claude 3.7 Sonnet)")
-    examples_table.add_row("/model claude-3-7-sonnet-20250219", "Switch to Claude 3.7 Sonnet model")
-    examples_table.add_row("/model o1", "Switch to OpenAI's O1 model (good for math)")
+
+    examples_table.add_row(
+        "/model 1",
+        "Switch to the first model in the list (Claude 3.7 Sonnet)")
+    examples_table.add_row(
+        "/model claude-3-7-sonnet-20250219",
+        "Switch to Claude 3.7 Sonnet model")
+    examples_table.add_row(
+        "/model o1",
+        "Switch to OpenAI's O1 model (good for math)")
     examples_table.add_row("/model gpt-4o", "Switch to OpenAI's GPT-4o model")
-    
+
     console.print(examples_table)
-    
+
     # Model categories table
-    categories_table = Table(title="Model Categories", show_header=True, header_style="bold green")
+    categories_table = Table(
+        title="Model Categories",
+        show_header=True,
+        header_style="bold green")
     categories_table.add_column("Category", style="green")
     categories_table.add_column("Description", style="white")
-    
-    categories_table.add_row("Claude 3.7", "Best models for complex reasoning and creative tasks")
-    categories_table.add_row("Claude 3.5", "Excellent balance of performance and efficiency")
-    categories_table.add_row("Claude 3", "Range of models from powerful (Opus) to fast (Haiku)")
-    categories_table.add_row("OpenAI O-series", "Specialized models with strong mathematical capabilities")
+
+    categories_table.add_row(
+        "Claude 3.7",
+        "Best models for complex reasoning and creative tasks")
+    categories_table.add_row(
+        "Claude 3.5",
+        "Excellent balance of performance and efficiency")
+    categories_table.add_row(
+        "Claude 3",
+        "Range of models from powerful (Opus) to fast (Haiku)")
+    categories_table.add_row(
+        "OpenAI O-series",
+        "Specialized models with strong mathematical capabilities")
     categories_table.add_row("OpenAI GPT-4", "Powerful general-purpose models")
-    categories_table.add_row("Ollama", "Local models running on your machine or Docker container")
-    
+    categories_table.add_row(
+        "Ollama",
+        "Local models running on your machine or Docker container")
+
     console.print(categories_table)
-    
+
     # Notes panel
     notes = Panel(
         Text.from_markup(
@@ -968,7 +1110,7 @@ def handle_help_model():
         border_style="yellow"
     )
     console.print(notes)
-    
+
     return True
 
 
@@ -977,35 +1119,43 @@ def handle_help_turns():
     from rich.table import Table
     from rich.panel import Panel
     from rich.text import Text
-    
+
     # Create a styled header
     header = Text("Turns Command Help", style="bold magenta")
     console.print(Panel(header, border_style="magenta"))
-    
+
     # Usage table
-    usage_table = Table(title="Usage", show_header=True, header_style="bold white")
+    usage_table = Table(
+        title="Usage",
+        show_header=True,
+        header_style="bold white")
     usage_table.add_column("Command", style="magenta")
     usage_table.add_column("Description", style="white")
-    
+
     usage_table.add_row("/turns", "Display current maximum number of turns")
-    usage_table.add_row("/turns <number>", "Change the maximum number of turns to <number>")
+    usage_table.add_row(
+        "/turns <number>",
+        "Change the maximum number of turns to <number>")
     usage_table.add_row("/turns inf", "Set unlimited turns")
     usage_table.add_row("/t", "Alias for /turns")
-    
+
     console.print(usage_table)
-    
+
     # Examples table
-    examples_table = Table(title="Examples", show_header=True, header_style="bold cyan")
+    examples_table = Table(
+        title="Examples",
+        show_header=True,
+        header_style="bold cyan")
     examples_table.add_column("Example", style="cyan")
     examples_table.add_column("Description", style="white")
-    
+
     examples_table.add_row("/turns 5", "Limit to 5 turns")
     examples_table.add_row("/turns 10", "Limit to 10 turns")
     examples_table.add_row("/turns inf", "Set unlimited turns")
     examples_table.add_row("/t 3", "Limit to 3 turns (using alias)")
-    
+
     console.print(examples_table)
-    
+
     # Notes panel
     notes = Panel(
         Text.from_markup(
@@ -1018,7 +1168,7 @@ def handle_help_turns():
         border_style="yellow"
     )
     console.print(notes)
-    
+
     return True
 
 
@@ -1083,21 +1233,22 @@ def handle_command(command, args=None):  # pylint: disable=too-many-branches,too
                 "[red]HTB extension not installed or properly configured"
                 "[/red]")
             return False
-            
+
     # Handle memory commands
     if command == "/memory":
         if not args:
             # Display memory help if no subcommand
-            console.print("[yellow]Memory command requires a subcommand: list, load, delete, or create[/yellow]")
+            console.print(
+                "[yellow]Memory command requires a subcommand: list, load, delete, or create[/yellow]")
             return False
-        
+
         subcommand = args[0]
         if subcommand == "list":
             return handle_memory_list()
         elif subcommand == "load":
             if len(args) < 2:
                 console.print("[red]Error: Collection name required[/red]")
-                return False
+            return False
             return handle_memory_load(args[1])
         elif subcommand == "delete":
             if len(args) < 2:
@@ -1110,9 +1261,10 @@ def handle_command(command, args=None):  # pylint: disable=too-many-branches,too
                 return False
             return handle_memory_create(args[1])
         else:
-            console.print(f"[red]Unknown memory subcommand: {subcommand}[/red]")
+            console.print(
+                f"[red]Unknown memory subcommand: {subcommand}[/red]")
             return False
-            
+
     # Handle other commands
     if command.startswith("/graph"):
         return handle_graph_show()
@@ -1144,7 +1296,7 @@ def handle_command(command, args=None):  # pylint: disable=too-many-branches,too
 
 class FuzzyCommandCompleter(Completer):
     """Command completer with fuzzy matching for the REPL.
-    
+
     This advanced completer provides intelligent suggestions for commands,
     subcommands, and arguments based on what the user is typing.
     It supports fuzzy matching to find commands even with typos.
@@ -1172,8 +1324,8 @@ class FuzzyCommandCompleter(Completer):
             # Get the Ollama API base URL
             api_base = get_ollama_api_base()
             
-            # Make a request to the Ollama API to get available models
-            response = requests.get(f"{api_base.replace('/v1', '')}/api/tags", timeout=2)
+            # Make a request to the Ollama API to get available models with a short timeout
+            response = requests.get(f"{api_base.replace('/v1', '')}/api/tags", timeout=1)
             
             if response.status_code == 200:
                 data = response.json()
@@ -1185,7 +1337,7 @@ class FuzzyCommandCompleter(Completer):
         except Exception:  # pylint: disable=broad-except
             # Silently fail if Ollama is not available
             pass
-            
+        
         # Standard models always available
         standard_models = [
             # Claude 3.7 models
@@ -1223,7 +1375,7 @@ class FuzzyCommandCompleter(Completer):
         """Get completions for the current document with fuzzy matching support."""
         text = document.text_before_cursor.strip()
         words = text.split()
-        
+
         # Refresh Ollama models periodically
         self.fetch_ollama_models()
 
@@ -1232,7 +1384,7 @@ class FuzzyCommandCompleter(Completer):
             for cmd, description in sorted(COMMAND_DESCRIPTIONS.items()):
                 yield Completion(
                     cmd,
-                    start_position=0,
+                                 start_position=0,
                     display=f"{cmd:<15} {description}",
                     style="fg:ansicyan bold"
                 )
@@ -1240,7 +1392,7 @@ class FuzzyCommandCompleter(Completer):
 
         if text.startswith('/'):
             current_word = words[-1]
-            
+
             # Main command completion (first word)
             if len(words) == 1:
                 # Complete main commands with fuzzy matching
@@ -1249,7 +1401,7 @@ class FuzzyCommandCompleter(Completer):
                     if cmd.startswith(current_word):
                         yield Completion(
                             cmd,
-                            start_position=-len(current_word),
+                                         start_position=-len(current_word),
                             display=f"{cmd:<15} {description}",
                             style="fg:ansicyan bold"
                         )
@@ -1268,7 +1420,7 @@ class FuzzyCommandCompleter(Completer):
                     if alias.startswith(current_word):
                         yield Completion(
                             alias,
-                            start_position=-len(current_word),
+                                         start_position=-len(current_word),
                             display=f"{alias:<15} {cmd} - {cmd_description}",
                             style="fg:ansigreen bold"
                         )
@@ -1290,13 +1442,14 @@ class FuzzyCommandCompleter(Completer):
                 if cmd in COMMANDS:
                     for subcmd in sorted(COMMANDS[cmd]):
                         # Get description for this subcommand if available
-                        subcmd_description = SUBCOMMAND_DESCRIPTIONS.get(f"{cmd} {subcmd}", "")
-                        
+                        subcmd_description = SUBCOMMAND_DESCRIPTIONS.get(
+                            f"{cmd} {subcmd}", "")
+
                         # Exact prefix match
                         if subcmd.startswith(current_word):
                             yield Completion(
                                 subcmd,
-                                start_position=-len(current_word),
+                                             start_position=-len(current_word),
                                 display=f"{subcmd:<15} {subcmd_description}",
                                 style="fg:ansiyellow bold"
                             )
@@ -1308,7 +1461,7 @@ class FuzzyCommandCompleter(Completer):
                                 display=f"{subcmd:<15} {subcmd_description}",
                                 style="fg:ansiyellow"
                             )
-                
+
                 # Special handling for model command
                 if cmd in ["/model", "/mod"]:
                     # First try to complete model numbers
@@ -1320,7 +1473,7 @@ class FuzzyCommandCompleter(Completer):
                                 display=f"{num:<3} {model_name}",
                                 style="fg:ansiwhite bold"
                             )
-                    
+
                     # Then try to complete model names
                     for model in self.cached_models:
                         if model.startswith(current_word):
@@ -1475,11 +1628,15 @@ def run_demo_loop(
     # Function to display bottom toolbar
     def get_bottom_toolbar():
         """Return bottom toolbar HTML content with enhanced information."""
-        # Cache the machine info for 60 seconds to improve performance
+        # Cache all data for 60 seconds to improve performance
         if not hasattr(get_bottom_toolbar, "cache_time") or \
-           not hasattr(get_bottom_toolbar, "cached_machine") or \
+           not hasattr(get_bottom_toolbar, "cached_data") or \
            (datetime.datetime.now() - get_bottom_toolbar.cache_time).total_seconds() > 60:
             
+            # Initialize cached data dictionary
+            cached_data = {}
+            
+            # Get HTB machine info
             active_machine = ""
             if is_caiextensions_platform_available():
                 try:
@@ -1490,112 +1647,120 @@ def run_demo_loop(
                         machine = htb_client.get_active_machine()
                         if machine:
                             active_machine = (
-                                f" | <b><style fg='cyan'>HTB:</style></b> {machine.get('name', 'Unknown')} "
+                                f" | <b><style fg='cyan'>HTB:</style></b> {
+                                    machine.get('name', 'Unknown')} "
                                 f"({machine.get('ip', 'Unknown')})"
                             )
                 except Exception:  # pylint: disable=broad-except # nosec B110
                     pass
+            cached_data['active_machine'] = active_machine
             
-            # Cache the result
-            get_bottom_toolbar.cache_time = datetime.datetime.now()
-            get_bottom_toolbar.cached_machine = active_machine
-        else:
-            active_machine = get_bottom_toolbar.cached_machine
-        
-        # Get local IP addresses using 'ip a' command
-        local_ips = []
-        vpn_ip = None
-        
-        try:
-            # Run 'ip a' command to get network interfaces
-            output = subprocess.check_output(['ip', 'a'], text=True)
-            
-            # Parse the output to extract IP addresses
-            for line in output.splitlines():
-                # Look for inet lines that contain IP addresses
-                if 'inet ' in line and not 'inet6' in line:
-                    # Extract the IP address
-                    ip_match = line.strip().split('inet ')[1].split('/')[0]
-                    if ip_match != '127.0.0.1':  # Skip localhost
-                        local_ips.append(ip_match)
-                        
-                        # Check if this is a tun/tap interface (VPN)
-                        if 'tun' in line or 'tap' in line:
-                            vpn_ip = ip_match
-            
-            # Format IP display, prioritizing VPN IP if available
-            if vpn_ip:
-                local_ip = f"{vpn_ip} (VPN)"
-            else:
-                local_ip = ", ".join(local_ips[:2])  # Show at most 2 IPs
-                if len(local_ips) > 2:
-                    local_ip += "..."
-                    
-            if not local_ips:
-                local_ip = "Unknown"
-        except Exception:  # pylint: disable=broad-except
-            local_ip = "Unknown"
-        
-        # Get OS information
-        import platform
-        os_info = platform.system()
-        
-        # Get model information from environment variable
-        model_info = os.getenv("CAI_MODEL", "Unknown")
-        
-        # Get system resource information
-        import psutil
-        try:
-            # CPU usage
-            cpu_percent = psutil.cpu_percent(interval=0.1)
-            
-            # Memory usage
-            memory = psutil.virtual_memory()
-            memory_percent = memory.percent
-            memory_used = f"{memory.used / (1024 * 1024 * 1024):.1f}GB"
-            memory_total = f"{memory.total / (1024 * 1024 * 1024):.1f}GB"
-            
-            # Disk usage
-            disk = psutil.disk_usage('/')
-            disk_percent = disk.percent
-            
-            # Format system resources with HTML formatting
-            system_resources = (
-                f"<b><style fg='green'>CPU:</style></b> {cpu_percent}% | "
-                f"<b><style fg='green'>RAM:</style></b> {memory_percent}% ({memory_used}/{memory_total}) | "
-                f"<b><style fg='green'>Disk:</style></b> {disk_percent}%"
-            )
-        except Exception:  # pylint: disable=broad-except
-            system_resources = "System resources unavailable"
-        
-        # Check if Ollama is available
-        ollama_status = "<b><style fg='red'>Unavailable</style></b>"
-        try:
-            api_base = get_ollama_api_base()
-            response = requests.get(f"{api_base.replace('/v1', '')}/api/tags", timeout=1)
-            if response.status_code == 200:
-                data = response.json()
-                model_count = 0
-                if 'models' in data:
-                    model_count = len(data['models'])
+            # Get local IP addresses
+            try:
+                # Run 'ip a' command to get network interfaces
+                output = subprocess.check_output(['ip', 'a'], text=True)
+                
+                local_ips = []
+                vpn_ip = None
+                
+                # Parse the output to extract IP addresses
+                for line in output.splitlines():
+                    # Look for inet lines that contain IP addresses
+                    if 'inet ' in line and not 'inet6' in line:
+                        # Extract the IP address
+                        ip_match = line.strip().split('inet ')[1].split('/')[0]
+                        if ip_match != '127.0.0.1':  # Skip localhost
+                            local_ips.append(ip_match)
+                            
+                            # Check if this is a tun/tap interface (VPN)
+                            if 'tun' in line or 'tap' in line:
+                                vpn_ip = ip_match
+                
+                # Format IP display, prioritizing VPN IP if available
+                if vpn_ip:
+                    local_ip = f"{vpn_ip} (VPN)"
                 else:
-                    # Fallback for older Ollama versions
-                    model_count = len(data.get('items', []))
-                ollama_status = f"<b><style fg='green'>Available</style></b> ({model_count} models)"
-        except Exception:  # pylint: disable=broad-except
-            pass
+                    local_ip = ", ".join(local_ips[:2])  # Show at most 2 IPs
+                    if len(local_ips) > 2:
+                        local_ip += "..."
+                        
+                if not local_ips:
+                    local_ip = "Unknown"
+            except Exception:  # pylint: disable=broad-except
+                local_ip = "Unknown"
+            cached_data['local_ip'] = local_ip
+            
+            # Get OS information
+            import platform
+            cached_data['os_info'] = platform.system()
+            
+            # Get model information from environment variable
+            cached_data['model_info'] = os.getenv("CAI_MODEL", "Unknown")
+            
+            # Get system resource information
+            import psutil
+            try:
+                # CPU usage
+                cpu_percent = psutil.cpu_percent(interval=0.1)
+
+                # Memory usage
+                memory = psutil.virtual_memory()
+                memory_percent = memory.percent
+                memory_used = f"{memory.used / (1024 * 1024 * 1024):.1f}GB"
+                memory_total = f"{memory.total / (1024 * 1024 * 1024):.1f}GB"
+
+                # Disk usage
+                disk = psutil.disk_usage('/')
+                disk_percent = disk.percent
+
+                # Format system resources with HTML formatting
+                system_resources = (
+                    f"<b><style fg='green'>CPU:</style></b> {cpu_percent}% | "
+                    f"<b><style fg='green'>RAM:</style></b> {
+                        memory_percent}% ({memory_used}/{memory_total}) | "
+                    f"<b><style fg='green'>Disk:</style></b> {disk_percent}%"
+                )
+            except Exception:  # pylint: disable=broad-except
+                system_resources = "System resources unavailable"
+            cached_data['system_resources'] = system_resources
+
+            # Check if Ollama is available
+            ollama_status = "<b><style fg='red'>Unavailable</style></b>"
+            try:
+                api_base = get_ollama_api_base()
+                response = requests.get(f"{api_base.replace('/v1', '')}/api/tags", timeout=0.5)
+                if response.status_code == 200:
+                    data = response.json()
+                    model_count = 0
+                    if 'models' in data:
+                        model_count = len(data['models'])
+                    else:
+                        # Fallback for older Ollama versions
+                        model_count = len(data.get('items', []))
+                    ollama_status = f"<b><style fg='green'>Available</style></b> ({model_count} models)"
+            except Exception:  # pylint: disable=broad-except
+                pass
+            cached_data['ollama_status'] = ollama_status
+            
+            # Cache all the data
+            get_bottom_toolbar.cache_time = datetime.datetime.now()
+            get_bottom_toolbar.cached_data = cached_data
+        else:
+            # Use cached data
+            cached_data = get_bottom_toolbar.cached_data
         
-        # Get current time
+        # Get current time (always fresh)
         current_time = datetime.datetime.now().strftime("%H:%M:%S")
-        
-        # Format the toolbar with HTML formatting for prompt_toolkit
+
+        # Format the toolbar with HTML formatting for prompt_toolkit using cached data
         return HTML(
             f'<b><style fg="yellow">CAI</style></b> | <style bg="green">Use ↑↓ for history</style>'
             f' | <style fg="yellow">Time: {current_time}</style>'
-            f' | <style fg="cyan">IP:</style> {local_ip} | <style fg="cyan">OS:</style> {os_info} | <style fg="magenta">Model:</style> {model_info}'
-            f' | <style fg="cyan">Ollama:</style> {ollama_status}'
-            f' | {system_resources}'
-            f'{active_machine}'
+            f' | <style fg="cyan">IP:</style> {cached_data["local_ip"]} | <style fg="cyan">OS:</style> {cached_data["os_info"]}'
+            f' | <style fg="magenta">Model:</style> {cached_data["model_info"]}'
+            f' | <style fg="cyan">Ollama:</style> {cached_data["ollama_status"]}'
+            f' | {cached_data["system_resources"]}'
+            f'{cached_data["active_machine"]}'
         )
 
     # Show welcome message with tips
@@ -1753,7 +1918,7 @@ def run_demo_loop(
 
 def get_ollama_api_base():
     """Get the Ollama API base URL.
-    
+
     Returns:
         str: The Ollama API base URL, defaulting to host.docker.internal:8000
     """
