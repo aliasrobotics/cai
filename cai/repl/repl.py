@@ -419,7 +419,7 @@ def handle_env_command() -> bool:
     # Get all environment variables
     env_vars = {
         k: v for k, v in os.environ.items() if k.startswith(
-            ('CAI_', 'CTF_')) or k in ['HTB_TOKEN']}
+            ('CAI_', 'CTF_'))}
 
     if not env_vars:
         console.print(
@@ -724,7 +724,7 @@ def run_demo_loop(
         'bottom-toolbar': 'bg:#222222 #aaaaaa',
     })
 
-    # Setup command completer
+    # # Setup command completer
     command_completer = FuzzyCommandCompleter()
 
     # Function to display bottom toolbar
@@ -776,7 +776,7 @@ def run_demo_loop(
                     history=FileHistory(str(history_file)),
                     auto_suggest=AutoSuggestFromHistory(),
                     key_bindings=kb,
-                    bottom_toolbar=get_bottom_toolbar,
+                    # bottom_toolbar=get_bottom_toolbar,
                     complete_in_thread=True,
                     complete_while_typing=False,  # Better performance
                     mouse_support=False  # Better performance
