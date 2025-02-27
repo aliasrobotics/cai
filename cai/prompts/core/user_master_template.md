@@ -22,13 +22,6 @@
 
     # Get CTF_INSIDE environment variable
     ctf_inside = os.getenv('CTF_INSIDE', 'true').lower()
-
-    # Get artifacts
-    artifacts = None
-    from cai import is_caiextensions_memory_available
-    if is_caiextensions_memory_available():
-        from caiextensions.memory import get_artifacts
-        artifacts = get_artifacts(os.getenv('CTF_NAME').lower())
 %>
 %if ctf_instructions:
 Instructions: ${ctf_instructions}
