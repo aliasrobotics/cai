@@ -810,6 +810,7 @@ def handle_model_command(args: List[str]) -> bool:
     global client  # pylint: disable=global-statement
     from rich.table import Table
     from rich.panel import Panel
+    import requests
     
     # Define model categories and their models for easy reference
     MODEL_CATEGORIES = {
@@ -818,7 +819,7 @@ def handle_model_command(args: List[str]) -> bool:
         ],
         "Claude 3.5": [
             {"name": "claude-3-5-sonnet-20240620", "description": "Excellent balance of performance and efficiency"},
-            {"name": "claude-3-5-20241122", "description": "Latest Claude 3.5 model with improved capabilities"}
+            {"name": "claude-3-5-sonnet-20241022", "description": "Latest Claude 3.5 model with improved capabilities"}
         ],
         "Claude 3": [
             {"name": "claude-3-opus-20240229", "description": "Powerful Claude 3 model for complex tasks"},
@@ -834,20 +835,57 @@ def handle_model_command(args: List[str]) -> bool:
             {"name": "gpt-4o", "description": "Latest GPT-4 model with improved capabilities"},
             {"name": "gpt-4-turbo", "description": "Fast and powerful GPT-4 model"}
         ],
+        "OpenAI GPT-4.5": [
+            {"name": "gpt-4.5-preview", "description": "Latest non reasoning openai model with improved capabilities"},
+        ],
         "OpenAI GPT-3.5": [
             {"name": "gpt-3.5-turbo", "description": "Fast and cost-effective model"}
+        ],
+        "DeepSeek": [
+            {"name": "deepseek-v3", "description": "DeepSeek's latest general-purpose model"},
+            {"name": "deepseek-r1", "description": "DeepSeek's specialized reasoning model"}
         ]
     }
+    
+    # Fetch model pricing data from LiteLLM GitHub repository
+    model_pricing_data = {}
+    try:
+        response = requests.get(
+            "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json",
+            timeout=2
+        )
+        if response.status_code == 200:
+            model_pricing_data = response.json()
+            
+            # Add DeepSeek models with their pricing if not already in the data
+            if "deepseek/deepseek-v3" in model_pricing_data and "deepseek-v3" not in model_pricing_data:
+                model_pricing_data["deepseek-v3"] = model_pricing_data["deepseek/deepseek-v3"]
+            if "deepseek/deepseek-r1" in model_pricing_data and "deepseek-r1" not in model_pricing_data:
+                model_pricing_data["deepseek-r1"] = model_pricing_data["deepseek/deepseek-r1"]
+    except Exception:  # pylint: disable=broad-except
+        console.print("[yellow]Warning: Could not fetch model pricing data[/yellow]")
     
     # Create a flat list of all models for numeric selection
     ALL_MODELS = []
     for category, models in MODEL_CATEGORIES.items():
         for model in models:
+            # Get pricing info if available
+            pricing_info = model_pricing_data.get(model["name"], {})
+            input_cost = pricing_info.get("input_cost_per_token", None)
+            output_cost = pricing_info.get("output_cost_per_token", None)
+            
+            # Convert to dollars per million tokens if values exist
+            input_cost_per_million = input_cost * 1000000 if input_cost is not None else None
+            output_cost_per_million = output_cost * 1000000 if output_cost is not None else None
+            
             ALL_MODELS.append({
                 "name": model["name"],
-                "provider": "Anthropic" if "claude" in model["name"] else "OpenAI",
+                "provider": "Anthropic" if "claude" in model["name"] else 
+                           "DeepSeek" if "deepseek" in model["name"] else "OpenAI",
                 "category": category,
-                "description": model["description"]
+                "description": model["description"],
+                "input_cost": input_cost_per_million,
+                "output_cost": output_cost_per_million
             })
     
     if not args:
@@ -862,15 +900,23 @@ def handle_model_command(args: List[str]) -> bool:
         model_table.add_column("Model", style="cyan")
         model_table.add_column("Provider", style="magenta")
         model_table.add_column("Category", style="blue")
+        model_table.add_column("Input Cost ($/M)", style="green", justify="right")
+        model_table.add_column("Output Cost ($/M)", style="red", justify="right")
         model_table.add_column("Description", style="white")
         
         # Add all predefined models with numbers
         for i, model in enumerate(ALL_MODELS, 1):
+            # Format pricing info as dollars per million tokens
+            input_cost_str = f"${model['input_cost']:.2f}" if model['input_cost'] is not None else "Unknown"
+            output_cost_str = f"${model['output_cost']:.2f}" if model['output_cost'] is not None else "Unknown"
+            
             model_table.add_row(
                 str(i),
                 model["name"],
                 model["provider"],
                 model["category"],
+                input_cost_str,
+                output_cost_str,
                 model["description"]
             )
         
@@ -903,11 +949,14 @@ def handle_model_command(args: List[str]) -> bool:
                         else:
                             size_str = f"{model_size/(1024*1024*1024):.1f} GB"
                     
+                    # Ollama models are free to use locally
                     model_table.add_row(
                         str(i),
                         model_name, 
                         "Ollama", 
                         "Local",
+                        "Free",
+                        "Free",
                         f"Local model{f' ({size_str})' if size_str else ''}"
                     )
                     
@@ -916,14 +965,16 @@ def handle_model_command(args: List[str]) -> bool:
                         "name": model_name,
                         "provider": "Ollama",
                         "category": "Local",
-                        "description": f"Local model{f' ({size_str})' if size_str else ''}"
+                        "description": f"Local model{f' ({size_str})' if size_str else ''}",
+                        "input_cost": 0.0,
+                        "output_cost": 0.0
                     })
         except Exception:  # pylint: disable=broad-except
             # Add a note about Ollama if we couldn't fetch models
             start_index = len(ALL_MODELS) + 1
-            model_table.add_row(str(start_index), "llama3", "Ollama", "Local", "Local Llama 3 model (if installed)")
-            model_table.add_row(str(start_index+1), "mistral", "Ollama", "Local", "Local Mistral model (if installed)")
-            model_table.add_row(str(start_index+2), "...", "Ollama", "Local", "Other local models (if installed)")
+            model_table.add_row(str(start_index), "llama3", "Ollama", "Local", "Free", "Free", "Local Llama 3 model (if installed)")
+            model_table.add_row(str(start_index+1), "mistral", "Ollama", "Local", "Free", "Free", "Local Mistral model (if installed)")
+            model_table.add_row(str(start_index+2), "...", "Ollama", "Local", "Free", "Free", "Other local models (if installed)")
         
         console.print(model_table)
         
