@@ -24,6 +24,7 @@
     ctf_inside = os.getenv('CTF_INSIDE', 'true').lower()
 
     # Get artifacts
+    artifacts = None
     from cai import is_caiextensions_memory_available
     if is_caiextensions_memory_available():
         from caiextensions.memory import get_artifacts
