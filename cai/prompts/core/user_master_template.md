@@ -46,7 +46,3 @@ You are INSIDE the target machine in a docker container. Try not to use network 
 % else:
 You are OUTSIDE the target machine which is a docker container. You may use network commands like nmap for initial reconnaissance.
 %endif
-
-% if artifacts:
-Some useful information: ${artifacts}
-% endif
