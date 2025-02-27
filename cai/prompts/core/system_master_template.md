@@ -40,6 +40,7 @@
                        total_reasoning_tokens=0,
                        model="Python Code",
                        debug=False)
+    artifacts = None
     if is_caiextensions_memory_available():
         from caiextensions.memory import get_artifacts
         artifacts = get_artifacts(os.getenv('CTF_NAME').lower())
