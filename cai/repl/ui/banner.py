@@ -128,25 +128,25 @@ def display_banner(console: Console):
     # Original banner with Alias Robotics colors (blue and white)
     # Use noqa to ignore line length for the ASCII art
     banner = f"""
-[bold blue]                CCCCCCCCCCCCC      ++++++++   ++++++++      IIIIIIIIII  # noqa: E501
-[bold blue]             CCC::::::::::::C  ++++++++++       ++++++++++  I::::::::I  # noqa: E501
-[bold blue]           CC:::::::::::::::C ++++++++++         ++++++++++ I::::::::I  # noqa: E501
-[bold blue]          C:::::CCCCCCCC::::C +++++++++    ++     +++++++++ II::::::II  # noqa: E501
-[bold blue]         C:::::C       CCCCCC +++++++     +++++     +++++++   I::::I  # noqa: E501
-[bold blue]        C:::::C                +++++     +++++++     +++++    I::::I  # noqa: E501
-[bold blue]        C:::::C                ++++                   ++++    I::::I  # noqa: E501
-[bold blue]        C:::::C                 ++                     ++     I::::I  # noqa: E501
-[bold blue]        C:::::C                  +   +++++++++++++++   +      I::::I  # noqa: E501
-[bold blue]        C:::::C                    +++++++++++++++++++        I::::I  # noqa: E501
-[bold blue]        C:::::C                     +++++++++++++++++         I::::I  # noqa: E501
-[bold blue]         C:::::C       CCCCCC        +++++++++++++++          I::::I  # noqa: E501
-[bold blue]          C:::::CCCCCCCC::::C         +++++++++++++         II::::::II  # noqa: E501
-[bold blue]           CC:::::::::::::::C           +++++++++           I::::::::I  # noqa: E501
-[bold blue]             CCC::::::::::::C             +++++             I::::::::I  # noqa: E501
-[bold blue]                CCCCCCCCCCCCC               ++              IIIIIIIIII  # noqa: E501
+[bold blue]                CCCCCCCCCCCCC      ++++++++   ++++++++      IIIIIIIIII  
+[bold blue]             CCC::::::::::::C  ++++++++++       ++++++++++  I::::::::I  
+[bold blue]           CC:::::::::::::::C ++++++++++         ++++++++++ I::::::::I  
+[bold blue]          C:::::CCCCCCCC::::C +++++++++    ++     +++++++++ II::::::II  
+[bold blue]         C:::::C       CCCCCC +++++++     +++++     +++++++   I::::I    
+[bold blue]        C:::::C                +++++     +++++++     +++++    I::::I    
+[bold blue]        C:::::C                ++++                   ++++    I::::I    
+[bold blue]        C:::::C                 ++                     ++     I::::I    
+[bold blue]        C:::::C                  +   +++++++++++++++   +      I::::I    
+[bold blue]        C:::::C                    +++++++++++++++++++        I::::I    
+[bold blue]        C:::::C                     +++++++++++++++++         I::::I    
+[bold blue]         C:::::C       CCCCCC        +++++++++++++++          I::::I    
+[bold blue]          C:::::CCCCCCCC::::C         +++++++++++++         II::::::II  
+[bold blue]           CC:::::::::::::::C           +++++++++           I::::::::I  
+[bold blue]             CCC::::::::::::C             +++++             I::::::::I  
+[bold blue]                CCCCCCCCCCCCC               ++              IIIIIIIIII  
 
-[bold blue]                              Cybersecurity AI (CAI) v{version}[/bold blue]  # noqa: E501
-[white]                              Supporting {models_count} AI models[/white]  # noqa: E501
+[bold blue]                              Cybersecurity AI (CAI) v{version}[/bold blue]
+[white]                              Supporting {models_count} AI models[/white]
     """
 
     console.print(banner)
