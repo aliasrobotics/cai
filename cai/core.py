@@ -247,8 +247,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             if "LLM Provider NOT provided" in str(e):
                 create_params["api_base"] = get_ollama_api_base()
                 create_params["custom_llm_provider"] = "openai"
-                os.environ["OLLAMA"] = "true"
-                os.environ["OPENAI_API_KEY"] = "Placeholder"
+                # os.environ["OLLAMA"] = "true"
+                # os.environ["OPENAI_API_KEY"] = "Placeholder"
                 try:
                     litellm_completion = litellm.completion(**create_params)
                 except litellm.exceptions.BadRequestError as e:  # pylint: disable=W0621,C0301 # noqa: E501

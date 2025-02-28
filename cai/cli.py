@@ -94,6 +94,18 @@ from cai.repl import run_demo_loop
 if is_pentestperf_available():
     import pentestperf as ptt  # pylint: disable=import-error
 
+# Import and register platforms at startup
+
+
+def initialize_platforms():
+    """Initialize and register available platforms."""
+    try:
+        from caiextensions.platform.base import platform_manager  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
+        from caiextensions.platform.htb.platform import HTBPlatform  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
+        platform_manager.register_platform("htb", HTBPlatform())
+    except ImportError:
+        pass
+
 
 def setup_ctf():
     """Setup CTF environment if CTF_NAME is provided"""
@@ -136,6 +148,9 @@ def run_with_env():
     4. Cleans up CTF environment on completion
     """
     from cai.state.pydantic import state_agent  # pylint: disable=import-outside-toplevel # noqa: E501
+
+    # Initialize platforms first
+    initialize_platforms()
 
     if (is_pentestperf_available() and
             os.getenv('CTF_NAME', None)):

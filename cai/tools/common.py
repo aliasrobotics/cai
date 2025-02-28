@@ -1,3 +1,4 @@
+# pylint: disable=too-many-instance-attributes,subprocess-popen-preexec-fn,consider-using-with,broad-exception-caught,line-too-long # noqa: E501
 """
 Basic utilities for executing tools
 inside or outside of virtual containers.

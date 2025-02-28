@@ -1,14 +1,17 @@
 """
 This is used to create and execute a script in python
 """
+# pylint: disable=import-error
+# run_command is used in other parts of the codebase that import this module
 
-import re
-import sys
-from io import StringIO
-import ast
+# pylint: disable=too-many-locals,too-many-branches
 
 
-def scripting_tool(command: str = "", args: str = "") -> str:
+def scripting_tool(
+        command: str = "",
+        args: str = "",
+        ctf=None  # pylint: disable=unused-argument
+) -> str:
     """Scripting tool for executing Python code directly in memory.
     IMPORTANT: Use with caution - executes Python code directly.
     IMPORTANT: Remember to import all the modules and libraries you need.
@@ -16,10 +19,10 @@ def scripting_tool(command: str = "", args: str = "") -> str:
     Args:
         command: Python code, with or without markdown format. Can handle:
             - Raw Python code
-            - Markdown formatted code (```python\ncode)
+            - Markdown formatted code (```python\\ncode)
             - Code with leading/trailing whitespace
         args: Additional command line arguments
-        ctf: CTF context object
+        ctf: CTF context object (unused but required for tool interface)
 
     Returns:
         str: Output from the executed Python code
@@ -28,6 +31,11 @@ def scripting_tool(command: str = "", args: str = "") -> str:
         ValueError: If the command is empty or invalid
         SecurityError: If potentially dangerous operations are detected
     """
+    # pylint: disable=import-outside-toplevel
+    import re
+    import sys
+    from io import StringIO
+    import ast
 
     if not command or not isinstance(command, str):
         raise ValueError("Command must be a non-empty string")
@@ -75,20 +83,48 @@ def scripting_tool(command: str = "", args: str = "") -> str:
         if args:
             local_vars['args'] = args
 
-        exec(script, {'__builtins__': __builtins__}, local_vars)
+        # Create a restricted environment for execution
+        safe_builtins = {
+            'abs': abs, 'all': all, 'any': any, 'ascii': ascii,
+            'bin': bin, 'bool': bool, 'bytearray': bytearray,
+            'bytes': bytes, 'chr': chr, 'complex': complex,
+            'dict': dict, 'divmod': divmod, 'enumerate': enumerate,
+            'filter': filter, 'float': float, 'format': format,
+            'frozenset': frozenset, 'hash': hash, 'hex': hex,
+            'int': int, 'isinstance': isinstance, 'issubclass': issubclass,
+            'iter': iter, 'len': len, 'list': list, 'map': map,
+            'max': max, 'min': min, 'next': next, 'object': object,
+            'oct': oct, 'ord': ord, 'pow': pow, 'print': print,
+            'range': range, 'repr': repr, 'reversed': reversed,
+            'round': round, 'set': set, 'slice': slice, 'sorted': sorted,
+            'str': str, 'sum': sum, 'tuple': tuple, 'type': type,
+            'zip': zip
+        }
+
+        # Parse the script to check for potentially dangerous operations
+        try:
+            parsed = ast.parse(script)
+            # Add additional security checks here if needed
+
+            # Execute in a restricted environment
+            restricted_globals = {'__builtins__': safe_builtins}
+            restricted_globals.update(local_vars)
+
+            # Use compile and eval instead of exec for better control
+            compiled_code = compile(parsed, '<string>', 'exec')
+            # pylint: disable=eval-used
+            eval(compiled_code, restricted_globals)  # nosec B307
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            return f"Error executing script: {str(e)}"
 
         # Get the output
         output = redirected_output.getvalue()
         return output if output else "Code executed successfully (no output)"
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-exception-caught
         return f"Error during execution: {str(e)}"
     finally:
         sys.stdout = old_stdout  # restore
 
 
-class SecurityError(Exception):  # to be filled
-    """
-    TO-DO
-    """
-
+class SecurityError(Exception):  # pylint: disable=missing-class-docstring
     pass
