@@ -1,4 +1,3 @@
-# pylint: disable=too-many-instance-attributes,subprocess-popen-preexec-fn,consider-using-with,broad-exception-caught,line-too-long # noqa: E501
 """
 Basic utilities for executing tools
 inside or outside of virtual containers.
@@ -17,7 +16,7 @@ from wasabi import color  # pylint: disable=import-error
 ACTIVE_SESSIONS = {}
 
 
-class ShellSession:
+class ShellSession:  # pylint: disable=too-many-instance-attributes
     """Class to manage interactive shell sessions"""
 
     def __init__(self, command, session_id=None, ctf=None):
@@ -54,7 +53,7 @@ class ShellSession:
             self.master, self.slave = pty.openpty()
 
             # Start the process
-            self.process = subprocess.Popen(
+            self.process = subprocess.Popen(  # pylint: disable=subprocess-popen-preexec-fn, consider-using-with # noqa: E501
                 self.command,
                 shell=True,  # nosec B602
                 stdin=self.slave,
@@ -123,7 +122,7 @@ class ShellSession:
 
     def get_output(self, clear=True):
         """Get and optionally clear the output buffer"""
-        output = "".join(self.output_buffer)
+        output = "\n".join(self.output_buffer)
         if clear:
             self.output_buffer = []
         return output
@@ -140,7 +139,7 @@ class ShellSession:
                 # Try to terminate the process group
                 try:
                     os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)
-                except BaseException:  # pylint: disable=bare-except
+                except BaseException:  # pylint: disable=bare-except,broad-except # noqa: E501
                     # If that fails, try to terminate just the process
                     self.process.terminate()
 
@@ -178,8 +177,7 @@ def list_shell_sessions():
             "running": session.is_running,
             "last_activity": time.strftime(
                 "%H:%M:%S",
-                time.localtime(session.last_activity)
-            )
+                time.localtime(session.last_activity))
         })
     return result
 
