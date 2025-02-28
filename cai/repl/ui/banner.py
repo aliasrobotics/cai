@@ -1,15 +1,17 @@
 """
 Module for displaying the CAI banner and welcome message.
 """
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from configparser import ConfigParser
+# Standard library imports
 import os
-import requests
 import glob
-import importlib
-import pkgutil
+import logging
+from configparser import ConfigParser
+
+# Third-party imports
+import requests  # pylint: disable=import-error
+from rich.console import Console  # pylint: disable=import-error
+from rich.panel import Panel  # pylint: disable=import-error
+from rich.table import Table  # pylint: disable=import-error
 
 
 def get_version():
@@ -20,7 +22,7 @@ def get_version():
         config.read('setup.cfg')
         version = config.get('metadata', 'version')
     except Exception:  # pylint: disable=broad-except
-        version = 'unknown'
+        logging.warning("Could not read version from setup.cfg")
     return version
 
 
@@ -29,7 +31,8 @@ def get_supported_models_count():
     try:
         # Fetch model data from LiteLLM repository
         response = requests.get(
-            "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json",
+            "https://raw.githubusercontent.com/BerriAI/litellm/main/"
+            "model_prices_and_context_window.json",
             timeout=2
         )
 
@@ -45,7 +48,9 @@ def get_supported_models_count():
             # Try to get Ollama models count
             try:
                 ollama_api_base = os.getenv(
-                    "OLLAMA_API_BASE", "http://host.docker.internal:8000/v1")
+                    "OLLAMA_API_BASE",
+                    "http://host.docker.internal:8000/v1"
+                )
                 ollama_response = requests.get(
                     f"{ollama_api_base.replace('/v1', '')}/api/tags",
                     timeout=1
@@ -55,15 +60,17 @@ def get_supported_models_count():
                     ollama_data = ollama_response.json()
                     ollama_models = len(
                         ollama_data.get(
-                            'models', ollama_data.get(
-                                'items', [])))
+                            'models', ollama_data.get('items', [])
+                        )
+                    )
                     return function_calling_models + ollama_models
             except Exception:  # pylint: disable=broad-except
-                pass
+                logging.debug("Could not fetch Ollama models")
+                # Continue without Ollama models
 
             return function_calling_models
     except Exception:  # pylint: disable=broad-except
-        pass
+        logging.warning("Could not fetch model data from LiteLLM")
 
     # Default count if we can't fetch the data
     return "many"
@@ -75,10 +82,13 @@ def count_tools():
         # Count Python files in the tools directory
         tool_files = glob.glob("cai/tools/**/*.py", recursive=True)
         # Exclude __init__.py and other non-tool files
-        tool_files = [f for f in tool_files if not f.endswith(
-            "__init__.py") and not f.endswith("__pycache__")]
+        tool_files = [
+            f for f in tool_files
+            if not f.endswith("__init__.py") and not f.endswith("__pycache__")
+        ]
         return len(tool_files)
     except Exception:  # pylint: disable=broad-except
+        logging.warning("Could not count tools")
         return "50+"
 
 
@@ -88,10 +98,13 @@ def count_agents():
         # Count Python files in the agents directory
         agent_files = glob.glob("cai/agents/**/*.py", recursive=True)
         # Exclude __init__.py and other non-agent files
-        agent_files = [f for f in agent_files if not f.endswith(
-            "__init__.py") and not f.endswith("__pycache__")]
+        agent_files = [
+            f for f in agent_files
+            if not f.endswith("__init__.py") and not f.endswith("__pycache__")
+        ]
         return len(agent_files)
     except Exception:  # pylint: disable=broad-except
+        logging.warning("Could not count agents")
         return "20+"
 
 
@@ -113,27 +126,28 @@ def display_banner(console: Console):
     models_count = get_supported_models_count()
 
     # Original banner with Alias Robotics colors (blue and white)
-    banner = """
-[bold blue]                CCCCCCCCCCCCC      ++++++++   ++++++++      IIIIIIIIII
-[bold blue]             CCC::::::::::::C  ++++++++++       ++++++++++  I::::::::I
-[bold blue]           CC:::::::::::::::C ++++++++++         ++++++++++ I::::::::I
-[bold blue]          C:::::CCCCCCCC::::C +++++++++    ++     +++++++++ II::::::II
-[bold blue]         C:::::C       CCCCCC +++++++     +++++     +++++++   I::::I
-[bold blue]        C:::::C                +++++     +++++++     +++++    I::::I
-[bold blue]        C:::::C                ++++                   ++++    I::::I
-[bold blue]        C:::::C                 ++                     ++     I::::I
-[bold blue]        C:::::C                  +   +++++++++++++++   +      I::::I
-[bold blue]        C:::::C                    +++++++++++++++++++        I::::I
-[bold blue]        C:::::C                     +++++++++++++++++         I::::I
-[bold blue]         C:::::C       CCCCCC        +++++++++++++++          I::::I
-[bold blue]          C:::::CCCCCCCC::::C         +++++++++++++         II::::::II
-[bold blue]           CC:::::::::::::::C           +++++++++           I::::::::I
-[bold blue]             CCC::::::::::::C             +++++             I::::::::I
-[bold blue]                CCCCCCCCCCCCC               ++              IIIIIIIIII
+    # Use noqa to ignore line length for the ASCII art
+    banner = f"""
+[bold blue]                CCCCCCCCCCCCC      ++++++++   ++++++++      IIIIIIIIII  # noqa: E501
+[bold blue]             CCC::::::::::::C  ++++++++++       ++++++++++  I::::::::I  # noqa: E501
+[bold blue]           CC:::::::::::::::C ++++++++++         ++++++++++ I::::::::I  # noqa: E501
+[bold blue]          C:::::CCCCCCCC::::C +++++++++    ++     +++++++++ II::::::II  # noqa: E501
+[bold blue]         C:::::C       CCCCCC +++++++     +++++     +++++++   I::::I  # noqa: E501
+[bold blue]        C:::::C                +++++     +++++++     +++++    I::::I  # noqa: E501
+[bold blue]        C:::::C                ++++                   ++++    I::::I  # noqa: E501
+[bold blue]        C:::::C                 ++                     ++     I::::I  # noqa: E501
+[bold blue]        C:::::C                  +   +++++++++++++++   +      I::::I  # noqa: E501
+[bold blue]        C:::::C                    +++++++++++++++++++        I::::I  # noqa: E501
+[bold blue]        C:::::C                     +++++++++++++++++         I::::I  # noqa: E501
+[bold blue]         C:::::C       CCCCCC        +++++++++++++++          I::::I  # noqa: E501
+[bold blue]          C:::::CCCCCCCC::::C         +++++++++++++         II::::::II  # noqa: E501
+[bold blue]           CC:::::::::::::::C           +++++++++           I::::::::I  # noqa: E501
+[bold blue]             CCC::::::::::::C             +++++             I::::::::I  # noqa: E501
+[bold blue]                CCCCCCCCCCCCC               ++              IIIIIIIIII  # noqa: E501
 
-[bold blue]                              Cybersecurity AI (CAI) v{version}[/bold blue]
-[white]                              Supporting {models_count} AI models[/white]
-    """.format(version=version, models_count=models_count)
+[bold blue]                              Cybersecurity AI (CAI) v{version}[/bold blue]  # noqa: E501
+[white]                              Supporting {models_count} AI models[/white]  # noqa: E501
+    """
 
     console.print(banner)
 
@@ -149,11 +163,13 @@ def display_framework_capabilities(console: Console):
         console: Rich console for output
     """
     # Create the main table
-    table = Table(title="[bold blue]CAI Framework Capabilities[/bold blue]",
-                  box=None,
-                  show_header=False,
-                  show_edge=False,
-                  padding=(0, 2))
+    table = Table(
+        title="[bold blue]CAI Framework Capabilities[/bold blue]",
+        box=None,
+        show_header=False,
+        show_edge=False,
+        padding=(0, 2)
+    )
 
     table.add_column("Category", style="bold cyan")
     table.add_column("Count", style="bold yellow")
@@ -163,25 +179,25 @@ def display_framework_capabilities(console: Console):
     table.add_row(
         "AI Models",
         str(get_supported_models_count()),
-        "Supported AI models including GPT-4, Claude, Llama, and local Ollama models"
+        "Supported AI models including GPT-4, Claude, Llama"
     )
 
     table.add_row(
         "Tools",
         str(count_tools()),
-        "Cybersecurity tools for reconnaissance, vulnerability scanning, and exploitation"
+        "Cybersecurity tools for reconnaissance and scanning"
     )
 
     table.add_row(
         "Agents",
         str(count_agents()),
-        "Specialized AI agents for different cybersecurity tasks and scenarios"
+        "Specialized AI agents for different cybersecurity tasks"
     )
 
     table.add_row(
         "CTF Memories",
         str(count_ctf_memories()),
-        "Capture The Flag challenge memories for training and reference"
+        "Capture The Flag challenge memories for training"
     )
 
     table.add_row(
@@ -193,13 +209,13 @@ def display_framework_capabilities(console: Console):
     table.add_row(
         "Attack Vectors",
         "200+",
-        "Comprehensive coverage of MITRE ATT&CK framework techniques"
+        "Comprehensive coverage of MITRE ATT&CK techniques"
     )
 
     table.add_row(
         "Automation Scripts",
         "50+",
-        "Ready-to-use automation scripts for common security tasks"
+        "Ready-to-use automation scripts for security tasks"
     )
 
     table.add_row(
@@ -211,13 +227,13 @@ def display_framework_capabilities(console: Console):
     table.add_row(
         "Integration APIs",
         "30+",
-        "APIs for integration with popular security tools and platforms"
+        "APIs for integration with popular security tools"
     )
 
     table.add_row(
         "Training Scenarios",
         "40+",
-        "Realistic scenarios for security training and simulation"
+        "Realistic scenarios for security training"
     )
 
     # Add the table to a panel for better visual separation

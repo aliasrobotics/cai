@@ -2,13 +2,16 @@
 Memory command for CAI REPL.
 This module provides commands for managing memory collections.
 """
-from typing import List, Optional
+from typing import (
+    List,
+    Optional
+)
 import os
-from wasabi import color
-from rich.console import Console
-from rich.table import Table
-from rich.panel import Panel
-from rich.text import Text
+from wasabi import color  # pylint: disable=import-error
+from rich.console import Console  # pylint: disable=import-error
+from rich.table import Table  # pylint: disable=import-error
+from rich.panel import Panel  # pylint: disable=import-error
+from rich.text import Text  # pylint: disable=import-error
 
 from cai.rag.vector_db import QdrantConnector
 from cai.repl.commands.base import Command, register_command
@@ -23,7 +26,10 @@ class MemoryCommand(Command):
         """Initialize the memory command."""
         super().__init__(
             name="/memory",
-            description="Manage memory collections for episodic and semantic memory",
+            description=(
+                "Manage memory collections for episodic and semantic"
+                "memory"
+            ),
             aliases=["/m"]
         )
 
@@ -45,7 +51,7 @@ class MemoryCommand(Command):
             "Create a new memory collection",
             self.handle_create)
 
-    def handle_list(self, args: Optional[List[str]] = None) -> bool:
+    def handle_list(self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
         """Handle /memory list command"""
         try:
             db = QdrantConnector()
@@ -70,7 +76,7 @@ class MemoryCommand(Command):
             print(f"Error listing collections: {e}")
             return False
 
-    def handle_load(self, args: Optional[List[str]] = None) -> bool:
+    def handle_load(self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
         """Handle /memory load command"""
         if not args:
             console.print("[red]Error: Collection name required[/red]")
@@ -94,7 +100,7 @@ class MemoryCommand(Command):
             print(f"Error setting memory collection: {e}")
             return False
 
-    def handle_delete(self, args: Optional[List[str]] = None) -> bool:
+    def handle_delete(self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
         """Handle /memory delete command"""
         if not args:
             console.print("[red]Error: Collection name required[/red]")
@@ -115,7 +121,7 @@ class MemoryCommand(Command):
             print(f"Error deleting collection: {e}")
             return False
 
-    def handle_create(self, args: Optional[List[str]] = None) -> bool:
+    def handle_create(self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
         """Handle /memory create command"""
         if not args:
             console.print("[red]Error: Collection name required[/red]")
@@ -131,29 +137,27 @@ class MemoryCommand(Command):
             success = db.create_collection(
                 collection_name=collection_name,
                 distance=distance)
-
             if success:
-                print(
+                console.print(
                     f"\nCreated collection: {
                         color(
                             collection_name,
                             fg='green',
                             bold=True)}\n")
                 return True
-            else:
-                print(f"Error creating collection: {collection_name}")
-                return False
+            print(f"Error creating collection: {collection_name}")
+            return False
         except Exception as e:  # pylint: disable=broad-except
             print(f"Error creating collection: {e}")
             return False
 
-    def handle_no_args(self) -> bool:
+    def handle_no_args(self) -> bool:  # pylint: disable=unused-argument # noqa: E501
         """Handle the command when no arguments are provided."""
         # Show memory help
         self.show_help()
         return True
 
-    def show_help(self) -> None:
+    def show_help(self) -> None:  # pylint: disable=unused-argument # noqa: E501
         """Show help for memory commands with rich formatting."""
         # Create a styled header
         header = Text("Memory Command Help", style="bold yellow")
@@ -226,11 +230,16 @@ class MemoryCommand(Command):
         # Notes panel
         notes = Panel(
             Text.from_markup(
-                "• Memory collections are stored in the Qdrant vector database\n"
-                "• The active collection is stored in the CAI_MEMORY_COLLECTION environment variable\n"
-                "• Episodic memory is used for specific CTFs or tasks\n"
-                "• Semantic memory (_all_) is used across all CTFs\n"
-                "• Memory is used to provide context to the agent"
+                "• Memory collections are stored in the Qdrant vector "
+                "database\n"
+                "• The active collection is stored in the "
+                "CAI_MEMORY_COLLECTION environment variable\n"
+                "• Episodic memory is used for specific CTFs or "
+                "tasks\n"
+                "• Semantic memory (_all_) is used across all "
+                "CTFs\n"
+                "• Memory is used to provide context to the "
+                "agent"
             ),
             title="Notes",
             border_style="yellow"

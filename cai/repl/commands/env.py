@@ -3,9 +3,12 @@ Environment command for CAI REPL.
 This module provides commands for displaying environment variables.
 """
 import os
-from typing import List, Optional
-from rich.console import Console
-from rich.table import Table
+from typing import (
+    List,
+    Optional
+)
+from rich.console import Console  # pylint: disable=import-error
+from rich.table import Table  # pylint: disable=import-error
 
 from cai.repl.commands.base import Command, register_command
 

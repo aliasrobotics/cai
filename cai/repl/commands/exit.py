@@ -29,7 +29,6 @@ class ExitCommand(Command):
             True if the command was handled successfully, False otherwise
         """
         sys.exit(0)
-        return True  # This line will never be reached
 
 
 # Register the command

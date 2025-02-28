@@ -1,3 +1,4 @@
+# pylint: disable=too-many-instance-attributes,subprocess-popen-preexec-fn,consider-using-with,broad-exception-caught,line-too-long # noqa: E501
 """
 Basic utilities for executing tools
 inside or outside of virtual containers.
@@ -175,7 +176,10 @@ def list_shell_sessions():
             "session_id": session_id,
             "command": session.command,
             "running": session.is_running,
-            "last_activity": time.strftime("%H:%M:%S", time.localtime(session.last_activity))
+            "last_activity": time.strftime(
+                "%H:%M:%S",
+                time.localtime(session.last_activity)
+            )
         })
     return result
 
