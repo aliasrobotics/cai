@@ -122,7 +122,7 @@ class ShellSession:  # pylint: disable=too-many-instance-attributes
 
     def get_output(self, clear=True):
         """Get and optionally clear the output buffer"""
-        output = "".join(self.output_buffer)
+        output = "\n".join(self.output_buffer)
         if clear:
             self.output_buffer = []
         return output
