@@ -123,27 +123,26 @@ def display_banner(console: Console):
         console: Rich console for output
     """
     version = get_version()
-    models_count = get_supported_models_count()
 
     # Original banner with Alias Robotics colors (blue and white)
     # Use noqa to ignore line length for the ASCII art
     banner = f"""
-[bold blue]                CCCCCCCCCCCCC      ++++++++   ++++++++      IIIIIIIIII  
-[bold blue]             CCC::::::::::::C  ++++++++++       ++++++++++  I::::::::I  
-[bold blue]           CC:::::::::::::::C ++++++++++         ++++++++++ I::::::::I  
-[bold blue]          C:::::CCCCCCCC::::C +++++++++    ++     +++++++++ II::::::II  
-[bold blue]         C:::::C       CCCCCC +++++++     +++++     +++++++   I::::I    
-[bold blue]        C:::::C                +++++     +++++++     +++++    I::::I    
-[bold blue]        C:::::C                ++++                   ++++    I::::I    
-[bold blue]        C:::::C                 ++                     ++     I::::I    
-[bold blue]        C:::::C                  +   +++++++++++++++   +      I::::I    
-[bold blue]        C:::::C                    +++++++++++++++++++        I::::I    
-[bold blue]        C:::::C                     +++++++++++++++++         I::::I    
-[bold blue]         C:::::C       CCCCCC        +++++++++++++++          I::::I    
-[bold blue]          C:::::CCCCCCCC::::C         +++++++++++++         II::::::II  
-[bold blue]           CC:::::::::::::::C           +++++++++           I::::::::I  
-[bold blue]             CCC::::::::::::C             +++++             I::::::::I  
-[bold blue]                CCCCCCCCCCCCC               ++              IIIIIIIIII  
+[bold blue]                CCCCCCCCCCCCC      ++++++++   ++++++++      IIIIIIIIII
+[bold blue]             CCC::::::::::::C  ++++++++++       ++++++++++  I::::::::I
+[bold blue]           CC:::::::::::::::C ++++++++++         ++++++++++ I::::::::I
+[bold blue]          C:::::CCCCCCCC::::C +++++++++    ++     +++++++++ II::::::II
+[bold blue]         C:::::C       CCCCCC +++++++     +++++     +++++++   I::::I
+[bold blue]        C:::::C                +++++     +++++++     +++++    I::::I
+[bold blue]        C:::::C                ++++                   ++++    I::::I
+[bold blue]        C:::::C                 ++                     ++     I::::I
+[bold blue]        C:::::C                  +   +++++++++++++++   +      I::::I
+[bold blue]        C:::::C                    +++++++++++++++++++        I::::I
+[bold blue]        C:::::C                     +++++++++++++++++         I::::I
+[bold blue]         C:::::C       CCCCCC        +++++++++++++++          I::::I
+[bold blue]          C:::::CCCCCCCC::::C         +++++++++++++         II::::::II
+[bold blue]           CC:::::::::::::::C           +++++++++           I::::::::I
+[bold blue]             CCC::::::::::::C             +++++             I::::::::I
+[bold blue]                CCCCCCCCCCCCC               ++              IIIIIIIIII
 
 [bold blue]                              Cybersecurity AI (CAI), v{version}[/bold blue]
 [white]                                  Bug bounty-ready AI[/white]
@@ -194,52 +193,10 @@ def display_framework_capabilities(console: Console):
         "Specialized AI agents for different cybersecurity tasks"
     )
 
-    table.add_row(
-        "CTF Memories",
-        str(count_ctf_memories()),
-        "Capture The Flag challenge memories for training"
-    )
-
-    table.add_row(
-        "Universal Plugins",
-        "25+",
-        "Plugins that work across different tools and environments"
-    )
-
-    table.add_row(
-        "Attack Vectors",
-        "200+",
-        "Comprehensive coverage of MITRE ATT&CK techniques"
-    )
-
-    table.add_row(
-        "Automation Scripts",
-        "50+",
-        "Ready-to-use automation scripts for security tasks"
-    )
-
-    table.add_row(
-        "Report Templates",
-        "15+",
-        "Professional security assessment report templates"
-    )
-
-    table.add_row(
-        "Integration APIs",
-        "30+",
-        "APIs for integration with popular security tools"
-    )
-
-    table.add_row(
-        "Training Scenarios",
-        "40+",
-        "Realistic scenarios for security training"
-    )
-
     # Add the table to a panel for better visual separation
     capabilities_panel = Panel(
         table,
-        title="[bold blue]Framework Arsenal[/bold blue]",
+        title="[bold blue]CAI Features[/bold blue]",
         border_style="blue",
         padding=(1, 2)
     )
@@ -255,7 +212,6 @@ def display_welcome_tips(console: Console):
         console: Rich console for output
     """
     console.print(Panel(
-        "[bold blue]Welcome to CAI REPL![/bold blue]\n\n"
         "[white]• Use arrow keys ↑↓ to navigate command history[/white]\n"
         "[white]• Press Tab for command completion[/white]\n"
         "[white]• Type /help for available commands[/white]\n"
