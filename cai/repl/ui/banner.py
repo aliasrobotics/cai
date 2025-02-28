@@ -145,8 +145,8 @@ def display_banner(console: Console):
 [bold blue]             CCC::::::::::::C             +++++             I::::::::I  
 [bold blue]                CCCCCCCCCCCCC               ++              IIIIIIIIII  
 
-[bold blue]                              Cybersecurity AI (CAI) v{version}[/bold blue]
-[white]                              Supporting {models_count} AI models[/white]
+[bold blue]                              Cybersecurity AI (CAI), v{version}[/bold blue]
+[white]                                  Bug bounty-ready AI[/white]
     """
 
     console.print(banner)
