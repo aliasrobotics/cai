@@ -163,7 +163,7 @@ def display_framework_capabilities(console: Console):
     """
     # Create the main table
     table = Table(
-        title="[bold blue]CAI Framework Capabilities[/bold blue]",
+        title="",
         box=None,
         show_header=False,
         show_edge=False,
@@ -181,11 +181,11 @@ def display_framework_capabilities(console: Console):
         "Supported AI models including GPT-4, Claude, Llama"
     )
 
-    table.add_row(
-        "Tools",
-        str(count_tools()),
-        "Cybersecurity tools for reconnaissance and scanning"
-    )
+    # table.add_row(
+    #     "Tools",
+    #     str(count_tools()),
+    #     "Cybersecurity tools for reconnaissance and scanning"
+    # )
 
     table.add_row(
         "Agents",

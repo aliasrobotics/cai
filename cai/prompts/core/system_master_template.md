@@ -41,7 +41,7 @@
                        model="Python Code",
                        debug=False)
     artifacts = None
-    if is_caiextensions_memory_available():
+    if is_caiextensions_memory_available() and os.getenv('CTF_NAME'):
         from caiextensions.memory import get_artifacts
         artifacts = get_artifacts(os.getenv('CTF_NAME').lower())
 %>
