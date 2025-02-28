@@ -1,6 +1,6 @@
-
+"""Basic CLI agents for CAI and CTFs"""
 import os
-from mako.template import Template
+from mako.template import Template  # pylint: disable=import-error
 from cai.types import Agent
 from cai.agents.mail import dns_smtp_agent
 from cai.tools.command_and_control.sshpass import (
@@ -10,6 +10,7 @@ from cai.tools.misc.reasoning import thought
 from cai.tools.reconnaissance.generic_linux_command import (
     generic_linux_command
 )
+
 
 def transfer_to_dns_agent():
     """
@@ -61,6 +62,33 @@ thought_agent = Agent(
     parallel_tool_calls=False
 )
 
+# Update the system prompt to include information about shell sessions
+cli_agent_system_prompt += """
+
+## Shell Session Management
+You can create and manage interactive shell sessions for commands like netcat,
+SSH, etc.
+
+- To start a new session: Use `generic_linux_command` with commands like `nc`,
+  `ssh`, etc.
+- To list active sessions: `generic_linux_command("session", "list")`
+- To get output from a session:
+  `generic_linux_command("session", "output <session_id>")`
+- To send input to a session:
+  `generic_linux_command("<command>", "<args>", session_id="<session_id>")`
+- To terminate a session:
+  `generic_linux_command("session", "kill <session_id>")`
+
+Example workflow:
+1. Start netcat:
+    `generic_linux_command("nc", "-lvnp 4444")` → Returns session ID
+2. Check output:
+    `generic_linux_command("session", "output <session_id>")`
+3. Send data:
+    `generic_linux_command("echo hello", session_id="<session_id>")`
+4. Kill when done:
+    `generic_linux_command("session", "kill <session_id>")`
+"""
 
 cli_agent = Agent(
     name="Boot2Root CTF Tester",
@@ -78,4 +106,3 @@ cli_agent = Agent(
 
 cli_agent.functions.append(transfer_to_dns_agent)
 dns_smtp_agent.functions.append(cli_agent_handoff)
-

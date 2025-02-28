@@ -85,3 +85,14 @@ def is_caiextensions_memory_available():
     except ImportError:
         return False
     return True
+
+
+def is_caiextensions_platform_available():
+    """
+    Check if caiextensions-platform is available
+    """
+    try:
+        from caiextensions.platform.base import platform_manager  # pylint: disable=import-error,import-outside-toplevel,unused-import  # noqa: E501,F401
+    except ImportError:
+        return False
+    return True

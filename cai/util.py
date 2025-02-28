@@ -336,6 +336,11 @@ def cli_print_agent_messages(agent_name, message, counter, model, debug,  # pyli
     if debug != 2:  # debug level 2
         return
 
+    # Use the model from environment variable if available
+    model_override = os.getenv('CAI_MODEL')
+    if model_override:
+        model = model_override
+
     # TODO: consider using the timestamp from the message  # pylint: disable=fixme # noqa: E501
     # or the LLM interaction timestamp
     timestamp = datetime.now().strftime("%H:%M:%S")
@@ -384,6 +389,11 @@ def cli_print_state(agent_name, message, counter, model, debug,  # pylint: disab
 
     if debug != 2:  # debug level 2
         return
+
+    # Use the model from environment variable if available
+    model_override = os.getenv('CAI_MODEL')
+    if model_override:
+        model = model_override
 
     # TODO: consider using the timestamp from the message  # pylint: disable=fixme # noqa: E501
     # or the LLM interaction timestamp
@@ -546,6 +556,11 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
 
     if debug != 2:  # debug level 2
         return
+
+    # Use the model from environment variable if available
+    model_override = os.getenv('CAI_MODEL')
+    if model_override:
+        model = model_override
 
     filtered_args = ({k: v for k, v in tool_args.items() if k != 'ctf'}
                         if tool_args else {})  # noqa: F541, E127
