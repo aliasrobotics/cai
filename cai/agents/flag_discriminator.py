@@ -1,3 +1,6 @@
+"""
+Flag Discriminator Agent
+"""
 
 import os
 from cai.types import Agent

@@ -87,9 +87,9 @@ from wasabi import color  # pylint: disable=import-error
 from cai import (
     is_pentestperf_available,
     cai_initial_agent
-    )
+)
 from cai.repl import run_demo_loop
-#from cai.agents.cli_basic import cli_agent
+# from cai.agents.cli_basic import cli_agent
 
 if is_pentestperf_available():
     import pentestperf as ptt  # pylint: disable=import-error

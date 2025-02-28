@@ -16,7 +16,7 @@ from wasabi import color  # pylint: disable=import-error
 ACTIVE_SESSIONS = {}
 
 
-class ShellSession:
+class ShellSession:  # pylint: disable=too-many-instance-attributes
     """Class to manage interactive shell sessions"""
 
     def __init__(self, command, session_id=None, ctf=None):
@@ -175,7 +175,9 @@ def list_shell_sessions():
             "session_id": session_id,
             "command": session.command,
             "running": session.is_running,
-            "last_activity": time.strftime("%H:%M:%S", time.localtime(session.last_activity))
+            "last_activity": time.strftime(
+                "%H:%M:%S",
+                time.localtime(session.last_activity))
         })
     return result
 

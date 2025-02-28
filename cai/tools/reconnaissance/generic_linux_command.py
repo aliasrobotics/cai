@@ -1,11 +1,16 @@
 """
 This is used to create a generic linux command.
 """
-from cai.tools.common import run_command, list_shell_sessions, get_session_output, terminate_session  # pylint: disable=import-error
+from cai.tools.common import (run_command,
+                              list_shell_sessions,
+                              get_session_output,
+                              terminate_session)  # pylint: disable=import-error # noqa E501
 
 
-def generic_linux_command(command: str = "", args: str = "", ctf=None,
-                          async_mode: bool = False, session_id: str = None) -> str:
+def generic_linux_command(command: str = "",
+                          args: str = "", ctf=None,
+                          async_mode: bool = False,
+                          session_id: str = None) -> str:
     """
     Execute Linux commands with support for interactive sessions.
 
@@ -17,7 +22,8 @@ def generic_linux_command(command: str = "", args: str = "", ctf=None,
     2. Session management:
        - For interactive commands(ssh)
        - Workflow:
-         - Start: generic_linux_command("ssh", "user@host") → Returns session ID
+         - Start: generic_linux_command("ssh", "user@host")
+           → Returns session ID
          - List: generic_linux_command("session", "list")
          - Get output: generic_linux_command("session", "output <id>")
          - Send input: Use session_id parameter
@@ -42,10 +48,9 @@ def generic_linux_command(command: str = "", args: str = "", ctf=None,
 
             result = "Active sessions:\n"
             for session in sessions:
-                result += f"ID: {
-                    session['session_id']} | Command: {
-                    session['command']} | Last activity: {
-                    session['last_activity']}\n"
+                result += (f"ID: {session['session_id']} | "
+                           f"Command: {session['command']} | "
+                           f"Last activity: {session['last_activity']}\n")
             return result
 
         if args.startswith("output "):
@@ -56,16 +61,15 @@ def generic_linux_command(command: str = "", args: str = "", ctf=None,
             session_id = args.split(" ")[1]
             return terminate_session(session_id)
 
-        return "Unknown session command. Available: list, output <id>, kill <id>"
+        return """Unknown session command.
+        Available: list, output <id>, kill <id>"""
 
     # Regular command execution
     full_command = f'{command} {args}'.strip()
 
     # Detect if this should be an async command
     if not async_mode and not session_id:
-        async_commands = [
-            'ssh',
-            'python -m http.server']
+        async_commands = ['ssh', 'python -m http.server']
         async_mode = any(cmd in full_command for cmd in async_commands)
 
     return run_command(full_command, ctf=ctf,
