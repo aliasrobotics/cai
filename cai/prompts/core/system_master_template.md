@@ -2,7 +2,6 @@
     import os
     from cai.util import cli_print_tool_call
     from cai.rag.vector_db import get_previous_memory
-    from cai import is_caiextensions_memory_available
 
     # Get system prompt from agent if provided
     system_prompt = (
@@ -40,10 +39,6 @@
                        total_reasoning_tokens=0,
                        model="Python Code",
                        debug=False)
-    artifacts = None
-    if is_caiextensions_memory_available():
-        from caiextensions.memory import get_artifacts
-        artifacts = get_artifacts(os.getenv('CTF_NAME').lower())
 %>
 
 ${system_prompt}
@@ -107,8 +102,4 @@ Environment context:
     % endfor
 % endif
 
-% endif
-
-% if artifacts:
-Some useful information: ${artifacts}
 % endif
