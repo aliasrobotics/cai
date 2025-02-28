@@ -20,7 +20,7 @@ ctf_agent_one_tool = Agent(
                     # 2. Shell Session Management: create and manage interactive shell sessions 
                     # for commands like netcat, SSH, telnet.
 
-                    - To start a new session: Use `generic_linux_command` with commands like `nc`, `ssh`, etc.
+                    - To start a new session: Use `generic_linux_command` with commands like `ssh`
                     - To list active sessions: `generic_linux_command("session", "list")`
                     - To get output from a session: `generic_linux_command("session", "output <session_id>")`
                     - To send input to a session: `generic_linux_command("<command>", "<args>", session_id="<session_id>")`
