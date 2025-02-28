@@ -84,9 +84,12 @@ from wasabi import color  # pylint: disable=import-error
 
 # Local imports
 
-from cai import is_pentestperf_available
+from cai import (
+    is_pentestperf_available,
+    cai_initial_agent
+)
 from cai.repl import run_demo_loop
-from cai.agents.cli_basic import cli_agent
+# from cai.agents.cli_basic import cli_agent
 
 if is_pentestperf_available():
     import pentestperf as ptt  # pylint: disable=import-error
@@ -164,7 +167,7 @@ def run_with_env():
 
         # Run interactive loop with CTF and state agent if available
         run_demo_loop(
-            cli_agent,
+            cai_initial_agent,
             debug=float(os.getenv('CAI_DEBUG', '2')),
             max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
             ctf=ctf if os.getenv('CTF_NAME', None) else None,
