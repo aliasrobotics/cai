@@ -90,7 +90,6 @@ from cai import (
 )
 from cai.repl import run_demo_loop
 from cai.agents.cli_basic import cli_agent
-from caiextensions.platform.base import platform_manager
 
 if is_pentestperf_available():
     import pentestperf as ptt  # pylint: disable=import-error
@@ -101,6 +100,7 @@ if is_pentestperf_available():
 def initialize_platforms():
     """Initialize and register available platforms."""
     try:
+        from caiextensions.platform.base import platform_manager
         from caiextensions.platform.htb.platform import HTBPlatform  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
         platform_manager.register_platform("htb", HTBPlatform())
     except ImportError:

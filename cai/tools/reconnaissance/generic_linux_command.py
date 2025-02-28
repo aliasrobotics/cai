@@ -48,9 +48,10 @@ def generic_linux_command(command: str = "",
 
             result = "Active sessions:\n"
             for session in sessions:
-                result += (f"ID: {session['session_id']} | "
-                           f"Command: {session['command']} | "
-                           f"Last activity: {session['last_activity']}\n")
+                result += f"ID: {
+                    session['session_id']} | Command: {
+                    session['command']} | Last activity: {
+                    session['last_activity']}\n"
             return result
 
         if args.startswith("output "):
