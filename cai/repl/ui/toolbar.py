@@ -5,9 +5,8 @@ import datetime
 import os
 import socket
 import platform
-import requests
-from prompt_toolkit.formatted_text import HTML
-from cai.core import get_ollama_api_base
+import requests  # pylint: disable=import-error
+from prompt_toolkit.formatted_text import HTML  # pylint: disable=import-error
 
 # Variable to track when to refresh the toolbar
 toolbar_last_refresh = [datetime.datetime.now()]
@@ -27,13 +26,26 @@ def get_bottom_toolbar():
         # Get Ollama information
         ollama_status = "unavailable"
         try:
-            ollama_api_base = get_ollama_api_base().replace("/v1", "")
-            response = requests.get(f"{ollama_api_base}/api/tags", timeout=1)
+            # Get Ollama models with a short timeout to prevent hanging
+            api_base = os.getenv(
+                "OLLAMA_API_BASE",
+                "http://host.docker.internal:8000/v1")
+            response = requests.get(
+                f"{api_base.replace('/v1', '')}/api/tags", timeout=1)
+
             if response.status_code == 200:
-                ollama_models = len(response.json().get("models", []))
+                data = response.json()
+                if 'models' in data:
+                    ollama_models = len(data['models'])
+                else:
+                    # Fallback for older Ollama versions
+                    ollama_models = len(data.get('items', []))
                 ollama_status = f"{ollama_models} models"
         except Exception:  # pylint: disable=broad-except
-            pass
+            # Silently fail if Ollama is not available
+            # This is acceptable as Ollama is optional and we don't want to
+            # disrupt the user experience if it's not running
+            ollama_status = "unavailable"
 
         # Get current time for the toolbar refresh indicator
         current_time = datetime.datetime.now().strftime("%H:%M")
@@ -58,7 +70,7 @@ def get_bottom_toolbar():
 def get_toolbar_with_refresh():
     """Get toolbar with refresh control (once per minute)."""
     now = datetime.datetime.now()
-    if (now - toolbar_last_refresh[0]
-        ).total_seconds() >= 60:  # Refresh every 60 seconds
+    seconds_elapsed = (now - toolbar_last_refresh[0]).total_seconds()
+    if seconds_elapsed >= 60:  # Refresh every 60 seconds
         toolbar_last_refresh[0] = now
     return get_bottom_toolbar()

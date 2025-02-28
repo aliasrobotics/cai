@@ -2,8 +2,14 @@
 Base module for CAI REPL commands.
 This module provides the base structure for all commands in the CAI REPL.
 """
-from typing import List, Optional, Dict, Any, Callable
-from rich.console import Console
+from typing import (
+    List,
+    Optional,
+    Dict,
+    Any,
+    Callable
+)
+from rich.console import Console  # pylint: disable=import-error
 
 console = Console()
 
@@ -131,8 +137,7 @@ def get_command(name: str) -> Optional[Command]:
         The command if found, None otherwise
     """
     # Check if it's an alias
-    if name in COMMAND_ALIASES:
-        name = COMMAND_ALIASES[name]
+    name = COMMAND_ALIASES.get(name, name)
 
     return COMMANDS.get(name)
 

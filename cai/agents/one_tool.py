@@ -3,7 +3,8 @@ CTF Agent with one tool
 """
 import os
 from cai.types import Agent
-from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa
+from cai.agents.common import create_ctf_agent
+
 model = os.getenv('CAI_MODEL', "qwen2.5:14b")
 
 ctf_agent_one_tool = Agent(

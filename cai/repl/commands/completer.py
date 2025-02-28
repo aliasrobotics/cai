@@ -1,19 +1,30 @@
 """
 Command completer for CAI REPL.
-This module provides a fuzzy command completer with autocompletion menu and command shadowing.
+This module provides a fuzzy command completer with autocompletion menu and
+command shadowing.
 """
-import os
+# Standard library imports
 import datetime
-import requests
-from typing import List, Dict, Any, Optional
+from typing import (
+    List,
+    Optional  # Dict and Any removed as unused
+)
 
-from prompt_toolkit.completion import Completer, Completion
-from prompt_toolkit.formatted_text import HTML
-from prompt_toolkit.styles import Style
-from rich.console import Console
+# Third-party imports
+import requests  # pylint: disable=import-error,unused-import,line-too-long # noqa: E501
+from prompt_toolkit.completion import (  # pylint: disable=import-error
+    Completer,
+    Completion
+)
+from prompt_toolkit.formatted_text import HTML  # pylint: disable=import-error
+from prompt_toolkit.styles import Style  # pylint: disable=import-error
+from rich.console import Console  # pylint: disable=import-error
 
 from cai.core import get_ollama_api_base
-from cai.repl.commands.base import COMMANDS, COMMAND_ALIASES
+from cai.repl.commands.base import (
+    COMMANDS,
+    COMMAND_ALIASES
+)
 
 console = Console()
 
@@ -37,7 +48,8 @@ class FuzzyCommandCompleter(Completer):
         super().__init__()
         self.cached_models = []
         self.cached_model_numbers = {}  # Map of numbers to model names
-        self.last_model_fetch = datetime.datetime.now() - datetime.timedelta(minutes=10)
+        self.last_model_fetch = datetime.datetime.now() - datetime.timedelta(
+            minutes=10)
         self.command_history = {}  # Store command usage frequency
         self.fetch_ollama_models()
 
@@ -50,7 +62,7 @@ class FuzzyCommandCompleter(Completer):
             'scrollbar.button': 'bg:#004b6b',
         })
 
-    def fetch_ollama_models(self):
+    def fetch_ollama_models(self):  # pylint: disable=too-many-branches,too-many-statements,inconsistent-return-statements,line-too-long # noqa: E501
         """Fetch available models from Ollama if it's running."""
         # Only fetch every 60 seconds to avoid excessive API calls
         now = datetime.datetime.now()
@@ -61,30 +73,25 @@ class FuzzyCommandCompleter(Completer):
         ollama_models = []
 
         try:
-            # Get the Ollama API base URL
+            # Get Ollama models with a short timeout to prevent hanging
             api_base = get_ollama_api_base()
-
-            # Make a request to the Ollama API to get available models with a
-            # short timeout
             response = requests.get(
                 f"{api_base.replace('/v1', '')}/api/tags", timeout=1)
 
             if response.status_code == 200:
                 data = response.json()
                 if 'models' in data:
-                    ollama_models = [model.get('name', '')
-                                     for model in data['models']]
+                    models = data['models']
                 else:
                     # Fallback for older Ollama versions
-                    ollama_models = [
-                        model.get(
-                            'name',
-                            '') for model in data.get(
-                            'items',
-                            [])]
+                    models = data.get('items', [])
+
+                return [(model.get('name', ''), []) for model in models]
         except Exception:  # pylint: disable=broad-except
             # Silently fail if Ollama is not available
-            pass
+            # This is acceptable as Ollama is optional and we don't want to
+            # disrupt the user experience if it's not running
+            return []
 
         # Standard models always available
         standard_models = [
@@ -198,8 +205,8 @@ class FuzzyCommandCompleter(Completer):
                     cmd,
                     start_position=-len(current_word),
                     display=HTML(
-                        f"<ansicyan><b>{
-                            cmd:<15}</b></ansicyan> {description}"),
+                        f"<ansicyan><b>{cmd:<15}</b></ansicyan> "
+                        f"{description}"),
                     style="fg:ansicyan bold"
                 ))
             # Fuzzy match (contains the substring)
@@ -208,8 +215,7 @@ class FuzzyCommandCompleter(Completer):
                     cmd,
                     start_position=-len(current_word),
                     display=HTML(
-                        f"<ansicyan>{
-                            cmd:<15}</ansicyan> {description}"),
+                        f"<ansicyan>{cmd:<15}</ansicyan> {description}"),
                     style="fg:ansicyan"
                 ))
 
@@ -221,8 +227,8 @@ class FuzzyCommandCompleter(Completer):
                     alias,
                     start_position=-len(current_word),
                     display=HTML(
-                        f"<ansigreen><b>{
-                            alias:<15}</b></ansigreen> {cmd} - {cmd_description}"),
+                        f"<ansigreen><b>{alias:<15}</b></ansigreen> "
+                        f"{cmd} - {cmd_description}"),
                     style="fg:ansigreen bold"
                 ))
             elif current_word in alias and not alias.startswith(current_word):
@@ -230,8 +236,8 @@ class FuzzyCommandCompleter(Completer):
                     alias,
                     start_position=-len(current_word),
                     display=HTML(
-                        f"<ansigreen>{
-                            alias:<15}</ansigreen> {cmd} - {cmd_description}"),
+                        f"<ansigreen>{alias:<15}</ansigreen> "
+                        f"{cmd} - {cmd_description}"),
                     style="fg:ansigreen"
                 ))
 
@@ -251,8 +257,7 @@ class FuzzyCommandCompleter(Completer):
         suggestions = []
 
         # If using an alias, get the real command
-        if cmd in COMMAND_ALIASES:
-            cmd = COMMAND_ALIASES[cmd]
+        cmd = COMMAND_ALIASES.get(cmd, cmd)
 
         all_commands = self.get_all_commands()
         subcommand_descriptions = self.get_subcommand_descriptions()
@@ -269,18 +274,19 @@ class FuzzyCommandCompleter(Completer):
                         subcmd,
                         start_position=-len(current_word),
                         display=HTML(
-                            f"<ansiyellow><b>{
-                                subcmd:<15}</b></ansiyellow> {subcmd_description}"),
+                            f"<ansiyellow><b>{subcmd:<15}</b></ansiyellow> "
+                            f"{subcmd_description}"),
                         style="fg:ansiyellow bold"
                     ))
                 # Fuzzy match
-                elif current_word in subcmd and not subcmd.startswith(current_word):
+                elif (current_word in subcmd and
+                      not subcmd.startswith(current_word)):
                     suggestions.append(Completion(
                         subcmd,
                         start_position=-len(current_word),
                         display=HTML(
-                            f"<ansiyellow>{
-                                subcmd:<15}</ansiyellow> {subcmd_description}"),
+                            f"<ansiyellow>{subcmd:<15}</ansiyellow> "
+                            f"{subcmd_description}"),
                         style="fg:ansiyellow"
                     ))
 
@@ -304,8 +310,8 @@ class FuzzyCommandCompleter(Completer):
                     num,
                     start_position=-len(current_word),
                     display=HTML(
-                        f"<ansiwhite><b>{
-                            num:<3}</b></ansiwhite> {model_name}"),
+                        f"<ansiwhite><b>{num:<3}</b></ansiwhite> "
+                        f"{model_name}"),
                     style="fg:ansiwhite bold"
                 ))
 
@@ -315,10 +321,12 @@ class FuzzyCommandCompleter(Completer):
                 suggestions.append(Completion(
                     model,
                     start_position=-len(current_word),
-                    display=HTML(f"<ansimagenta><b>{model}</b></ansimagenta>"),
+                    display=HTML(
+                        f"<ansimagenta><b>{model}</b></ansimagenta>"),
                     style="fg:ansimagenta bold"
                 ))
-            elif current_word.lower() in model.lower() and not model.startswith(current_word):
+            elif (current_word.lower() in model.lower() and
+                  not model.startswith(current_word)):
                 suggestions.append(Completion(
                     model,
                     start_position=-len(current_word),
@@ -358,8 +366,10 @@ class FuzzyCommandCompleter(Completer):
 
         return None
 
+    # pylint: disable=unused-argument
     def get_completions(self, document, complete_event):
-        """Get completions for the current document with fuzzy matching support.
+        """Get completions for the current document
+        with fuzzy matching support.
 
         Args:
             document: The document to complete
@@ -390,8 +400,8 @@ class FuzzyCommandCompleter(Completer):
                     cmd,
                     start_position=0,
                     display=HTML(
-                        f"<ansicyan><b>{
-                            cmd:<15}</b></ansicyan> {description}"),
+                        f"<ansicyan><b>{cmd:<15}</b></ansicyan> "
+                        f"{description}"),
                     style="fg:ansicyan bold"
                 )
             return
@@ -414,4 +424,4 @@ class FuzzyCommandCompleter(Completer):
                 else:
                     # Get subcommand suggestions
                     yield from self.get_subcommand_suggestions(
-                            cmd, current_word)
+                        cmd, current_word)

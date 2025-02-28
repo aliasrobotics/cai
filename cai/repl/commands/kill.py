@@ -4,8 +4,11 @@ This module provides commands for terminating active processes or sessions.
 """
 import os
 import signal
-from typing import List, Optional
-from rich.console import Console
+from typing import (
+    List,
+    Optional
+)
+from rich.console import Console  # pylint: disable=import-error
 
 from cai.repl.commands.base import Command, register_command
 
@@ -54,7 +57,7 @@ class KillCommand(Command):
             try:
                 os.killpg(pid, signal.SIGTERM)
                 console.print(f"[green]Process group {pid} terminated[/green]")
-            except BaseException:
+            except BaseException:  # pylint: disable=broad-exception-caught
                 # If killing the process group fails, try killing just the
                 # process
                 os.kill(pid, signal.SIGTERM)
@@ -69,7 +72,7 @@ class KillCommand(Command):
                 f"[yellow]No process with PID {
                     args[0]} found[/yellow]")
             return False
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             console.print(f"[red]Error killing process: {str(e)}[/red]")
             return False
 

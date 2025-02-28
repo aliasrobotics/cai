@@ -1,11 +1,15 @@
 """
 Turns command for CAI REPL.
-This module provides commands for viewing and changing the maximum number of turns.
+This module provides commands for viewing and changing the maximum number
+of turns.
 """
 import os
-from typing import List, Optional
-from rich.console import Console
-from rich.panel import Panel
+from typing import (
+    List,
+    Optional
+)
+from rich.console import Console  # pylint: disable=import-error
+from rich.panel import Panel  # pylint: disable=import-error
 
 from cai.repl.commands.base import Command, register_command
 
@@ -65,10 +69,9 @@ class TurnsCommand(Command):
             turns = args[0]
             # Check if it's a number or 'inf'
             if turns.lower() == 'inf':
-                max_turns_value = float('inf')
                 turns = 'inf'
             else:
-                max_turns_value = float(turns)
+                turns = int(turns)
 
             # Set the max turns in environment variable
             os.environ["CAI_MAX_TURNS"] = turns

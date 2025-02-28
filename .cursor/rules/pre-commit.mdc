@@ -1,0 +1,72 @@
+---
+description: code formatting to pre-commit
+globs: 
+alwaysApply: false
+---
+
+	1.	Maximum Line Length
+	•	Limit all code lines to a maximum of 79 characters.
+	•	For docstrings and comments, consider a limit of 72 characters where applicable.
+	•	Exceptions are allowed for long URLs or strings when justified.
+	2.	Indentation
+	•	Use exactly 4 spaces per indentation level.
+	•	Never mix tabs and spaces.
+	3.	Imports Organization
+	•	Place all imports at the top of the file.
+	•	Organize imports into three groups (in this order):
+a. Standard library modules
+b. Third-party libraries
+c. Local application-specific imports
+	•	Separate each group with a single blank line.
+	4.	Whitespace in Expressions and Statements
+	•	Use a single space around binary operators (e.g., assignment =, arithmetic operators +, -, *, / etc.).
+	•	Do not add spaces immediately inside parentheses, brackets, or braces.
+	5.	Blank Lines
+	•	Separate top-level function and class definitions with two blank lines.
+	•	Use a single blank line to separate methods within a class.
+	6.	Comments and Documentation
+	•	Write comments as complete sentences, starting with a capital letter and ending with proper punctuation.
+	•	Use inline comments sparingly and place them at least two spaces away from the code.
+	•	For blocks of code, use clear block comments to explain “why” something is done, not just “what” is done.
+	•	Every public module, function, class, and method should have a docstring describing its purpose and usage. Docstrings should use triple double-quotes ("""Docstring""").
+	7.	Naming Conventions
+	•	Use snake_case for functions, variables, and methods.
+	•	Use CamelCase for class names.
+	•	Use UPPERCASE for constants.
+	•	Avoid using single-character names except for counters or iterators in small loops.
+	8.	Trailing Whitespace and Extra Blank Lines
+	•	Remove any trailing whitespace at the end of every line.
+	•	Ensure there are no extra blank lines at the end of the file.
+	9.	End-of-File Newline
+	•	Every file should end with a single newline character.
+	10.	Operator and Punctuation Spacing
+	•	Do not include extraneous spaces before commas, semicolons, or colons.
+	•	Ensure proper spacing in function definitions and calls (e.g., def func(arg1, arg2): with no extra spaces).
+	11.	Use of Semicolons
+	•	Avoid using semicolons to separate statements on the same line.
+	12.	String Quotes Consistency
+	•	Use either single ('...') or double quotes ("...") consistently throughout the project, unless there’s a specific need to use one over the other.
+	13.	Exception Handling
+	•	Catch specific exceptions instead of using a bare except: clause.
+	•	Provide clear error messages and, if needed, logging when exceptions are caught.
+	14.	Function and Class Definitions
+	•	Include comprehensive docstrings for functions and classes that explain parameters, return types, and possible exceptions.
+	•	Maintain a consistent order in class definitions (e.g., public methods before private ones).
+	15.	Pre-commit Hooks
+	•	Set up pre-commit hooks to run automated checks (such as Flake8, Black, and Bandit) before code is committed.
+	•	Ensure that the hooks are configured to catch formatting errors, security vulnerabilities, and style deviations automatically.
+	16.	Security Checks with Bandit
+	•	Run Bandit regularly to scan for common security issues.
+	•	Follow its recommendations to mitigate potential vulnerabilities in the code.
+	17.	Code Complexity and Refactoring
+	•	Write simple, readable code.
+	•	Refactor complex functions or classes to reduce cognitive load and improve maintainability.
+	18.	Consistent Formatting Tools
+	•	Consider using auto-formatting tools like Black in conjunction with manual reviews to ensure uniform code style across the project.
+	•	Ensure that automated formatting aligns with the team’s agreed-upon coding standards.
+	19.	Linting with Flake8
+	•	Regularly run Flake8 to identify syntax errors, unused imports, or deviations from PEP8.
+	•	Address all Flake8 warnings and errors to maintain code quality.
+	20.	General Consistency
+	•	Maintain consistency in coding style, naming, and structure throughout the project.
+	•	Regularly review and update the coding standards documentation to reflect any new guideli

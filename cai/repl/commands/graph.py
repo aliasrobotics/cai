@@ -2,8 +2,11 @@
 Graph command for CAI REPL.
 This module provides commands for visualizing the agent interaction graph.
 """
-from typing import List, Optional
-from rich.console import Console
+from typing import (
+    List,
+    Optional
+)
+from rich.console import Console  # pylint: disable=import-error
 
 from cai.repl.commands.base import Command, register_command
 
@@ -34,8 +37,9 @@ class GraphCommand(Command):
 
     def handle_graph_show(self) -> bool:
         """Handle /graph show command"""
+        from cai.repl.repl import client  # pylint: disable=import-error
+
         # Import here to avoid circular imports
-        from cai.repl.repl import client
 
         if not client or not client._graph:  # pylint: disable=protected-access
             console.print("[yellow]No conversation graph available.[/yellow]")

@@ -3,10 +3,10 @@ Collection of basic agents
 """
 
 import os
-from cai.types import Agent
-from cai.tools.reconnaissance.netcat import netcat
-from cai.tools.reconnaissance.nmap import nmap
-from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa
+from cai.util import Agent  # pylint: disable=import-error
+from cai.tools.reconnaissance.netcat import netcat  # pylint: disable=import-error # noqa: E501
+from cai.tools.reconnaissance.nmap import nmap  # pylint: disable=import-error # noqa: E501
+from cai.agents.common import create_ctf_agent
 
 # First party imports
 from cai.tools.reconnaissance.filesystem import (

@@ -4,15 +4,23 @@ This module provides commands for viewing and changing the current LLM model.
 """
 import os
 import datetime
-import requests
-from typing import List, Optional, Dict, Any
-from rich.console import Console
-from rich.table import Table
-from rich.panel import Panel
+# Standard library imports
+from typing import List, Optional  # Dict and Any removed as unused
+
+# Third-party imports
+import requests  # pylint: disable=import-error
+from rich.console import Console  # pylint: disable=import-error
+from rich.table import Table  # pylint: disable=import-error
+from rich.panel import Panel  # pylint: disable=import-error
 from cai.core import get_ollama_api_base
 from cai.repl.commands.base import Command, register_command
 
 console = Console()
+
+LITELLM_URL = (
+    "https://raw.githubusercontent.com/BerriAI/litellm/main/"
+    "model_prices_and_context_window.json"
+)
 
 
 class ModelCommand(Command):
@@ -28,8 +36,11 @@ class ModelCommand(Command):
 
         # Cache for model information
         self.cached_models = []
-        self.cached_model_numbers = {}  # Map of numbers to model names
-        self.last_model_fetch = datetime.datetime.now() - datetime.timedelta(minutes=10)
+        # Map of numbers to model names
+        self.cached_model_numbers = {}
+        self.last_model_fetch = (
+            datetime.datetime.now() - datetime.timedelta(minutes=10)
+        )
 
     def handle(self, args: Optional[List[str]] = None) -> bool:
         """Handle the model command.
@@ -42,48 +53,92 @@ class ModelCommand(Command):
         """
         return self.handle_model_command(args)
 
+    # pylint: disable=too-many-locals,too-many-branches,too-many-statements
     def handle_model_command(self, args: List[str]) -> bool:
         """Change the model used by CAI.
 
         Args:
-            args: List containing the model name to use or a number to select from the list
+            args: List containing the model name to use or a number to select
+                from the list
 
         Returns:
             bool: True if the model was changed successfully
         """
         # Define model categories and their models for easy reference
+        # pylint: disable=invalid-name
         MODEL_CATEGORIES = {
             "Claude 3.7": [
-                {"name": "claude-3-7-sonnet-20250219",
-                 "description": "Best model for complex reasoning and creative tasks"}
+                {
+                    "name": "claude-3-7-sonnet-20250219",
+                    "description": (
+                        "Best model for complex reasoning and creative tasks"
+                    )
+                }
             ],
             "Claude 3.5": [
-                {"name": "claude-3-5-sonnet-20240620",
-                 "description": "Excellent balance of performance and efficiency"},
-                {"name": "claude-3-5-sonnet-20241022",
-                 "description": "Latest Claude 3.5 model with improved capabilities"}
+                {
+                    "name": "claude-3-5-sonnet-20240620",
+                    "description": (
+                        "Excellent balance of performance and efficiency"
+                    )
+                },
+                {
+                    "name": "claude-3-5-sonnet-20241022",
+                    "description": (
+                        "Latest Claude 3.5 model with improved capabilities"
+                    )
+                }
             ],
             "Claude 3": [
-                {"name": "claude-3-opus-20240229",
-                 "description": "Powerful Claude 3 model for complex tasks"},
-                {"name": "claude-3-sonnet-20240229",
-                 "description": "Balanced performance and speed"},
-                {"name": "claude-3-haiku-20240307",
-                 "description": "Fast and efficient model"}
+                {
+                    "name": "claude-3-opus-20240229",
+                    "description": "Powerful Claude 3 model for complex tasks"
+                },
+                {
+                    "name": "claude-3-sonnet-20240229",
+                    "description": "Balanced performance and speed"
+                },
+                {
+                    "name": "claude-3-haiku-20240307",
+                    "description": "Fast and efficient model"
+                }
             ],
             "OpenAI O-series": [
-                {"name": "o1", "description": "Excellent for mathematical reasoning and problem-solving"},
-                {"name": "o1-mini",
-                 "description": "Smaller O1 model with good math capabilities"},
-                {"name": "o3-mini", "description": "Latest mini model in the O-series"},
-                {"name": "gpt-4o",
-                 "description": "Latest GPT-4 model with improved capabilities"},
-                {"name": "gpt-4o-audio-preview",
-                 "description": "GPT-4o with audio capabilities"},
-                {"name": "gpt-4o-audio-preview-2024-12-17",
-                 "description": "Updated GPT-4o with audio capabilities"},
-                {"name": "gpt-4o-audio-preview-2024-10-01",
-                 "description": "Previous GPT-4o with audio capabilities"}
+                {
+                    "name": "o1",
+                    "description": (
+                        "Excellent for mathematical reasoning and "
+                        "problem-solving"
+                    )
+                },
+                {
+                    "name": "o1-mini",
+                    "description": (
+                        "Smaller O1 model with good math capabilities"
+                    )
+                },
+                {
+                    "name": "o3-mini",
+                    "description": "Latest mini model in the O-series"
+                },
+                {
+                    "name": "gpt-4o",
+                    "description": (
+                        "Latest GPT-4 model with improved capabilities"
+                    )
+                },
+                {
+                    "name": "gpt-4o-audio-preview",
+                    "description": "GPT-4o with audio capabilities"
+                },
+                {
+                    "name": "gpt-4o-audio-preview-2024-12-17",
+                    "description": "Updated GPT-4o with audio capabilities"
+                },
+                {
+                    "name": "gpt-4o-audio-preview-2024-10-01",
+                    "description": "Previous GPT-4o with audio capabilities"
+                }
             ],
             "OpenAI GPT-4": [
                 {"name": "gpt-4", "description": "Original GPT-4 model"},
@@ -91,44 +146,64 @@ class ModelCommand(Command):
                  "description": "Fast and powerful GPT-4 model"}
             ],
             "OpenAI GPT-4.5": [
-                {"name": "gpt-4.5-preview",
-                 "description": "Latest non reasoning openai model with improved capabilities"},
-                {"name": "gpt-4.5-preview-2025-02-27",
-                 "description": "Specific version of GPT-4.5 preview"}
+                {
+                    "name": "gpt-4.5-preview",
+                    "description": (
+                        "Latest non reasoning openai model with "
+                        "improved capabilities"
+                    )
+                },
+                {
+                    "name": "gpt-4.5-preview-2025-02-27",
+                    "description": "Specific version of GPT-4.5 preview"
+                }
             ],
             "OpenAI GPT-3.5": [
-                {"name": "gpt-3.5-turbo",
-                 "description": "Fast and cost-effective model"}
+                {
+                    "name": "gpt-3.5-turbo",
+                    "description": "Fast and cost-effective model"
+                }
             ],
             "DeepSeek": [
-                {"name": "deepseek-v3",
-                 "description": "DeepSeek's latest general-purpose model"},
-                {"name": "deepseek-r1",
-                 "description": "DeepSeek's specialized reasoning model"}
+                {
+                    "name": "deepseek-v3",
+                    "description": "DeepSeek's latest general-purpose model"
+                },
+                {
+                    "name": "deepseek-r1",
+                    "description": "DeepSeek's specialized reasoning model"
+                }
             ]
         }
 
         # Fetch model pricing data from LiteLLM GitHub repository
         model_pricing_data = {}
         try:
-            response = requests.get(
-                "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json",
-                timeout=2
-            )
+            response = requests.get(LITELLM_URL, timeout=2)
             if response.status_code == 200:
                 model_pricing_data = response.json()
 
-                # Add DeepSeek models with their pricing if not already in the
-                # data
-                if "deepseek/deepseek-v3" in model_pricing_data and "deepseek-v3" not in model_pricing_data:
-                    model_pricing_data["deepseek-v3"] = model_pricing_data["deepseek/deepseek-v3"]
-                if "deepseek/deepseek-r1" in model_pricing_data and "deepseek-r1" not in model_pricing_data:
-                    model_pricing_data["deepseek-r1"] = model_pricing_data["deepseek/deepseek-r1"]
+                # Add DeepSeek models with their pricing if not in data
+                deepseek_v3_path = "deepseek/deepseek-v3"
+                deepseek_r1_path = "deepseek/deepseek-r1"
+
+                if (deepseek_v3_path in model_pricing_data and
+                        "deepseek-v3" not in model_pricing_data):
+                    model_pricing_data["deepseek-v3"] = (
+                        model_pricing_data[deepseek_v3_path]
+                    )
+                if (deepseek_r1_path in model_pricing_data and
+                        "deepseek-r1" not in model_pricing_data):
+                    model_pricing_data["deepseek-r1"] = (
+                        model_pricing_data[deepseek_r1_path]
+                    )
         except Exception:  # pylint: disable=broad-except
             console.print(
-                "[yellow]Warning: Could not fetch model pricing data[/yellow]")
+                "[yellow]Warning: Could not fetch model pricing data[/yellow]"
+            )
 
         # Create a flat list of all models for numeric selection
+        # pylint: disable=invalid-name
         ALL_MODELS = []
         for category, models in MODEL_CATEGORIES.items():
             for model in models:
@@ -138,14 +213,21 @@ class ModelCommand(Command):
                 output_cost = pricing_info.get("output_cost_per_token", None)
 
                 # Convert to dollars per million tokens if values exist
-                input_cost_per_million = input_cost * 1000000 if input_cost is not None else None
-                output_cost_per_million = output_cost * \
-                    1000000 if output_cost is not None else None
+                input_cost_per_million = None
+                output_cost_per_million = None
+
+                if input_cost is not None:
+                    input_cost_per_million = input_cost * 1000000
+                if output_cost is not None:
+                    output_cost_per_million = output_cost * 1000000
 
                 ALL_MODELS.append({
                     "name": model["name"],
-                    "provider": "Anthropic" if "claude" in model["name"] else
-                    "DeepSeek" if "deepseek" in model["name"] else "OpenAI",
+                    "provider": (
+                        "Anthropic" if "claude" in model["name"]
+                        else "DeepSeek" if "deepseek" in model["name"]
+                        else "OpenAI"
+                    ),
                     "category": category,
                     "description": model["description"],
                     "input_cost": input_cost_per_million,
@@ -155,16 +237,20 @@ class ModelCommand(Command):
         # Update cached models
         self.cached_models = [model["name"] for model in ALL_MODELS]
         self.cached_model_numbers = {
-            str(i): model["name"] for i,
-            model in enumerate(
-                ALL_MODELS,
-                1)}
+            str(i): model["name"]
+            for i, model in enumerate(ALL_MODELS, 1)
+        }
 
-        if not args:
+        if not args:  # pylint: disable=too-many-nested-blocks
             # Display current model
             model_info = os.getenv("CAI_MODEL", "Unknown")
-            console.print(Panel(f"Current model: [bold green]{model_info}[/bold green]",
-                                border_style="green", title="Active Model"))
+            console.print(
+                Panel(
+                    f"Current model: [bold green]{model_info}[/bold green]",
+                    border_style="green",
+                    title="Active Model"
+                )
+            )
 
             # Show available models in a table
             model_table = Table(
@@ -188,10 +274,14 @@ class ModelCommand(Command):
             # Add all predefined models with numbers
             for i, model in enumerate(ALL_MODELS, 1):
                 # Format pricing info as dollars per million tokens
-                input_cost_str = f"${
-                    model['input_cost']:.2f}" if model['input_cost'] is not None else "Unknown"
-                output_cost_str = f"${
-                    model['output_cost']:.2f}" if model['output_cost'] is not None else "Unknown"
+                input_cost_str = (
+                    f"${model['input_cost']:.2f}"
+                    if model['input_cost'] is not None else "Unknown"
+                )
+                output_cost_str = (
+                    f"${model['output_cost']:.2f}"
+                    if model['output_cost'] is not None else "Unknown"
+                )
 
                 model_table.add_row(
                     str(i),
@@ -204,11 +294,15 @@ class ModelCommand(Command):
                 )
 
             # Ollama models (if available)
+            # pylint: disable=too-many-nested-blocks
             try:
                 # Get Ollama models with a short timeout to prevent hanging
                 api_base = get_ollama_api_base()
+                ollama_base = api_base.replace('/v1', '')
                 response = requests.get(
-                    f"{api_base.replace('/v1', '')}/api/tags", timeout=1)
+                    f"{ollama_base}/api/tags",
+                    timeout=1
+                )
 
                 if response.status_code == 200:
                     data = response.json()
@@ -228,14 +322,18 @@ class ModelCommand(Command):
                         # Convert size to human-readable format
                         size_str = ""
                         if model_size:
+                            size_mb = model_size / (1024 * 1024)
                             if model_size < 1024 * 1024 * 1024:
-                                size_str = f"{model_size /
-                                              (1024 * 1024):.1f} MB"
+                                size_str = f"{size_mb:.1f} MB"
                             else:
-                                size_str = f"{model_size /
-                                              (1024 * 1024 * 1024):.1f} GB"
+                                size_gb = size_mb / 1024
+                                size_str = f"{size_gb:.1f} GB"
 
                         # Ollama models are free to use locally
+                        model_description = "Local model"
+                        if size_str:
+                            model_description += f" ({size_str})"
+
                         model_table.add_row(
                             str(i),
                             model_name,
@@ -243,8 +341,7 @@ class ModelCommand(Command):
                             "Local",
                             "Free",
                             "Free",
-                            f"Local model{
-                                f' ({size_str})' if size_str else ''}"
+                            model_description
                         )
 
                         # Add to cached models for numeric selection
@@ -281,11 +378,17 @@ class ModelCommand(Command):
             # Usage instructions
             console.print("\n[cyan]Usage:[/cyan]")
             console.print(
-                "  [bold]/model <model_name>[/bold] - Select by name (e.g. [bold]/model claude-3-7-sonnet-20250219[/bold])")
+                "  [bold]/model <model_name>[/bold] - Select by name (e.g. "
+                "[bold]/model claude-3-7-sonnet-20250219[/bold])"
+            )
             console.print(
-                "  [bold]/model <number>[/bold]     - Select by number (e.g. [bold]/model 1[/bold] for first model in list)")
+                "  [bold]/model <number>[/bold]     - Select by number (e.g. "
+                "[bold]/model 1[/bold] for first model in list)"
+            )
             console.print(
-                "  [bold]/model-show[/bold]         - Show all available models from LiteLLM repository")
+                "  [bold]/model-show[/bold]         - Show all available "
+                "models from LiteLLM repository"
+            )
             return True
 
         model_arg = args[0]
@@ -296,8 +399,8 @@ class ModelCommand(Command):
             if 0 <= model_index < len(self.cached_models):
                 model_name = self.cached_models[model_index]
             else:
-                # Si el número está fuera de rango, usamos el número
-                # directamente como nombre del modelo
+                # If the number is out of range, we use the number
+                # directly as the model name
                 model_name = model_arg
         else:
             model_name = model_arg
@@ -305,12 +408,19 @@ class ModelCommand(Command):
         # Set the model in environment variable
         os.environ["CAI_MODEL"] = model_name
 
-        console.print(Panel(
+        # Display model change notification
+        change_message = (
             f"Model changed to: [bold green]{model_name}[/bold green]\n"
-            "[yellow]Note: This will take effect on the next agent interaction[/yellow]",
-            border_style="green",
-            title="Model Changed"
-        ))
+            "[yellow]Note: This will take effect on the next agent "
+            "interaction[/yellow]"
+        )
+        console.print(
+            Panel(
+                change_message,
+                border_style="green",
+                title="Model Changed"
+            )
+        )
         return True
 
 
@@ -325,7 +435,7 @@ class ModelShowCommand(Command):
             aliases=["/mod-show"]
         )
 
-    def handle(self, args: Optional[List[str]] = None) -> bool:
+    def handle(self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=too-many-locals,too-many-branches,too-many-statements,line-too-long # noqa: E501
         """Handle the model-show command.
 
         Args:
@@ -349,16 +459,17 @@ class ModelShowCommand(Command):
 
         # Fetch model pricing data from LiteLLM GitHub repository
         try:
-            with console.status("[bold blue]Fetching model data from GitHub...[/bold blue]"):
-                response = requests.get(
-                    "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json",
-                    timeout=5
-                )
+            with console.status(
+                "[bold blue]Fetching model data...[/bold blue]"
+            ):
+                response = requests.get(LITELLM_URL, timeout=5)
 
                 if response.status_code != 200:
-                    console.print(
-                        f"[red]Error fetching model data: HTTP {
-                            response.status_code}[/red]")
+                    error_msg = (
+                        f"[red]Error fetching model data: "
+                        f"HTTP {response.status_code}[/red]"
+                    )
+                    console.print(error_msg)
                     return True
 
                 model_data = response.json()
@@ -373,7 +484,8 @@ class ModelShowCommand(Command):
             model_table = Table(
                 title=title,
                 show_header=True,
-                header_style="bold yellow")
+                header_style="bold yellow"
+            )
             model_table.add_column("#", style="bold white", justify="right")
             model_table.add_column("Model", style="cyan")
             model_table.add_column("Provider", style="magenta")
@@ -397,10 +509,12 @@ class ModelShowCommand(Command):
             for model_name, model_info in sorted(model_data.items()):
                 total_models += 1
 
-                # Skip if showing only supported models and this one doesn't
-                # support function calling
-                if show_only_supported and not model_info.get(
-                        "supports_function_calling", False):
+                # Skip if showing only supported models and no function calling
+                supports_functions = model_info.get(
+                    "supports_function_calling",
+                    False
+                )
+                if show_only_supported and not supports_functions:
                     continue
 
                 # Skip if search term provided and not in model name
@@ -416,8 +530,7 @@ class ModelShowCommand(Command):
                 elif provider == "openai":
                     provider = "OpenAI"
                 elif "/" in model_name:
-                    # Extract provider from model name if in format
-                    # provider/model
+                    # Extract provider from model name
                     provider = model_name.split("/")[0].capitalize()
 
                 # Get max tokens
@@ -428,14 +541,23 @@ class ModelShowCommand(Command):
                 output_cost = model_info.get("output_cost_per_token", 0)
 
                 # Convert to dollars per million tokens
-                input_cost_per_million = input_cost * 1000000 if input_cost else 0
-                output_cost_per_million = output_cost * 1000000 if output_cost else 0
+                input_cost_per_million = (
+                    input_cost * 1000000 if input_cost else 0
+                )
+                output_cost_per_million = (
+                    output_cost * 1000000 if output_cost else 0
+                )
 
                 # Format pricing info
-                input_cost_str = f"${
-                    input_cost_per_million:.4f}" if input_cost_per_million else "Free"
-                output_cost_str = f"${
-                    output_cost_per_million:.4f}" if output_cost_per_million else "Free"
+                if input_cost_per_million:
+                    input_cost_str = f"${input_cost_per_million:.4f}"
+                else:
+                    input_cost_str = "Free"
+
+                if output_cost_per_million:
+                    output_cost_str = f"${output_cost_per_million:.4f}"
+                else:
+                    output_cost_str = "Free"
 
                 # Get features
                 features = []
@@ -445,16 +567,17 @@ class ModelShowCommand(Command):
                     features.append("Function calling")
                 if model_info.get("supports_parallel_function_calling"):
                     features.append("Parallel functions")
-                if model_info.get("supports_audio_input") or model_info.get(
-                        "supports_audio_output"):
+                if (model_info.get("supports_audio_input") or
+                        model_info.get("supports_audio_output")):
                     features.append("Audio")
                 if model_info.get("mode") == "embedding":
                     features.append("Embeddings")
                 if model_info.get("mode") == "image_generation":
                     features.append("Image generation")
 
-                features_str = ", ".join(
-                    features) if features else "Text generation"
+                features_str = (
+                    ", ".join(features) if features else "Text generation"
+                )
 
                 # Add row to table
                 model_table.add_row(
@@ -471,10 +594,10 @@ class ModelShowCommand(Command):
 
             # Now add Ollama models if available
             try:
-                # Get Ollama models with a short timeout to prevent hanging
+                # Get Ollama models with a short timeout
                 api_base = get_ollama_api_base()
-                ollama_response = requests.get(
-                    f"{api_base.replace('/v1', '')}/api/tags", timeout=1)
+                api_tags = f"{api_base.replace('/v1', '')}/api/tags"
+                ollama_response = requests.get(api_tags, timeout=1)
 
                 if ollama_response.status_code == 200:
                     ollama_data = ollama_response.json()
@@ -491,7 +614,8 @@ class ModelShowCommand(Command):
                         model_name = model.get('name', '')
 
                         # Skip if search term provided and not in model name
-                        if search_term and search_term not in model_name.lower():
+                        if (search_term and
+                                search_term not in model_name.lower()):
                             continue
 
                         total_models += 1
@@ -501,14 +625,18 @@ class ModelShowCommand(Command):
                         # Convert size to human-readable format
                         size_str = ""
                         if model_size:
+                            size_mb = model_size / (1024 * 1024)
                             if model_size < 1024 * 1024 * 1024:
-                                size_str = f"{model_size /
-                                              (1024 * 1024):.1f} MB"
+                                size_str = f"{size_mb:.1f} MB"
                             else:
-                                size_str = f"{model_size /
-                                              (1024 * 1024 * 1024):.1f} GB"
+                                size_gb = size_mb / 1024
+                                size_str = f"{size_gb:.1f} GB"
 
                         # Add row to table
+                        model_description = "Local model"
+                        if size_str:
+                            model_description += f" ({size_str})"
+
                         model_table.add_row(
                             str(model_index),
                             model_name,
@@ -516,20 +644,27 @@ class ModelShowCommand(Command):
                             "Varies",
                             "Free",
                             "Free",
-                            f"Local model{
-                                f' ({size_str})' if size_str else ''}"
+                            model_description
                         )
 
                         model_index += 1
             except Exception:  # pylint: disable=broad-except
-                pass
+                # Silently fail if Ollama is not available
+                # This is acceptable as Ollama is optional and we don't want to
+                # disrupt the user experience if it's not running
+                console.print(
+                    "[dim]Ollama models not available[/dim]",
+                    style="dim")
 
             # Display the table
             console.print(model_table)
 
             # Display summary
-            summary_text = f"\n[cyan]Showing {
-                displayed_models} of {total_models} models"
+            displayed_str = str(displayed_models)
+            total_str = str(total_models)
+            summary_text = (
+                f"\n[cyan]Showing {displayed_str} of {total_str} models"
+            )
             if show_only_supported:
                 summary_text += " with function calling support"
             if search_term:
@@ -540,21 +675,30 @@ class ModelShowCommand(Command):
             # Usage instructions
             console.print("\n[cyan]Usage:[/cyan]")
             console.print(
-                "  [bold]/model-show[/bold]                - Show all available models")
+                "  [bold]/model-show[/bold]                - Show all "
+                "available models")
             console.print(
-                "  [bold]/model-show supported[/bold]      - Show only models with function calling")
+                "  [bold]/model-show supported[/bold]      - Show only "
+                "models with function calling")
             console.print(
-                "  [bold]/model-show <search>[/bold]       - Filter models by search term")
+                "  [bold]/model-show <search>[/bold]       - Filter "
+                "models by search term")
             console.print(
-                "  [bold]/model-show supported <search>[/bold] - Filter supported models by search term")
+                "  [bold]/model-show supported <search>[/bold] - Filter "
+                "supported models by search term")
             console.print(
-                "  [bold]/model <model_name>[/bold]        - Select a model to use")
+                "  [bold]/model <model_name>[/bold]        - Select a "
+                "model to use")
             console.print(
-                "  [bold]/model <number>[/bold]            - Select a model by its number")
+                "  [bold]/model <number>[/bold]            - Select a "
+                "model by its number")
 
             # Data source attribution
-            console.print(
-                "\n[dim]Data source: https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json[/dim]")
+            data_source = (
+                "https://github.com/BerriAI/litellm/blob/main/"
+                "model_prices_and_context_window.json"
+            )
+            console.print(f"\n[dim]Data source: {data_source}[/dim]")
 
         except Exception as e:  # pylint: disable=broad-except
             console.print(f"[red]Error fetching model data: {str(e)}[/red]")

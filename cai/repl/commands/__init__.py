@@ -1,9 +1,16 @@
 """
 Commands module for CAI REPL.
-This module exports all commands available in the CAI REPL.
+This module exports all commands available
+in the CAI REPL.
 """
-from cai.repl.commands.completer import FuzzyCommandCompleter
-from typing import Dict, List, Optional
+from typing import (
+    Dict,
+    List,
+)
+
+from cai.repl.commands.completer import (
+    FuzzyCommandCompleter
+)
 
 # Import base command structure
 from cai.repl.commands.base import (
@@ -17,7 +24,7 @@ from cai.repl.commands.base import (
 
 # Import all command modules
 # These imports will register the commands with the registry
-from cai.repl.commands import (
+from cai.repl.commands import (  # pylint: disable=import-error,unused-import,line-too-long,redefined-builtin # noqa: E501,F401
     memory,
     help,
     graph,

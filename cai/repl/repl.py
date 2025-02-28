@@ -39,7 +39,7 @@ from cai.repl.ui.logging import setup_session_logging
 from cai.repl.ui.prompt import get_user_input
 
 if is_caiextensions_platform_available():
-    from caiextensions.platform.base import (  # pylint: disable=ungrouped-imports,line-too-long,import-error # noqa: E501
+    from caiextensions.platform.base import (  # pylint: disable=ungrouped-imports,line-too-long,import-error,unused-import # noqa: E501,F401
         platform_manager
     )
 
@@ -53,7 +53,7 @@ def handle_command(command, args=None):
     return commands_handle_command(command, args)
 
 
-def run_demo_loop(
+def run_demo_loop(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements # noqa: E501
     starting_agent,
     context_variables=None,
     stream=False,
@@ -138,7 +138,8 @@ def run_demo_loop(
             if ctf and len(messages) == 1:
                 pass
             else:
-                # Create a variable to hold the current text for command shadow
+                # Create a variable to hold the current text for command
+                # shadow
                 current_text = ['']
 
                 # Create key bindings
@@ -184,7 +185,7 @@ def run_demo_loop(
                 transient=True,
             ) as progress:
 
-                task = progress.add_task(   # noqa: F841
+                task = progress.add_task(   # noqa: F841 #pylint: disable=unused-variable # noqa: E501
                     description="Thinking",
                     total=None)
 
@@ -220,21 +221,24 @@ def run_demo_loop(
                     progress.add_task(
                         description="Generating report...", total=None)
 
-                    from caiextensions.report.common import create_report
+                    from caiextensions.report.common import create_report  # pylint: disable=import-error,unused-import,line-too-long,import-outside-toplevel,no-name-in-module # noqa: E501
                     report_type = os.environ.get("CAI_REPORT", "ctf").lower()
 
                     if report_type == "pentesting":
-                        from caiextensions.report.pentesting.pentesting_agent import reporter_agent
+                        from caiextensions.report.pentesting.pentesting_agent import reporter_agent  # pylint: disable=import-error,unused-import,line-too-long,import-outside-toplevel,no-name-in-module # noqa: E501
                         template = str(
-                            files('caiextensions.report.pentesting') / 'template.md')
+                            files('caiextensions.report.pentesting') /
+                            'template.md')
                     elif report_type == "nis2":
-                        from caiextensions.report.nis2.nis2_report_agent import reporter_agent
+                        from caiextensions.report.nis2.nis2_report_agent import reporter_agent  # pylint: disable=import-error,unused-import,line-too-long,import-outside-toplevel,no-name-in-module # noqa: E501
                         template = str(
-                            files('caiextensions.report.nis2') / 'template.md')
+                            files('caiextensions.report.nis2') /
+                            'template.md')
                     else:
-                        from caiextensions.report.ctf.ctf_reporter_agent import reporter_agent
+                        from caiextensions.report.ctf.ctf_reporter_agent import reporter_agent  # pylint: disable=import-error,unused-import,line-too-long,import-outside-toplevel,no-name-in-module # noqa: E501
                         template = str(
-                            files('caiextensions.report.ctf') / 'template.md')
+                            files('caiextensions.report.ctf') /
+                            'template.md')
 
                     client = CAI(
                         state_agent=state_agent,

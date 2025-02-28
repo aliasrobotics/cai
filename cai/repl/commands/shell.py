@@ -5,8 +5,11 @@ This module provides commands for executing shell commands.
 import os
 import signal
 import subprocess  # nosec B404
-from typing import List, Optional
-from rich.console import Console
+from typing import (
+    List,
+    Optional
+)
+from rich.console import Console  # pylint: disable=import-error
 
 from cai.repl.commands.base import Command, register_command
 
@@ -60,7 +63,7 @@ class ShellCommand(Command):
 
         try:
             # Set temporary handler for SIGINT that only affects shell command
-            def shell_sigint_handler(sig, frame):
+            def shell_sigint_handler(sig, frame):  # pylint: disable=unused-argument
                 # Just allow KeyboardInterrupt to propagate
                 signal.signal(signal.SIGINT, original_sigint_handler)
                 raise KeyboardInterrupt
@@ -81,49 +84,50 @@ class ShellCommand(Command):
                 # For async commands, use os.system to allow terminal
                 # interaction
                 console.print(
-                    "[yellow]Running in async mode (Ctrl+C to return to REPL)[/yellow]")
+                    "[yellow]Running in async mode "
+                    "(Ctrl+C to return to REPL)[/yellow]")
                 os.system(shell_command)  # nosec B605
                 console.print(
                     "[green]Async command completed or detached[/green]")
                 return True
+
+            # For regular commands, use the standard approach
+            process = subprocess.Popen(  # nosec B602 # pylint: disable=consider-using-with # noqa: E501
+                shell_command,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
+                bufsize=1
+            )
+
+            # Show output in real time
+            for line in iter(process.stdout.readline, ''):
+                print(line, end='')
+
+            # Wait for process to finish
+            process.wait()
+
+            if process.returncode == 0:
+                console.print(
+                    "[green]Command completed successfully[/green]")
             else:
-                # For regular commands, use the standard approach
-                process = subprocess.Popen(  # nosec B602
-                    shell_command,
-                    shell=True,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    universal_newlines=True,
-                    bufsize=1
-                )
+                console.print(
+                    f"[yellow]Command exited with code {
+                        process.returncode}"
+                    f"[/yellow]")
+            return True
 
-                # Show output in real time
-                for line in iter(process.stdout.readline, ''):
-                    print(line, end='')
-
-                # Wait for process to finish
-                process.wait()
-
-                if process.returncode == 0:
-                    console.print(
-                        "[green]Command completed successfully[/green]")
-                else:
-                    console.print(
-                        f"[yellow]Command exited with code {
-                            process.returncode}"
-                        f"[/yellow]")
-
-                return True
         except KeyboardInterrupt:
             # Handle CTRL+C only for this command
             try:
                 if not is_async:
                     process.terminate()
                 console.print("\n[yellow]Command interrupted by user[/yellow]")
-            except Exception:  # nosec B110
+            except Exception:  # pylint: disable=broad-except # nosec
                 pass
             return True
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             console.print(f"[red]Error executing command: {str(e)}[/red]")
             return False
         finally:

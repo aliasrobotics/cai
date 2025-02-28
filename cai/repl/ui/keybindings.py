@@ -2,6 +2,8 @@
 Module for CAI REPL key bindings.
 """
 import os
+import subprocess  # nosec B404 - Required for screen clearing
+# pylint: disable=import-error
 from prompt_toolkit.key_binding import KeyBindings
 
 
@@ -18,9 +20,17 @@ def create_key_bindings(current_text):
     kb = KeyBindings()
 
     @kb.add('c-l')
-    def clear_screen(event):
+    def _(event):  # pylint: disable=unused-argument
         """Clear the screen."""
-        os.system('cls' if os.name == 'nt' else 'clear')
+        # Replace os.system with subprocess.run to avoid shell injection
+        if os.name == 'nt':
+            # Using fixed commands with shell=False is safe
+            # nosec B603 B607
+            subprocess.run(['cls'], shell=False, check=False)
+        else:
+            # Using fixed commands with shell=False is safe
+            # nosec B603 B607
+            subprocess.run(['clear'], shell=False, check=False)
 
     @kb.add('tab')
     def handle_tab(event):
@@ -39,6 +49,7 @@ def create_key_bindings(current_text):
         current_text[0] = text
 
         # Check if we have a command shadow
+        # pylint: disable=import-outside-toplevel
         from cai.repl.commands import FuzzyCommandCompleter
         shadow = FuzzyCommandCompleter().get_command_shadow(text)
         if shadow and shadow.startswith(text):

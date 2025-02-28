@@ -2,9 +2,12 @@
 Platform command for CAI REPL.
 This module provides commands for interacting with platform-specific features.
 """
-from typing import List, Optional
-from rich.console import Console
-from rich.panel import Panel
+from typing import (
+    List,
+    Optional
+)
+from rich.console import Console  # pylint: disable=import-error
+from rich.panel import Panel  # pylint: disable=import-error
 
 from cai import is_caiextensions_platform_available
 from cai.repl.commands.base import Command, register_command
@@ -25,7 +28,7 @@ class PlatformCommand(Command):
 
         # Add subcommands dynamically based on available platforms
         if is_caiextensions_platform_available():
-            from caiextensions.platform.base import platform_manager
+            from caiextensions.platform.base import platform_manager  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
 
             # Add list subcommand
             self.add_subcommand(
@@ -39,9 +42,13 @@ class PlatformCommand(Command):
                 platform_cmds = platform_manager.get_platform(
                     platform).get_commands()
                 for cmd in platform_cmds:
-                    # We don't actually add these as subcommands, as they're handled dynamically
-                    # But we could if we wanted to
-                    pass
+                    # Add platform-specific commands as subcommands
+                    self.add_subcommand(
+                        f"{platform}:{cmd}",
+                        f"Execute {cmd} command on {platform} platform",
+                        lambda args, p=platform, c=cmd:
+                            self.handle_platform_command([p, c] + (args or []))
+                    )
 
     def handle(self, args: Optional[List[str]] = None) -> bool:
         """Handle the platform command.
@@ -58,13 +65,13 @@ class PlatformCommand(Command):
 
         return self.handle_platform_command(args)
 
-    def handle_list(self, args: Optional[List[str]] = None) -> bool:
+    def handle_list(self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
         """Handle /platform list command."""
         if not is_caiextensions_platform_available():
             console.print("[red]Platform extensions are not available[/red]")
             return False
 
-        from caiextensions.platform.base import platform_manager
+        from caiextensions.platform.base import platform_manager  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
         platforms = platform_manager.list_platforms()
 
         console.print(Panel(
@@ -81,7 +88,7 @@ class PlatformCommand(Command):
             console.print("[red]Platform extensions are not available[/red]")
             return False
 
-        from caiextensions.platform.base import platform_manager
+        from caiextensions.platform.base import platform_manager  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
 
         if not args:
             # Show available platforms
