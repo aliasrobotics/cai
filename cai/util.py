@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 """
 This module contains utility functions for the CAI library.
 """
