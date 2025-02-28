@@ -20,22 +20,7 @@ def generic_linux_command(
     session_id: Optional[str] = None
 ) -> str:
     """
-    Execute Linux commands with support for interactive sessions.
-
-    Two modes:
-    1. Regular command execution:
-       - For normal Linux commands
-       - Example: generic_linux_command("ls", "-la")
-
-    2. Session management:
-       - For interactive commands(ssh)
-       - Workflow:
-         - Start: generic_linux_command("ssh", "user@host")
-           → Returns session ID
-         - List: generic_linux_command("session", "list")
-         - Get output: generic_linux_command("session", "output <id>")
-         - Send input: Use session_id parameter
-         - End: generic_linux_command("session", "kill <id>")
+    A simple tool to do a linux command.
 
     Args:
         command: The name of the command

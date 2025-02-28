@@ -1,7 +1,4 @@
-"""
-Basic agents Boot2Root CTF Tester and Thought Agent
-
-"""
+"""Basic CLI agents for CAI and CTFs"""
 import os
 from mako.template import Template  # pylint: disable=import-error
 from cai.types import Agent
