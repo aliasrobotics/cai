@@ -72,5 +72,13 @@ def generic_linux_command(command: str = "",
         async_commands = ['ssh', 'python -m http.server']
         async_mode = any(cmd in full_command for cmd in async_commands)
 
+    # NOTE: review this as it's a hack to get
+    # around the long delays with nc connections
+    if session_id:
+        timeout = 10
+    else:
+        timeout = 100
+
     return run_command(full_command, ctf=ctf,
-                       async_mode=async_mode, session_id=session_id)
+                       async_mode=async_mode, session_id=session_id,
+                       timeout=timeout)
