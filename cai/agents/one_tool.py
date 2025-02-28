@@ -1,3 +1,6 @@
+"""
+CTF Agent with one tool
+"""
 import os
 from cai.types import Agent
 from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa
@@ -17,15 +20,22 @@ ctf_agent_one_tool = Agent(
 
                     ## generic_linux_command usage
                     # 1. Regular command execution
-                    # 2. Shell Session Management: create and manage interactive shell sessions 
-                    # for commands like netcat, SSH, telnet.
+                    # 2. Shell Session Management: create and manage
+                    # interactive shell sessions for commands like netcat,
+                    # SSH, telnet.
 
-                    - To start a new session: Use `generic_linux_command` with commands like `ssh`
-                    - To list active sessions: `generic_linux_command("session", "list")`
-                    - To get output from a session: `generic_linux_command("session", "output <session_id>")`
-                    - To send input to a session: `generic_linux_command("<command>", "<args>", session_id="<session_id>")`
-                    - To terminate a session: `generic_linux_command("session", "kill <session_id>")`
-                    
+                    - To start a new session: Use `generic_linux_command` with
+                      commands like `ssh`
+                    - To list active sessions:
+                      `generic_linux_command("session", "list")`
+                    - To get output from a session:
+                      `generic_linux_command("session", "output <session_id>")`
+                    - To send input to a session:
+                      `generic_linux_command("<command>", "<args>",
+                      session_id="<session_id>")`
+                    - To terminate a session:
+                      `generic_linux_command("session", "kill <session_id>")`
+
                     """,
     functions=[
         generic_linux_command,

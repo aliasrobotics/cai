@@ -1,4 +1,6 @@
-
+"""
+Collection of basic agents
+"""
 
 import os
 from cai.types import Agent
@@ -20,10 +22,6 @@ from cai.tools.reconnaissance.crypto_tools import (
 )
 model = os.getenv('CAI_MODEL', "qwen2.5:14b")
 
-import os
-from cai import Agent
-from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa
-model = os.getenv('CAI_MODEL', "qwen2.5:14b")
 
 ctf_agent = Agent(
     model=model,
@@ -56,7 +54,6 @@ def transfer_to_ctf_agent(**kwargs):  # pylint: disable=W0613
     return ctf_agent
 
 
-
 network_agent = Agent(
     model=model,
     name="Network Specialist",
@@ -76,6 +73,7 @@ network_agent = Agent(
         6. DO NOT SEND THE SAME COMMAND OVER AND OVER"""),
     functions=[netcat, nmap],
 )
+
 
 def transfer_to_network_agent(**kwargs):  # pylint: disable=W0613
     """ Transfer to network agent.
@@ -128,10 +126,8 @@ listing_agent = Agent(
         generic_linux_command],
 )
 
+
 def transfer_to_listing_agent(**kwargs):  # pylint: disable=W0613
     """ Transfer to listing agent.
     Accepts any keyword arguments but ignores them."""
     return listing_agent
-
-
-

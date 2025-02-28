@@ -1,14 +1,18 @@
 """
 This is used to create and execute a script in python
 """
-from cai.tools.common import run_command  
+
+import re
+import sys
+from io import StringIO
+import ast
 
 
-def scripting_tool(command: str = "", args: str = "", ctf=None) -> str:
+def scripting_tool(command: str = "", args: str = "") -> str:
     """Scripting tool for executing Python code directly in memory.
     IMPORTANT: Use with caution - executes Python code directly.
     IMPORTANT: Remember to import all the modules and libraries you need.
-    
+
     Args:
         command: Python code, with or without markdown format. Can handle:
             - Raw Python code
@@ -16,18 +20,14 @@ def scripting_tool(command: str = "", args: str = "", ctf=None) -> str:
             - Code with leading/trailing whitespace
         args: Additional command line arguments
         ctf: CTF context object
-    
+
     Returns:
         str: Output from the executed Python code
-        
+
     Raises:
         ValueError: If the command is empty or invalid
         SecurityError: If potentially dangerous operations are detected
     """
-    import re
-    import sys
-    from io import StringIO
-    import ast
 
     if not command or not isinstance(command, str):
         raise ValueError("Command must be a non-empty string")
@@ -54,10 +54,12 @@ def scripting_tool(command: str = "", args: str = "", ctf=None) -> str:
     try:
         tree = ast.parse(script)
         for node in ast.walk(tree):
-            if isinstance(node, (ast.Import, ast.ImportFrom)): # Check for potentially dangerous operations
+            if isinstance(node, (ast.Import, ast.ImportFrom)
+                          ):  # Check for potentially dangerous operations
                 module = node.names[0].name.split('.')[0]
                 if module in ['os', 'sys', 'subprocess', 'shutil']:
-                    raise SecurityError(f"Importing potentially dangerous module: {module}")
+                    raise SecurityError(
+                        f"Importing potentially dangerous module: {module}")
     except SyntaxError as e:
         return f"Python syntax error: {str(e)}"
     except SecurityError as e:
@@ -72,16 +74,21 @@ def scripting_tool(command: str = "", args: str = "", ctf=None) -> str:
         local_vars = {}
         if args:
             local_vars['args'] = args
-            
+
         exec(script, {'__builtins__': __builtins__}, local_vars)
-        
+
         # Get the output
         output = redirected_output.getvalue()
         return output if output else "Code executed successfully (no output)"
     except Exception as e:
         return f"Error during execution: {str(e)}"
     finally:
-        sys.stdout = old_stdout # restore
+        sys.stdout = old_stdout  # restore
 
-class SecurityError(Exception): # to be filled
+
+class SecurityError(Exception):  # to be filled
+    """
+    TO-DO
+    """
+
     pass

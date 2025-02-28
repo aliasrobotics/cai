@@ -1,6 +1,9 @@
+"""
+Basic agents Boot2Root CTF Tester and Thought Agent
 
+"""
 import os
-from mako.template import Template
+from mako.template import Template  # pylint: disable=import-error
 from cai.types import Agent
 from cai.agents.mail import dns_smtp_agent
 from cai.tools.command_and_control.sshpass import (
@@ -10,6 +13,7 @@ from cai.tools.misc.reasoning import thought
 from cai.tools.reconnaissance.generic_linux_command import (
     generic_linux_command
 )
+
 
 def transfer_to_dns_agent():
     """
@@ -78,4 +82,3 @@ cli_agent = Agent(
 
 cli_agent.functions.append(transfer_to_dns_agent)
 dns_smtp_agent.functions.append(cli_agent_handoff)
-
