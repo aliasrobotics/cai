@@ -211,11 +211,11 @@ def terminate_session(session_id):
     return result
 
 
-def _run_ctf(ctf, command, stdout=False):
+def _run_ctf(ctf, command, stdout=False, timeout=100):
     try:
         # Ensure the command is executed in a shell that supports command
         # chaining
-        output = ctf.get_shell(command)
+        output = ctf.get_shell(command, timeout=timeout)
         # exploit_logger.log_ok()
 
         if stdout:
@@ -227,7 +227,7 @@ def _run_ctf(ctf, command, stdout=False):
         return f"Error executing CTF command: {str(e)}"
 
 
-def _run_local(command, stdout=False):
+def _run_local(command, stdout=False, timeout=100):
     try:
         # nosec B602 - shell=True is required for command chaining
         result = subprocess.run(
@@ -236,7 +236,7 @@ def _run_local(command, stdout=False):
             capture_output=True,
             text=True,
             check=False,
-            timeout=100)
+            timeout=timeout)
         output = result.stdout if result.stdout else result.stderr
         if stdout:
             print("\033[32m" + output + "\033[0m")
@@ -252,8 +252,9 @@ def _run_local(command, stdout=False):
         return error_msg
 
 
-def run_command(command, ctf=None, stdout=False,
-                async_mode=False, session_id=None):
+def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arguments # noqa: E501
+                async_mode=False, session_id=None,
+                timeout=100):
     """
     Run command either in CTF container or on the local attacker machine
 
@@ -291,5 +292,5 @@ def run_command(command, ctf=None, stdout=False,
 
     # Otherwise, run command normally
     if ctf:
-        return _run_ctf(ctf, command, stdout)
-    return _run_local(command, stdout)
+        return _run_ctf(ctf, command, stdout, timeout)
+    return _run_local(command, stdout, timeout)
