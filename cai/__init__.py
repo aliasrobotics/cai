@@ -38,6 +38,9 @@ if cai_agent == "one_tool":
         transfer_to_flag_discriminator
     )
     flag_discriminator.functions.append(transfer_to_ctf_agent_one_tool)
+elif cai_agent == "codeagent":
+    from cai.agents.codeagent import codeagent
+    cai_initial_agent = codeagent
 else:
     # stop and raise error
     raise ValueError(f"Invalid CAI agent type: {cai_agent}")

@@ -51,6 +51,7 @@ from .types import (
     Response,
     Result,
 )
+from cai.agents.codeagent import CodeAgent
 
 __CTX_VARS_NAME__ = "context_variables"
 litellm.suppress_debug_info = True
@@ -155,6 +156,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         model_override: str,
         stream: bool,
         debug: bool,
+        master_template: str = "system_master_template.md"
     ) -> ChatCompletionMessage:
         """
         Get a chat completion for the given agent, history,
@@ -163,7 +165,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         context_variables = defaultdict(str, context_variables)
 
         messages = [{"role": "system", "content": Template(  # nosec: B702
-            filename="cai/prompts/core/system_master_template.md").render(
+            filename=f"cai/prompts/core/{master_template}").render(
                 agent=agent,
                 ctf_instructions=history[0]["content"],
                 context_variables=context_variables)
@@ -196,7 +198,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             "stream": stream,
         }
 
-        if tools:
+        if tools and not isinstance(agent, CodeAgent):
             create_params["parallel_tool_calls"] = agent.parallel_tool_calls
             create_params["tools"] = tools
             create_params["tool_choice"] = agent.tool_choice

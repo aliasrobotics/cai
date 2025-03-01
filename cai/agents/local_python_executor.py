@@ -609,7 +609,8 @@ def evaluate_binop(
         custom_tools,
         authorized_imports)
 
-    # Determine the operation based on the type of the operator in the BinOp
+    # Determine the operation based on the type of
+    # the operator in the BinOp
     if isinstance(binop.op, ast.Add):
         return left_val + right_val
     elif isinstance(binop.op, ast.Sub):
@@ -783,7 +784,10 @@ def evaluate_call(
             func = ERRORS[func_name]
         else:
             raise InterpreterError(
-                f"It is not permitted to evaluate other functions than the provided tools or functions defined/imported in previous code (tried to execute {
+                f"It is not permitted to evaluate other functions "
+                f"than the provided tools or functions "
+                f"defined/imported in previous code "
+                f"(tried to execute {
                     call.func.id})."
             )
 
@@ -868,7 +872,8 @@ def evaluate_call(
                 and (func not in static_tools.values())
             ):
                 raise InterpreterError(
-                    f"Invoking a builtin function that has not been explicitly added as a tool is not allowed ({
+                    f"Invoking a builtin function that has "
+                    f"not been explicitly added as a tool is not allowed ({
                         func_name})."
                 )
             return func(*args, **kwargs)
@@ -896,7 +901,8 @@ def evaluate_subscript(
 
     if isinstance(value, str) and isinstance(index, str):
         raise InterpreterError(
-            "You're trying to subscript a string with a string index, which is impossible")
+            "You're trying to subscript a string with a string index, "
+            "which is impossible")
     if isinstance(value, pd.core.indexing._LocIndexer):
         parent_object = value.obj
         return parent_object.loc[index]
