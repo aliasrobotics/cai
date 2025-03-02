@@ -18,10 +18,15 @@ import re
 import json
 import copy
 import os
+import signal
+import time
+import platform
+import threading
 from typing import Any, Dict, List, Optional, Union, Callable
 
 from cai.types import Agent, Result
 from cai.state import State
+from wasabi import color  # pylint: disable=import-error
 
 # Import necessary components for code execution
 from cai.agents.local_python_executor import (
@@ -30,6 +35,7 @@ from cai.agents.local_python_executor import (
     truncate_content,
     fix_final_answer_code,
 )
+from cai.logger import exploit_logger
 
 
 class CodeAgentException(Exception):
@@ -50,6 +56,36 @@ class CodeParsingError(CodeAgentException):
 class CodeExecutionError(CodeAgentException):
     """Exception raised when there's an error executing code."""
     pass
+
+
+class CodeExecutionTimeoutError(CodeAgentException):
+    """Exception raised when code execution times out."""
+    pass
+
+
+# Define a timeout handler function
+def timeout_handler(signum, frame):
+    """Signal handler for timeouts."""
+    raise TimeoutError("Code execution timed out")
+
+
+# Define a class for thread-based timeout (for Windows compatibility)
+class ThreadWithResult(threading.Thread):
+    """Thread class that can return a result and catch exceptions."""
+    
+    def __init__(self, target, args=(), kwargs=None):
+        super().__init__()
+        self.target = target
+        self.args = args
+        self.kwargs = kwargs or {}
+        self.result = None
+        self.exception = None
+        
+    def run(self):
+        try:
+            self.result = self.target(*self.args, **self.kwargs)
+        except Exception as e:
+            self.exception = e
 
 
 def parse_code_blobs(text: str) -> str:
@@ -112,15 +148,19 @@ class CodeAgent(Agent):
     code, runs the code in a controlled environment, and 
     returns the results. It can use tools through code 
     execution and maintain state between interactions.
-    
-    Attributes:
-        additional_authorized_imports (List[str]): 
-            Additional imports allowed beyond base modules
-        state (Dict[str, Any]): 
-            State variables maintained across executions
-        python_executor (LocalPythonInterpreter): 
-            The Python code interpreter
+
+    NOTE: This class is implemented using exceptional techniques 
+    due to how Pydantic handles model inheritance and field 
+    initialization, which avoids using the 
+    `self.attribute = value` syntax and defining the pydantic 
+    model fields as class variables.
     """
+    
+    # Define model configuration for Pydantic
+    model_config = {
+        "arbitrary_types_allowed": True,
+        "extra": "allow",  # Allow extra attributes not defined in the model
+    }
     
     def __init__(
         self,
@@ -132,36 +172,32 @@ class CodeAgent(Agent):
         max_print_outputs_length: Optional[int] = None,
         reasoning_effort: Optional[str] = "medium",
         max_steps: int = 6,
+        execution_timeout: int = 30,  # Default timeout of 30 seconds
     ):
         """
         Initialize a CodeAgent.
-        
-        Args:
-            name (str): Name of the agent
-            model (str): Model to use for generating code
-            instructions (Union[str, Callable]): Custom instructions for the agent
-            functions (List[Callable]): Functions to register with the agent
-            additional_authorized_imports (List[str]): Additional Python imports to allow
-            max_print_outputs_length (int): Maximum length of print outputs
-            reasoning_effort (str): Level of reasoning effort ("low", "medium", "high")
-            max_steps (int): Maximum number of steps the agent can take
         """
-        # CodeAgent specific attributes
-        self.additional_authorized_imports = additional_authorized_imports or []
-        self.authorized_imports = list(set(BASE_BUILTIN_MODULES) | set(self.additional_authorized_imports))
-        self.max_print_outputs_length = max_print_outputs_length
-        self.max_steps = max_steps
-        self.context_variables = {}
-        self.step_number = 0
+        # Store CodeAgent-specific parameters as local variables first
+        _additional_imports = additional_authorized_imports or []
+        _max_print_length = max_print_outputs_length
+        _max_steps = max_steps
+        _execution_timeout = execution_timeout
         
-        # Create the default instructions with authorized imports information
-        default_instructions = self._create_instructions()
+        # Calculate authorized imports
+        _authorized_imports = list(set(BASE_BUILTIN_MODULES) | set(_additional_imports))
         
-        # Initialize with default or custom instructions
+        # Store attributes as instance variables before creating instructions
+        # Using object.__setattr__ to bypass Pydantic's attribute setting mechanism
+        object.__setattr__(self, 'additional_authorized_imports', _additional_imports)
+        object.__setattr__(self, 'authorized_imports', _authorized_imports)
+        object.__setattr__(self, 'execution_timeout', _execution_timeout)
+        
+        # Create instructions if needed
         if instructions is None:
-            instructions = default_instructions
-            
-        # Initialize parent class
+            # Use the _create_instructions method to generate the default instructions
+            instructions = self._create_instructions()
+        
+        # Initialize parent class first
         super().__init__(
             name=name,
             model=model,
@@ -171,12 +207,21 @@ class CodeAgent(Agent):
             temperature=0.2,  # Lower temperature for predictable code
         )
         
+        # Store remaining attributes as instance variables
+        # Using object.__setattr__ to bypass Pydantic's attribute setting mechanism
+        object.__setattr__(self, 'max_print_outputs_length', _max_print_length)
+        object.__setattr__(self, 'max_steps', _max_steps)
+        object.__setattr__(self, 'execution_timeout', _execution_timeout)
+        object.__setattr__(self, 'context_variables', {})
+        object.__setattr__(self, 'step_number', 0)
+        
         # Initialize the Python interpreter
-        self.python_executor = LocalPythonInterpreter(
-            additional_authorized_imports=self.additional_authorized_imports,
+        python_executor = LocalPythonInterpreter(
+            additional_authorized_imports=_additional_imports,
             tools={},  # We'll populate tools from functions
-            max_print_outputs_length=max_print_outputs_length,
+            max_print_outputs_length=_max_print_length,
         )
+        object.__setattr__(self, 'python_executor', python_executor)
         
         # Register functions as tools for the Python executor
         self._register_functions_as_tools()
@@ -204,9 +249,9 @@ Important guidelines:
 - Use the final_answer() function to provide your final answer when you've solved the problem
 - When in doubt, test your approach with small examples first
 - Maintain variables in memory across interactions - your state persists
+- Your code execution has a timeout of {self.execution_timeout} seconds - avoid infinite loops or long-running operations
 
-Here's an example of a good response:
-```python
+Here's an example of a good response:```python
 # Let's solve this step by step
 import math
 
@@ -236,7 +281,13 @@ I'll execute your code and show you the results.
             func_name = func.__name__
             self.python_executor.static_tools[func_name] = func
     
-    def process_interaction(self, messages: List[Dict], context_variables: Dict = None) -> Result:
+    # @exploit_logger.log_agent()
+    def process_interaction(
+        self, 
+        messages: List[Dict], 
+        context_variables: Dict = None, 
+        debug: bool = False
+    ) -> Result:
         """
         Process a conversation by generating and executing Python code.
         
@@ -246,6 +297,7 @@ I'll execute your code and show you the results.
         Args:
             messages (List[Dict]): List of messages in the conversation
             context_variables (Dict, optional): Variables to be made available in the code
+            debug (bool, optional): Whether to print debug information
             
         Returns:
             Result: A Result object containing the execution result and updated context
@@ -268,14 +320,14 @@ I'll execute your code and show you the results.
             if "```" in latest_user_message:
                 try:
                     code = parse_code_blobs(latest_user_message)
-                    return self._execute_code(code)
+                    return self._execute_code(code, debug)
                 except CodeParsingError:
                     # If parsing fails, generate code based on the message
                     pass
             
             # Generate code using the LLM based on the conversation
-            code = self._generate_code(messages)
-            return self._execute_code(code)
+            code = self._generate_code(messages, debug)
+            return self._execute_code(code, debug)
             
         except CodeAgentException as e:
             # Handle agent-specific exceptions
@@ -284,7 +336,7 @@ I'll execute your code and show you the results.
                 context_variables=self.context_variables
             )
     
-    def _generate_code(self, messages: List[Dict]) -> str:
+    def _generate_code(self, messages: List[Dict], debug: bool = False) -> str:
         """
         Generate Python code based on the conversation history.
         
@@ -293,6 +345,7 @@ I'll execute your code and show you the results.
         
         Args:
             messages (List[Dict]): List of messages in the conversation
+            debug (bool, optional): Whether to print debug information
             
         Returns:
             str: Generated Python code
@@ -301,6 +354,9 @@ I'll execute your code and show you the results.
             CodeGenerationError: If code generation fails
         """
         try:
+            if debug:
+                print(color("🧠 Starting code generation...", fg="blue", bold=True))
+            
             # Import here to avoid circular imports
             from cai.core import CAI
             
@@ -335,35 +391,146 @@ I'll execute your code and show you the results.
             # Parse code blocks from the response
             try:
                 code = parse_code_blobs(model_response)
+                if debug:
+                    print(color("📝 Generated code:", fg="green", bold=True))
+                    print(color(f"```python\n{code}\n```", fg="green"))
+                    print(color("✅ Code generation completed", fg="blue", bold=True))
                 return code
             except CodeParsingError:
                 # If no code block found, but the content looks like code, return it as is
                 if "def " in model_response or "import " in model_response or "print(" in model_response:
+                    if debug:
+                        print(color("📝 Generated code (no code block found, but looks like code):", fg="yellow", bold=True))
+                        print(color(f"```python\n{model_response}\n```", fg="yellow"))
+                        print(color("✅ Code generation completed", fg="blue", bold=True))
                     return model_response
+                if debug:
+                    print(color("❌ No code found in model response", fg="red", bold=True))
                 raise  # Re-raise if doesn't look like code
             
         except Exception as e:
+            if debug:
+                print(color(f"❌ Code generation failed: {str(e)}", fg="red", bold=True))
             raise CodeGenerationError(f"Failed to generate code: {str(e)}")
     
-    def _execute_code(self, code: str) -> Result:
+    def _execute_code(self, code: str, debug: bool = False) -> Result:
         """
         Execute the Python code and return the result.
         
         Args:
             code (str): Python code to execute
+            debug (bool, optional): Whether to print debug information
             
         Returns:
             Result: A Result object containing the execution result and updated state
             
         Raises:
             CodeExecutionError: If code execution fails
+            CodeExecutionTimeoutError: If code execution times out
         """
         try:
+            if debug:
+                print(color("🚀 Starting code execution...", fg="blue", bold=True))
+            
             # Fix the code if needed (e.g., ensure final_answer is properly used)
             code = fix_final_answer_code(code)
             
-            # Execute the code
-            output, execution_logs, is_final_answer = self.python_executor(code, self.context_variables)
+            # Execute the code with timeout
+            if debug:
+                print(color("⚙️ Executing code...", fg="cyan"))
+            
+            # Check if we're on a Unix-like system (Linux, macOS) or Windows
+            # as the timeout implementation differs
+            is_windows = platform.system() == "Windows"
+            
+            if is_windows:
+                # Windows implementation using threads
+                execution_logs = ""
+                output = None
+                is_final_answer = False
+                
+                # Define a function to execute the code
+                def execute_code():
+                    return self.python_executor(code, self.context_variables)
+                
+                # Create and start the thread
+                thread = ThreadWithResult(target=execute_code)
+                thread.start()
+                thread.join(timeout=self.execution_timeout)
+                
+                # Check if the thread is still alive (timeout occurred)
+                if thread.is_alive():
+                    # Thread is still running, timeout occurred
+                    # We can't easily kill the thread in Python, but we can proceed without waiting for it
+                    if hasattr(self.python_executor, "state") and "_print_outputs" in self.python_executor.state:
+                        execution_logs = str(self.python_executor.state.get("_print_outputs", ""))
+                    
+                    timeout_message = f"Code execution timed out after {self.execution_timeout} seconds."
+                    if debug:
+                        print(color("⏱️ Code execution timed out:", fg="red", bold=True))
+                        print(color(f"{timeout_message}", fg="red"))
+                        
+                        if execution_logs:
+                            print(color("📋 Logs before timeout:", fg="yellow", bold=True))
+                            print(color(f"{execution_logs}", fg="yellow"))
+                    
+                    result_message = f"Code execution timed out after {self.execution_timeout} seconds.\n\n"
+                    if execution_logs:
+                        result_message += f"Execution logs before timeout:\n```\n{execution_logs}\n```\n\n"
+                    result_message += "Please optimize your code to run more efficiently or break it into smaller steps."
+                    
+                    return Result(
+                        value=result_message,
+                        context_variables=self.context_variables
+                    )
+                
+                # If we get here, the thread completed within the timeout
+                if thread.exception:
+                    # Re-raise the exception
+                    raise thread.exception
+                
+                # Get the result
+                output, execution_logs, is_final_answer = thread.result
+            else:
+                # Unix implementation using signals
+                original_handler = signal.getsignal(signal.SIGALRM)
+                signal.signal(signal.SIGALRM, timeout_handler)
+                signal.alarm(self.execution_timeout)
+                
+                try:
+                    # Execute the code with timeout
+                    output, execution_logs, is_final_answer = self.python_executor(code, self.context_variables)
+                    # Disable the alarm if execution completes
+                    signal.alarm(0)
+                except TimeoutError:
+                    # Reset the signal handler
+                    signal.signal(signal.SIGALRM, original_handler)
+                    # Get execution logs if available
+                    execution_logs = ""
+                    if hasattr(self.python_executor, "state") and "_print_outputs" in self.python_executor.state:
+                        execution_logs = str(self.python_executor.state.get("_print_outputs", ""))
+                    
+                    timeout_message = f"Code execution timed out after {self.execution_timeout} seconds."
+                    if debug:
+                        print(color("⏱️ Code execution timed out:", fg="red", bold=True))
+                        print(color(f"{timeout_message}", fg="red"))
+                        
+                        if execution_logs:
+                            print(color("📋 Logs before timeout:", fg="yellow", bold=True))
+                            print(color(f"{execution_logs}", fg="yellow"))
+                    
+                    result_message = f"Code execution timed out after {self.execution_timeout} seconds.\n\n"
+                    if execution_logs:
+                        result_message += f"Execution logs before timeout:\n```\n{execution_logs}\n```\n\n"
+                    result_message += "Please optimize your code to run more efficiently or break it into smaller steps."
+                    
+                    return Result(
+                        value=result_message,
+                        context_variables=self.context_variables
+                    )
+                finally:
+                    # Reset the signal handler
+                    signal.signal(signal.SIGALRM, original_handler)
             
             # Prepare the result message
             result_message = f"Code execution completed.\n\n"
@@ -372,6 +539,21 @@ I'll execute your code and show you the results.
                 result_message += f"Execution logs:\n```\n{execution_logs}\n```\n\n"
             
             result_message += f"Output: {truncate_content(str(output))}"
+            
+            # Print execution results with color if debug is enabled
+            if debug:
+                print(color("📊 Execution results:", fg="green", bold=True))
+                if execution_logs:
+                    print(color("📋 Logs:", fg="cyan", bold=True))
+                    print(color(f"{execution_logs}", fg="cyan"))
+                
+                print(color("🔍 Output:", fg="yellow", bold=True))
+                print(color(f"{truncate_content(str(output))}", fg="yellow"))
+                
+                if is_final_answer:
+                    print(color("🏁 Final answer provided", fg="green", bold=True))
+                
+                print(color("✅ Code execution completed", fg="blue", bold=True))
             
             # Return the result
             return Result(
@@ -386,12 +568,19 @@ I'll execute your code and show you the results.
                 execution_logs = str(self.python_executor.state.get("_print_outputs", ""))
             
             error_message = f"Code execution failed: {type(e).__name__}: {str(e)}"
-            if execution_logs:
-                error_message += f"\n\nExecution logs before error:\n```\n{execution_logs}\n```"
+            if debug:
+                print(color("❌ Code execution failed:", fg="red", bold=True))
+                print(color(f"{error_message}", fg="red"))
+                
+                if execution_logs:
+                    print(color("📋 Logs before error:", fg="yellow", bold=True))
+                    print(color(f"{execution_logs}", fg="yellow"))
+            
+            error_message += f"\n\nExecution logs before error:\n```\n{execution_logs}\n```"
             
             raise CodeExecutionError(error_message)
     
-    def run(self, messages: List[Dict], context_variables: Dict = None) -> Result:
+    def run(self, messages: List[Dict], context_variables: Dict = None, debug: bool = True) -> Result:
         """
         Run the agent on a conversation.
         
@@ -400,6 +589,7 @@ I'll execute your code and show you the results.
         Args:
             messages (List[Dict]): List of messages in the conversation
             context_variables (Dict, optional): Variables to be made available to the agent
+            debug (bool, optional): Whether to print debug information
             
         Returns:
             Result: A Result object containing the execution result and updated context
@@ -413,12 +603,14 @@ I'll execute your code and show you the results.
             )
         
         # Process the conversation
-        return self.process_interaction(messages, context_variables)
+        return self.process_interaction(messages, context_variables, debug)
 
 
-model = os.getenv('CAI_MODEL', "claude-3-7-sonnet-20250219")
+model = os.getenv('CAI_MODEL', "qwen2.5-coder:32b-instruct-fp16-ctx-32768")
 codeagent = CodeAgent(
     model=model,
     name="CodeAgent",
     additional_authorized_imports=["*"],
+    execution_timeout=30,
+    # execution_timeout=int(os.getenv('CAI_CODE_TIMEOUT', '30')),  # Get timeout from env var or use default 30 seconds
 )

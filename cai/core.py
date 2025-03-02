@@ -198,7 +198,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             "stream": stream,
         }
 
-        if tools and not isinstance(agent, CodeAgent):
+        if tools:
             create_params["parallel_tool_calls"] = agent.parallel_tool_calls
             create_params["tools"] = tools
             create_params["tool_choice"] = agent.tool_choice
@@ -279,7 +279,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             print("Rate Limit Error:" + str(e))
             time.sleep(60)
             litellm_completion = litellm.completion(**create_params)
-
+    
         if self.rec_training_data:
             self.rec_training_data.rec_training_data(
                 create_params, litellm_completion)
@@ -532,6 +532,49 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         """
         Process an interaction with the AI agent.
         """
+        # Special handling for CodeAgent
+        if isinstance(active_agent, CodeAgent):
+            # Call CodeAgent's specialized process_interaction method
+            result = active_agent.process_interaction(
+                messages=history,
+                context_variables=context_variables,
+                debug=debug
+            )
+            
+            # Create a message from the result
+            message_content = result.value
+            message = {
+                "role": "assistant",
+                "content": message_content,
+                "sender": active_agent.name
+            }
+            
+            # Add message to history
+            history.append(message)
+            
+            # Print the message
+            cli_print_agent_messages(active_agent.name,
+                                    message_content,
+                                    n_turn,
+                                    active_agent.model,
+                                    debug)
+            
+            # Register in the graph
+            self._graph.add_to_graph(graph.Node(
+                name=active_agent.name,
+                agent=active_agent,
+                turn=n_turn,
+                message=message,
+                history=history
+            ))
+            
+            # Update context variables from the result
+            context_variables.update(result.context_variables)
+            
+            # Return None to indicate the turn is complete
+            return None
+            
+        # Regular agent processing (existing code)
         # get completion with current history, agent
         completion = self.get_chat_completion(
             agent=active_agent,
@@ -583,7 +626,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 message=message,
                 history=history
             ))
-            return None
+            return None  # returning None to indicate 
+                         # the turn is complete
 
         # handle function calls, updating context_variables, and switching
         # agents
@@ -609,6 +653,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         return (partial_response.agent
                 if partial_response.agent
                 else active_agent)
+
 
     @exploit_logger.log_response("🚩" + os.getenv('CTF_NAME', 'test') +
                                  " @ " + os.getenv('CI_JOB_ID', 'local'))
