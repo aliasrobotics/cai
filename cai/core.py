@@ -26,7 +26,7 @@ from cai import graph
 # Local imports
 from cai.datarecorder import DataRecorder
 from cai import (
-    transfer_to_state_agent
+    transfer_to_state_agent,
 )
 from cai.state.common import StateAgent
 from cai.cost.llm_cost import (
@@ -281,6 +281,12 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                             **create_params)
                     else:
                         raise e
+            if "Invalid first message" in str(e):
+                new_messages = create_params.get("messages", [])
+                if new_messages and new_messages[1].get("role") != "user":
+                    new_messages.insert(1, {"role": "user", "content": "Prompt missed"})
+                    create_params["messages"] = new_messages
+                    litellm_completion = litellm.completion(**create_params)
             elif "An assistant message with 'tool_calls'" in str(e) or "`tool_use` blocks must be followed by a user message with `tool_result`" in str(e):  # noqa: E501 # pylint: disable=C0301
                 print(f"Error: {str(e)}")
                 # EDGE CASE: Report Agent CTRL C error
@@ -487,6 +493,10 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 """
                 try:
                     raw_result = function_map[tool_name](**tool_args)
+                except KeyboardInterrupt:
+                    print("\nCtrl+C pressed")
+                    raw_result = "\n\nCOMMAND INTERRUPTED by user, probably cause you are bad"
+                    return raw_result
                 except TypeError as e:
                     if "unexpected keyword argument" in str(
                             e):  # Usual Error when open source model try do a handoff # noqa: E501
@@ -852,48 +862,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
             except KeyboardInterrupt:
                 print("\nCtrl+C pressed")
-
-                # Check if HTB VPN is active
-                vpn_active = False
-                try:
-                    if is_caiextensions_platform_available():
-                        from caiextensions.platform.htb.cli import (  # pylint: disable=import-error,import-outside-toplevel,line-too-long # noqa: E501
-                            is_vpn_connected, vpn_active
-                        )
-                        if is_vpn_connected() and vpn_active:
-                            print(
-                                "\n[yellow]VPN connection is active and "
-                                "persistent[/yellow]")
-                            print(
-                                "[yellow]Press Ctrl+C again to exit or "
-                                "continue...[/yellow]")
-                except ImportError:
-                    pass
-
-                try:
-                    time.sleep(2)  # wait for user to press Ctrl+C again
-                except KeyboardInterrupt:
-                    print("\nCtrl+C pressed again")
-
-                    # Warn about active VPN before exiting
-                    try:
-                        if is_caiextensions_platform_available():
-                            from caiextensions.platform.htb.cli import (  # pylint: disable=import-error,import-outside-toplevel,line-too-long # noqa: E501
-                                is_vpn_connected, vpn_active
-                            )
-                            if is_vpn_connected() and vpn_active:
-                                print(
-                                    "\n[red]Warning: VPN connection will "
-                                    "remain active[/red]"
-                                )
-                                print(
-                                    "[yellow]Use '/platform htb:disconnect' "
-                                    "to close it[/yellow]"
-                                )
-                    except ImportError:
-                        pass
-
-                    break
+                break
 
             # Check if the flag is found in the last tool output
             # Accountability

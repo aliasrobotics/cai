@@ -307,7 +307,7 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
             )
 
             messages = response.messages
-
+            print(messages)
             # Log assistant response
             if messages and len(messages) > 0:
                 last_message = messages[-1]
@@ -386,3 +386,12 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
             # Display final execution time
             display_execution_time()
             break
+
+def fix_message_list(messages):
+    # ... código existente ...
+    
+    # Asegurar que el primer mensaje sea siempre de un usuario para Anthropic
+    if new_messages and new_messages[0].get("role") != "user":
+        new_messages.insert(0, {"role": "user", "content": "."})
+    
+    return new_messages
