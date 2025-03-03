@@ -20,7 +20,7 @@ import platform
 import re
 import signal
 import threading
-from typing import Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 # Third-party imports
 from wasabi import color  # pylint: disable=import-error # noqa: E402
@@ -175,6 +175,7 @@ class CodeAgent(Agent):
         reasoning_effort: Optional[str] = "medium",
         max_steps: int = 10,
         execution_timeout: int = 60,  # Default timeout of 60 seconds
+        tool_choice: str = "auto",
     ):
         """
         Initialize a CodeAgent.
@@ -184,7 +185,7 @@ class CodeAgent(Agent):
         _max_print_length = max_print_outputs_length
         _max_steps = max_steps
         _execution_timeout = execution_timeout
-
+        _tool_choice = tool_choice
         # Calculate authorized imports
         _authorized_imports = list(
             set(BASE_BUILTIN_MODULES) | set(_additional_imports))
@@ -198,6 +199,7 @@ class CodeAgent(Agent):
             _additional_imports)
         object.__setattr__(self, 'authorized_imports', _authorized_imports)
         object.__setattr__(self, 'execution_timeout', _execution_timeout)
+        object.__setattr__(self, 'tool_choice', _tool_choice)
         object.__setattr__(self, 'cai_instance', None)
 
         # Create instructions if needed
@@ -305,13 +307,13 @@ I'll execute your code and show you the results.
             func_name = func.__name__
             self.python_executor.static_tools[func_name] = func
 
-    # @exploit_logger.log_agent()
     def process_interaction(
         self,
+        cai_instance: object,
         messages: List[Dict],
         context_variables: Dict = None,
         debug: bool = False
-    ) -> Result:
+    ) -> Tuple[Result, str, Optional[Any]]:
         """
         Process a conversation by generating and executing
         Python code.
@@ -321,6 +323,8 @@ I'll execute your code and show you the results.
         Python code based on the latest user message.
 
         Args:
+            cai_instance (object):
+                The CAI instance that is calling the CodeAgent
             messages (List[Dict]):
                 List of messages in the conversation
             context_variables (Dict, optional):
@@ -329,9 +333,11 @@ I'll execute your code and show you the results.
                 Whether to print debug information
 
         Returns:
-            Tuple[Result, str]:
-                A tuple containing the Result object with
-                execution results and the generated code string
+            Tuple[Result, str, Optional[Any]]:
+                A tuple containing:
+                - Result object with execution results
+                - Generated code string
+                - Optional completion object from LLM
         """
         if context_variables:
             self.context_variables.update(context_variables)
@@ -345,7 +351,7 @@ I'll execute your code and show you the results.
             return Result(
                 value="No user message found in the conversation.",
                 context_variables=self.context_variables
-            ), ""
+            ), "", None
 
         latest_user_message = user_messages[-1].get("content", "")
 
@@ -356,15 +362,16 @@ I'll execute your code and show you the results.
                 try:
                     code = parse_code_blobs(latest_user_message)
                     result = self._execute_code(code, debug)
-                    return result, code
+                    return result, code, None
                 except CodeParsingError:
                     # If parsing fails, generate code based on the message
                     pass
 
             # Generate code using the LLM based on the conversation
-            code = self._generate_code(messages, debug)
+            code, completion = self._generate_code(
+                cai_instance, messages, debug)
             result = self._execute_code(code, debug)
-            return result, code
+            return result, code, completion
 
         except CodeAgentException as e:
             # Handle agent-specific exceptions
@@ -374,9 +381,10 @@ I'll execute your code and show you the results.
             return Result(
                 value=f"Error: {str(e)}",
                 context_variables=self.context_variables
-            ), code
+            ), code, None
 
-    def _generate_code(self, messages: List[Dict], debug: bool = False) -> str:
+    def _generate_code(self, cai_instance: object,
+                       messages: List[Dict], debug: bool = False) -> str:
         """
         Generate Python code based on the conversation history.
 
@@ -384,8 +392,12 @@ I'll execute your code and show you the results.
         the task described in the conversation.
 
         Args:
-            messages (List[Dict]): List of messages in the conversation
-            debug (bool, optional): Whether to print debug information
+            cai_instance (object):
+                The CAI instance that is calling the CodeAgent
+            messages (List[Dict]):
+                List of messages in the conversation
+            debug (bool, optional):
+                Whether to print debug information
 
         Returns:
             str: Generated Python code
@@ -401,9 +413,6 @@ I'll execute your code and show you the results.
                         fg="blue",
                         bold=True))
 
-            # Import here to avoid circular imports
-            from cai.core import CAI  # pylint: disable=import-outside-toplevel # noqa: E402,E501
-
             # Create a message that prompts the LLM to generate code
             code_generation_message = {
                 "role": "user",
@@ -416,17 +425,6 @@ I'll execute your code and show you the results.
             # Clone the messages and add our code generation prompt
             messages_copy = copy.deepcopy(messages)
             messages_copy.append(code_generation_message)
-
-            # Create a temporary CAI instance just for code generation
-            # This is efficient as CAI doesn't maintain much state on init
-            try:
-                if self.cai_instance is None:  # pylint: disable=access-member-before-definition # noqa: E702,E501
-                    self.cai_instance = CAI()  # pylint: disable=attribute-defined-outside-init # noqa: E702,E501
-                cai_instance = self.cai_instance
-            except AttributeError:
-                # If cai_instance attribute doesn't exist, create it
-                object.__setattr__(self, 'cai_instance', CAI())
-                cai_instance = self.cai_instance
 
             # Get completion from the model
             completion = cai_instance.get_chat_completion(
@@ -442,39 +440,6 @@ I'll execute your code and show you the results.
             # Extract the model's response
             model_response = completion.choices[0].message.content
 
-            if debug:
-                print(color("🔍 CAI instance tokens:", fg="blue", bold=True))
-                print(
-                    color(
-                        f"  Input tokens: {
-                            cai_instance.interaction_input_tokens}",
-                        fg="cyan"))
-                print(
-                    color(
-                        f"  Output tokens: {
-                            cai_instance.interaction_output_tokens}",
-                        fg="cyan"))
-                print(
-                    color(
-                        f"  Reasoning tokens: {
-                            cai_instance.interaction_reasoning_tokens}",
-                        fg="cyan"))
-                print(
-                    color(
-                        f"  Total input tokens: {
-                            cai_instance.total_input_tokens}",
-                        fg="cyan"))
-                print(
-                    color(
-                        f"  Total output tokens: {
-                            cai_instance.total_output_tokens}",
-                        fg="cyan"))
-                print(
-                    color(
-                        f"  Total reasoning tokens: {
-                            cai_instance.total_reasoning_tokens}",
-                        fg="cyan"))
-
             # Parse code blocks from the response
             try:
                 code = parse_code_blobs(model_response)
@@ -486,7 +451,7 @@ I'll execute your code and show you the results.
                             "✅ Code generation completed",
                             fg="blue",
                             bold=True))
-                return code
+                return code, completion
             except CodeParsingError:
                 # If no code block found, but the content looks like code,
                 # return it as is
@@ -509,7 +474,7 @@ I'll execute your code and show you the results.
                                 "✅ Code generation completed",
                                 fg="blue",
                                 bold=True))
-                    return model_response
+                    return model_response, completion
                 if debug:
                     print(
                         color(
@@ -788,60 +753,20 @@ I'll execute your code and show you the results.
         self.step_number += 1  # pylint: disable=no-member # noqa: E702
         if self.step_number > self.max_steps:  # pylint: disable=no-member # noqa: E702,E501
             return Result(
-                value="Reached maximum number of steps. "
-                "Please restart the conversation.",
+                value="Reached maximum number of steps in CodeAgent. "
+                "Stopping execution.",
                 context_variables=self.context_variables
             )
 
         # Process the conversation
-        result, _ = self.process_interaction(
+        result, _, _ = self.process_interaction(
             messages, context_variables, debug)
-
-        # Ensure token usage is properly tracked
-        # Token usage is already tracked in the cai_instance attribute
-        # and will be extracted by get_token_usage()
-
         return result
 
-    def get_token_usage(self):
-        """
-        Extract token usage information from the
-        cai_instance attribute.
 
-        Returns:
-            dict: A dictionary containing token usage
-                information with keys:
-                - interaction_input_tokens
-                - interaction_output_tokens
-                - interaction_reasoning_tokens
-                - total_input_tokens
-                - total_output_tokens
-                - total_reasoning_tokens
-        """
-        if not self.cai_instance:
-            return {
-                "interaction_input_tokens": 0,
-                "interaction_output_tokens": 0,
-                "interaction_reasoning_tokens": 0,
-                "total_input_tokens": 0,
-                "total_output_tokens": 0,
-                "total_reasoning_tokens": 0
-            }
-
-        return {
-            "interaction_input_tokens":
-                self.cai_instance.interaction_input_tokens,
-            "interaction_output_tokens":
-                self.cai_instance.interaction_output_tokens,
-            "interaction_reasoning_tokens":
-                self.cai_instance.interaction_reasoning_tokens,
-            "total_input_tokens":
-                self.cai_instance.total_input_tokens,
-            "total_output_tokens":
-                self.cai_instance.total_output_tokens,
-            "total_reasoning_tokens":
-                self.cai_instance.total_reasoning_tokens
-        }
+def transfer_to_codeagent(**kwargs):  # pylint: disable=W0613
+    """Transfer to codeagent."""
+    return codeagent
 
 
 codeagent_model = os.getenv(
@@ -852,6 +777,8 @@ codeagent = CodeAgent(
     name="CodeAgent",
     additional_authorized_imports=["*"],
     execution_timeout=60,
+    # functions=[],
+    # tool_choice="required",  # force tool call for handoffs
     # execution_timeout=int(os.getenv('CAI_CODE_TIMEOUT', '30')),  # Get
     # timeout from env var or use default 30 seconds
 )
