@@ -145,6 +145,28 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
     # Display banner and welcome message
     display_banner(console)
 
+    # Check for active VPN connection
+    if is_caiextensions_platform_available():
+        try:
+            from caiextensions.platform.htb.cli import (  # pylint: disable=import-error,import-outside-toplevel,line-too-long # noqa: E501
+                is_vpn_connected, get_vpn_ip
+            )
+            if is_vpn_connected():
+                console.print(Panel(
+                    "\n".join([
+                        "[green]VPN Connected[/green]",
+                        f"IP: {get_vpn_ip()}",
+                        "Use [bold]/platform vpn-status[/bold] to check "
+                        "status",
+                        "Use [bold]/platform keep-vpn[/bold] to make "
+                        "connection persistent"
+                    ]),
+                    title="HackTheBox VPN Status",
+                    border_style="green"
+                ))
+        except ImportError:
+            pass
+
     messages = []
     messages_init = []
     if ctf:

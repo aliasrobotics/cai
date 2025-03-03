@@ -852,10 +852,47 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
             except KeyboardInterrupt:
                 print("\nCtrl+C pressed")
+
+                # Check if HTB VPN is active
+                vpn_active = False
+                try:
+                    if is_caiextensions_platform_available():
+                        from caiextensions.platform.htb.cli import (  # pylint: disable=import-error,import-outside-toplevel,line-too-long # noqa: E501
+                            is_vpn_connected, vpn_active
+                        )
+                        if is_vpn_connected() and vpn_active:
+                            print(
+                                "\n[yellow]VPN connection is active and "
+                                "persistent[/yellow]")
+                            print(
+                                "[yellow]Press Ctrl+C again to exit or "
+                                "continue...[/yellow]")
+                except ImportError:
+                    pass
+
                 try:
                     time.sleep(2)  # wait for user to press Ctrl+C again
                 except KeyboardInterrupt:
                     print("\nCtrl+C pressed again")
+
+                    # Warn about active VPN before exiting
+                    try:
+                        if is_caiextensions_platform_available():
+                            from caiextensions.platform.htb.cli import (  # pylint: disable=import-error,import-outside-toplevel,line-too-long # noqa: E501
+                                is_vpn_connected, vpn_active
+                            )
+                            if is_vpn_connected() and vpn_active:
+                                print(
+                                    "\n[red]Warning: VPN connection will "
+                                    "remain active[/red]"
+                                )
+                                print(
+                                    "[yellow]Use '/platform htb:disconnect' "
+                                    "to close it[/yellow]"
+                                )
+                    except ImportError:
+                        pass
+
                     break
 
             # Check if the flag is found in the last tool output

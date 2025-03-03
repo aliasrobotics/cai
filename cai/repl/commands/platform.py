@@ -36,6 +36,18 @@ class PlatformCommand(Command):
                 "List available platforms",
                 self.handle_list)
 
+            # Add VPN status command
+            self.add_subcommand(
+                "vpn-status",
+                "Check the status of the VPN connection",
+                self.handle_vpn_status)
+
+            # Add keep-vpn command
+            self.add_subcommand(
+                "keep-vpn",
+                "Keep VPN connection active even when interrupted",
+                self.handle_keep_vpn)
+
             # Add platform-specific subcommands
             platforms = platform_manager.list_platforms()
             for platform in platforms:
@@ -119,6 +131,91 @@ class PlatformCommand(Command):
         # Pass the command to the platform (without the platform name)
         platform.handle_command(args[1:])
         return True
+
+    def handle_vpn_status(
+            self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
+        """
+        Check the status of the VPN connection.
+
+        Args:
+            args: Optional list of command arguments (not used)
+
+        Returns:
+            True if the command was handled successfully, False otherwise
+        """
+        if not is_caiextensions_platform_available():
+            console.print("[red]Platform extensions are not available[/red]")
+            return False
+
+        try:
+            from caiextensions.platform.htb.cli import (  # pylint: disable=import-error,import-outside-toplevel,line-too-long # noqa: E501
+                is_vpn_connected, get_vpn_ip, vpn_active
+            )
+            # Check VPN connection status
+            if is_vpn_connected():
+                status = "[green]Connected[/green]"
+            else:
+                status = "[red]Disconnected[/red]"
+
+            # Check if VPN is set to persistent mode
+            if vpn_active:
+                persistent = "[green]Yes[/green]"
+            else:
+                persistent = "[red]No[/red]"
+            ip = get_vpn_ip()
+
+            console.print(Panel(
+                f"Status: {status}\n"
+                f"Persistent: {persistent}\n"
+                f"IP Address: {ip}",
+                title="VPN Status",
+                border_style="blue"
+            ))
+            return True
+        except ImportError:
+            console.print("[red]HTB platform module not available[/red]")
+            return False
+
+    def handle_keep_vpn(
+            self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
+        """
+        Set the VPN to remain active even when the program is interrupted.
+
+        Args:
+            args: Optional list of command arguments (not used)
+
+        Returns:
+            True if the command was handled successfully, False otherwise
+        """
+        if not is_caiextensions_platform_available():
+            console.print("[red]Platform extensions are not available[/red]")
+            return False
+
+        try:
+            from caiextensions.platform.htb.cli import (  # pylint: disable=import-error,import-outside-toplevel,line-too-long # noqa: E501
+                is_vpn_connected
+            )
+            if not is_vpn_connected():
+                console.print("[red]No active VPN connection found[/red]")
+                console.print(
+                    "[yellow]Connect to VPN first using "
+                    "/platform htb:connect[/yellow]"
+                )
+                return False
+
+            # Set the VPN to persistent mode
+            import caiextensions.platform.htb.cli as htb_cli  # pylint: disable=import-error,import-outside-toplevel,line-too-long # noqa: E501
+            htb_cli.vpn_active = True
+
+            console.print(
+                "[green]VPN connection set to persistent mode[/green]")
+            console.print(
+                "[yellow]VPN will remain active even if you press Ctrl+C"
+                "[/yellow]")
+            return True
+        except ImportError:
+            console.print("[red]HTB platform module not available[/red]")
+            return False
 
 
 # Register the command
