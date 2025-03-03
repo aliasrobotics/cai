@@ -6,7 +6,6 @@ import os
 from cai.util import Agent  # pylint: disable=import-error
 from cai.tools.reconnaissance.netcat import netcat  # pylint: disable=import-error # noqa: E501
 from cai.tools.reconnaissance.nmap import nmap  # pylint: disable=import-error # noqa: E501
-from cai.agents.common import create_ctf_agent
 
 # First party imports
 from cai.tools.reconnaissance.filesystem import (
@@ -14,6 +13,9 @@ from cai.tools.reconnaissance.filesystem import (
     cat_file,
     find_file,
     pwd_command
+)
+from cai.tools.reconnaissance.generic_linux_command import (
+    generic_linux_command
 )
 from cai.tools.reconnaissance.crypto_tools import (
     decode64,

@@ -34,7 +34,8 @@ from cai.repl.commands import (  # pylint: disable=import-error,unused-import,li
     platform,
     kill,
     model,
-    turns
+    turns,
+    agent
 )
 
 # Define helper functions
