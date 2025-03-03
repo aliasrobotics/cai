@@ -13,7 +13,7 @@ and local modules.
 import copy
 import json
 from collections import defaultdict
-from typing import List
+from typing import List, Tuple
 # Package/library imports
 import time
 import os
@@ -32,6 +32,7 @@ from cai.state.common import StateAgent
 from cai.cost.llm_cost import (
     calculate_conversation_cost
 )
+from .agents.codeagent import CodeAgent
 from .util import (
     function_to_json,
     debug_print,
@@ -42,6 +43,7 @@ from .util import (
     get_ollama_api_base,
     check_flag,
     visualize_agent_graph,
+    cli_print_codeagent_output,
 )
 from .types import (
     Agent,
@@ -155,6 +157,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         model_override: str,
         stream: bool,
         debug: bool,
+        master_template: str = "system_master_template.md"
     ) -> ChatCompletionMessage:
         """
         Get a chat completion for the given agent, history,
@@ -162,13 +165,15 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         """
         context_variables = defaultdict(str, context_variables)
 
+        # --------------------------------
+        # Messages
+        # --------------------------------
         messages = [{"role": "system", "content": Template(  # nosec: B702
-            filename="cai/prompts/core/system_master_template.md").render(
+            filename=f"cai/prompts/core/{master_template}").render(
                 agent=agent,
                 ctf_instructions=history[0]["content"],
                 context_variables=context_variables)
         }]
-
         for msg in history:
             if (msg.get("sender") not in ["Report Agent"] and
                 not any("add_memory" in call.get("function", {}).get("name", "")  # noqa: E501
@@ -176,12 +181,18 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                                      else []))):
                 messages.append(msg)
 
+        # --------------------------------
+        # Debug
+        # --------------------------------
         debug_print(
             debug,
             "Getting chat completion for...:",
             messages,
             brief=self.brief)
 
+        # --------------------------------
+        # Tools
+        # --------------------------------
         tools = [function_to_json(f) for f in agent.functions if callable(f)]
         # hide context_variables from model
         for tool in tools:
@@ -190,35 +201,35 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             if __CTX_VARS_NAME__ in params["required"]:
                 params["required"].remove(__CTX_VARS_NAME__)
 
+        # --------------------------------
+        # Inference parameters
+        # --------------------------------
         create_params = {
             "model": model_override or agent.model,
             "messages": messages,
             "stream": stream,
         }
-
         if tools:
             create_params["parallel_tool_calls"] = agent.parallel_tool_calls
             create_params["tools"] = tools
             create_params["tool_choice"] = agent.tool_choice
-            create_params["temperature"] = 0.7
             create_params["stream_options"] = {"include_usage": True}
-
+            if not isinstance(agent, CodeAgent):  # Don't set temperature for CodeAgent  # noqa: E501
+                create_params["temperature"] = 0.7
         # Refer to https://docs.litellm.ai/docs/completion/json_mode
         if agent.structured_output_class:
-
             # if providing the schema
             #
             # # NOTE: this is not working
             # # other than for Ollama-served models
             # create_params["response_format"] =
             #   agent.structured_output_class.model_json_schema()
-
+            #
             # when using pydantic
             create_params["response_format"] = agent.structured_output_class
 
             # set temperature to 0 when using structured output
             create_params["temperature"] = 0.0
-
         # NOTE: This is a workaround to avoid errors with O1 and O3 models
         # since reasoners don't support parallel tool calls, nor
         # temperature
@@ -233,6 +244,10 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             create_params["reasoning_effort"] = agent.reasoning_effort
         if any(x in agent.model for x in ["claude"]):
             litellm.modify_params = True
+
+        # --------------------------------
+        # Inference
+        # --------------------------------
         try:
             if os.getenv("OLLAMA", "").lower() == "true":
                 litellm_completion = litellm.completion(
@@ -278,11 +293,16 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             time.sleep(60)
             litellm_completion = litellm.completion(**create_params)
 
+        # --------------------------------
+        # Training data
+        # --------------------------------
         if self.rec_training_data:
             self.rec_training_data.rec_training_data(
                 create_params, litellm_completion)
 
-        # update token counts
+        # --------------------------------
+        # Token counts
+        # --------------------------------
         if litellm_completion.usage:
             self.interaction_input_tokens = (
                 litellm_completion.usage.prompt_tokens
@@ -523,13 +543,121 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         return partial_response
 
+    def process_interaction_codeagent(  # pylint: disable=too-many-arguments,too-many-locals,too-many-statements,too-many-branches,useless-return # noqa: E501
+            self, active_agent, history,
+            context_variables, debug, n_turn) -> None:
+        """
+        Process an interaction specifically for CodeAgent type.
+
+        Args:
+            active_agent: The CodeAgent instance
+            history: List of previous messages
+            context_variables: Dictionary of context variables
+            debug: Debug level
+            n_turn: Current turn number
+
+        Returns:
+            None: CodeAgent interactions always complete in one turn
+        """
+        # Call CodeAgent's specialized process_interaction method
+        result, code, completion = active_agent.process_interaction(  # pylint: disable=unused-variable # noqa: E501
+            cai_instance=self,
+            messages=history,
+            context_variables=context_variables,
+            debug=False
+        )
+
+        # Create a message from the result
+        message_content = result.value
+        message = {
+            "role": "assistant",
+            "content": message_content,
+            "sender": active_agent.name
+        }
+
+        # Add message to history
+        history.append(message)
+
+        # Print the message using the specialized CodeAgent output printer
+        cli_print_codeagent_output(
+            active_agent.name,
+            message_content,
+            code,
+            n_turn,
+            active_agent.model,
+            debug,
+            interaction_input_tokens=self.interaction_input_tokens,
+            interaction_output_tokens=self.interaction_output_tokens,
+            interaction_reasoning_tokens=self.interaction_reasoning_tokens,
+            total_input_tokens=self.total_input_tokens,
+            total_output_tokens=self.total_output_tokens,
+            total_reasoning_tokens=self.total_reasoning_tokens
+        )
+
+        # Register in the graph
+        self._graph.add_to_graph(graph.Node(
+            name=active_agent.name,
+            agent=active_agent,
+            turn=n_turn,
+            message=message,
+            history=history
+        ))
+
+        # Update context variables from the result
+        context_variables.update(result.context_variables)
+
+        # Handle tool calls
+        # NOTE: this doesn't seem to work very well
+        # with CodeAgent, so we're disabling it for now
+        #
+        # if completion:
+        #     completion_message = completion.choices[0].message
+        #     if completion_message.tool_calls and execute_tools:
+        #         partial_response = self.handle_tool_calls(
+        #             completion_message.tool_calls,
+        #             active_agent.functions,
+        #             context_variables, debug, active_agent, n_turn,
+        #             message=completion_message.content
+        #         )
+        #         return (partial_response.agent
+        #                 if partial_response.agent
+        #                 else active_agent)
+        #
+
+        # Turn complete
+        #
+        # NOTE: considered handoffs but they don't
+        # seem to perform well when in combination
+        # with code gen.
+        return None
+
     @exploit_logger.log_agent()
-    def process_interaction(self, active_agent, history, context_variables,  # pylint: disable=too-many-arguments  # noqa: E501
-                            model_override, stream, debug, execute_tools,
-                            n_turn):
+    def process_interaction(self, active_agent, history, context_variables,  # pylint: disable=too-many-arguments,too-many-locals,too-many-statements,too-many-branches # noqa: E501
+                            model_override, stream, debug,
+                            execute_tools, n_turn) -> Tuple[Agent, None]:
         """
         Process an interaction with the AI agent.
+
+        Args:
+            active_agent: The agent to interact with
+            history: List of previous messages
+            context_variables: Dictionary of context variables
+            model_override: Override the model specified in the agent
+            stream: Whether to stream the response
+            debug: Debug level
+            execute_tools: Whether to execute tools
+            n_turn: Current turn number
+
+        Returns:
+            Agent or None: Returns a new agent if there's a handoff,
+                          or None if the turn is complete
         """
+        # Special handling for CodeAgent
+        if isinstance(active_agent, CodeAgent):
+            return self.process_interaction_codeagent(
+                active_agent, history, context_variables, debug, n_turn)
+
+        # Regular agent processing (existing code)
         # get completion with current history, agent
         completion = self.get_chat_completion(
             agent=active_agent,
@@ -581,7 +709,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 message=message,
                 history=history
             ))
-            return None
+            return None  # returning None to indicate
+            # the turn is complete
 
         # handle function calls, updating context_variables, and switching
         # agents
@@ -703,6 +832,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     active_agent = self.semantic_builder
                     agent_iteration(active_agent)
                     active_agent = prev_agent
+
                 # Stateful agent iteration
                 # If the session is stateful, invoke the memory agent at
                 # defined intervals
