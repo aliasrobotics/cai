@@ -422,3 +422,17 @@ cat ~/.ssh/id_ed25519.pub
 ```bash
 find . -name "*.pyc" -delete && find . -name "__pycache__" -delete
 ```
+
+
+### If host networking is not working with ollama check whether it has been disabled in Docker because you are not signed in
+
+Docker in OS X behaves funny sometimes. Check if the following message has shown up:
+
+*Host networking has been disabled because you are not signed in. Please sign in to enable it*.
+
+Make sure this has been addressed and also that the Dev Container is not forwarding the 8000 port (click on x, if necessary in the ports section).
+
+To verify connection, from within the VSCode devcontainer:
+```bash
+curl -v http://host.docker.internal:8000/api/version
+```

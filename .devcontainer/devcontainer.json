@@ -66,12 +66,8 @@
 																		// the dockerfile to cache
 																		// requirements in container
 	// Install cai via "pip3 install -e ."
-
-	// // Quadrant gen setup
-	"postCreateCommand": "pip3 install -e /workspace/",
-
-	// Extensions
-	"postCreateCommand": "pip3 install -e '/workspace/caiextensions-report' && pip3 install -e '/workspace/pentestperf'",
+	// Extensions, NOTE: only one postCreateCommand is allowed, so we need to install all extensions here
+	"postCreateCommand": "pip3 install -e /workspace/ && pip3 install -e '/workspace/caiextensions-report' && pip3 install -e '/workspace/pentestperf'",
 
 	// MSF setup, and RAG setup
 	"postStartCommand": [

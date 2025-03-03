@@ -3,21 +3,27 @@
 This module contains utility functions for the CAI library.
 """
 
+# Standard library imports
 import inspect
 import json
 import os
+import re
 from datetime import datetime
 from typing import Any
-from wasabi import color  # pylint: disable=import-error
-from rich.text import Text  # pylint: disable=import-error
-from rich.panel import Panel  # pylint: disable=import-error
+
+# Third-party imports
+from litellm.types.utils import Message  # pylint: disable=import-error
 from rich.box import ROUNDED  # pylint: disable=import-error
 from rich.console import Console, Group  # pylint: disable=import-error
+from rich.panel import Panel  # pylint: disable=import-error
+from rich.pretty import install as install_pretty  # pylint: disable=import-error # noqa: 501
+from rich.text import Text  # pylint: disable=import-error
 from rich.theme import Theme  # pylint: disable=import-error
 from rich.traceback import install  # pylint: disable=import-error
-from rich.pretty import install as install_pretty  # pylint: disable=import-error # noqa: 501
 from rich.tree import Tree  # pylint: disable=import-error
-from litellm.types.utils import Message  # pylint: disable=import-error
+from wasabi import color  # pylint: disable=import-error
+
+# Local imports
 from cai.cost.llm_cost import calculate_conversation_cost
 from cai.graph import Node, get_default_graph
 from cai.types import (
@@ -463,9 +469,212 @@ def cli_print_state(agent_name, message, counter, model, debug,  # pylint: disab
         console.print(main_panel)
 
 
-def _create_token_display(interaction_input_tokens, interaction_output_tokens,  # noqa: E501, pylint: disable=R0913
-                          interaction_reasoning_tokens, total_input_tokens,
-                          total_output_tokens, total_reasoning_tokens, model) -> Text:  # noqa: E501
+def cli_print_codeagent_output(agent_name, message_content, code, counter, model, debug,  # pylint: disable=too-many-arguments,too-many-locals,unused-argument,too-many-statements,too-many-branches # noqa: E501
+                               interaction_input_tokens=None,
+                               interaction_output_tokens=None,
+                               interaction_reasoning_tokens=None,
+                               total_input_tokens=None,
+                               total_output_tokens=None,
+                               total_reasoning_tokens=None):
+    """
+    Print CodeAgent output with both the generated code and execution results.
+
+    Args:
+        agent_name: Name of the agent
+        message_content: The execution result message
+        code: The generated Python code
+        counter: Turn counter
+        model: Model name
+        debug: Debug level
+        interaction_input_tokens: Input tokens for current interaction
+        interaction_output_tokens: Output tokens for current interaction
+        interaction_reasoning_tokens: Reasoning tokens for current interaction
+        total_input_tokens: Total input tokens used
+        total_output_tokens: Total output tokens used
+        total_reasoning_tokens: Total reasoning tokens used
+    """
+    if not debug:
+        return
+
+    if debug != 2:  # debug level 2
+        return
+
+    # Use the model from environment variable if available
+    model_override = os.getenv('CAI_MODEL')
+    if model_override:
+        model = model_override
+
+    timestamp = datetime.now().strftime("%H:%M:%S")
+
+    # Create header text
+    header_text = Text()
+    header_text.append(f"[{counter}] ", style="arrow")
+    header_text.append(f"Agent: {agent_name} ", style="timestamp")
+    header_text.append(f"[{timestamp}", style="dim")
+    if model:
+        header_text.append(f" ({model})", style="model")
+    header_text.append("]", style="dim")
+
+    # Create token display if token information is available
+    tokens_text = None
+    if (interaction_input_tokens is not None and  # pylint: disable=R0916 # noqa: E501
+            interaction_output_tokens is not None and
+            interaction_reasoning_tokens is not None and
+            total_input_tokens is not None and
+            total_output_tokens is not None and
+            total_reasoning_tokens is not None):
+
+        tokens_text = _create_token_display(
+            interaction_input_tokens,
+            interaction_output_tokens,
+            interaction_reasoning_tokens,
+            total_input_tokens,
+            total_output_tokens,
+            total_reasoning_tokens,
+            model
+        )
+
+    # Print header
+    console.print(header_text)
+
+    # Create and print code panel
+    if code:
+        try:
+            # Try to format the code for better readability
+            from rich.syntax import Syntax  # pylint: disable=import-outside-toplevel,import-error # noqa: E402,E501
+            syntax = Syntax(code, "python", theme="monokai", line_numbers=True)
+            code_panel = Panel(
+                syntax,
+                title="Generated Code",
+                border_style="arrow",
+                title_align="left",
+                box=ROUNDED,
+                padding=(1, 2),
+                width=console.width
+            )
+            console.print(code_panel)
+        except Exception:  # pylint: disable=broad-exception-caught # noqa: E722,E501
+            # Fallback if syntax highlighting fails
+            code_panel = Panel(
+                Text(code, style="content"),
+                title="Generated Code",
+                border_style="arrow",
+                title_align="left",
+                box=ROUNDED,
+                padding=(1, 2),
+                width=console.width
+            )
+            console.print(code_panel)
+
+    # # Print separator
+    # console.rule(style="dim")
+
+    # Extract execution results from message_content
+    # Look for execution logs section
+    execution_logs = None
+    output = None
+    timeout_error = None
+
+    # Check for timeout error
+    if "Code execution timed out after" in message_content:
+        try:
+            # Extract the timeout message
+            timeout_match = re.search(
+                r"Code execution timed out after (\d+) seconds\.",
+                message_content)
+            if timeout_match:
+                timeout_seconds = timeout_match.group(1)
+                timeout_error = f"Code execution timed out after {
+                    timeout_seconds} seconds."
+
+                # Try to extract logs from timeout message
+                logs_match = re.search(
+                    r"Execution logs before timeout:\n```\n([\s\S]*?)\n```",
+                    message_content)
+                if logs_match:
+                    execution_logs = logs_match.group(1)
+        except Exception:  # pylint: disable=broad-exception-caught # noqa: E722,E501
+            # nosec B110
+            pass
+
+    # If not a timeout, look for regular execution logs
+    if not timeout_error and "Execution logs:" in message_content:
+        try:
+            # Try to extract execution logs between ```...``` markers
+            logs_match = re.search(
+                r"Execution logs:\n```\n([\s\S]*?)\n```",
+                message_content)
+            if logs_match:
+                execution_logs = logs_match.group(1)
+        except Exception:  # pylint: disable=broad-exception-caught # noqa: E722,E501
+            # nosec B110
+            pass
+
+    # Look for output section
+    if "Output:" in message_content:
+        try:
+            output_match = re.search(
+                r"Output: ([\s\S]*?)(?:\n\n|$)",
+                message_content)
+            if output_match:
+                output = output_match.group(1)
+        except Exception:  # pylint: disable=broad-exception-caught # noqa: E722,E501
+            # nosec B110
+            pass
+
+    # Create content for results panel
+    result_content = []
+
+    # Add timeout error if present
+    if timeout_error:
+        result_content.extend([
+            Text("⚠️ " + timeout_error, style="bold red"),
+            Text("")  # Empty line for spacing
+        ])
+
+    if execution_logs:
+        result_content.extend([
+            Text("Execution Logs:", style="timestamp"),
+            Text(execution_logs, style="content"),
+            Text("")  # Empty line for spacing
+        ])
+
+    if output:
+        result_content.extend([
+            Text("Output:", style="timestamp"),
+            Text(output, style="content")
+        ])
+
+    # If we couldn't parse the message, just show the whole thing
+    if not result_content:
+        result_content = [Text(message_content, style="content")]
+
+    # Add token information if available
+    if tokens_text:
+        result_content.append(tokens_text)
+
+    # Create and print results panel
+    results_panel = Panel(
+        Group(*result_content),
+        title="Execution Results",
+        border_style="border",
+        title_align="left",
+        box=ROUNDED,
+        padding=(1, 2),
+        width=console.width
+    )
+    console.print(results_panel)
+
+
+def _create_token_display(  # pylint: disable=too-many-arguments,too-many-locals,too-many-statements,too-many-branches # noqa: E501
+    interaction_input_tokens,
+    interaction_output_tokens,  # noqa: E501, pylint: disable=R0913
+    interaction_reasoning_tokens,
+    total_input_tokens,
+    total_output_tokens,
+    total_reasoning_tokens,
+    model
+) -> Text:  # noqa: E501
     """
     Create a Text object displaying token usage information.
 

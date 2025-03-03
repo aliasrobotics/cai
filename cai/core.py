@@ -32,6 +32,7 @@ from cai.state.common import StateAgent
 from cai.cost.llm_cost import (
     calculate_conversation_cost
 )
+from .agents.codeagent import CodeAgent
 from .util import (
     function_to_json,
     debug_print,
@@ -42,6 +43,7 @@ from .util import (
     get_ollama_api_base,
     check_flag,
     visualize_agent_graph,
+    cli_print_codeagent_output,
 )
 from .types import (
     Agent,
@@ -51,7 +53,6 @@ from .types import (
     Response,
     Result,
 )
-from cai.agents.codeagent import CodeAgent
 
 __CTX_VARS_NAME__ = "context_variables"
 litellm.suppress_debug_info = True
@@ -279,7 +280,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             print("Rate Limit Error:" + str(e))
             time.sleep(60)
             litellm_completion = litellm.completion(**create_params)
-    
+
         if self.rec_training_data:
             self.rec_training_data.rec_training_data(
                 create_params, litellm_completion)
@@ -526,7 +527,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         return partial_response
 
     @exploit_logger.log_agent()
-    def process_interaction(self, active_agent, history, context_variables,  # pylint: disable=too-many-arguments  # noqa: E501
+    def process_interaction(self, active_agent, history, context_variables,  # pylint: disable=too-many-arguments,too-many-locals,too-many-statements,too-many-branches # noqa: E501
                             model_override, stream, debug, execute_tools,
                             n_turn):
         """
@@ -535,12 +536,36 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # Special handling for CodeAgent
         if isinstance(active_agent, CodeAgent):
             # Call CodeAgent's specialized process_interaction method
-            result = active_agent.process_interaction(
+            result, code = active_agent.process_interaction(
                 messages=history,
                 context_variables=context_variables,
-                debug=debug
+                debug=False
             )
-            
+
+            # Extract token usage from CodeAgent and update CAI instance's
+            # token attributes
+            token_usage = active_agent.get_token_usage()
+            self.interaction_input_tokens = (
+                token_usage["interaction_input_tokens"]
+            )
+            self.interaction_output_tokens = (
+                token_usage["interaction_output_tokens"]
+            )
+            self.interaction_reasoning_tokens = (
+                token_usage["interaction_reasoning_tokens"]
+            )
+
+            # Update total tokens
+            self.total_input_tokens += (
+                token_usage["interaction_input_tokens"]
+            )
+            self.total_output_tokens += (
+                token_usage["interaction_output_tokens"]
+            )
+            self.total_reasoning_tokens += (
+                token_usage["interaction_reasoning_tokens"]
+            )
+
             # Create a message from the result
             message_content = result.value
             message = {
@@ -548,17 +573,26 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 "content": message_content,
                 "sender": active_agent.name
             }
-            
+
             # Add message to history
             history.append(message)
-            
-            # Print the message
-            cli_print_agent_messages(active_agent.name,
-                                    message_content,
-                                    n_turn,
-                                    active_agent.model,
-                                    debug)
-            
+
+            # Print the message using the specialized CodeAgent output printer
+            cli_print_codeagent_output(
+                active_agent.name,
+                message_content,
+                code,
+                n_turn,
+                active_agent.model,
+                debug,
+                interaction_input_tokens=self.interaction_input_tokens,
+                interaction_output_tokens=self.interaction_output_tokens,
+                interaction_reasoning_tokens=self.interaction_reasoning_tokens,
+                total_input_tokens=self.total_input_tokens,
+                total_output_tokens=self.total_output_tokens,
+                total_reasoning_tokens=self.total_reasoning_tokens
+            )
+
             # Register in the graph
             self._graph.add_to_graph(graph.Node(
                 name=active_agent.name,
@@ -567,13 +601,13 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 message=message,
                 history=history
             ))
-            
+
             # Update context variables from the result
             context_variables.update(result.context_variables)
-            
+
             # Return None to indicate the turn is complete
             return None
-            
+
         # Regular agent processing (existing code)
         # get completion with current history, agent
         completion = self.get_chat_completion(
@@ -626,8 +660,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 message=message,
                 history=history
             ))
-            return None  # returning None to indicate 
-                         # the turn is complete
+            return None  # returning None to indicate
+            # the turn is complete
 
         # handle function calls, updating context_variables, and switching
         # agents
@@ -653,7 +687,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         return (partial_response.agent
                 if partial_response.agent
                 else active_agent)
-
 
     @exploit_logger.log_response("🚩" + os.getenv('CTF_NAME', 'test') +
                                  " @ " + os.getenv('CI_JOB_ID', 'local'))
