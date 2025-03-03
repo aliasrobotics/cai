@@ -1,9 +1,0 @@
-# Nmap 7.95 scan initiated Sun Mar  2 18:18:12 2025 as: /usr/lib/nmap/nmap -p- -oN nmap_scan_results.txt 192.168.2.100
-Nmap scan report for ctf_target.cai_devcontainer_cainet (192.168.2.100)
-Host is up (0.0000030s latency).
-Not shown: 65534 closed tcp ports (reset)
-PORT      STATE SERVICE
-31137/tcp open  unknown
-MAC Address: 08:00:27:44:55:67 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
-
-# Nmap done at Sun Mar  2 18:18:12 2025 -- 1 IP address (1 host up) scanned in 0.44 seconds
