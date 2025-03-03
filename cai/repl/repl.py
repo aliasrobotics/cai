@@ -7,16 +7,21 @@ import json
 import os
 from importlib.resources import files
 import datetime
+import time
 
 # Third party imports
 from mako.template import Template  # pylint: disable=import-error
 from wasabi import color  # pylint: disable=import-error
 from rich.console import Console  # pylint: disable=import-error
+from rich.panel import Panel  # pylint: disable=import-error
+from rich.box import ROUNDED  # pylint: disable=import-error
 from rich.progress import (  # pylint: disable=import-error
     Progress,
     SpinnerColumn,
     TextColumn
 )
+from rich.text import Text  # pylint: disable=import-error
+from rich.console import Group  # pylint: disable=import-error
 
 # Local imports
 from cai import (
@@ -24,7 +29,7 @@ from cai import (
     is_caiextensions_platform_available
 )
 from cai.core import CAI  # pylint: disable=import-error
-
+from cai.util import GLOBAL_START_TIME
 # Import command system
 from cai.repl.commands import (
     handle_command as commands_handle_command,
@@ -46,6 +51,68 @@ if is_caiextensions_platform_available():
 # Global variables
 client = None  # pylint: disable=invalid-name
 console = Console()
+START_TIME = None  # Global timer start time
+
+
+def format_time(seconds):
+    """Format time in a hacker-like style."""
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    seconds = seconds % 60
+
+    if hours > 0:
+        return f"{hours}h {minutes}m {seconds:.1f}s"
+    if minutes > 0:
+        return f"{minutes}m {seconds:.1f}s"
+    return f"{seconds:.1f}s"
+
+
+def get_elapsed_time():
+    """Get the elapsed time since the start of the session."""
+    if START_TIME is None:
+        return "0.0s"
+
+    elapsed = time.time() - START_TIME
+    return format_time(elapsed)
+
+
+def display_execution_time():
+    """Display the total execution time in a hacker-like style."""
+    if START_TIME is None:
+        return
+
+    current_time = time.time()
+    session_elapsed = current_time - START_TIME
+    session_time_str = format_time(session_elapsed)
+
+    # Get global LLM time from CAI instantiation
+    llm_time = None
+    if GLOBAL_START_TIME is not None:
+        llm_time = current_time - GLOBAL_START_TIME
+        llm_time_str = format_time(llm_time)
+        llm_percentage = (llm_time / session_elapsed) * \
+            100 if session_elapsed > 0 else 0
+
+    # Create a panel for the execution time
+    content = []
+    content.append(
+        f"[bold cyan]Session Time:[/bold cyan] [bold green]{session_time_str}[/bold green]")  # noqa: E501 #pylint: disable=line-too-long
+    if llm_time:
+        content.append(
+            f"[bold cyan]LLM Processing Time:[/bold cyan] [bold yellow]{
+                llm_time_str}[/bold yellow] "
+            f"[dim]({llm_percentage:.1f}% of session)[/dim]"
+        )
+
+    time_panel = Panel(
+        Group(*[Text(line) for line in content]),
+        border_style="blue",
+        box=ROUNDED,
+        padding=(0, 1),
+        title="[bold]Session Statistics[/bold]",
+        title_align="left"
+    )
+    console.print(time_panel)
 
 
 def handle_command(command, args=None):
@@ -63,18 +130,11 @@ def run_demo_loop(  # pylint: disable=too-many-arguments,too-many-locals,too-man
     state_agent=None
 ) -> None:
     """
-    Run the demo loop for CAI.
-
-    Args:
-        starting_agent: The agent to start with
-        context_variables: Optional context variables
-        stream: Whether to stream responses
-        debug: Debug level
-        max_turns: Maximum number of turns
-        ctf: Optional CTF instance to use
-        state_agent: Optional state agent to use
+    Run the demo loop for CAI with enhanced timing and visual feedback.
     """
-    global client  # pylint: disable=global-statement
+    global client, START_TIME  # pylint: disable=global-statement
+    START_TIME = time.time()  # Start the global timer
+
     # Initialize CAI with CTF and state agent if provided
     client = CAI(
         ctf=ctf if os.getenv(
@@ -185,7 +245,7 @@ def run_demo_loop(  # pylint: disable=too-many-arguments,too-many-locals,too-man
                 transient=True,
             ) as progress:
 
-                task = progress.add_task(   # noqa: F841 #pylint: disable=unused-variable # noqa: E501
+                task = progress.add_task(   # noqa: F841,E501 #pylint: disable=unused-variable,line-too-long
                     description="Thinking",
                     total=None)
 
@@ -278,4 +338,6 @@ def run_demo_loop(  # pylint: disable=too-many-arguments,too-many-locals,too-man
                         datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
                     f"\n")
 
+            # Display final execution time
+            display_execution_time()
             break

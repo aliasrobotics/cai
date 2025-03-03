@@ -5,6 +5,7 @@ This module contains utility functions for the CAI library.
 
 # Standard library imports
 import inspect
+import time
 import json
 import os
 import re
@@ -30,6 +31,50 @@ from cai.types import (
     Agent,
     ChatCompletionMessageToolCall
 )
+
+# Global timing variables
+GLOBAL_START_TIME = None
+LAST_TOOL_TIME = None
+
+
+def initialize_global_timer():
+    """Initialize the global timer."""
+    global GLOBAL_START_TIME  # pylint: disable=global-statement
+    GLOBAL_START_TIME = time.time()
+
+
+def reset_global_timer():
+    """Reset the global timer."""
+    global GLOBAL_START_TIME  # pylint: disable=global-statement
+    GLOBAL_START_TIME = None
+
+
+def format_elapsed_time(seconds):
+    """Format elapsed time into a human readable string."""
+    if seconds < 60:
+        return f"{seconds:.1f}s"
+    if seconds < 3600:
+        minutes = seconds // 60
+        seconds = seconds % 60
+        return f"{int(minutes)}m {seconds:.1f}s"
+    hours = seconds // 3600
+    minutes = (seconds % 3600) // 60
+    seconds = seconds % 60
+    return f"{int(hours)}h {int(minutes)}m {seconds:.1f}s"
+
+
+def get_elapsed_time():
+    """Get elapsed time since global start."""
+    if GLOBAL_START_TIME is None:
+        return "0.0s"
+    return format_elapsed_time(time.time() - GLOBAL_START_TIME)
+
+
+def get_tool_elapsed_time():
+    """Get elapsed time since last tool call."""
+    if LAST_TOOL_TIME is None:
+        return "0.0s"
+    return format_elapsed_time(time.time() - LAST_TOOL_TIME)
 
 
 def get_model_input_tokens(model):
@@ -335,7 +380,7 @@ def cli_print_agent_messages(agent_name, message, counter, model, debug,  # pyli
                              total_input_tokens=None,
                              total_output_tokens=None,
                              total_reasoning_tokens=None):
-    """Print agent messages/thoughts."""
+    """Print agent messages/thoughts with enhanced visual formatting."""
     if not debug:
         return
 
@@ -347,22 +392,20 @@ def cli_print_agent_messages(agent_name, message, counter, model, debug,  # pyli
     if model_override:
         model = model_override
 
-    # TODO: consider using the timestamp from the message  # pylint: disable=fixme # noqa: E501
-    # or the LLM interaction timestamp
     timestamp = datetime.now().strftime("%H:%M:%S")
 
+    # Create a more hacker-like header
     text = Text()
-    text.append(f"[{counter}] ", style="arrow")
-    text.append(f"Agent: {agent_name} ", style="timestamp")
+    text.append(f"[{counter}] ", style="bold cyan")
+    text.append(f"Agent: {agent_name} ", style="bold green")
     if message:
-        text.append(f">> {message} ", style="agent")
+        text.append(f">> {message} ", style="yellow")
     text.append(f"[{timestamp}", style="dim")
     if model:
-        text.append(
-            f" ({model})", style="model")
+        text.append(f" ({model})", style="bold magenta")
     text.append("]", style="dim")
 
-    # state and tokens
+    # Add token information with enhanced formatting
     tokens_text = None
     if (interaction_input_tokens is not None and  # pylint: disable=R0916
             interaction_output_tokens is not None and
@@ -382,14 +425,23 @@ def cli_print_agent_messages(agent_name, message, counter, model, debug,  # pyli
         )
         text.append(tokens_text)
 
-    console.print(text)
+    # Create a panel for better visual separation
+    panel = Panel(
+        text,
+        border_style="blue",
+        box=ROUNDED,
+        padding=(0, 1),
+        title="[bold]Agent Interaction[/bold]",
+        title_align="left"
+    )
+    console.print(panel)
 
 
 def cli_print_state(agent_name, message, counter, model, debug,  # pylint: disable=too-many-arguments,too-many-locals,unused-argument # noqa: E501
                     interaction_input_tokens, interaction_output_tokens,
                     interaction_reasoning_tokens, total_input_tokens,
                     total_output_tokens, total_reasoning_tokens):
-    """Print network state messages/thoughts."""
+    """Print network state messages with enhanced visual formatting."""
     if not debug:
         return
 
@@ -401,22 +453,18 @@ def cli_print_state(agent_name, message, counter, model, debug,  # pylint: disab
     if model_override:
         model = model_override
 
-    # TODO: consider using the timestamp from the message  # pylint: disable=fixme # noqa: E501
-    # or the LLM interaction timestamp
     timestamp = datetime.now().strftime("%H:%M:%S")
-    # agent header
+
+    # Create a more hacker-like header
     text = Text()
-    # text.append(f"[{counter}] ", style="arrow")
-    text.append("[-]", style="arrow")  # do not report on the turn
-    text.append(f"Agent: {agent_name} ", style="timestamp")
-    # timestamp and model
+    text.append("[-]", style="bold cyan")
+    text.append(f"Agent: {agent_name} ", style="bold green")
     text.append(f"[{timestamp}", style="dim")
     if model:
-        text.append(
-            f" ({model})", style="model")
+        text.append(f" ({model})", style="bold magenta")
     text.append("]", style="dim")
 
-    # state and tokens
+    # Add token information with enhanced formatting
     tokens_text = None
     if (interaction_input_tokens is not None and  # pylint: disable=R0916
             interaction_output_tokens is not None and
@@ -440,22 +488,21 @@ def cli_print_state(agent_name, message, counter, model, debug,  # pylint: disab
         parsed_message = json.loads(message)
         formatted_message = json.dumps(parsed_message, indent=2)
         group_content.extend([
-            Text(formatted_message, style="content"),
+            Text(formatted_message, style="yellow"),
             tokens_text if tokens_text else Text("")
         ])
     except json.JSONDecodeError:
-        # If message is not valid JSON, use it as-is
         group_content.extend([
-            Text("⚠️ Invalid JSON", style="warning", justify="right"),
-            Text(message, style="content"),
+            Text("⚠️ Invalid JSON", style="bold red", justify="right"),
+            Text(message, style="yellow"),
             tokens_text if tokens_text else Text("")
         ])
 
     if message:
         main_panel = Panel(
             Group(*group_content),
-            title="",
-            border_style="border_state",
+            title="[bold]Network State[/bold]",
+            border_style="green",
             title_align="left",
             box=ROUNDED,
             padding=(1, 2),
@@ -463,8 +510,17 @@ def cli_print_state(agent_name, message, counter, model, debug,  # pylint: disab
             style="content"
         )
 
-    # print
-    console.print(text)
+    # Create a header panel
+    header_panel = Panel(
+        text,
+        border_style="blue",
+        box=ROUNDED,
+        padding=(0, 1),
+        title="[bold]State Agent[/bold]",
+        title_align="left"
+    )
+
+    console.print(header_panel)
     if message:
         console.print(main_panel)
 
@@ -676,74 +732,61 @@ def _create_token_display(  # pylint: disable=too-many-arguments,too-many-locals
     model
 ) -> Text:  # noqa: E501
     """
-    Create a Text object displaying token usage information.
-
-    Args:
-        interaction_input_tokens: Input tokens for current interaction
-        interaction_output_tokens: Output tokens for current interaction
-        interaction_reasoning_tokens: Reasoning tokens for current interaction
-        total_input_tokens: Total input tokens used
-        total_output_tokens: Total output tokens used
-        total_reasoning_tokens: Total reasoning tokens used
-        model: The model being used
-
-    Returns:
-        rich.text.Text: Formatted token display text
+    Create a Text object displaying token usage information
+    with enhanced formatting.
     """
     tokens_text = Text(justify="right")
-    # Current interaction tokens
-    tokens_text.append(
-        "\n(tokens) Interaction: ",
-        style="current_token_count")
-    tokens_text.append(
-        f"I:{interaction_input_tokens} ",
-        style="current_token_count")
-    tokens_text.append(
-        f"O:{interaction_output_tokens} ",
-        style="current_token_count")
-    tokens_text.append(
-        f"R:{interaction_reasoning_tokens} ",
-        style="current_token_count")
 
-    # Calculate current interaction cost
+    # Current interaction tokens with enhanced styling
+    tokens_text.append("\n", style="bold")
+    tokens_text.append("[bold cyan](tokens)[/bold cyan]", style="")
+    tokens_text.append(" Interaction: ", style="bold")
+    tokens_text.append(f"I:{interaction_input_tokens} ", style="green")
+    tokens_text.append(f"O:{interaction_output_tokens} ", style="red")
+    tokens_text.append(f"R:{interaction_reasoning_tokens} ", style="yellow")
+
+    # Calculate and display current interaction cost
     current_costs = calculate_conversation_cost(
         interaction_input_tokens,
         interaction_output_tokens,
         model
     )
-    tokens_text.append(
-        f"(${current_costs['total_cost']:.4f}) ",
-        style="cost")
+    tokens_text.append(f"(${current_costs['total_cost']:.4f}) ", style="bold")
 
-    tokens_text.append("| Total: ", style="total_token_count")
-    tokens_text.append(
-        f"I:{total_input_tokens} ",
-        style="total_token_count")
-    tokens_text.append(
-        f"O:{total_output_tokens} ",
-        style="total_token_count")
-    tokens_text.append(
-        f"R:{total_reasoning_tokens} ",
-        style="total_token_count")
+    # Total tokens with enhanced styling
+    tokens_text.append("| Total: ", style="bold")
+    tokens_text.append(f"I:{total_input_tokens} ", style="green")
+    tokens_text.append(f"O:{total_output_tokens} ", style="red")
+    tokens_text.append(f"R:{total_reasoning_tokens} ", style="yellow")
 
     total_costs = calculate_conversation_cost(
         total_input_tokens,
         total_output_tokens,
         model
     )
-    tokens_text.append(
-        f"(${total_costs['total_cost']:.4f}) ",
-        style="cost")
+    tokens_text.append(f"(${total_costs['total_cost']:.4f}) ", style="bold")
 
-    # Context usage
+    # Context usage with enhanced styling
     context_pct = interaction_input_tokens / \
         get_model_input_tokens(model) * 100
-    tokens_text.append("| Context: ", style="context_tokens")
-    tokens_text.append(f"{context_pct:.1f}% ", style="context_tokens")
+    tokens_text.append("| Context: ", style="bold")
+    tokens_text.append(f"{context_pct:.1f}% ", style="bold")
+
+    # Enhanced context indicator
+    if context_pct < 50:
+        indicator = "🟩"
+        color = "green"
+    elif context_pct < 80:
+        indicator = "🟨"
+        color = "yellow"
+    else:
+        indicator = "🟥"
+        color = "red"
+
     tokens_text.append(
-        f"{'🟩' if context_pct < 50 else '🟨' if context_pct <
-            80 else '🟥'} ({get_model_input_tokens(model)})",
-        style="context_tokens")
+        f"{indicator} ({get_model_input_tokens(model)})",
+        style=color
+    )
 
     return tokens_text
 
@@ -758,8 +801,7 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
                         total_reasoning_tokens,
                         model,
                         debug):
-    """Print tool call information."""
-
+    """Print tool call information with enhanced visual formatting."""
     if not debug:
         return
 
@@ -775,15 +817,28 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
                         if tool_args else {})  # noqa: F541, E127
     args_str = ", ".join(f"{k}={v}" for k, v in filtered_args.items())
 
+    # Create a more hacker-like header with execution time
+    global LAST_TOOL_TIME, GLOBAL_START_TIME  # pylint: disable=global-variable-not-assigned # noqa: E501
+    current_time = time.time()
+
     text = Text()
-    text.append(f"{tool_name}(", style="tool")
-    text.append(args_str, style="args_str")
+    text.append(f"{tool_name}(", style="bold cyan")
+    text.append(args_str, style="yellow")
     if "agent" in tool_name.lower() or "transfer" in tool_name.lower(
     ) or "handoff" in tool_name.lower():
-        text.append("Handoff", style="agent")
+        text.append("Handoff", style="bold green")
+    text.append(")", style="bold cyan")
+
+    # Add timing information
+    total_elapsed = format_elapsed_time(
+        current_time - GLOBAL_START_TIME) if GLOBAL_START_TIME else "0.0s"
+    tool_elapsed = format_elapsed_time(
+        current_time - LAST_TOOL_TIME) if LAST_TOOL_TIME else "0.0s"
     text.append(
-        ") ",
-        style="tool")
+        f" [Total: {total_elapsed} | Tool: {tool_elapsed}]",
+        style="bold magenta")
+
+    LAST_TOOL_TIME = current_time
 
     if tool_output:
         output = str(tool_output)
@@ -805,24 +860,24 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
                 model
             )
 
-        # If title text is too long for panel width, show it in the groups
-        # instead, Convert Text object to string to get length
+        # Handle panel width and content
         title_width = len(str(text))
-        max_title_width = console.width - 4  # Account for panel borders
+        max_title_width = console.width - 4
 
         group_content = []
         if title_width > max_title_width:
             group_content.append(text)
 
         group_content.extend([
-            Text(output, style="content"),
+            Text(output, style="yellow"),
             tokens_text if tokens_text else Text("")
         ])
 
+        # Create a more visually appealing panel
         main_panel = Panel(
             Group(*group_content),
             title="" if title_width > max_title_width else text,
-            border_style="border",
+            border_style="blue",
             title_align="left",
             box=ROUNDED,
             padding=(1, 2),
@@ -831,7 +886,11 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
         )
         console.print(main_panel)
     else:
-        text.append("-> (No output)")
+        # Calculate execution time for no output case
+        exec_time = time.time() - current_time
+        time_str = f"[{exec_time:.2f}s]"
+        text.append(f" {time_str}", style="bold magenta")
+        text.append("-> (No output)", style="dim")
         console.print(text)
 
 
@@ -1111,7 +1170,8 @@ def fix_message_list(messages):  # pylint: disable=R0914,R0915,R0912
             for occ in valid_occurrences:
                 msg_idx, typ, j = occ
                 if typ == "assistant":
-                    removal_assistant_entries.setdefault(msg_idx, set()).add(j)
+                    removal_assistant_entries.setdefault(
+                        msg_idx, set()).add(j)
                 elif typ == "tool":
                     removal_messages.add(msg_idx)
         else:
