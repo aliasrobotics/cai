@@ -402,7 +402,7 @@ class HelpCommand(Command):
         # Tips section
         tips = Panel(
             Text.from_markup(
-                "[bold cyan]Tips:[/bold cyan]\n"
+                "Tips:\n"
                 "• Use [bold]Tab[/bold] for command completion\n"
                 "• Use [bold]↑/↓[/bold] to navigate command history\n"
                 "• Use [bold]Ctrl+L[/bold] to clear the screen\n"

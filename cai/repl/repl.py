@@ -96,10 +96,10 @@ def display_execution_time():
     # Create a panel for the execution time
     content = []
     content.append(
-        f"[bold cyan]Session Time:[/bold cyan] [bold green]{session_time_str}[/bold green]")  # noqa: E501 #pylint: disable=line-too-long
+        f"Session Time: {session_time_str}")  # noqa: E501 #pylint: disable=line-too-long
     if llm_time:
         content.append(
-            f"[bold cyan]LLM Processing Time:[/bold cyan] [bold yellow]{
+            f"LLM Processing Time: [bold yellow]{
                 llm_time_str}[/bold yellow] "
             f"[dim]({llm_percentage:.1f}% of session)[/dim]"
         )

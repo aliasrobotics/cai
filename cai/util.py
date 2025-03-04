@@ -739,7 +739,7 @@ def _create_token_display(  # pylint: disable=too-many-arguments,too-many-locals
 
     # Current interaction tokens with enhanced styling
     tokens_text.append("\n", style="bold")
-    tokens_text.append("[bold cyan](tokens)[/bold cyan]", style="")
+    tokens_text.append("(tokens)", style="")
     tokens_text.append(" Interaction: ", style="bold")
     tokens_text.append(f"I:{interaction_input_tokens} ", style="green")
     tokens_text.append(f"O:{interaction_output_tokens} ", style="red")
@@ -775,17 +775,17 @@ def _create_token_display(  # pylint: disable=too-many-arguments,too-many-locals
     # Enhanced context indicator
     if context_pct < 50:
         indicator = "🟩"
-        color = "green"
+        color_local = "green"
     elif context_pct < 80:
         indicator = "🟨"
-        color = "yellow"
+        color_local = "yellow"
     else:
         indicator = "🟥"
-        color = "red"
+        color_local = "red"
 
     tokens_text.append(
         f"{indicator} ({get_model_input_tokens(model)})",
-        style=color
+        style=color_local
     )
 
     return tokens_text
