@@ -329,11 +329,7 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                     response_report.messages[0]['content'])
                 report_data["history"] = json.dumps(
                     response.messages, indent=4)
-                report_path = create_report(report_data, template)
-
-                console.print(
-                    f"[green]Report generated successfully: {report_path}"
-                    f"[/green]")
+                create_report(report_data, template)
 
             # Log end of session
             with open(session_log, "a", encoding="utf-8") as f:
