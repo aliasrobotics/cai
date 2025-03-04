@@ -306,8 +306,14 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                 model_override=os.getenv('CAI_MODEL', None),
             )
 
+            # Add the first user content to the messages list if it exists
+            if messages and messages[0].get(
+                    "role") == "user" and messages[0].get("content"):
+                if response.messages and response.messages[0].get(
+                        "role") != "user":
+                    response.messages.insert(0, messages[0])
+
             messages = response.messages
-            print(messages)
             # Log assistant response
             if messages and len(messages) > 0:
                 last_message = messages[-1]
