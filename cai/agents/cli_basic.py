@@ -1,13 +1,13 @@
 """Basic CLI agents for CAI and CTFs"""
 import os
 from mako.template import Template  # pylint: disable=import-error
-from cai.types import Agent
-from cai.agents.mail import dns_smtp_agent
-from cai.tools.command_and_control.sshpass import (
+from cai.types import Agent  # pylint: disable=import-error
+from cai.agents.mail import dns_smtp_agent  # pylint: disable=import-error
+from cai.tools.command_and_control.sshpass import (  # pylint: disable=import-error # noqa: E501
     run_ssh_command_with_credentials
 )
-from cai.tools.misc.reasoning import thought
-from cai.tools.reconnaissance.generic_linux_command import (
+from cai.tools.misc.reasoning import thought  # pylint: disable=import-error
+from cai.tools.reconnaissance.generic_linux_command import (  # pylint: disable=import-error # noqa: E501
     generic_linux_command
 )
 
@@ -40,7 +40,7 @@ web_bounty_agent_system_prompt = Template(  # nosec B702
 def boot2root_agent_handoff(ctf=None):  # pylint: disable=unused-argument
     """
     CLI Security Tester, call this function
-    empty CliAgent() to transfer to boot2root_agent
+    empty to transfer to boot2root_agent
     """
     return boot2root_agent
 
@@ -48,7 +48,7 @@ def boot2root_agent_handoff(ctf=None):  # pylint: disable=unused-argument
 def thought_agent_handoff(ctf=None):  # pylint: disable=unused-argument
     """
     Thought Agent, call this function empty
-    Thought_Agent() to transfer to thought_agent
+    to transfer to thought_agent
     """
     return thought_agent
 
@@ -100,6 +100,9 @@ boot2root_agent = Agent(
         run_ssh_command_with_credentials,
         # thought_agent_handoff,
         # Code_Executor_Expert,
+        # web_request_framework,
+        # generate_php_webshell,
+        # upload_ftp_webshell
     ],
     parallel_tool_calls=False,
 )
