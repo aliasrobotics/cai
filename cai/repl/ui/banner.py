@@ -150,8 +150,10 @@ def display_banner(console: Console):
 
     console.print(banner)
 
-    # Create a table showcasing CAI framework capabilities
-    display_framework_capabilities(console)
+    # # Create a table showcasing CAI framework capabilities
+    # #
+    # # reconsider in the future if necessary
+    # display_framework_capabilities(console)
 
 
 def display_framework_capabilities(console: Console):

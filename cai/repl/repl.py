@@ -37,7 +37,7 @@ from cai.repl.commands import (
 )
 
 # Import UI modules
-from cai.repl.ui.banner import display_banner, display_welcome_tips
+from cai.repl.ui.banner import display_banner
 from cai.repl.ui.toolbar import get_toolbar_with_refresh
 from cai.repl.ui.keybindings import create_key_bindings
 from cai.repl.ui.logging import setup_session_logging
@@ -190,8 +190,12 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
     # Create command completer with fuzzy matching
     command_completer = FuzzyCommandCompleter()
 
-    # Display welcome tips
-    display_welcome_tips(console)
+    # # Display welcome tips
+    # #
+    # # reconsider in the future if necessary
+    # # or alternatively, push into a /tips command
+    #
+    # display_welcome_tips(console)
 
     while True:
         try:
