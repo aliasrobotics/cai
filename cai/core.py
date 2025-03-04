@@ -26,7 +26,7 @@ from cai import graph
 # Local imports
 from cai.datarecorder import DataRecorder
 from cai import (
-    transfer_to_state_agent
+    transfer_to_state_agent,
 )
 from cai.state.common import StateAgent
 from cai.cost.llm_cost import (
@@ -260,7 +260,14 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     custom_llm_provider="openai"
                 )
             else:
-                litellm_completion = litellm.completion(**create_params)
+                try:
+                    litellm_completion = litellm.completion(**create_params)
+                except Exception:  # pylint: disable=W0718
+                    create_params["api_base"] = get_ollama_api_base()
+                    create_params["custom_llm_provider"] = "openai"
+                    os.environ["OLLAMA"] = "true"
+                    os.environ["OPENAI_API_KEY"] = "Placeholder"
+                    litellm_completion = litellm.completion(**create_params)
 
         except litellm.exceptions.BadRequestError as e:
             if "LLM Provider NOT provided" in str(e):
@@ -487,6 +494,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 """
                 try:
                     raw_result = function_map[tool_name](**tool_args)
+                except KeyboardInterrupt:
+                    print("\nCtrl+C pressed")
+                    raw_result = ("\n\nCOMMAND INTERRUPTED by user, "
+                                  "probably cause you are bad")
+                    return raw_result
                 except TypeError as e:
                     if "unexpected keyword argument" in str(
                             e):  # Usual Error when open source model try do a handoff # noqa: E501
@@ -852,11 +864,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
             except KeyboardInterrupt:
                 print("\nCtrl+C pressed")
-                try:
-                    time.sleep(2)  # wait for user to press Ctrl+C again
-                except KeyboardInterrupt:
-                    print("\nCtrl+C pressed again")
-                    break
+                break
 
             # Check if the flag is found in the last tool output
             # Accountability
