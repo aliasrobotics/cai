@@ -156,3 +156,6 @@ report/
 # extensions
 caiextensions*/
 pentestperf
+
+# logging
+.cai

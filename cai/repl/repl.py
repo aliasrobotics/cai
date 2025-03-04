@@ -237,8 +237,8 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
             if ctf and len(messages) == 1:
                 pass
             else:
-                # Create a variable to hold the current text for command
-                # shadow
+                # Create a variable to hold the current text
+                # for command shadow
                 current_text = ['']
 
                 # Create key bindings
