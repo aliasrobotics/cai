@@ -72,7 +72,7 @@ Usage Examples:
 
     # Run against a CTF
     CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" \
-        CAI_MODEL="gpt-4o" CAI_TRACING="false" python3 cai/cli.py
+        CAI_MODEL="qwen2.5:14b" CAI_TRACING="true" python3 cai/cli.py
 
     # Run without a target in human-in-the-loop mode, generating a report
     CAI_TRACING=False CAI_REPORT=pentesting CAI_MODEL="gpt-4o" \
@@ -187,7 +187,8 @@ def run_with_env():
             debug=float(os.getenv('CAI_DEBUG', '2')),
             max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
             ctf=ctf if os.getenv('CTF_NAME', None) else None,
-            state_agent=state_agent
+            state_agent=state_agent,
+            source="cli"
         )
 
     finally:

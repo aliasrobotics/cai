@@ -72,6 +72,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                  force_until_flag=False,
                  challenge=None,
                  ctf_inside=True,
+                 source="cli",  # Add source parameter with default value
                  ):
         """
         Initialize the CAI object.
@@ -88,6 +89,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 flag is found. NOTE: This is only used when force_until_flag is
                 True
             ctf_inside: Whether the CTF is inside a docker container
+            source: Source of the CAI call ("cli" or "test_generic")
 
         The CAI object manages the core conversation loop, handling messages,
         tool calls, and agent interactions. It maintains state like:
@@ -103,6 +105,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.ctf_inside = ctf_inside
         self.brief = False
         self.init_len = 0  # initial length of history
+        self.source = source  # Store the source
 
         # graph
         self._graph = graph.get_default_graph()
@@ -789,9 +792,10 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # dependent on the file that invokes it
         #
         if os.getenv("CAI_TRACING", "true").lower() == "true":
+            # Get logging URL based on source
+            logging_url = exploit_logger.get_logger_url(source=self.source)
             print(
-                color("Logging URL: " +
-                      exploit_logger.get_logger_url(),
+                color("Logging URL: " + logging_url,
                       fg="white", bg="pink")
             )
 
