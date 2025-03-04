@@ -77,8 +77,12 @@ class ExploitLogger:
         self.tracing = tracing  # if False, doesn't log anything
         self.active_agent_name = None
 
-    def get_logger_url(self):
-        """Get the current Phoenix logger's log URL."""
+    def get_logger_url(self, source="cli"):
+        """Get the current Phoenix logger's log URL.
+
+        Args:
+            source (str): Source of the call ("cli" or "test_generic")
+        """
         # First try to get span from our context var
         span = current_span.get()
 
@@ -97,8 +101,12 @@ class ExploitLogger:
         span_context = span.get_span_context()
         trace_id_hex = format(span_context.trace_id, "032x")
 
-        return f"http://11.0.0.1:6006/projects/UHJvamVjdDo1/traces/{
-            trace_id_hex}"
+        # Use different project IDs based on source
+        project_id = ("UHJvamVjdDo1"
+                      if source == "test_generic"
+                      else "UHJvamVjdDo5")
+        return f"http://11.0.0.1:6006/projects/{
+            project_id}/traces/{trace_id_hex}"
 
     def log_response(self, chain_element_name):
         """Decorator to log the response of a function call.

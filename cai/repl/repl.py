@@ -127,7 +127,8 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
     debug=False,
     max_turns=float('inf'),
     ctf=None,
-    state_agent=None
+    state_agent=None,
+    source="cli"  # Add source parameter with default value
 ) -> None:
     """
     Run the demo loop for CAI with enhanced timing and visual feedback.
@@ -140,7 +141,8 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
         ctf=ctf if os.getenv(
             'CTF_INSIDE',
             "true").lower() == "true" else None,
-        state_agent=state_agent)
+        state_agent=state_agent,
+        source=source)  # Pass source parameter
 
     # Display banner and welcome message
     display_banner(console)

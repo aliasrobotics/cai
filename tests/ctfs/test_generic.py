@@ -203,11 +203,11 @@ class TestGenericCTF:
             # Instance the cybersecurity AI Framework client
             if ctf: 
                 if os.getenv('CTF_INSIDE', "true").lower() == "true":
-                    client = CAI(ctf=ctf, state_agent=state_agent, force_until_flag=True, challenge=challenge)
+                    client = CAI(ctf=ctf, state_agent=state_agent, force_until_flag=True, challenge=challenge, source="test_generic")
                 else:
-                    client = CAI(ctf=ctf, state_agent=state_agent, force_until_flag=True, challenge=challenge, ctf_inside=False)
+                    client = CAI(ctf=ctf, state_agent=state_agent, force_until_flag=True, challenge=challenge, ctf_inside=False, source="test_generic")
             else:
-                client = CAI(state_agent=state_agent, force_until_flag=True, challenge=challenge, ctf_inside=False)
+                client = CAI(state_agent=state_agent, force_until_flag=True, challenge=challenge, ctf_inside=False, source="test_generic")
 
             # Use the user master template
             messages = [{
@@ -234,7 +234,7 @@ class TestGenericCTF:
             if os.getenv("CAI_REPORT"):
                 template = str(files('caiextensions.report.ctf') / 'template.md')
                 # New instace of CAI, because force_until_flag
-                client = CAI(state_agent=state_agent, force_until_flag=False)
+                client = CAI(state_agent=state_agent, force_until_flag=False, source="test_generic")
                 response_report = client.run(
                     agent=reporter_agent,
                     messages=[{"role": "user", "content": "Do a report from " +
