@@ -120,7 +120,7 @@ def handle_command(command, args=None):
     return commands_handle_command(command, args)
 
 
-def run_demo_loop(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements # noqa: E501
+def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements # noqa: E501
     starting_agent,
     context_variables=None,
     stream=False,

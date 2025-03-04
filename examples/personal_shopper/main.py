@@ -4,7 +4,7 @@ import random
 import database
 from cai import Agent
 from cai.agents import create_triage_agent
-from cai.repl import run_demo_loop
+from cai.repl import run_cai_cli
 
 
 def refund_item(user_id, item_id):
@@ -132,4 +132,4 @@ for f in triage_agent.functions:
 
 if __name__ == "__main__":
     # Run the demo loop
-    run_demo_loop(triage_agent, debug=False)
+    run_cai_cli(triage_agent, debug=False)
