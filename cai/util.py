@@ -31,7 +31,7 @@ from cai.types import (
     Agent,
     ChatCompletionMessageToolCall
 )
-from cai.repl.repl import format_time
+import cai.repl.repl
 
 # Global timing variables
 GLOBAL_START_TIME = None
@@ -54,14 +54,14 @@ def get_elapsed_time():
     """Get elapsed time since global start."""
     if GLOBAL_START_TIME is None:
         return "0.0s"
-    return format_time(time.time() - GLOBAL_START_TIME)
+    return cai.repl.repl.format_time(time.time() - GLOBAL_START_TIME)
 
 
 def get_tool_elapsed_time():
     """Get elapsed time since last tool call."""
     if LAST_TOOL_TIME is None:
         return "0.0s"
-    return format_time(time.time() - LAST_TOOL_TIME)
+    return cai.repl.repl.format_time(time.time() - LAST_TOOL_TIME)
 
 
 def get_model_input_tokens(model):
@@ -817,9 +817,9 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
     text.append(")", style="bold cyan")
 
     # Add timing information
-    total_elapsed = format_time(
+    total_elapsed = cai.repl.repl.format_time(
         current_time - GLOBAL_START_TIME) if GLOBAL_START_TIME else "0.0s"
-    tool_elapsed = format_time(
+    tool_elapsed = cai.repl.repl.format_time(
         current_time - LAST_TOOL_TIME) if LAST_TOOL_TIME else "0.0s"
     text.append(
         f" [Total: {total_elapsed} | Tool: {tool_elapsed}]",
