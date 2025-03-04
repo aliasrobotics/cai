@@ -41,6 +41,9 @@ if cai_agent == "one_tool":
 elif cai_agent == "codeagent":
     from cai.agents.codeagent import codeagent
     cai_initial_agent = codeagent
+elif cai_agent == "boot2root":
+    from cai.agents.cli_basic import boot2root_agent
+    cai_initial_agent = boot2root_agent
 else:
     # stop and raise error
     raise ValueError(f"Invalid CAI agent type: {cai_agent}")

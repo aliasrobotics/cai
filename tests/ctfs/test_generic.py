@@ -50,43 +50,54 @@ Environment Variables:
           or from outside (meaning the dev environment) (default: "true")
 
     Other optional:
-        CAI_MODEL: Model to use for agents (default: "qwen2.5:14b")
-        CAI_DEBUG: Set debug output level (default: "1").
+        CAI_MODEL: Model to use for agents
+            (default: "qwen2.5:14b")
+        CAI_DEBUG: Set debug output level (default: "1")
             - 0: Only tool outputs
             - 1: Verbose debug output
             - 2: CLI debug output
         CAI_BRIEF: Enable/disable brief output mode (default: "false")
-        CAI_MAX_TURNS: Maximum number of turns for agent interactions (default: "inf")
-        CAI_TRACING: Enable/disable OpenTelemetry tracing (default: "true"). When enabled,
-                    traces execution flow and agent interactions for debugging and analysis.
-        CAI_AGENT_TYPE: Specify the agents to use it could take the value of: 
-                     - one_tool (default): one single agent with one tool
-                     - (see others in cai/__init__.py)
-                     - (for creating new agents, see cai/agents/ folder)
-        CAI_STATE: Enable/disable stateful mode (default: "false"). When enabled,
-                      the agent will use a state agent to keep track of the state of the
-                      network and the flags found.
-        CAI_REPORT: Enable/disable reporter mode. It could take the value of: 
-                      - ctf (default): do a report from a ctf resolution
-                      - nis2: do a report for nis2
-                      - pentesting: do a report from a pentesting 
-        
+        CAI_MAX_TURNS: Maximum number of turns for
+            agent interactions (default: "inf")
+        CAI_TRACING: Enable/disable OpenTelemetry tracing
+            (default: "true"). When enabled, traces execution 
+            flow and agent interactions for debugging and analysis.
+        CAI_AGENT_TYPE: Specify the agents to use it could take 
+            the value of (default: "one_tool"): 
+            - one_tool (default): one single agent with one tool
+            - codeagent: unifies LLM agents' actions into a single 
+              action space integrated with Python interpreter
+            - boot2root: use an agent with a speciliced prompt and
+              tools for boot2root CTFs.
+            - (for creating new agents pattern:
+                1. Add the pattern in to cai/agents/ folder
+                2. Add elsif for the new patter in cai/__init__.py
+                3. Document the new value for CAI_AGENT_TYPE)
+        CAI_STATE: Enable/disable stateful mode (default: "false").
+            When enabled, the agent will use a state agent to keep 
+            track of the state of the network and the flags found.
         CAI_MEMORY: Enable/disable memory mode (default: "false")
             - episodic: use episodic memory
             - semantic: use semantic memory
             - all: use both episodic and semantic memorys
-        CAI_MEMORY_ONLINE: Enable/disable online memory mode 
+        CAI_MEMORY_ONLINE: Enable/disable online memory mode
             (default: "false")
-        CAI_MEMORY_OFFLINE: Enable/disable offline memory mode 
+        CAI_MEMORY_OFFLINE: Enable/disable offline memory
             (default: "false")
-        CAI_MEMORY_COLLECTION: Name of the collection in Qdrant
-            in exercises (required if CAI_MEMORY=episodic)
-        CAI_ENV_CONTEXT: Add enviroment context, dirs and current 
-            env available (default: "true")
-        CAI_MEMORY_ONLINE_INTERVAL: Number of turns between 
+        CAI_ENV_CONTEXT: Add enviroment context, dirs and
+            current env available (default: "true")
+        CAI_MEMORY_ONLINE_INTERVAL: Number of turns between
             online memory updates (default: "5")
         CAI_PRICE_LIMIT: Price limit for the conversation in dollars
-            (default: "1")    
+            (default: "1")
+    
+    Extensions (only applicable if the right extension is installed):
+
+        "report"
+            CAI_REPORT: Enable/disable reporter mode. Possible values:
+                - ctf (default): do a report from a ctf resolution
+                - nis2: do a report for nis2
+                - pentesting: do a report from a pentesting      
 """
 
 import pytest

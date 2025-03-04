@@ -107,7 +107,7 @@ dns_smtp_agent = Agent(
         "Inspect domains for mail spoofing vulnerabilities by checking SPF, "
         "DMARC, and DKIM. Use check_mail_spoofing_vulnerability for "
         "detailed reports. Use execute_cli_command for basic scans. "
-        "USE ONLY TOOL CALLS, DONT RETURN REASON. Then return to cli_agent"
+        "USE ONLY TOOL CALLS, DONT RETURN REASON."
     ),
     functions=[check_mail_spoofing_vulnerability, execute_cli_command]
 )

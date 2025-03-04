@@ -20,7 +20,7 @@ def transfer_to_dns_agent():
 
 
 # Prompts
-cli_agent_system_prompt = Template(  # nosec B702
+boot2root_agent_system_prompt = Template(  # nosec B702
     filename="cai/prompts/system_cli_pentest_expert.md"
 ).render()
 
@@ -37,12 +37,12 @@ web_bounty_agent_system_prompt = Template(  # nosec B702
 ).render()
 
 
-def cli_agent_handoff(ctf=None):  # pylint: disable=unused-argument
+def boot2root_agent_handoff(ctf=None):  # pylint: disable=unused-argument
     """
     CLI Security Tester, call this function
-    empty CliAgent() to transfer to cli_agent
+    empty CliAgent() to transfer to boot2root_agent
     """
-    return cli_agent
+    return boot2root_agent
 
 
 def thought_agent_handoff(ctf=None):  # pylint: disable=unused-argument
@@ -58,12 +58,12 @@ thought_agent = Agent(
     name="ThoughAgent",
     model=os.getenv('CAI_MODEL', "qwen2.5:14b"),
     instructions=thought_agent_system_prompt,
-    functions=[thought, cli_agent_handoff],
+    functions=[thought, boot2root_agent_handoff],
     parallel_tool_calls=False
 )
 
 # Update the system prompt to include information about shell sessions
-cli_agent_system_prompt += """
+boot2root_agent_system_prompt += """
 
 ## Shell Session Management
 You can create and manage interactive shell sessions for commands like netcat,
@@ -90,9 +90,9 @@ Example workflow:
     `generic_linux_command("session", "kill <session_id>")`
 """
 
-cli_agent = Agent(
+boot2root_agent = Agent(
     name="Boot2Root CTF Tester",
-    instructions=cli_agent_system_prompt,
+    instructions=boot2root_agent_system_prompt,
     model=os.getenv('CAI_MODEL', "qwen2.5:14b"),
     functions=[
         # execute_cli_command,  # does not support ctf context
@@ -104,5 +104,5 @@ cli_agent = Agent(
     parallel_tool_calls=False,
 )
 
-cli_agent.functions.append(transfer_to_dns_agent)
-dns_smtp_agent.functions.append(cli_agent_handoff)
+boot2root_agent.functions.append(transfer_to_dns_agent)
+dns_smtp_agent.functions.append(boot2root_agent_handoff)

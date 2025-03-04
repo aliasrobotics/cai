@@ -17,7 +17,7 @@ else:
     sys.exit(1)
 
 # Prompts
-cli_agent_system_prompt = Template(filename="cai/prompts/system_cli_pentest_expert.md").render()
+boot2root_agent_system_prompt = Template(filename="cai/prompts/system_cli_pentest_expert.md").render()
 thought_agent_system_prompt = Template(filename="cai/prompts/system_thought_router.md").render()
 env_context = Template(filename="cai/prompts/ctx/env_context.md").render()
 exploit_agent_system_prompt = Template(filename="cai/prompts/system_exploit_expert.md").render()
@@ -42,14 +42,14 @@ ctf.start_ctf()
 
 def CliAgent():
     """
-    CLI Security Tester, call this function empty CliAgent() to transfer to cli_agent
+    CLI Security Tester, call this function empty CliAgent() to transfer to boot2root_agent
     This agent has the following tools:
     execute_cli_command,
     web_request_framework,
     generate_php_webshell,
     upload_ftp_webshell
     """
-    return cli_agent
+    return boot2root_agent
 
 
 def Thought_Agent():
@@ -69,9 +69,9 @@ thought_agent = Agent(
 )
 
 
-cli_agent = Agent(
+boot2root_agent = Agent(
     name="Boot2Root CTF Tester",
-    instructions=cli_agent_system_prompt + env_context,
+    instructions=boot2root_agent_system_prompt + env_context,
     functions=[
         execute_cli_command,
         Thought_Agent,
