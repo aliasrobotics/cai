@@ -130,7 +130,42 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
     state_agent=None
 ) -> None:
     """
-    Run the demo loop for CAI with enhanced timing and visual feedback.
+    Run the interactive CLI loop for Cybersecurity AI
+    (CAI) with enhanced timing and visual feedback.
+
+    This function initializes the CAI environment, displays
+    the banner, and manages the interactive session with
+    the user. It handles CTF challenges if provided and maintains
+    session history and logging.
+
+    Args:
+        starting_agent:
+            The initial agent to use for the conversation
+        context_variables:
+            Optional dictionary of context variables to initialize
+            the session
+        stream:
+            Boolean flag to enable/disable streaming responses
+            (default: False)
+        debug:
+            Boolean flag to enable/disable debug output
+            (default: False)
+        max_turns:
+            Maximum number of interaction turns before terminating
+            (default: infinity)
+        ctf:
+            Optional CTF configuration object for Capture The
+            Flag challenges
+        state_agent:
+            Optional state tracking agent for maintaining network state
+
+    Returns:
+        None
+
+    Note:
+        This function uses global variables for timing
+        and client management. Session logs are stored
+        in the ~/.cai/history directory.
     """
     global client, START_TIME  # pylint: disable=global-statement
     START_TIME = time.time()  # Start the global timer
