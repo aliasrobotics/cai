@@ -1,7 +1,7 @@
 # Personal shopper
 
 This CAI is a personal shopping agent that can help with making sales and refunding orders.
-This example uses the helper function `run_demo_loop`, which allows us to create an interactive CAI session.
+This example uses the helper function `run_cai_cli`, which allows us to create an interactive CAI session.
 In this example, we also use a Sqlite3 database with customer information and transaction data.
 
 ## Overview

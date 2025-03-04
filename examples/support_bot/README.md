@@ -1,7 +1,7 @@
 # Support bot
 
 This example is a customer service bot which includes a user interface agent and a help center agent with several tools.
-This example uses the helper function `run_demo_loop`, which allows us to create an interactive CAI session.
+This example uses the helper function `run_cai_cli`, which allows us to create an interactive CAI session.
 
 ## Overview
 

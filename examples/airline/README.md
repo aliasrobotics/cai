@@ -1,7 +1,7 @@
 # Airline customer service
 
 This example demonstrates a multi-agent setup for handling different customer service requests in an airline context using the CAI framework. The agents can triage requests, handle flight modifications, cancellations, and lost baggage cases.
-This example uses the helper function `run_demo_loop`, which allows us to create an interactive CAI session.
+This example uses the helper function `run_cai_cli`, which allows us to create an interactive CAI session.
 
 ## Agents
 

@@ -174,7 +174,7 @@ At its core, CAI's `client.run()` implements the following loop:
 | **stream**            | `bool`  | If `True`, enables streaming responses                                                                                                                 | `False`        |
 | **debug**             | `bool`  | If `True`, enables debug logging                                                                                                                       | `False`        |
 
-Once `client.run()` is finished (after potentially multiple calls to agents and tools) it will return a `Response` containing all the relevant updated state. Specifically, the new `messages`, the last `Agent` to be called, and the most up-to-date `context_variables`. You can pass these values (plus new user messages) in to your next execution of `client.run()` to continue the interaction where it left off – much like `chat.completions.create()`. (The `run_demo_loop` function implements an example of a full execution loop in `/cai/repl/repl.py`.)
+Once `client.run()` is finished (after potentially multiple calls to agents and tools) it will return a `Response` containing all the relevant updated state. Specifically, the new `messages`, the last `Agent` to be called, and the most up-to-date `context_variables`. You can pass these values (plus new user messages) in to your next execution of `client.run()` to continue the interaction where it left off – much like `chat.completions.create()`. (The `run_cai_cli` function implements an example of a full execution loop in `/cai/repl/repl.py`.)
 
 #### `Response` Fields
 
@@ -377,12 +377,12 @@ Evaluations are crucial to any project, and we encourage developers to bring the
 
 # Utils
 
-Use the `run_demo_loop` to test out your cai! This will run a REPL on your command line. Supports streaming.
+Use the `run_cai_cli` to test out your cai! This will run a REPL on your command line. Supports streaming.
 
 ```python
-from cai.repl import run_demo_loop
+from cai.repl import run_cai_cli
 ...
-run_demo_loop(agent, stream=True)
+run_cai_cli(agent, stream=True)
 ```
 
 # Acknowledgements

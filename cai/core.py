@@ -44,6 +44,7 @@ from .util import (
     check_flag,
     visualize_agent_graph,
     cli_print_codeagent_output,
+    initialize_global_timer,
 )
 from .types import (
     Agent,
@@ -95,6 +96,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         - Network state (if state_agent provided)
         - Training data recording (if enabled)
         """
+        # Initialize global timer at CAI instantiation
+        initialize_global_timer()
+
         self.ctf = ctf
         self.ctf_inside = ctf_inside
         self.brief = False
@@ -762,7 +766,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         - "interaction": a single interaction with the LLM, with
             its corresponding tool calls and responses.
         """
-
+        # No need to initialize timer here since ya se hizo en __init__
         start_time = time.time()
         self.brief = brief
         visualize_agent_graph(agent)

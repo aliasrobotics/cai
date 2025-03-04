@@ -4,7 +4,7 @@ import qdrant_client
 from openai import OpenAI
 
 from cai import Agent
-from cai.repl import run_demo_loop
+from cai.repl import run_cai_cli
 
 # Initialize connections
 client = OpenAI()
@@ -95,4 +95,4 @@ def transfer_to_help_center():
 user_interface_agent.functions.append(transfer_to_help_center)
 
 if __name__ == "__main__":
-    run_demo_loop(user_interface_agent)
+    run_cai_cli(user_interface_agent)
