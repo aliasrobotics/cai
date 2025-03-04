@@ -177,23 +177,30 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
             "true").lower() == "true" else None,
         state_agent=state_agent)
 
-    # Display banner and welcome message
+    # Display CAI banner and welcome message
     display_banner(console)
 
-    messages = []
-    messages_init = []
+    # Initialize message containers
+    messages = []  # Main message history for the conversation
+    messages_init = []  # Stores initial messages, report generation
+
+    # Handle CTF (Capture The Flag) specific setup if enabled
     if ctf:
-        # Get challenge
+        # Determine which challenge to use
         challenge_key = os.getenv('CTF_CHALLENGE')
         challenges = list(ctf.get_challenges().keys())
+        # Use specified challenge if valid, otherwise use first available
+        # challenge
         challenge = challenge_key if challenge_key in challenges else (
             challenges[0] if len(challenges) > 0 else None)
 
+        # Display the active challenge information
         if challenge:
             print(color("Testing challenge: ", fg="white", bg="blue")
                   + color(f"'{challenge}'", fg="white", bg="blue"))
 
-        # Get initial messages aligned with CTF
+        # Create initial message with CTF context using the template
+        # This sets up the conversation with necessary CTF details
         messages += [{
             "role": "user",
             "content": Template(  # nosec B702
@@ -204,13 +211,18 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
             )
         }]
 
-        messages_init = messages
+        # Save initial messages separately to preserve them for report
+        # generation. This allows us to include the initial context
+        # in reports even after the conversation has progressed
+        messages_init = messages.copy()
+
+    # Set the starting agent
     agent = starting_agent
 
-    # Setup logging
+    # Setup session logging to track conversation history
     history_file, session_log, log_interaction = setup_session_logging()
 
-    # Log start of session
+    # Initialize the session log file with metadata
     with open(session_log, "w", encoding="utf-8") as f:
         f.write(
             f"CAI Session started at {
@@ -222,7 +234,7 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                 f.write(f"Challenge: {challenge}\n")
         f.write("\n")
 
-    # Create command completer with fuzzy matching
+    # Initialize command completer with fuzzy matching for better UX
     command_completer = FuzzyCommandCompleter()
 
     # # Display welcome tips
@@ -232,19 +244,22 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
     #
     # display_welcome_tips(console)
 
+    # Main interaction loop
     while True:
         try:
+            # Skip user input prompt for the first message in CTF mode
+            # This allows the initial CTF context to be sent automatically
             if ctf and len(messages) == 1:
                 pass
             else:
                 # Create a variable to hold the current text
-                # for command shadow
+                # for command shadow (showing command suggestions)
                 current_text = ['']
 
-                # Create key bindings
+                # Create key bindings for terminal input handling
                 kb = create_key_bindings(current_text)
 
-                # Get user input
+                # Get user input with command completion and history
                 user_input = get_user_input(
                     command_completer,
                     kb,
@@ -253,31 +268,33 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                     current_text
                 )
 
-                # Record command usage for command shadowing
+                # Record command usage to improve command suggestions over time
                 if user_input.startswith('/'):
                     command_completer.record_command_usage(user_input)
 
-                # Log user input
+                # Log user input to the session log
                 log_interaction("user", user_input)
 
-                # Handle commands
+                # Handle special commands (starting with / or $)
                 if user_input.startswith('/') or user_input.startswith('$'):
                     parts = user_input.strip().split()
                     command = parts[0]
                     args = parts[1:] if len(parts) > 1 else None
 
-                    # Handle the command
+                    # Process the command with the handler
                     if handle_command(command, args):
-                        continue
+                        continue  # Command was handled, continue
+                        # to next iteration
 
-                    # If we get here, command wasn't handled correctly
+                    # If command wasn't recognized, show error
                     console.print(f"[red]Unknown command: {command}[/red]")
                     continue
 
-                # If not a command, add as message to agent
+                # If not a command, add as a regular message to the
+                # conversation
                 messages.append({"role": "user", "content": user_input})
 
-            # Show a spinner while waiting for the response
+            # Show a spinner while waiting for the agent's response
             with Progress(
                 SpinnerColumn(),
                 TextColumn("[progress.description]{task.description}"),
@@ -288,6 +305,7 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                     description="Thinking",
                     total=None)
 
+            # Process the conversation with the agent
             response = client.run(
                 agent=agent,
                 messages=messages,
@@ -298,18 +316,21 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                 model_override=os.getenv('CAI_MODEL', None),
             )
 
+            # Update messages with the response
             messages = response.messages
 
-            # Log assistant response
+            # Log the assistant's response to the session log
             if messages and len(messages) > 0:
                 last_message = messages[-1]
                 if last_message.get(
                         "role") == "assistant" and last_message.get("content"):
                     log_interaction("assistant", last_message["content"])
 
+            # Update the active agent if it changed during the conversation
             if response.agent:
                 agent = response.agent
         except KeyboardInterrupt:
+            # Handle report generation when user interrupts the session
             if is_caiextensions_report_available and os.getenv("CAI_REPORT"):
                 # Show a spinner while generating the report
                 with Progress(
@@ -320,9 +341,12 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                     progress.add_task(
                         description="Generating report...", total=None)
 
+                    # Import the appropriate report module based on report type
                     from caiextensions.report.common import create_report  # pylint: disable=import-error,unused-import,line-too-long,import-outside-toplevel,no-name-in-module # noqa: E501
                     report_type = os.environ.get("CAI_REPORT", "ctf").lower()
 
+                    # Select the appropriate report agent and template based on
+                    # report type
                     if report_type == "pentesting":
                         from caiextensions.report.pentesting.pentesting_agent import reporter_agent  # pylint: disable=import-error,unused-import,line-too-long,import-outside-toplevel,no-name-in-module # noqa: E501
                         template = str(
@@ -339,9 +363,13 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                             files('caiextensions.report.ctf') /
                             'template.md')
 
+                    # Initialize a new CAI client for report generation
                     client = CAI(
                         state_agent=state_agent,
                         force_until_flag=False)
+
+                # Generate the report by sending the conversation history to
+                # the reporter agent
                 response_report = client.run(
                     agent=reporter_agent,
                     messages=[{
@@ -358,21 +386,29 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                             'CAI_MAX_TURNS', 'inf')),
                 )
 
+                # Add the initial context message back to the history
+                # if it exists. This ensures the report includes the
+                # original CTF setup
                 if messages_init:
                     response.messages.insert(0, messages_init[0])
+
+                # Parse the report data and include the full conversation
+                # history
                 report_data = json.loads(
                     response_report.messages[0]['content'])
                 report_data["history"] = json.dumps(
                     response.messages, indent=4)
+
+                # Generate the final report using the template
                 create_report(report_data, template)
 
-            # Log end of session
+            # Log the end of the session
             with open(session_log, "a", encoding="utf-8") as f:
                 f.write(
                     f"\nSession ended at {
                         datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
                     f"\n")
 
-            # Display final execution time
+            # Display the total execution time before exiting
             display_execution_time()
             break
