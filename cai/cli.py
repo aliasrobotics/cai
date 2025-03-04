@@ -105,7 +105,7 @@ from cai import (
     is_pentestperf_available,
     cai_initial_agent
 )
-from cai.repl import run_demo_loop
+from cai.repl import run_cai_cli
 
 if is_pentestperf_available():
     import pentestperf as ptt  # pylint: disable=import-error
