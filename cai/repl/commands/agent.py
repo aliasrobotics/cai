@@ -396,30 +396,6 @@ class AgentCommand(Command):
         console.print(Markdown(markdown_content))
         return True
 
-    def handle_multi(self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
-        """Handle /agent multi command to enable multi-agent mode.
-
-        Args:
-            args: Optional list of command arguments (not used)
-
-        Returns:
-            True if the command was handled successfully
-        """
-        # Check if CAI_MULTI_AGENT environment variable is set
-        multi_agent = os.getenv('CAI_MULTI_AGENT', 'false').lower() == 'true'
-
-        if not multi_agent:
-            # Set the environment variable
-            os.environ['CAI_MULTI_AGENT'] = 'true'
-            console.print("[green]Multi-agent mode enabled[/green]")
-            console.print(
-                "[yellow]Note: This will take effect on restart[/yellow]")
-        else:
-            console.print(
-                "[yellow]Multi-agent mode is already enabled[/yellow]")
-
-        return True
-
 
 # Register the command
 register_command(AgentCommand())

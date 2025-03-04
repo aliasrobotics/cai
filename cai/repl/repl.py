@@ -29,7 +29,7 @@ from cai import (
     is_caiextensions_platform_available
 )
 from cai.core import CAI  # pylint: disable=import-error
-from cai.util import GLOBAL_START_TIME
+from cai.util import GLOBAL_START_TIME, format_time
 # Import command system
 from cai.repl.commands import (
     handle_command as commands_handle_command,
@@ -54,19 +54,6 @@ client = None  # pylint: disable=invalid-name
 START_TIME = None
 current_agent = None  # pylint: disable=invalid-name
 agent = None  # pylint: disable=invalid-name
-
-
-def format_time(seconds):
-    """Format time in a hacker-like style."""
-    hours = int(seconds // 3600)
-    minutes = int((seconds % 3600) // 60)
-    seconds = seconds % 60
-
-    if hours > 0:
-        return f"{hours}h {minutes}m {seconds:.1f}s"
-    if minutes > 0:
-        return f"{minutes}m {seconds:.1f}s"
-    return f"{seconds:.1f}s"
 
 
 def get_elapsed_time():
@@ -136,18 +123,6 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
     """
     global client, START_TIME, current_agent, agent  # pylint: disable=global-statement # noqa: E501
     START_TIME = time.time()  # Start the global timer
-
-    # Check for multi-agent mode
-    multi_agent = os.getenv('CAI_MULTI_AGENT', 'false').lower() == 'true'
-    if multi_agent:
-        console.print(Panel(
-            "[bold green]Multi-agent mode enabled[/bold green]\n"
-            "Use [bold]/agent list[/bold] to see available agents\n"
-            "Use [bold]/agent select <name|number>[/bold] to switch agents",
-            title="Multi-Agent Mode",
-            border_style="green"
-        ))
-
     # Initialize CAI with CTF and state agent if provided
     client = CAI(
         ctf=ctf if os.getenv(
@@ -306,21 +281,7 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                 model_override=os.getenv('CAI_MODEL', None),
             )
 
-            # Add the first user content to the messages list if it exists
-            if messages and messages[0].get(
-                    "role") == "user" and messages[0].get("content"):
-                if response.messages and response.messages[0].get(
-                        "role") != "user":
-                    response.messages.insert(0, messages[0])
-
-            messages = response.messages
-            # Log assistant response
-            if messages and len(messages) > 0:
-                last_message = messages[-1]
-                if last_message.get(
-                        "role") == "assistant" and last_message.get("content"):
-                    log_interaction("assistant", last_message["content"])
-
+            messages.extend(response.messages)
             # Update both agent variables if the response contains a new agent
             if response.agent:
                 agent = response.agent

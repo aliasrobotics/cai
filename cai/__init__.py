@@ -1,63 +1,20 @@
 """
 A library to build Bug Bounty-level grade Cybersecurity AIs (CAIs).
 """
+
 # Standard library imports
-import os
-import pkgutil
-
-from cai.agents.flag_discriminator import (flag_discriminator,
-                                           transfer_to_flag_discriminator)
-
-
-# Extend the search path for namespace packages (allows merging)
-__path__ = pkgutil.extend_path(__path__, __name__)
-
-# Import state transfer functions
-# NOTE: this, together with the logic in test_generic.py,
-# is a workaround to make the state agent work.
-# Need to unify it all together and make it work
-# agnostic to the state agent implementation.
-#
-# TODO: fix this  # pylint: disable=fixme
-from cai.state.pydantic import state_agent
-
-# Get model from environment or use default
-model = os.getenv('CAI_MODEL', "qwen2.5:14b")
-
-
-########################################################
-# MAIN
-########################################################
-
-cai_agent = os.getenv('CAI_AGENT_TYPE', "one_tool").lower()
-
-if cai_agent == "one_tool":
-    from cai.agents.one_tool import ctf_agent_one_tool, transfer_to_ctf_agent_one_tool  # noqa
-    cai_initial_agent = ctf_agent_one_tool  # noqa
-    cai_initial_agent.functions.append(
-        transfer_to_flag_discriminator
-    )
-    flag_discriminator.functions.append(transfer_to_ctf_agent_one_tool)
-elif cai_agent == "codeagent":
-    from cai.agents.codeagent import codeagent
-    cai_initial_agent = codeagent
-elif cai_agent == "boot2root":
-    from cai.agents.cli_basic import boot2root_agent
-    cai_initial_agent = boot2root_agent
-else:
-    # stop and raise error
-    raise ValueError(f"Invalid CAI agent type: {cai_agent}")
-
-
-def transfer_to_state_agent():
-    """
-    Transfer to the state agent
-    """
-    return state_agent
-
+# None
 ########################################################
 # Extensions utilities
 ########################################################
+# Import agents
+from cai.agents import (  # pylint: disable=unused-import # noqa: F401
+    cai_initial_agent, 
+    transfer_to_state_agent,  
+    state_agent, 
+    flag_discriminator,  
+    transfer_to_flag_discriminator,  
+)  
 
 
 def is_pentestperf_available():
