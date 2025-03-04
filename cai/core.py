@@ -260,7 +260,15 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     custom_llm_provider="openai"
                 )
             else:
-                litellm_completion = litellm.completion(**create_params)
+                try:
+                    litellm_completion = litellm.completion(**create_params)
+                except Exception as e:  # pylint: disable=W0718
+                    print(f"Error: {str(e)}")
+                    create_params["api_base"] = get_ollama_api_base()
+                    create_params["custom_llm_provider"] = "openai"
+                    os.environ["OLLAMA"] = "true"
+                    os.environ["OPENAI_API_KEY"] = "Placeholder"
+                    litellm_completion = litellm.completion(**create_params)
 
         except litellm.exceptions.BadRequestError as e:
             if "LLM Provider NOT provided" in str(e):
@@ -284,7 +292,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             if "Invalid first message" in str(e):
                 new_messages = create_params.get("messages", [])
                 if new_messages and new_messages[1].get("role") != "user":
-                    new_messages.insert(1, {"role": "user", "content": "Prompt missed"})
+                    new_messages.insert(
+                        1, {"role": "user", "content": "Prompt missed"})
                     create_params["messages"] = new_messages
                     litellm_completion = litellm.completion(**create_params)
             elif "An assistant message with 'tool_calls'" in str(e) or "`tool_use` blocks must be followed by a user message with `tool_result`" in str(e):  # noqa: E501 # pylint: disable=C0301
@@ -495,7 +504,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     raw_result = function_map[tool_name](**tool_args)
                 except KeyboardInterrupt:
                     print("\nCtrl+C pressed")
-                    raw_result = "\n\nCOMMAND INTERRUPTED by user, probably cause you are bad"
+                    raw_result = ("\n\nCOMMAND INTERRUPTED by user, "
+                                  "probably cause you are bad")
                     return raw_result
                 except TypeError as e:
                     if "unexpected keyword argument" in str(
