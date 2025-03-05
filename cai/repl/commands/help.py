@@ -786,13 +786,13 @@ class HelpCommand(Command):
             try:
                 from caiextensions.platform.base import platform_manager
                 platforms = platform_manager.list_platforms()
-                
+
                 if not platforms:
                     console.print(
                         "[yellow]No platforms registered.[/yellow]"
                     )
                     return True
-                    
+
                 platform_table = create_styled_table(
                     "Available Platforms",
                     [
@@ -804,29 +804,32 @@ class HelpCommand(Command):
 
                 for platform_name in platforms:
                     platform = platform_manager.get_platform(platform_name)
-                    description = getattr(platform, 'description', platform_name.capitalize())
+                    description = getattr(
+                        platform, 'description', platform_name.capitalize())
                     platform_table.add_row(
                         platform_name,
                         description
                     )
 
                 console.print(platform_table)
-                
+
                 # Add platform command examples
                 examples = []
                 for platform_name in platforms:
                     platform = platform_manager.get_platform(platform_name)
                     commands = platform.get_commands()
                     if commands:
-                        examples.append(f"[green]/platform {platform_name} {commands[0]}[/green] - Example {platform_name} command")
-                
+                        examples.append(
+                            f"[green]/platform {platform_name} {
+                                commands[0]}[/green] - Example {platform_name} command")
+
                 if examples:
                     console.print(Panel(
                         "\n".join(examples),
                         title="Platform Command Examples",
                         border_style="blue"
                     ))
-                    
+
                 return True
             except (ImportError, Exception) as e:
                 console.print(

@@ -299,7 +299,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 print(f"Error: {str(e)}")
                 # Fix for null content in messages
                 create_params["messages"] = [
-                    msg if msg.get("content") is not None else 
+                    msg if msg.get("content") is not None else
                     {**msg, "content": ""} for msg in create_params["messages"]
                 ]
                 litellm_completion = litellm.completion(**create_params)
@@ -884,7 +884,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
                 # Standard agent iteration
                 active_agent = agent_iteration(active_agent)
-                
+
                 n_turn += 1
                 if (self.semantic_rag and
                         (n_turn != 0 and n_turn % self.rag_interval == 0)

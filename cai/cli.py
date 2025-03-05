@@ -122,7 +122,7 @@ def initialize_platforms():
     print("Initializing platforms...")
     try:
         from caiextensions.platform.base import platform_manager  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
-        
+
         # Register HTB platform
         try:
             from caiextensions.platform.htb.platform import HTBPlatform  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
@@ -130,34 +130,35 @@ def initialize_platforms():
             print("HTB platform registered successfully.")
         except ImportError as e:
             print(f"Failed to register HTB platform: {e}")
-        
+
         # Register PortSwigger platform
         try:
             # First ensure the module is importable
             import sys
             import os
-            
+
             # Get the path to caiextensions-platform
             caiext_path = None
             for path in sys.path:
                 if os.path.basename(path) == 'caiextensions-platform':
                     caiext_path = path
                     break
-            
+
             if caiext_path:
                 print(f"Found caiextensions-platform at: {caiext_path}")
             else:
                 print("caiextensions-platform not found in sys.path")
-                
+
             # Import the platform module
             from caiextensions.platform.portswigger.platform import PortSwiggerWebAcademy  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
-            platform_manager.register_platform("portswigger", PortSwiggerWebAcademy())
+            platform_manager.register_platform(
+                "portswigger", PortSwiggerWebAcademy())
             print("PortSwigger platform registered successfully.")
         except ImportError as e:
             print(f"Failed to register PortSwigger platform: {e}")
             import traceback
             traceback.print_exc()
-            
+
     except ImportError as e:
         print(f"Failed to initialize platforms: {e}")
         import traceback
