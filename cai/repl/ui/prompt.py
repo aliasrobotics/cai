@@ -3,7 +3,7 @@ Module for CAI REPL prompt functionality.
 """
 from prompt_toolkit import prompt  # pylint: disable=import-error
 from prompt_toolkit.history import FileHistory  # pylint: disable=import-error
-from prompt_toolkit.auto_suggest import AutoSuggestFromHistory  # pylint: disable=import-error
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory  # pylint: disable=import-error # noqa: E501
 from prompt_toolkit.styles import Style  # pylint: disable=import-error
 from prompt_toolkit.formatted_text import HTML  # pylint: disable=import-error
 from cai.repl.commands import FuzzyCommandCompleter
@@ -70,5 +70,6 @@ def get_user_input(
         enable_system_prompt=True,  # Enable shadow prediction
         enable_suspend=True,  # Allow suspending with Ctrl+Z
         enable_open_in_editor=True,  # Allow editing with Ctrl+X Ctrl+E
+        multiline=True,  # Enable multiline input
         rprompt=get_rprompt
     )

@@ -76,6 +76,13 @@ def create_key_bindings(current_text):
                 # Otherwise, start completion
                 buffer.start_completion(select_first=True)
 
+    @kb.add('escape', 'enter')
+    def handle_escape_enter(event):
+        """
+        Alternative way to insert a newline using Escape followed by Enter.
+        """
+        event.current_buffer.insert_text('\n')
+
     @kb.add('right')
     def handle_right_arrow(event):
         """Handle right arrow key to complete command shadow."""
