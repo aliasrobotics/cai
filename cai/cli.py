@@ -178,5 +178,10 @@ def run_with_env():
             ctf.stop_ctf()
 
 
-if __name__ == "__main__":
+def main():
+    """Main entry point for the CLI."""
     run_with_env()
+
+
+if __name__ == "__main__":
+    main()
