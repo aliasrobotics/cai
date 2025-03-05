@@ -59,3 +59,13 @@ def create_reasoner_agent(
         instructions=agent_instructions,
         **kwargs
     )
+
+
+reasoner_agent = create_reasoner_agent()
+
+
+def transfer_to_reasoner(**kwargs) -> str:  # pylint: disable=unused-argument
+    """
+    Transfer the conversation to the reasoner agent.
+    """
+    return reasoner_agent
