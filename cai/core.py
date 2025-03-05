@@ -758,7 +758,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
     def _get_turn_name(self):  # pylint disable=inconsistent-return-statements
         """Get the turn name based on the source."""
-        return "Turn" if self.source == "cli" else "No turn"
+        return (
+            "Turn" if self.source == "cli"
+            else "🚩 " + os.getenv('CTF_NAME', 'test') + " @ " +
+                 os.getenv('CI_JOB_ID', 'local')
+        )
 
     @exploit_logger.log_response(_get_turn_name)
     def run(  # pylint: disable=too-many-arguments,dangerous-default-value,too-many-locals,too-many-statements,too-many-branches # noqa: E501
