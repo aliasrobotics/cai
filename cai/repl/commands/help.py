@@ -783,24 +783,56 @@ class HelpCommand(Command):
     def handle_help_platform_manager(self) -> bool:
         """Show help for platform manager commands."""
         if HAS_PLATFORM_EXTENSIONS and is_caiextensions_platform_available():
-            platform_manager = PlatformManager()
-            platform_table = create_styled_table(
-                "Available Platforms",
-                [
-                    ("Platform", "magenta"),
-                    ("Description", "white")
-                ],
-                "bold magenta"
-            )
-
-            for platform in platform_manager.get_platforms():
-                platform_table.add_row(
-                    platform.name,
-                    platform.description
+            try:
+                from caiextensions.platform.base import platform_manager
+                platforms = platform_manager.list_platforms()
+                
+                if not platforms:
+                    console.print(
+                        "[yellow]No platforms registered.[/yellow]"
+                    )
+                    return True
+                    
+                platform_table = create_styled_table(
+                    "Available Platforms",
+                    [
+                        ("Platform", "magenta"),
+                        ("Description", "white")
+                    ],
+                    "bold magenta"
                 )
 
-            console.print(platform_table)
-            return True
+                for platform_name in platforms:
+                    platform = platform_manager.get_platform(platform_name)
+                    description = getattr(platform, 'description', platform_name.capitalize())
+                    platform_table.add_row(
+                        platform_name,
+                        description
+                    )
+
+                console.print(platform_table)
+                
+                # Add platform command examples
+                examples = []
+                for platform_name in platforms:
+                    platform = platform_manager.get_platform(platform_name)
+                    commands = platform.get_commands()
+                    if commands:
+                        examples.append(f"[green]/platform {platform_name} {commands[0]}[/green] - Example {platform_name} command")
+                
+                if examples:
+                    console.print(Panel(
+                        "\n".join(examples),
+                        title="Platform Command Examples",
+                        border_style="blue"
+                    ))
+                    
+                return True
+            except (ImportError, Exception) as e:
+                console.print(
+                    f"[yellow]Error loading platforms: {e}[/yellow]"
+                )
+                return True
 
         console.print(
             "[yellow]No platform extensions available.[/yellow]"
