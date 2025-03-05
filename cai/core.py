@@ -153,6 +153,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             self.semantic_builder = semantic_builder
         self.challenge = challenge
         self.total_cost = 0
+        # Logging url gobal until CAI ends
+        self.logging_url = None
         # load env variables
         load_dotenv()
 
@@ -756,8 +758,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 if partial_response.agent
                 else active_agent)
 
-    @exploit_logger.log_response("🚩" + os.getenv('CTF_NAME', 'test') +
-                                 " @ " + os.getenv('CI_JOB_ID', 'local'))
+    # @exploit_logger.log_response("🚩" + os.getenv('CTF_NAME', 'test') +
+    #                          " @ " + os.getenv('CI_JOB_ID', 'local'))
     def run(  # pylint: disable=too-many-arguments,dangerous-default-value,too-many-locals,too-many-statements,too-many-branches # noqa: E501
         self,
         agent: Agent,
@@ -793,9 +795,12 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         #
         if os.getenv("CAI_TRACING", "true").lower() == "true":
             # Get logging URL based on source
-            logging_url = exploit_logger.get_logger_url(source=self.source)
+            if self.logging_url is None:
+                self.logging_url = exploit_logger.get_logger_url(
+                    source=self.source)
+
             print(
-                color("Logging URL: " + logging_url,
+                color("Logging URL: " + self.logging_url,
                       fg="white", bg="pink")
             )
 
