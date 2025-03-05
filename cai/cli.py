@@ -59,6 +59,10 @@ Environment Variables
             online memory updates (default: "5")
         CAI_PRICE_LIMIT: Price limit for the conversation in dollars
             (default: "1")
+        CAI_SUPPORT_MODEL: Model to use for the support agent
+            (default: "o3-mini")
+        CAI_SUPPPORT_INTERVAL: Number of turns between support agent
+            executions (default: "5")
 
     Extensions (only applicable if the right extension is installed):
 
