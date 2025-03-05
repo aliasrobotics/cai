@@ -648,7 +648,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # NOTE: considered handoffs but they don't
         # seem to perform well when in combination
         # with code gen.
-        return None
+        #
+        # For now, return the same CodeAgent
+        return active_agent
 
     @exploit_logger.log_agent()
     def process_interaction(self, active_agent, history, context_variables,  # pylint: disable=too-many-arguments,too-many-locals,too-many-statements,too-many-branches # noqa: E501
