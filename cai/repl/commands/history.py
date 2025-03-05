@@ -66,6 +66,10 @@ class HistoryCommand(Command):
             else:
                 role_style = "red"
 
+            # Add a newline between each role for better readability
+            if idx > 1:
+                table.add_row("", "", "")
+
             table.add_row(
                 str(idx),
                 f"[{role_style}]{role}[/{role_style}]",
