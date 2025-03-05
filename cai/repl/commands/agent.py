@@ -3,32 +3,32 @@ Agent command for CAI REPL.
 This module provides commands for managing and switching between agents.
 """
 # Standard library imports
+import inspect
 import importlib
 import os
-import inspect
 import pkgutil
+import sys
 from typing import (
     Dict,
     List,
     Optional
 )
-import sys
+
 # Third-party imports
 from rich.console import Console  # pylint: disable=import-error
-from rich.table import Table  # pylint: disable=import-error
 from rich.markdown import Markdown  # pylint: disable=import-error
+from rich.table import Table  # pylint: disable=import-error
 
 # Local imports
-from cai.types import Agent
-from cai.repl.commands.base import Command, register_command
 from cai import (
     state_agent,
     transfer_to_state_agent
 )
-
-# Import core agents that are guaranteed to be available
-from cai.agents.one_tool import ctf_agent_one_tool
 from cai.agents.codeagent import codeagent
+from cai.agents.one_tool import ctf_agent_one_tool
+from cai.repl.commands.base import Command, register_command
+from cai.types import Agent
+from cai.util import visualize_agent_graph
 import cai.agents
 
 console = Console()
@@ -325,6 +325,7 @@ class AgentCommand(Command):
 
                 console.print(
                     f"[green]Switched to agent: {agent_name}[/green]")
+                visualize_agent_graph(agent)
                 return True
             console.print("[red]Error: CAI client not initialized[/red]")
             return False

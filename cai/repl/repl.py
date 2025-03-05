@@ -3,6 +3,7 @@ This module provides a REPL interface for testing and
 interacting with CAI agents.
 """
 # Standard library imports
+
 import json
 import os
 from importlib.resources import files
@@ -56,6 +57,7 @@ client = None  # pylint: disable=invalid-name
 START_TIME = None
 current_agent = None  # pylint: disable=invalid-name
 agent = None  # pylint: disable=invalid-name
+messages = []  # Global messages list to store conversation history
 
 
 def get_elapsed_time():
@@ -111,6 +113,15 @@ def handle_command(command, args=None):
     return commands_handle_command(command, args)
 
 
+def get_messages():
+    """Get the current conversation messages.
+
+    Returns:
+        list: The list of conversation messages
+    """
+    return messages
+
+
 @exploit_logger.log_response("🚩" + os.getenv('CTF_NAME', 'CLI') +
                              " @ " + os.getenv('CI_JOB_ID', 'run_cai_cli'))
 def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements # noqa: E501
@@ -124,9 +135,46 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
     source="cli"  # Add source parameter with default value
 ) -> None:
     """
-    Run the demo loop for CAI with enhanced timing and visual feedback.
+    Run the interactive CLI loop for Cybersecurity AI
+    (CAI) with enhanced timing and visual feedback.
+
+    This function initializes the CAI environment, displays
+    the banner, and manages the interactive session with
+    the user. It handles CTF challenges if provided and maintains
+    session history and logging.
+
+    Args:
+        starting_agent:
+            The initial agent to use for the conversation
+        context_variables:
+            Optional dictionary of context variables to initialize
+            the session
+        stream:
+            Boolean flag to enable/disable streaming responses
+            (default: False)
+        debug:
+            Boolean flag to enable/disable debug output
+            (default: False)
+        max_turns:
+            Maximum number of interaction turns before terminating
+            (default: infinity)
+        ctf:
+            Optional CTF configuration object for Capture The
+            Flag challenges
+        state_agent:
+            Optional state tracking agent for maintaining network state
+
+    Returns:
+        None
+
+    Note:
+        This function uses global variables for timing
+        and client management. Session logs are stored
+        in the ~/.cai/history directory.
     """
-    global client, START_TIME, current_agent, agent  # pylint: disable=global-statement # noqa: E501
+    # Using globals to maintain state across function calls
+    # pylint: disable=global-statement
+    global client, START_TIME, current_agent, agent, messages
     START_TIME = time.time()  # Start the global timer
     # Initialize CAI with CTF and state agent if provided
     client = CAI(
@@ -143,7 +191,7 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
     current_agent = starting_agent
     agent = starting_agent  # Initialize the agent variable as well
 
-    # Display banner and welcome message
+    # Display CAI banner and welcome message
     display_banner(console)
 
     # Check for active VPN connection
@@ -168,20 +216,24 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
         except ImportError:
             pass
 
-    messages = []
+    messages = []  # Initialize the global messages list
     messages_init = []
     if ctf:
-        # Get challenge
+        # Determine which challenge to use
         challenge_key = os.getenv('CTF_CHALLENGE')
         challenges = list(ctf.get_challenges().keys())
+        # Use specified challenge if valid, otherwise use first available
+        # challenge
         challenge = challenge_key if challenge_key in challenges else (
             challenges[0] if len(challenges) > 0 else None)
 
+        # Display the active challenge information
         if challenge:
             print(color("Testing challenge: ", fg="white", bg="blue")
                   + color(f"'{challenge}'", fg="white", bg="blue"))
 
-        # Get initial messages aligned with CTF
+        # Create initial message with CTF context using the template
+        # This sets up the conversation with necessary CTF details
         messages += [{
             "role": "user",
             "content": Template(  # nosec B702
@@ -192,14 +244,14 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
             )
         }]
 
-        messages_init = messages
+        messages_init = messages.copy()
     current_agent = starting_agent  # Set the global current_agent
     agent = starting_agent  # Set the global agent variable as well
 
-    # Setup logging
+    # Setup session logging to track conversation history
     history_file, session_log, log_interaction = setup_session_logging()
 
-    # Log start of session
+    # Initialize the session log file with metadata
     with open(session_log, "w", encoding="utf-8") as f:
         f.write(
             f"CAI Session started at {
@@ -211,7 +263,7 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                 f.write(f"Challenge: {challenge}\n")
         f.write("\n")
 
-    # Create command completer with fuzzy matching
+    # Initialize command completer with fuzzy matching for better UX
     command_completer = FuzzyCommandCompleter()
 
     # # Display welcome tips
@@ -221,19 +273,22 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
     #
     # display_welcome_tips(console)
 
+    # Main interaction loop
     while True:
         try:
+            # Skip user input prompt for the first message in CTF mode
+            # This allows the initial CTF context to be sent automatically
             if ctf and len(messages) == 1:
                 pass
             else:
-                # Create a variable to hold the current text for command
-                # shadow
+                # Create a variable to hold the current text
+                # for command shadow (showing command suggestions)
                 current_text = ['']
 
-                # Create key bindings
+                # Create key bindings for terminal input handling
                 kb = create_key_bindings(current_text)
 
-                # Get user input
+                # Get user input with command completion and history
                 user_input = get_user_input(
                     command_completer,
                     kb,
@@ -242,31 +297,33 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                     current_text
                 )
 
-                # Record command usage for command shadowing
+                # Record command usage to improve command suggestions over time
                 if user_input.startswith('/'):
                     command_completer.record_command_usage(user_input)
 
-                # Log user input
+                # Log user input to the session log
                 log_interaction("user", user_input)
 
-                # Handle commands
+                # Handle special commands (starting with / or $)
                 if user_input.startswith('/') or user_input.startswith('$'):
                     parts = user_input.strip().split()
                     command = parts[0]
                     args = parts[1:] if len(parts) > 1 else None
 
-                    # Handle the command
+                    # Process the command with the handler
                     if handle_command(command, args):
-                        continue
+                        continue  # Command was handled, continue
+                        # to next iteration
 
-                    # If we get here, command wasn't handled correctly
+                    # If command wasn't recognized, show error
                     console.print(f"[red]Unknown command: {command}[/red]")
                     continue
 
-                # If not a command, add as message to agent
+                # If not a command, add as a regular message to the
+                # conversation
                 messages.append({"role": "user", "content": user_input})
 
-            # Show a spinner while waiting for the response
+            # Show a spinner while waiting for the agent's response
             with Progress(
                 SpinnerColumn(),
                 TextColumn("[progress.description]{task.description}"),
@@ -277,6 +334,7 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                     description="Thinking",
                     total=None)
 
+            # Process the conversation with the agent
             response = client.run(
                 agent=current_agent,  # Use the global current_agent
                 messages=messages,
@@ -293,6 +351,7 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                 agent = response.agent
                 current_agent = response.agent
         except KeyboardInterrupt:
+            # Handle report generation when user interrupts the session
             if is_caiextensions_report_available and os.getenv("CAI_REPORT"):
                 # Show a spinner while generating the report
                 with Progress(
@@ -303,9 +362,12 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                     progress.add_task(
                         description="Generating report...", total=None)
 
+                    # Import the appropriate report module based on report type
                     from caiextensions.report.common import create_report  # pylint: disable=import-error,unused-import,line-too-long,import-outside-toplevel,no-name-in-module # noqa: E501
                     report_type = os.environ.get("CAI_REPORT", "ctf").lower()
 
+                    # Select the appropriate report agent and template based on
+                    # report type
                     if report_type == "pentesting":
                         from caiextensions.report.pentesting.pentesting_agent import reporter_agent  # pylint: disable=import-error,unused-import,line-too-long,import-outside-toplevel,no-name-in-module # noqa: E501
                         template = str(
@@ -322,9 +384,13 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                             files('caiextensions.report.ctf') /
                             'template.md')
 
+                    # Initialize a new CAI client for report generation
                     client = CAI(
                         state_agent=state_agent,
                         force_until_flag=False)
+
+                # Generate the report by sending the conversation history to
+                # the reporter agent
                 response_report = client.run(
                     agent=reporter_agent,
                     messages=[{
@@ -341,21 +407,29 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                             'CAI_MAX_TURNS', 'inf')),
                 )
 
+                # Add the initial context message back to the history
+                # if it exists. This ensures the report includes the
+                # original CTF setup
                 if messages_init:
                     response.messages.insert(0, messages_init[0])
+
+                # Parse the report data and include the full conversation
+                # history
                 report_data = json.loads(
                     response_report.messages[0]['content'])
                 report_data["history"] = json.dumps(
                     response.messages, indent=4)
+
+                # Generate the final report using the template
                 create_report(report_data, template)
 
-            # Log end of session
+            # Log the end of the session
             with open(session_log, "a", encoding="utf-8") as f:
                 f.write(
                     f"\nSession ended at {
                         datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
                     f"\n")
 
-            # Display final execution time
+            # Display the total execution time before exiting
             display_execution_time()
             break
