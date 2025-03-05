@@ -793,7 +793,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         if os.getenv("CAI_TRACING", "true").lower() == "true":
             # Get logging URL based on source
             logging_url = exploit_logger.get_logger_url(source=self.source)
-
             print(
                 color("Logging URL: " + logging_url,
                       fg="white", bg="pink")
