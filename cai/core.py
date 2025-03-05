@@ -42,7 +42,6 @@ from .util import (
     cli_print_state,
     get_ollama_api_base,
     check_flag,
-    visualize_agent_graph,
     cli_print_codeagent_output,
     initialize_global_timer,
 )
@@ -769,8 +768,10 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # No need to initialize timer here since ya se hizo en __init__
         start_time = time.time()
         self.brief = brief
-        visualize_agent_graph(agent)
         self.init_len = len(messages)
+
+        # visualize_agent_graph(agent)  # Do not show the agent
+        #                               # graph for every run()
 
         # TODO: consider moving this outside of CAI  # pylint: disable=fixme  # noqa: E501
         # as the logging URL has a harcoded bit which is
