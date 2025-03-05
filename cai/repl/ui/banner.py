@@ -219,6 +219,7 @@ def display_welcome_tips(console: Console):
         "[white]• Type /help for available commands[/white]\n"
         "[white]• Type /help aliases for command shortcuts[/white]\n"
         "[white]• Press Ctrl+L to clear the screen[/white]\n"
+        "[white]• Press Esc+Enter to add a new line (multiline input)[/white]\n"
         "[white]• Press Ctrl+C to exit[/white]",
         title="Quick Tips",
         border_style="blue"
