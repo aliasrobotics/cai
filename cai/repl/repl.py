@@ -29,7 +29,7 @@ from cai import (
     is_caiextensions_platform_available
 )
 from cai.core import CAI  # pylint: disable=import-error
-from cai.util import GLOBAL_START_TIME
+from cai.util import GLOBAL_START_TIME, format_time
 # Import command system
 from cai.repl.commands import (
     handle_command as commands_handle_command,
@@ -49,22 +49,11 @@ if is_caiextensions_platform_available():
     )
 
 # Global variables
-client = None  # pylint: disable=invalid-name
 console = Console()
-START_TIME = None  # Global timer start time
-
-
-def format_time(seconds):
-    """Format time in a hacker-like style."""
-    hours = int(seconds // 3600)
-    minutes = int((seconds % 3600) // 60)
-    seconds = seconds % 60
-
-    if hours > 0:
-        return f"{hours}h {minutes}m {seconds:.1f}s"
-    if minutes > 0:
-        return f"{minutes}m {seconds:.1f}s"
-    return f"{seconds:.1f}s"
+client = None  # pylint: disable=invalid-name
+START_TIME = None
+current_agent = None  # pylint: disable=invalid-name
+agent = None  # pylint: disable=invalid-name
 
 
 def get_elapsed_time():
@@ -127,7 +116,8 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
     debug=False,
     max_turns=float('inf'),
     ctf=None,
-    state_agent=None
+    state_agent=None,
+    source="cli"  # Add source parameter with default value
 ) -> None:
     """
     Run the interactive CLI loop for Cybersecurity AI
@@ -167,24 +157,50 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
         and client management. Session logs are stored
         in the ~/.cai/history directory.
     """
-    global client, START_TIME  # pylint: disable=global-statement
+    global client, START_TIME, current_agent, agent  # pylint: disable=global-statement # noqa: E501
     START_TIME = time.time()  # Start the global timer
-
     # Initialize CAI with CTF and state agent if provided
     client = CAI(
         ctf=ctf if os.getenv(
             'CTF_INSIDE',
             "true").lower() == "true" else None,
-        state_agent=state_agent)
+        state_agent=state_agent,
+        source=source)  # Pass source parameter
+
+    # Set the initial active agent
+    client.active_agent = starting_agent
+
+    # Initialize the current_agent global variable
+    current_agent = starting_agent
+    agent = starting_agent  # Initialize the agent variable as well
 
     # Display CAI banner and welcome message
     display_banner(console)
 
-    # Initialize message containers
-    messages = []  # Main message history for the conversation
-    messages_init = []  # Stores initial messages, report generation
+    # Check for active VPN connection
+    if is_caiextensions_platform_available():
+        try:
+            from caiextensions.platform.htb.cli import (  # pylint: disable=import-error,import-outside-toplevel,line-too-long # noqa: E501
+                is_vpn_connected, get_vpn_ip
+            )
+            if is_vpn_connected():
+                console.print(Panel(
+                    "\n".join([
+                        "[green]VPN Connected[/green]",
+                        f"IP: {get_vpn_ip()}",
+                        "Use [bold]/platform vpn-status[/bold] to check "
+                        "status",
+                        "Use [bold]/platform keep-vpn[/bold] to make "
+                        "connection persistent"
+                    ]),
+                    title="HackTheBox VPN Status",
+                    border_style="green"
+                ))
+        except ImportError:
+            pass
 
-    # Handle CTF (Capture The Flag) specific setup if enabled
+    messages = []
+    messages_init = []
     if ctf:
         # Determine which challenge to use
         challenge_key = os.getenv('CTF_CHALLENGE')
@@ -211,13 +227,9 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
             )
         }]
 
-        # Save initial messages separately to preserve them for report
-        # generation. This allows us to include the initial context
-        # in reports even after the conversation has progressed
         messages_init = messages.copy()
-
-    # Set the starting agent
-    agent = starting_agent
+    current_agent = starting_agent  # Set the global current_agent
+    agent = starting_agent  # Set the global agent variable as well
 
     # Setup session logging to track conversation history
     history_file, session_log, log_interaction = setup_session_logging()
@@ -307,7 +319,7 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
 
             # Process the conversation with the agent
             response = client.run(
-                agent=agent,
+                agent=current_agent,  # Use the global current_agent
                 messages=messages,
                 context_variables=context_variables or {},
                 stream=stream,
@@ -316,19 +328,11 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                 model_override=os.getenv('CAI_MODEL', None),
             )
 
-            # Update messages with the response
-            messages = response.messages
-
-            # Log the assistant's response to the session log
-            if messages and len(messages) > 0:
-                last_message = messages[-1]
-                if last_message.get(
-                        "role") == "assistant" and last_message.get("content"):
-                    log_interaction("assistant", last_message["content"])
-
-            # Update the active agent if it changed during the conversation
+            messages.extend(response.messages)
+            # Update both agent variables if the response contains a new agent
             if response.agent:
                 agent = response.agent
+                current_agent = response.agent
         except KeyboardInterrupt:
             # Handle report generation when user interrupts the session
             if is_caiextensions_report_available and os.getenv("CAI_REPORT"):

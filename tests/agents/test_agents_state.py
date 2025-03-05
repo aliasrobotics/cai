@@ -60,7 +60,7 @@ MODELS = [
 
     ## Closed models 
     # "gpt-4o-mini",
-    # "gpt-4o",
+    #"gpt-4o",
     # "deepseek/deepseek-chat",
     # "claude-3-5-sonnet-20240620"
 ]

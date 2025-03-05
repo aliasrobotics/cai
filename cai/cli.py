@@ -22,13 +22,29 @@ Environment Variables
         CAI_MODEL: Model to use for agents
             (default: "qwen2.5:14b")
         CAI_DEBUG: Set debug output level (default: "1")
+            - 0: Only tool outputs
+            - 1: Verbose debug output
+            - 2: CLI debug output
         CAI_BRIEF: Enable/disable brief output mode (default: "false")
         CAI_MAX_TURNS: Maximum number of turns for
             agent interactions (default: "inf")
         CAI_TRACING: Enable/disable OpenTelemetry tracing
-            (default: "true")
-        CAI_AGENT_TYPE: Specify agent type (default: "one_tool")
-        CAI_STATE: Enable/disable stateful mode (default: "false")
+            (default: "true"). When enabled, traces execution
+            flow and agent interactions for debugging and analysis.
+        CAI_AGENT_TYPE: Specify the agents to use it could take
+            the value of (default: "one_tool"):
+            - one_tool (default): one single agent with one tool
+            - codeagent: unifies LLM agents' actions into a single
+              action space integrated with Python interpreter
+            - boot2root: use an agent with a speciliced prompt and
+              tools for boot2root CTFs.
+            - (for creating new agents pattern:
+                1. Add the pattern in to cai/agents/ folder
+                2. Add elsif for the new patter in cai/__init__.py
+                3. Document the new value for CAI_AGENT_TYPE)
+        CAI_STATE: Enable/disable stateful mode (default: "false").
+            When enabled, the agent will use a state agent to keep
+            track of the state of the network and the flags found.
         CAI_MEMORY: Enable/disable memory mode (default: "false")
             - episodic: use episodic memory
             - semantic: use semantic memory
@@ -43,6 +59,7 @@ Environment Variables
             online memory updates (default: "5")
         CAI_PRICE_LIMIT: Price limit for the conversation in dollars
             (default: "1")
+
     Extensions (only applicable if the right extension is installed):
 
         "report"
@@ -55,7 +72,7 @@ Usage Examples:
 
     # Run against a CTF
     CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" \
-        CAI_MODEL="gpt-4o" CAI_TRACING="false" python3 cai/cli.py
+        CAI_MODEL="qwen2.5:14b" CAI_TRACING="true" python3 cai/cli.py
 
     # Run without a target in human-in-the-loop mode, generating a report
     CAI_TRACING=False CAI_REPORT=pentesting CAI_MODEL="gpt-4o" \
@@ -84,9 +101,11 @@ from wasabi import color  # pylint: disable=import-error
 
 # Local imports
 
-from cai import is_pentestperf_available
+from cai import (
+    is_pentestperf_available,
+    cai_initial_agent
+)
 from cai.repl import run_cai_cli
-from cai import cai_initial_agent
 
 if is_pentestperf_available():
     import pentestperf as ptt  # pylint: disable=import-error
@@ -168,7 +187,8 @@ def run_with_env():
             debug=float(os.getenv('CAI_DEBUG', '2')),
             max_turns=float(os.getenv('CAI_MAX_TURNS', 'inf')),
             ctf=ctf if os.getenv('CTF_NAME', None) else None,
-            state_agent=state_agent
+            state_agent=state_agent,
+            source="cli"
         )
 
     finally:

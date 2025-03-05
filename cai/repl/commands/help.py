@@ -157,7 +157,7 @@ class HelpCommand(Command):
             "• [yellow]/agent info <n>[/yellow] - Show details about an "
             "agent\n\n"
             "[bold]Examples:[/bold]\n"
-            "• [green]/agent use cli_agent[/green] - Switch to the CLI "
+            "• [green]/agent use boot2root_agent[/green] - Switch to the CLI "
             "security testing agent\n"
             "• [green]/agent use dns_smtp_agent[/green] - Switch to the "
             "DNS/SMTP reconnaissance agent",

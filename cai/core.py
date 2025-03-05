@@ -26,7 +26,7 @@ from cai import graph
 # Local imports
 from cai.datarecorder import DataRecorder
 from cai import (
-    transfer_to_state_agent
+    transfer_to_state_agent,
 )
 from cai.state.common import StateAgent
 from cai.cost.llm_cost import (
@@ -71,6 +71,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                  force_until_flag=False,
                  challenge=None,
                  ctf_inside=True,
+                 source="cli",  # Add source parameter with default value
                  ):
         """
         Initialize the CAI object.
@@ -87,6 +88,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 flag is found. NOTE: This is only used when force_until_flag is
                 True
             ctf_inside: Whether the CTF is inside a docker container
+            source: Source of the CAI call ("cli" or "test_generic")
 
         The CAI object manages the core conversation loop, handling messages,
         tool calls, and agent interactions. It maintains state like:
@@ -102,6 +104,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.ctf_inside = ctf_inside
         self.brief = False
         self.init_len = 0  # initial length of history
+        self.source = source  # Store the source
 
         # graph
         self._graph = graph.get_default_graph()
@@ -259,7 +262,14 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     custom_llm_provider="openai"
                 )
             else:
-                litellm_completion = litellm.completion(**create_params)
+                try:
+                    litellm_completion = litellm.completion(**create_params)
+                except Exception:  # pylint: disable=W0718
+                    create_params["api_base"] = get_ollama_api_base()
+                    create_params["custom_llm_provider"] = "openai"
+                    os.environ["OLLAMA"] = "true"
+                    os.environ["OPENAI_API_KEY"] = "Placeholder"
+                    litellm_completion = litellm.completion(**create_params)
 
         except litellm.exceptions.BadRequestError as e:
             if "LLM Provider NOT provided" in str(e):
@@ -486,6 +496,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 """
                 try:
                     raw_result = function_map[tool_name](**tool_args)
+                except KeyboardInterrupt:
+                    print("\nCtrl+C pressed")
+                    raw_result = ("\n\nCOMMAND INTERRUPTED by user, "
+                                  "probably cause you are bad")
+                    return raw_result
                 except TypeError as e:
                     if "unexpected keyword argument" in str(
                             e):  # Usual Error when open source model try do a handoff # noqa: E501
@@ -632,7 +647,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # NOTE: considered handoffs but they don't
         # seem to perform well when in combination
         # with code gen.
-        return None
+        #
+        # For now, return the same CodeAgent
+        return active_agent
 
     @exploit_logger.log_agent()
     def process_interaction(self, active_agent, history, context_variables,  # pylint: disable=too-many-arguments,too-many-locals,too-many-statements,too-many-branches # noqa: E501
@@ -778,9 +795,10 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # dependent on the file that invokes it
         #
         if os.getenv("CAI_TRACING", "true").lower() == "true":
+            # Get logging URL based on source
+            logging_url = exploit_logger.get_logger_url(source=self.source)
             print(
-                color("Logging URL: " +
-                      exploit_logger.get_logger_url(),
+                color("Logging URL: " + logging_url,
                       fg="white", bg="pink")
             )
 
@@ -853,11 +871,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
             except KeyboardInterrupt:
                 print("\nCtrl+C pressed")
-                try:
-                    time.sleep(2)  # wait for user to press Ctrl+C again
-                except KeyboardInterrupt:
-                    print("\nCtrl+C pressed again")
-                    break
+                break
 
             # Check if the flag is found in the last tool output
             # Accountability
