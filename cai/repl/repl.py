@@ -43,6 +43,8 @@ from cai.repl.ui.keybindings import create_key_bindings
 from cai.repl.ui.logging import setup_session_logging
 from cai.repl.ui.prompt import get_user_input
 
+from cai.logger import exploit_logger
+
 if is_caiextensions_platform_available():
     from caiextensions.platform.base import (  # pylint: disable=ungrouped-imports,line-too-long,import-error,unused-import # noqa: E501,F401
         platform_manager
@@ -109,6 +111,8 @@ def handle_command(command, args=None):
     return commands_handle_command(command, args)
 
 
+@exploit_logger.log_response("🚩" + os.getenv('CTF_NAME', 'CLI') +
+                             " @ " + os.getenv('CI_JOB_ID', 'run_cai_cli'))
 def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements # noqa: E501
     starting_agent,
     context_variables=None,

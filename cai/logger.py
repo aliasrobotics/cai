@@ -112,7 +112,10 @@ class ExploitLogger:
         """Decorator to log the response of a function call.
 
         Args:
-            chain_element_name (str): The name of the chain element.
+            chain_element_name (str or callable):
+                The name of the chain element.
+                Can be a static string or a callable
+                that takes the instance as argument.
 
         Returns:
             Callable: The decorated function.
@@ -123,15 +126,23 @@ class ExploitLogger:
                 if not self.tracing:
                     return func(*args, **kwargs)
 
+                # Get the actual chain element name
+                if callable(chain_element_name):
+                    # If it's a callable, call it with the
+                    # instance (first arg)
+                    actual_name = chain_element_name(args[0])
+                else:
+                    actual_name = chain_element_name
+
                 parent_context = context.get_current()
 
                 with self.tracer.start_as_current_span(
-                    chain_element_name, context=parent_context
+                    actual_name, context=parent_context
                 ) as span:
                     current_span.set(span)
                     span.set_attribute(
                         SpanAttributes.OPENINFERENCE_SPAN_KIND, "CHAIN")
-                    span.set_attribute("chain.name", chain_element_name)
+                    span.set_attribute("chain.name", actual_name)
 
                     try:
                         response = func(*args, **kwargs)
