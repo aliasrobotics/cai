@@ -756,7 +756,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 if partial_response.agent
                 else active_agent)
 
-    @exploit_logger.log_response("Turn")
+    def _get_turn_name(self):  # pylint disable=inconsistent-return-statements
+        """Get the turn name based on the source."""
+        return "Turn" if self.source == "cli" else "No turn"
+
+    @exploit_logger.log_response(_get_turn_name)
     def run(  # pylint: disable=too-many-arguments,dangerous-default-value,too-many-locals,too-many-statements,too-many-branches # noqa: E501
         self,
         agent: Agent,
