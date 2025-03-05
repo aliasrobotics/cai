@@ -32,6 +32,7 @@ from cai.state.common import StateAgent
 from cai.cost.llm_cost import (
     calculate_conversation_cost
 )
+from cai.agents.support import create_reasoner_agent
 from .agents.codeagent import CodeAgent
 from .util import (
     function_to_json,
@@ -124,6 +125,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.interaction_output_tokens = 0
         self.interaction_reasoning_tokens = 0
         self.max_chars_per_message = 5000  # number of characters
+        self.last_reasoning_content = ""
 
         # training data
         if log_training_data:
@@ -169,6 +171,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         Get a chat completion for the given agent, history,
         and context variables.
         """
+
         context_variables = defaultdict(str, context_variables)
 
         # --------------------------------
@@ -178,10 +181,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             filename=f"cai/prompts/core/{master_template}").render(
                 agent=agent,
                 ctf_instructions=history[0]["content"],
-                context_variables=context_variables)
+                context_variables=context_variables,
+                reasoning_content=self.last_reasoning_content)
         }]
         for msg in history:
-            if (msg.get("sender") not in ["Report Agent"] and
+            if (msg.get("sender") not in ["Report Agent", "Reasoner Agent"] and
                 not any("add_memory" in call.get("function", {}).get("name", "")  # noqa: E501
                         for call in (msg.get("tool_calls") if msg.get("tool_calls")  # noqa: E501
                                      else []))):
@@ -262,14 +266,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     custom_llm_provider="openai"
                 )
             else:
-                try:
-                    litellm_completion = litellm.completion(**create_params)
-                except Exception:  # pylint: disable=W0718
-                    create_params["api_base"] = get_ollama_api_base()
-                    create_params["custom_llm_provider"] = "openai"
-                    os.environ["OLLAMA"] = "true"
-                    os.environ["OPENAI_API_KEY"] = "Placeholder"
-                    litellm_completion = litellm.completion(**create_params)
+                litellm_completion = litellm.completion(**create_params)
 
         except litellm.exceptions.BadRequestError as e:
             if "LLM Provider NOT provided" in str(e):
@@ -306,6 +303,16 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             time.sleep(60)
             litellm_completion = litellm.completion(**create_params)
 
+        except Exception:  # pylint: disable=W0718
+            create_params["api_base"] = get_ollama_api_base()
+            create_params["custom_llm_provider"] = "openai"
+            os.environ["OLLAMA"] = "true"
+            os.environ["OPENAI_API_KEY"] = "Placeholder"
+            try:
+                litellm_completion = litellm.completion(**create_params)
+            except Exception as e:  # pylint: disable=W0718
+                print("Error: " + str(e))
+                return None
         # --------------------------------
         # Training data
         # --------------------------------
@@ -687,7 +694,14 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             stream=stream,
             debug=debug,
         )
+
+        if completion is None:
+            return None
+
         message = completion.choices[0].message
+
+        if active_agent.name == "Reasoner Agent":
+            self.last_reasoning_content = message.content
 
         debug_print(
             debug,
@@ -827,7 +841,14 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 os.getenv("CAI_PRICE_LIMIT", "100")):
             # Needs to be inside while loop to avoid using the same function
             # for all iterations
-            def agent_iteration(agent):
+            def agent_iteration(
+                agent,
+                model_override=model_override,
+                stream=stream,
+                debug=debug,
+                execute_tools=execute_tools,
+                n_turn=n_turn
+            ):
                 return self.process_interaction(
                     agent,
                     history,
@@ -840,6 +861,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 )
 
             try:
+                response = ""
                 # Memory agent iteration
                 # If RAG is active and the turn is at a RAG interval, process
                 # using the memory agent
@@ -849,7 +871,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
                     prev_agent = active_agent
                     active_agent = self.episodic_builder
-                    agent_iteration(active_agent)
+                    response = agent_iteration(active_agent)
                     active_agent = prev_agent
 
                 # Standard agent iteration
@@ -860,7 +882,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                         and self.rag_online):
                     prev_agent = active_agent
                     active_agent = self.semantic_builder
-                    agent_iteration(active_agent)
+                    response = agent_iteration(active_agent)
                     active_agent = prev_agent
 
                 # Stateful agent iteration
@@ -872,10 +894,32 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                             >= self.STATE_INTERACTIONS_INTERVAL):
                         prev_agent = active_agent
                         active_agent = transfer_to_state_agent()
-                        agent_iteration(active_agent)
+                        response = agent_iteration(active_agent)
                         active_agent = prev_agent
                         self.state_interactions_count = 0
-
+                # Reasoner agent iteration
+                # If reasoner agent is active and the turn is at a reasoner
+                # interval, process using the reasoner agent
+                # This is part of the support system to be added to the
+                # master template of agents and prompts
+                reasoner_interval = int(
+                    os.getenv("CAI_REASONER_INTERVAL", "5"))
+                if (n_turn != 0 and
+                    n_turn % reasoner_interval == 0 and
+                        os.getenv("CAI_SUPPORT_MODEL") is not None):
+                    prev_agent = active_agent
+                    active_agent = create_reasoner_agent(
+                        name="Reasoner Agent",
+                        model=os.getenv("CAI_SUPPORT_MODEL")
+                    )
+                    response = agent_iteration(
+                        active_agent,
+                        model_override=active_agent.model
+                    )
+                    active_agent = prev_agent
+                # Exit condition if inference fails
+                if response is None:
+                    break
             except KeyboardInterrupt:
                 print("\nCtrl+C pressed")
                 break

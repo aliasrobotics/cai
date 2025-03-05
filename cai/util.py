@@ -395,14 +395,27 @@ def cli_print_agent_messages(agent_name, message, counter, model, debug,  # pyli
 
     # Create a more hacker-like header
     text = Text()
-    text.append(f"[{counter}] ", style="bold cyan")
-    text.append(f"Agent: {agent_name} ", style="bold green")
-    if message:
-        text.append(f">> {message} ", style="yellow")
-    text.append(f"[{timestamp}", style="dim")
-    if model:
-        text.append(f" ({model})", style="bold magenta")
-    text.append("]", style="dim")
+
+    # Special handling for Reasoner Agent
+    if agent_name == "Reasoner Agent":
+        text.append(f"[{counter}] ", style="bold red")
+        text.append(f"Agent: {agent_name} ", style="bold yellow")
+        if message:
+            text.append(f">> {message} ", style="green")
+        text.append(f"[{timestamp}", style="dim")
+        if model:
+            text.append(f" ({os.getenv('CAI_SUPPORT_MODEL')})",
+                        style="bold blue")
+        text.append("]", style="dim")
+    else:
+        text.append(f"[{counter}] ", style="bold cyan")
+        text.append(f"Agent: {agent_name} ", style="bold green")
+        if message:
+            text.append(f">> {message} ", style="yellow")
+        text.append(f"[{timestamp}", style="dim")
+        if model:
+            text.append(f" ({model})", style="bold magenta")
+        text.append("]", style="dim")
 
     # Add token information with enhanced formatting
     tokens_text = None
@@ -427,10 +440,12 @@ def cli_print_agent_messages(agent_name, message, counter, model, debug,  # pyli
     # Create a panel for better visual separation
     panel = Panel(
         text,
-        border_style="blue",
+        border_style="red" if agent_name == "Reasoner Agent" else "blue",
         box=ROUNDED,
         padding=(0, 1),
-        title="[bold]Agent Interaction[/bold]",
+        title=("[bold]Reasoning Analysis[/bold]"
+               if agent_name == "Reasoner Agent"
+               else "[bold]Agent Interaction[/bold]"),
         title_align="left"
     )
     console.print(panel)

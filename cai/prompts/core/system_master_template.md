@@ -44,6 +44,8 @@
     if is_caiextensions_memory_available() and os.getenv('CTF_NAME'):
         from caiextensions.memory import get_artifacts
         artifacts = get_artifacts(os.getenv('CTF_NAME').lower())
+    has_reasoning = 'reasoning_content' in locals() and locals()['reasoning_content'] is not None
+
 %>
 
 ${system_prompt}
@@ -64,6 +66,13 @@ ${memory}
 Remember that you must follow an iterative process of executing tools and commands autonomously based on the memory provided. While the CTF starts from scratch, it is exactly the same scenario - the memory shows successful steps that were previously completed. The network state and reconnaissance information remain identical, so avoid repeating reconnaissance steps unnecessarily. Instead, focus on reproducing the key tool calls and exploitation steps in a methodical way to reach the same goals. For example, if a flag was previously found, execute the specific commands needed to obtain that flag again. Always use the flag discriminator to validate flags. Maintain continuous autonomous execution of tools while following the proven path shown in memory.
 % endif
 
+% if reasoning_content is not None:
+<reasoning>
+${reasoning_content}
+</reasoning>
+
+
+% endif
 % if env_context.lower() == 'true':
 <%
     import platform
