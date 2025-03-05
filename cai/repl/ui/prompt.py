@@ -70,5 +70,7 @@ def get_user_input(
         enable_system_prompt=True,  # Enable shadow prediction
         enable_suspend=True,  # Allow suspending with Ctrl+Z
         enable_open_in_editor=True,  # Allow editing with Ctrl+X Ctrl+E
-        rprompt=get_rprompt
+        rprompt=get_rprompt,
+        multiline=True,
+        prompt_continuation=''
     )
