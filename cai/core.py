@@ -32,7 +32,7 @@ from cai.state.common import StateAgent
 from cai.cost.llm_cost import (
     calculate_conversation_cost
 )
-from cai.agents.support import create_reasoner_agent
+from cai.agents.meta.reasoner_support import create_reasoner_agent
 from .agents.codeagent import CodeAgent
 from .util import (
     function_to_json,
