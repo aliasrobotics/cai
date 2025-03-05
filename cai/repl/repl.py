@@ -3,6 +3,7 @@ This module provides a REPL interface for testing and
 interacting with CAI agents.
 """
 # Standard library imports
+
 import json
 import os
 from importlib.resources import files
@@ -54,6 +55,7 @@ client = None  # pylint: disable=invalid-name
 START_TIME = None
 current_agent = None  # pylint: disable=invalid-name
 agent = None  # pylint: disable=invalid-name
+messages = []  # Global messages list to store conversation history
 
 
 def get_elapsed_time():
@@ -109,6 +111,15 @@ def handle_command(command, args=None):
     return commands_handle_command(command, args)
 
 
+def get_messages():
+    """Get the current conversation messages.
+
+    Returns:
+        list: The list of conversation messages
+    """
+    return messages
+
+
 def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements # noqa: E501
     starting_agent,
     context_variables=None,
@@ -157,7 +168,9 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
         and client management. Session logs are stored
         in the ~/.cai/history directory.
     """
-    global client, START_TIME, current_agent, agent  # pylint: disable=global-statement # noqa: E501
+    # Using globals to maintain state across function calls
+    # pylint: disable=global-statement
+    global client, START_TIME, current_agent, agent, messages
     START_TIME = time.time()  # Start the global timer
     # Initialize CAI with CTF and state agent if provided
     client = CAI(
@@ -199,7 +212,7 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
         except ImportError:
             pass
 
-    messages = []
+    messages = []  # Initialize the global messages list
     messages_init = []
     if ctf:
         # Determine which challenge to use
