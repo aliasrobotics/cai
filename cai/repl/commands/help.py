@@ -331,11 +331,11 @@ class HelpCommand(Command):
         console.print(
             Panel(
                 Text.from_markup(
-                    "Welcome to the CAI REPL help system. "
+                    "Welcome to the CAI help system. "
                     "This system provides information about "
                     "available commands and features."
                 ),
-                title="CAI REPL Help",
+                title="CAI Help",
                 border_style="yellow"
             )
         )
