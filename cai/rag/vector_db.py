@@ -116,8 +116,7 @@ class QdrantConnector:
                 )
             )
             return True
-        except Exception as e:  # pylint: disable=broad-exception-caught
-            print(f"Error creating collection: {e}")
+        except Exception:  # pylint: disable=broad-exception-caught
             return False
 
     def _get_embeddings(self, texts: List[str]) -> List[List[float]]:
@@ -169,8 +168,7 @@ class QdrantConnector:
                 points=points
             )
             return True
-        except Exception as e:  # pylint: disable=broad-exception-caught
-            print(f"Error adding points: {e}")
+        except Exception:  # pylint: disable=broad-exception-caught
             return False
 
     def search(  # pylint: disable=too-many-arguments,too-many-locals # noqa: E501
@@ -251,8 +249,7 @@ class QdrantConnector:
                             point.payload.get("text", "")
                         )
             return "\n".join(extracted_texts)
-        except Exception as e:  # pylint: disable=broad-exception-caught
-            print(f"Error searching: {e}")
+        except Exception:  # pylint: disable=broad-exception-caught
             return ""
 
     def filter_points(
@@ -280,8 +277,7 @@ class QdrantConnector:
                     "metadata": point.payload
                 } for point in results
             ]
-        except Exception as e:  # pylint: disable=broad-exception-caught
-            print(f"Error filtering: {e}")
+        except Exception:  # pylint: disable=broad-exception-caught
             return []
 
 
