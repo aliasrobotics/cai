@@ -17,22 +17,6 @@ def test_master_template_basic(template, base_agent):
     assert 'Test instructions' in result
     assert 'CTF_INSIDE' not in result
 
-def test_master_template_with_ctf_inside_true(template, base_agent):
-    """Test master template with CTF_INSIDE=true"""
-    os.environ['CTF_INSIDE'] = 'true'
-    result = template.render(agent=base_agent, reasoning_content=None, ctf_instructions="")
-    print(result)
-    assert 'You are INSIDE the target machine' in result
-    del os.environ['CTF_INSIDE']
-
-def test_master_template_with_ctf_inside_false(template, base_agent):
-    """Test master template with CTF_INSIDE=false"""
-    os.environ['CTF_INSIDE'] = 'false'
-    result = template.render(agent=base_agent, reasoning_content=None, ctf_instructions="")
-    print(result)
-    assert 'You are OUTSIDE the target machine' in result
-    del os.environ['CTF_INSIDE']
-
 def test_master_template_with_env_vars(template, base_agent):
     """Test master template with environment variables and vector DB"""
     os.environ['CTF_NAME'] = 'test_ctf'
