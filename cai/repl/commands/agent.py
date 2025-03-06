@@ -75,7 +75,9 @@ class AgentCommand(Command):
         }
 
     def _get_available_agents(self) -> Dict[str, Agent]:
-        """Get a dictionary of all available agents.
+        """
+        Get a dictionary of all available agents compiled
+        from the cai/agents folder.
 
         Returns:
             Dictionary mapping agent names to Agent instances

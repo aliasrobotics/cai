@@ -26,7 +26,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from wasabi import color  # pylint: disable=import-error # noqa: E402
 
 # Local imports
-from cai.agents.local_python_executor import (
+from cai.agents.meta.local_python_executor import (
     BASE_BUILTIN_MODULES,
     LocalPythonInterpreter,
     fix_final_answer_code,
