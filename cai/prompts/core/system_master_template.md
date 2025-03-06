@@ -1,4 +1,27 @@
 <%
+    # This system master document provides a template
+    # for constructing system prompts for CAI's agentic
+    # flows and systems.
+    #
+    # The structure of the prompts include the following
+    # sections:
+    #
+    # 1. Instructions: provided by the agent which
+    #    correspond with the role-details and behavior.
+    #
+    # 2. Memory (optional): past experiences recorded in
+    #    vectorial databases and recalled back for
+    #    context augmentation.
+    #
+    # 3. Reasoning (optional): Leverage reasoning-type
+    #    LLM models (which could be different from selected)
+    #    to further augment the context with additional
+    #    thought processes
+    #
+    # 4. Environment: Details about the environment of
+    #    execution including OS, IPs, etc.
+    #
+
     import os
     from cai.util import cli_print_tool_call
     from cai.rag.vector_db import get_previous_memory
@@ -47,18 +70,9 @@
     has_reasoning = 'reasoning_content' in locals() and locals()['reasoning_content'] is not None
 
 %>
-
 ${system_prompt}
-
-% if ctf_inside is not None:
-    % if ctf_inside.lower() == 'true':
-You are INSIDE the target machine in a docker container. Try not to use network commands unless necessary.
-    % elif ctf_inside.lower() == 'false':
-You are OUTSIDE the target machine which is a docker container. You may use network commands like nmap for initial reconnaissance.
-    % endif
-% endif
-
 % if rag_enabled:
+
 <memory>
 ${memory}
 </memory>
@@ -70,7 +84,6 @@ Remember that you must follow an iterative process of executing tools and comman
 <reasoning>
 ${reasoning_content}
 </reasoning>
-
 
 % endif
 % if env_context.lower() == 'true':

@@ -1,20 +1,22 @@
 """
-Config command for CAI REPL.
-This module provides commands for displaying and configuring environment
-variables.
+Config command for CAI via environmental variables.
 """
+# Standard library imports
 import os
 from typing import List, Optional
 
+# Third party imports
 from rich.console import Console  # pylint: disable=import-error
 from rich.table import Table  # pylint: disable=import-error
 
+# Local imports
 from cai.repl.commands.base import Command, register_command
 
 console = Console()
 
 # Define environment variables with descriptions and default values
 ENV_VARS = {
+    # CTF variables
     1: {
         "name": "CTF_NAME",
         "description": "Name of the CTF challenge to run",
@@ -40,6 +42,7 @@ ENV_VARS = {
         "description": "Whether to conquer the CTF from within container",
         "default": "true"
     },
+    # CAI variables
     6: {
         "name": "CAI_MODEL",
         "description": "Model to use for agents",
@@ -106,20 +109,20 @@ ENV_VARS = {
         "default": "1"
     },
     19: {
+        "name": "CAI_REPORT",
+        "description": "Enable/disable reporter mode (ctf, nis2, pentesting)",
+        "default": "ctf"
+    },
+    20: {
         "name": "CAI_SUPPORT_MODEL",
         "description": "Model to use for the support agent",
         "default": "o3-mini"
     },
-    20: {
+    21: {
         "name": "CAI_SUPPPORT_INTERVAL",
         "description": "Number of turns between support agent executions",
         "default": "5"
     },
-    21: {
-        "name": "CAI_REPORT",
-        "description": "Enable/disable reporter mode (ctf, nis2, pentesting)",
-        "default": "ctf"
-    }
 }
 
 

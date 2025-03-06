@@ -61,7 +61,7 @@ Environment Variables
             (default: "1")
         CAI_SUPPORT_MODEL: Model to use for the support agent
             (default: "o3-mini")
-        CAI_SUPPPORT_INTERVAL: Number of turns between support agent
+        CAI_SUPPORT_INTERVAL: Number of turns between support agent
             executions (default: "5")
 
     Extensions (only applicable if the right extension is installed):
@@ -99,6 +99,7 @@ Usage Examples:
 """
 # Standard library imports
 import os
+import traceback
 
 # Third-party imports
 from wasabi import color  # pylint: disable=import-error
@@ -136,12 +137,10 @@ def initialize_platforms():
                 "portswigger", PortSwiggerWebAcademy())
         except ImportError as e:
             print(f"Failed to register PortSwigger platform: {e}")
-            import traceback
             traceback.print_exc()
 
     except ImportError as e:
         print(f"Failed to initialize platforms: {e}")
-        import traceback
         traceback.print_exc()
 
 
