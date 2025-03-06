@@ -316,12 +316,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             litellm_completion = litellm.completion(**create_params)
 
         except Exception:  # pylint: disable=W0718
-            create_params["api_base"] = get_ollama_api_base()
-            create_params["custom_llm_provider"] = "openai"
-            os.environ["OLLAMA"] = "true"
-            os.environ["OPENAI_API_KEY"] = "Placeholder"
+            ollama_params = create_params.copy()
+            ollama_params["api_base"] = get_ollama_api_base()
+            ollama_params["custom_llm_provider"] = "openai"
             try:
-                litellm_completion = litellm.completion(**create_params)
+                litellm_completion = litellm.completion(**ollama_params)
             except Exception as e:  # pylint: disable=W0718
                 print("Error: " + str(e))
                 return None
