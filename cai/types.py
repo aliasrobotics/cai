@@ -30,9 +30,10 @@ class Agent(BaseModel):  # pylint: disable=too-few-public-methods
     parallel_tool_calls: bool = False
     structured_output_class: Optional[type] = None
     reasoning_effort: Optional[str] = "low"  # "low", "medium", "high"
-    pattern: Optional[str] = None  # the agentic pattern associated
-                                   # see cai/agents/__init__.py for more
-                                   # information
+     
+    # the agentic pattern associated
+    #    see cai/agents/__init__.py for more information   
+    pattern: Optional[str] = None 
 
 
 class Response(BaseModel):  # pylint: disable=too-few-public-methods

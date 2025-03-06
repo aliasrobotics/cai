@@ -3,35 +3,35 @@ CAI agents abstraction layer
 
 CAI abstracts its cybersecurity behavior via agents and agentic patterns.
 
-An Agent in an intelligent system that interacts with some environment. 
-More technically, and agent is anything that can be viewed as perceiving 
-its environment through sensors and acting upon that environment through 
-actuators (Russel & Norvig, AI: A Modern Approach). In cybersecurity, 
-an Agent interacts with systems and networks, using peripherals and 
-network interfaces as sensors, and executing network actions as 
+An Agent in an intelligent system that interacts with some environment.
+More technically, and agent is anything that can be viewed as perceiving
+its environment through sensors and acting upon that environment through
+actuators (Russel & Norvig, AI: A Modern Approach). In cybersecurity,
+an Agent interacts with systems and networks, using peripherals and
+network interfaces as sensors, and executing network actions as
 actuators.
 
-An Agentic Pattern is a structured design paradigm in artificial 
-intelligence systems where autonomous or semi-autonomous agents operate 
-within a "defined interaction framework" to achieve a goal. These 
-patterns specify the organization, coordination, and communication 
-methods among agents, guiding decision-making, task execution, 
+An Agentic Pattern is a structured design paradigm in artificial
+intelligence systems where autonomous or semi-autonomous agents operate
+within a "defined interaction framework" to achieve a goal. These
+patterns specify the organization, coordination, and communication
+methods among agents, guiding decision-making, task execution,
 and delegation.
 
 An agentic pattern (`AP`) can be formally defined as a tuple:
 
 
-\[
+\\[
 AP = (A, H, D, C, E)
-\]
+\\]
 
 where:
 
-- **\(A\) (Agents):** A set of autonomous entities, \( A = \{a_1, a_2, ..., a_n\} \), each with defined roles, capabilities, and internal states.
-- **\(H\) (Handoffs):** A function \( H: A \times T \to A \) that governs how tasks \( T \) are transferred between agents based on predefined logic (e.g., rules, negotiation, bidding).
-- **\(D\) (Decision Mechanism):** A decision function \( D: S \to A \) where \( S \) represents system states, and \( D \) determines which agent takes action at any given time.
-- **\(C\) (Communication Protocol):** A messaging function \( C: A \times A \to M \), where \( M \) is a message space, defining how agents share information.
-- **\(E\) (Execution Model):** A function \( E: A \times I \to O \) where \( I \) is the input space and \( O \) is the output space, defining how agents perform tasks.
+- **\\(A\\) (Agents):** A set of autonomous entities, \\( A = \\{a_1, a_2, ..., a_n\\} \\), each with defined roles, capabilities, and internal states.
+- **\\(H\\) (Handoffs):** A function \\( H: A \times T \to A \\) that governs how tasks \\( T \\) are transferred between agents based on predefined logic (e.g., rules, negotiation, bidding).
+- **\\(D\\) (Decision Mechanism):** A decision function \\( D: S \to A \\) where \\( S \\) represents system states, and \\( D \\) determines which agent takes action at any given time.
+- **\\(C\\) (Communication Protocol):** A messaging function \\( C: A \times A \to M \\), where \\( M \\) is a message space, defining how agents share information.
+- **\\(E\\) (Execution Model):** A function \\( E: A \times I \to O \\) where \\( I \\) is the input space and \\( O \\) is the output space, defining how agents perform tasks.
 
 | **Agentic Pattern** | **Description** |
 |--------------------|------------------------|
