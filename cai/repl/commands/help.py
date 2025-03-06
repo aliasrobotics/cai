@@ -98,40 +98,54 @@ class HelpCommand(Command):
         # Add subcommands
         self.add_subcommand(
             "memory",
-            "Show help for memory commands",
-            self.handle_memory)
+            "Display help for memory commands",
+            self.handle_memory
+        )
         self.add_subcommand(
             "agents",
-            "Show help for agent-related features",
-            self.handle_agents)
+            "Display help for agent commands",
+            self.handle_agents
+        )
         self.add_subcommand(
             "graph",
-            "Show help for graph visualization",
-            self.handle_graph)
+            "Display help for graph commands",
+            self.handle_graph
+        )
         self.add_subcommand(
             "platform",
-            "Show help for platform-specific features",
-            self.handle_platform)
+            "Display help for platform commands",
+            self.handle_platform
+        )
         self.add_subcommand(
             "shell",
-            "Show help for shell command execution",
-            self.handle_shell)
+            "Display help for shell commands",
+            self.handle_shell
+        )
         self.add_subcommand(
             "env",
-            "Show help for environment variables",
-            self.handle_env)
+            "Display help for environment commands",
+            self.handle_env
+        )
         self.add_subcommand(
             "aliases",
-            "Show all command aliases",
-            self.handle_aliases)
+            "Display command aliases",
+            self.handle_aliases
+        )
         self.add_subcommand(
             "model",
-            "Show help for model selection",
-            self.handle_model)
+            "Display help for model commands",
+            self.handle_model
+        )
         self.add_subcommand(
             "turns",
-            "Show help for managing turns",
-            self.handle_turns)
+            "Display help for turns commands",
+            self.handle_turns
+        )
+        self.add_subcommand(
+            "config",
+            "Display help for config commands",
+            self.handle_config
+        )
 
     def handle_memory(self, _: Optional[List[str]] = None) -> bool:
         """Show help for memory commands."""
@@ -270,6 +284,17 @@ class HelpCommand(Command):
         """Show help for managing turns."""
         return self.handle_help_turns()
 
+    def handle_config(self, _: Optional[List[str]] = None) -> bool:
+        """Display help for config commands.
+
+        Args:
+            _: Ignored arguments
+
+        Returns:
+            True if successful
+        """
+        return self.handle_help_config()
+
     def handle_no_args(self) -> bool:
         """Handle the command when no arguments are provided."""
         return self.handle_help()
@@ -298,10 +323,22 @@ class HelpCommand(Command):
         console.print(table)
 
     def handle_help(self) -> bool:
-        """Handle /help command with improved formatting and details."""
-        # Create a styled header
-        header = Text("CAI Command Reference", style="bold cyan")
-        console.print(Panel(header, border_style="cyan"))
+        """Display general help information.
+
+        Returns:
+            True if successful
+        """
+        console.print(
+            Panel(
+                Text.from_markup(
+                    "Welcome to the CAI help system. "
+                    "This system provides information about "
+                    "available commands and features."
+                ),
+                title="CAI Help",
+                border_style="yellow"
+            )
+        )
 
         # Memory Commands
         memory_commands = [
@@ -355,6 +392,24 @@ class HelpCommand(Command):
             shell_commands,
             "bold green",
             "green"
+        )
+
+        # Config Commands
+        config_commands = [
+            ("/config", "/cfg",
+             "List all environment variables and their values"),
+            ("/config list", "/cfg list",
+             "List all environment variables and their values"),
+            ("/config get <number>", "/cfg get <number>",
+             "Get the value of a specific environment variable"),
+            ("/config set <number> <value>", "/cfg set <number> <value>",
+             "Set the value of a specific environment variable")
+        ]
+        self._print_command_table(
+            "Config Commands",
+            config_commands,
+            "bold magenta",
+            "magenta"
         )
 
         # Environment Commands
@@ -728,28 +783,117 @@ class HelpCommand(Command):
     def handle_help_platform_manager(self) -> bool:
         """Show help for platform manager commands."""
         if HAS_PLATFORM_EXTENSIONS and is_caiextensions_platform_available():
-            platform_manager = PlatformManager()
-            platform_table = create_styled_table(
-                "Available Platforms",
-                [
-                    ("Platform", "magenta"),
-                    ("Description", "white")
-                ],
-                "bold magenta"
-            )
+            try:
+                from caiextensions.platform.base import platform_manager
+                platforms = platform_manager.list_platforms()
 
-            for platform in platform_manager.get_platforms():
-                platform_table.add_row(
-                    platform.name,
-                    platform.description
+                if not platforms:
+                    console.print(
+                        "[yellow]No platforms registered.[/yellow]"
+                    )
+                    return True
+
+                platform_table = create_styled_table(
+                    "Available Platforms",
+                    [
+                        ("Platform", "magenta"),
+                        ("Description", "white")
+                    ],
+                    "bold magenta"
                 )
 
-            console.print(platform_table)
-            return True
+                for platform_name in platforms:
+                    platform = platform_manager.get_platform(platform_name)
+                    description = getattr(
+                        platform, 'description', platform_name.capitalize())
+                    platform_table.add_row(
+                        platform_name,
+                        description
+                    )
+
+                console.print(platform_table)
+
+                # Add platform command examples
+                examples = []
+                for platform_name in platforms:
+                    platform = platform_manager.get_platform(platform_name)
+                    commands = platform.get_commands()
+                    if commands:
+                        examples.append(
+                            f"[green]/platform {platform_name} {
+                                commands[0]}[/green] - Example {platform_name} command")
+
+                if examples:
+                    console.print(Panel(
+                        "\n".join(examples),
+                        title="Platform Command Examples",
+                        border_style="blue"
+                    ))
+
+                return True
+            except (ImportError, Exception) as e:
+                console.print(
+                    f"[yellow]Error loading platforms: {e}[/yellow]"
+                )
+                return True
 
         console.print(
             "[yellow]No platform extensions available.[/yellow]"
         )
+        return True
+
+    def handle_help_config(self) -> bool:
+        """Display help for config commands.
+
+        Returns:
+            True if successful
+        """
+        console.print(
+            Panel(
+                Text.from_markup(
+                    "The [bold yellow]/config[/bold yellow] command allows you"
+                    "to view and configure environment variables that control"
+                    "the behavior of CAI."
+                ),
+                title="Config Commands",
+                border_style="yellow"
+            )
+        )
+
+        # Create table for subcommands
+        table = create_styled_table(
+            "Available Subcommands",
+            [("Command", "yellow"), ("Description", "white")]
+        )
+
+        table.add_row(
+            "/config",
+            "List all environment variables and their current values"
+        )
+        table.add_row(
+            "/config list",
+            "List all environment variables and their current values"
+        )
+        table.add_row(
+            "/config get <number>",
+            "Get the value of a specific environment variable by its number"
+        )
+        table.add_row(
+            "/config set <number> <value>",
+            "Set the value of a specific environment variable by its number"
+        )
+
+        console.print(table)
+
+        # Create notes panel
+        notes = [
+            "Environment variables control various aspects of CAI behavior.",
+            "Changes environment variables only affect the current session.",
+            "Use the [yellow]/config list[/yellow] command to see options.",
+            "Each variable is assigned a number for easy reference."
+        ]
+        console.print(create_notes_panel(notes))
+
         return True
 
 

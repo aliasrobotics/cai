@@ -59,6 +59,10 @@ Environment Variables
             online memory updates (default: "5")
         CAI_PRICE_LIMIT: Price limit for the conversation in dollars
             (default: "1")
+        CAI_SUPPORT_MODEL: Model to use for the support agent
+            (default: "o3-mini")
+        CAI_SUPPORT_INTERVAL: Number of turns between support agent
+            executions (default: "5")
 
     Extensions (only applicable if the right extension is installed):
 
@@ -95,6 +99,7 @@ Usage Examples:
 """
 # Standard library imports
 import os
+import traceback
 
 # Third-party imports
 from wasabi import color  # pylint: disable=import-error
@@ -117,10 +122,26 @@ def initialize_platforms():
     """Initialize and register available platforms."""
     try:
         from caiextensions.platform.base import platform_manager  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
-        from caiextensions.platform.htb.platform import HTBPlatform  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
-        platform_manager.register_platform("htb", HTBPlatform())
-    except ImportError:
-        pass
+
+        # Register HTB platform
+        try:
+            from caiextensions.platform.htb.platform import HTBPlatform  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
+            platform_manager.register_platform("htb", HTBPlatform())
+        except ImportError as e:
+            print(f"Failed to register HTB platform: {e}")
+
+        # Register PortSwigger platform
+        try:
+            from caiextensions.platform.portswigger.platform import PortSwiggerWebAcademy  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
+            platform_manager.register_platform(
+                "portswigger", PortSwiggerWebAcademy())
+        except ImportError as e:
+            print(f"Failed to register PortSwigger platform: {e}")
+            traceback.print_exc()
+
+    except ImportError as e:
+        print(f"Failed to initialize platforms: {e}")
+        traceback.print_exc()
 
 
 def setup_ctf():

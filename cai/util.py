@@ -395,14 +395,27 @@ def cli_print_agent_messages(agent_name, message, counter, model, debug,  # pyli
 
     # Create a more hacker-like header
     text = Text()
-    text.append(f"[{counter}] ", style="bold cyan")
-    text.append(f"Agent: {agent_name} ", style="bold green")
-    if message:
-        text.append(f">> {message} ", style="yellow")
-    text.append(f"[{timestamp}", style="dim")
-    if model:
-        text.append(f" ({model})", style="bold magenta")
-    text.append("]", style="dim")
+
+    # Special handling for Reasoner Agent
+    if agent_name == "Reasoner Agent":
+        text.append(f"[{counter}] ", style="bold red")
+        text.append(f"Agent: {agent_name} ", style="bold yellow")
+        if message:
+            text.append(f">> {message} ", style="green")
+        text.append(f"[{timestamp}", style="dim")
+        if model:
+            text.append(f" ({os.getenv('CAI_SUPPORT_MODEL')})",
+                        style="bold blue")
+        text.append("]", style="dim")
+    else:
+        text.append(f"[{counter}] ", style="bold cyan")
+        text.append(f"Agent: {agent_name} ", style="bold green")
+        if message:
+            text.append(f">> {message} ", style="yellow")
+        text.append(f"[{timestamp}", style="dim")
+        if model:
+            text.append(f" ({model})", style="bold magenta")
+        text.append("]", style="dim")
 
     # Add token information with enhanced formatting
     tokens_text = None
@@ -427,10 +440,12 @@ def cli_print_agent_messages(agent_name, message, counter, model, debug,  # pyli
     # Create a panel for better visual separation
     panel = Panel(
         text,
-        border_style="blue",
+        border_style="red" if agent_name == "Reasoner Agent" else "blue",
         box=ROUNDED,
         padding=(0, 1),
-        title="[bold]Agent Interaction[/bold]",
+        title=("[bold]Reasoning Analysis[/bold]"
+               if agent_name == "Reasoner Agent"
+               else "[bold]Agent Interaction[/bold]"),
         title_align="left"
     )
     console.print(panel)
@@ -569,6 +584,21 @@ def cli_print_codeagent_output(agent_name, message_content, code, counter, model
     if model:
         header_text.append(f" ({model})", style="model")
     header_text.append("]", style="dim")
+
+    # Create a more hacker-like header with execution time
+    global LAST_TOOL_TIME, GLOBAL_START_TIME  # pylint: disable=global-variable-not-assigned # noqa: E501
+    current_time = time.time()
+
+    # Add timing information
+    total_elapsed = format_time(
+        current_time - GLOBAL_START_TIME) if GLOBAL_START_TIME else "0.0s"
+    tool_elapsed = format_time(
+        current_time - LAST_TOOL_TIME) if LAST_TOOL_TIME else "0.0s"
+    header_text.append(
+        f" [Total: {total_elapsed} | Tool: {tool_elapsed}]",
+        style="bold magenta")
+
+    LAST_TOOL_TIME = current_time
 
     # Create token display if token information is available
     tokens_text = None
