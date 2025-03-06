@@ -945,6 +945,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
             except KeyboardInterrupt:
                 print("\nCtrl+C pressed")
+                n_turn += 1
                 break
 
             # Check if the flag is found in the last tool output
