@@ -121,10 +121,28 @@ def initialize_platforms():
     """Initialize and register available platforms."""
     try:
         from caiextensions.platform.base import platform_manager  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
-        from caiextensions.platform.htb.platform import HTBPlatform  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
-        platform_manager.register_platform("htb", HTBPlatform())
-    except ImportError:
-        pass
+
+        # Register HTB platform
+        try:
+            from caiextensions.platform.htb.platform import HTBPlatform  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
+            platform_manager.register_platform("htb", HTBPlatform())
+        except ImportError as e:
+            print(f"Failed to register HTB platform: {e}")
+
+        # Register PortSwigger platform
+        try:
+            from caiextensions.platform.portswigger.platform import PortSwiggerWebAcademy  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
+            platform_manager.register_platform(
+                "portswigger", PortSwiggerWebAcademy())
+        except ImportError as e:
+            print(f"Failed to register PortSwigger platform: {e}")
+            import traceback
+            traceback.print_exc()
+
+    except ImportError as e:
+        print(f"Failed to initialize platforms: {e}")
+        import traceback
+        traceback.print_exc()
 
 
 def setup_ctf():

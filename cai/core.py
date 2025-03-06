@@ -295,6 +295,17 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 create_params["messages"] = fix_message_list(
                     create_params["messages"])
                 litellm_completion = litellm.completion(**create_params)
+            # this captures an error related to the fact
+            # that the messages list contains an empty 
+            # content position
+            elif "expected a string, got null" in str(e):
+                print(f"Error: {str(e)}")
+                # Fix for null content in messages
+                create_params["messages"] = [
+                    msg if msg.get("content") is not None else
+                    {**msg, "content": ""} for msg in create_params["messages"]
+                ]
+                litellm_completion = litellm.completion(**create_params)
             else:
                 raise e
 
@@ -876,6 +887,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
                 # Standard agent iteration
                 active_agent = agent_iteration(active_agent)
+
                 n_turn += 1
                 if (self.semantic_rag and
                         (n_turn != 0 and n_turn % self.rag_interval == 0)
@@ -918,8 +930,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     )
                     active_agent = prev_agent
                 # Exit condition if inference fails
-                if response is None:
-                    break
+
             except KeyboardInterrupt:
                 print("\nCtrl+C pressed")
                 break
