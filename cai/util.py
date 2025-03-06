@@ -585,6 +585,21 @@ def cli_print_codeagent_output(agent_name, message_content, code, counter, model
         header_text.append(f" ({model})", style="model")
     header_text.append("]", style="dim")
 
+    # Create a more hacker-like header with execution time
+    global LAST_TOOL_TIME, GLOBAL_START_TIME  # pylint: disable=global-variable-not-assigned # noqa: E501
+    current_time = time.time()
+
+    # Add timing information
+    total_elapsed = format_time(
+        current_time - GLOBAL_START_TIME) if GLOBAL_START_TIME else "0.0s"
+    tool_elapsed = format_time(
+        current_time - LAST_TOOL_TIME) if LAST_TOOL_TIME else "0.0s"
+    header_text.append(
+        f" [Total: {total_elapsed} | Tool: {tool_elapsed}]",
+        style="bold magenta")
+
+    LAST_TOOL_TIME = current_time
+
     # Create token display if token information is available
     tokens_text = None
     if (interaction_input_tokens is not None and  # pylint: disable=R0916 # noqa: E501
