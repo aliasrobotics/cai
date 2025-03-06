@@ -83,21 +83,4 @@ def create_key_bindings(current_text):
         """
         event.current_buffer.insert_text('\n')
 
-    @kb.add('right')
-    def handle_right_arrow(event):
-        """Handle right arrow key to complete command shadow."""
-        buffer = event.current_buffer
-        text = buffer.text
-
-        # Update current text for shadow
-        current_text[0] = text
-
-        # Check if we have a command shadow
-        # pylint: disable=import-outside-toplevel
-        shadow = FuzzyCommandCompleter().get_command_shadow(text)
-        if shadow and shadow.startswith(text):
-            # Complete with the shadow
-            buffer.text = shadow
-            buffer.cursor_position = len(shadow)
-
     return kb
