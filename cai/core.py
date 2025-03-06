@@ -295,6 +295,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 create_params["messages"] = fix_message_list(
                     create_params["messages"])
                 litellm_completion = litellm.completion(**create_params)
+            # this captures an error related to the fact
+            # that the messages list contains an empty 
+            # content position
             elif "expected a string, got null" in str(e):
                 print(f"Error: {str(e)}")
                 # Fix for null content in messages
