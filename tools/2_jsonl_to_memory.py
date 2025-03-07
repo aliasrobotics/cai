@@ -2,7 +2,7 @@
 Longterm Memory agent module for processing historical messages through memory management.
 
 Usage:
-    JSONL_FILE_PATH="jsonl_path" CAI_MEMORY_COLLECTION="CTF_NAME|Target_Name" CAI_MODEL="qwen2.5:14b" python3 tools/2_jsonl_to_memory.py
+    JSONL_FILE_PATH="jsonl_path" CAI_MEMORY="episodic" CAI_MEMORY_COLLECTION="CTF_NAME|Target_Name" CAI_MODEL="qwen2.5:14b" python3 tools/2_jsonl_to_memory.py
 
 Examples:
     ## episodic memory

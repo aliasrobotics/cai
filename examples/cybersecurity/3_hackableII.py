@@ -4,7 +4,7 @@ Advanced Boot2Root CTF Framework with CLI, Code Interpreter and Analysis Modes
 import sys
 from cai import is_pentestperf_available
 from cai.core import CAI, Agent
-from cai.agents.cli_basic import thought_agent
+from cai.agents.patterns.boot2root import thought_agent
 if is_pentestperf_available():
     import pentestperf as ptt    
 else:
