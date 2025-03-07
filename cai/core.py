@@ -307,6 +307,15 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     {**msg, "content": ""} for msg in create_params["messages"]
                 ]
                 litellm_completion = litellm.completion(**create_params)
+            # Handle Anthropic error for empty text content blocks
+            elif "text content blocks must be non-empty" in str(e):
+                print(f"Error: {str(e)}")
+                # Fix for empty content in messages for Anthropic models
+                create_params["messages"] = [
+                    msg if msg.get("content") not in [None, ""] else
+                    {**msg, "content": "Empty content block"} for msg in create_params["messages"]
+                ]
+                litellm_completion = litellm.completion(**create_params)
             else:
                 raise e
 
