@@ -32,16 +32,8 @@ Environment Variables
             (default: "true"). When enabled, traces execution
             flow and agent interactions for debugging and analysis.
         CAI_AGENT_TYPE: Specify the agents to use it could take
-            the value of (default: "one_tool"):
-            - one_tool (default): one single agent with one tool
-            - codeagent: unifies LLM agents' actions into a single
-              action space integrated with Python interpreter
-            - boot2root: use an agent with a speciliced prompt and
-              tools for boot2root CTFs.
-            - (for creating new agents pattern:
-                1. Add the pattern in to cai/agents/ folder
-                2. Add elsif for the new patter in cai/__init__.py
-                3. Document the new value for CAI_AGENT_TYPE)
+            the value of (default: "one_tool_agent"). Use "/agent"
+            command in CLI to list all available agents.
         CAI_STATE: Enable/disable stateful mode (default: "false").
             When enabled, the agent will use a state agent to keep
             track of the state of the network and the flags found.
@@ -153,7 +145,7 @@ def setup_ctf():
     print(color("Setting up CTF: ", fg="black", bg="yellow") +
           color(ctf_name, fg="black", bg="yellow"))
 
-    ctf = ptt.ctf(
+    ctf = ptt.ctf(  # pylint: disable=I1101  # noqa
         ctf_name,
         subnet=os.getenv('CTF_SUBNET', "192.168.2.0/24"),
         container_name="ctf_target",

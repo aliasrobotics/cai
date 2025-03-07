@@ -105,6 +105,7 @@ boot2root_agent = Agent(
         # upload_ftp_webshell
     ],
     parallel_tool_calls=False,
+    pattern="swarm"
 )
 
 boot2root_agent.functions.append(transfer_to_dns_agent)

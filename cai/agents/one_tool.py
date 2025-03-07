@@ -6,7 +6,7 @@ from cai.types import Agent
 from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa
 model = os.getenv('CAI_MODEL', "qwen2.5:14b")
 
-ctf_agent_one_tool = Agent(
+one_tool_agent = Agent(
     model=model,
     name="CTF agent",
     instructions="""You are a Cybersecurity expert Leader facing a CTF
@@ -44,7 +44,7 @@ ctf_agent_one_tool = Agent(
 )
 
 
-def transfer_to_ctf_agent_one_tool(**kwargs):  # pylint: disable=W0613
+def transfer_to_one_tool_agent(**kwargs):  # pylint: disable=W0613
     """Transfer to ctf agent.
     Accepts any keyword arguments but ignores them."""
-    return ctf_agent_one_tool
+    return one_tool_agent
