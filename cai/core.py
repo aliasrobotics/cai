@@ -896,7 +896,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 # --------------------------------
                 active_agent = agent_interaction(active_agent)
 
-                n_turn += 1
                 if (self.semantic_rag and
                         (n_turn != 0 and n_turn % self.rag_interval == 0)
                         and self.rag_online):
@@ -942,9 +941,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                         model_override=active_agent.model
                     )
                     active_agent = prev_agent
+                n_turn += 1
 
             except KeyboardInterrupt:
                 print("\nCtrl+C pressed")
+                n_turn += 1
                 break
 
             # Check if the flag is found in the last tool output
