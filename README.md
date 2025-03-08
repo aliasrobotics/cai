@@ -2,7 +2,7 @@
 
 A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity AIs (CAIs).
 
-<div align="center">
+```
 
                CCCCCCCCCCCCC      ++++++++   ++++++++       IIIIIIIIII
             CCC::::::::::::C  ++++++++++       ++++++++++   I::::::::I
@@ -23,7 +23,7 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
 
                            Cybersecurity AI (CAI), v0.3.2
                                  Bug bounty-ready AI
-</div>
+```
 
 
 > [!WARNING]
