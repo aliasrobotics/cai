@@ -1,6 +1,29 @@
+<div align="center">
+
+                CCCCCCCCCCCCC      ++++++++   ++++++++      IIIIIIIIII
+             CCC::::::::::::C  ++++++++++       ++++++++++  I::::::::I
+           CC:::::::::::::::C ++++++++++         ++++++++++ I::::::::I
+          C:::::CCCCCCCC::::C +++++++++    ++     +++++++++ II::::::II
+         C:::::C       CCCCCC +++++++     +++++     +++++++   I::::I
+        C:::::C                +++++     +++++++     +++++    I::::I
+        C:::::C                ++++                   ++++    I::::I
+        C:::::C                 ++                     ++     I::::I
+        C:::::C                  +   +++++++++++++++   +      I::::I
+        C:::::C                    +++++++++++++++++++        I::::I
+        C:::::C                     +++++++++++++++++         I::::I
+         C:::::C       CCCCCC        +++++++++++++++          I::::I
+          C:::::CCCCCCCC::::C         +++++++++++++         II::::::II
+           CC:::::::::::::::C           +++++++++           I::::::::I
+             CCC::::::::::::C             +++++             I::::::::I
+                CCCCCCCCCCCCC               ++              IIIIIIIIII
+
+                              <strong>Cybersecurity AI (CAI), v0.3.2</strong>
+                                  Bug bounty-ready AI
+</div>
+
 # Cybersecurity AI (`CAI`)
 
-A lightweight, ergonomic framework for building Bug Bounty-level grade Cybersecurity AIs (CAIs).
+A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity AIs (CAIs).
 
 > [!WARNING]
 > CAI is currently under development.
@@ -10,7 +33,34 @@ A lightweight, ergonomic framework for building Bug Bounty-level grade Cybersecu
 > By no means the authors of CAI encourage or promote the unauthorized tampering with compute systems. Please don't use the source code in here to favour cybercrime. Pentest for good instead.
 
 
-## Why CAI?
+
+## :bookmark: Table of Contents
+
+- [Cybersecurity AI (`CAI`)](#cybersecurity-ai-cai)
+  - [:bookmark: Table of Contents](#bookmark-table-of-contents)
+  - [:bust\_in\_silhouette: Why CAI?](#bust_in_silhouette-why-cai)
+  - [:nut\_and\_bolt: Install](#nut_and_bolt-install)
+    - [Basic Requirements](#basic-requirements)
+    - [Development Requirements](#development-requirements)
+    - [Optional Requirements: caiextensions](#optional-requirements-caiextensions)
+    - [Reproduce CI-Setup locally](#reproduce-ci-setup-locally)
+  - [:triangular\_ruler: Architecture:](#triangular_ruler-architecture)
+    - [Code structure](#code-structure)
+    - [Key Concepts](#key-concepts)
+      - [🔹 Agent](#-agent)
+      - [🔹 Agentic Patterns](#-agentic-patterns)
+      - [🔹 How do agents work together? Functions](#-how-do-agents-work-together-functions)
+      - [🔹 Interactions and Turns](#-interactions-and-turns)
+      - [🔹 Human-In-The-Loop (HITL)](#-human-in-the-loop-hitl)
+  - [:rocket: Quickstart](#rocket-quickstart)
+    - [Environment Variables](#environment-variables)
+  - [FAQ](#faq)
+  - [Citation](#citation)
+  - [Acknowledgements](#acknowledgements)
+
+
+
+## :bust_in_silhouette: Why CAI?
 The cybersecurity landscape is undergoing a dramatic transformation as AI becomes increasingly integrated into security operations. Industry experts predict that by 2028, AI-powered security testing tools will outnumber human pentesters. This shift represents a fundamental change in how we approach cybersecurity challenges. *AI is not just another tool - it's becoming essential for addressing complex security vulnerabilities and staying ahead of sophisticated threats. As organizations face more advanced cyber attacks, AI-enhanced security testing will be crucial for maintaining robust defenses.*
 
 We believe that democratizing access to advanced cybersecurity AI tools is vital for the entire security community. That's why we're releasing Cybersecurity AI (`CAI`) as an open source framework. Our goal is to empower security researchers, ethical hackers, and organizations to build and deploy powerful AI-driven security tools. By making these capabilities openly available, we aim to level the playing field and ensure that cutting-edge security AI technology isn't limited to well-funded private companies or state actors.
@@ -18,66 +68,52 @@ We believe that democratizing access to advanced cybersecurity AI tools is vital
 Bug Bounty programs have become a cornerstone of modern cybersecurity, providing a crucial mechanism for organizations to identify and fix vulnerabilities in their systems before they can be exploited. These programs have proven highly effective at securing both public and private infrastructure, with researchers discovering critical vulnerabilities that might have otherwise gone unnoticed. CAI is specifically designed to enhance these efforts by providing a lightweight, ergonomic framework for building specialized AI agents that can assist in various aspects of Bug Bounty hunting - from initial reconnaissance to vulnerability validation and reporting. Our framework aims to augment human expertise with AI capabilities, helping researchers work more efficiently and thoroughly in their quest to make digital systems more secure.
 
 
-
-## Install
-
+## :nut_and_bolt: Install
+### Basic Requirements
 Requires Python 3.10+
 
 ```shell
 pip install git+https://gitlab.com/aliasrobotics/alias_research/cai.git
 ```
 
-## Usage
+### Development Requirements
 
-```python
-from cai.core import CAI, Agent
-
-client = CAI()
-
-def transfer_to_agent_b():
-    return agent_b
-
-
-agent_a = Agent(
-    name="Agent A",
-    instructions="You are a helpful agent.",
-    functions=[transfer_to_agent_b],
-)
-
-agent_b = Agent(
-    name="Agent B",
-    instructions="Only speak in Haikus.",
-)
-
-response = client.run(
-    agent=agent_a,
-    messages=[{"role": "user", "content": "I want to talk to agent B."}],
-)
-
-print(response.messages[-1]["content"])
+```shell
+pip install pre-commit
 ```
 
+If you want to contribute to this project, use [**Pre-commit**](https://pre-commit.com/) before your MR
+```bash
+pre-commit # files staged
+pre-commit run --all-files # all files
 ```
-Hope glimmers brightly,
-New paths converge gracefully,
-What can I assist?
+
+### Optional Requirements: [caiextensions](https://gitlab.com/aliasrobotics/alias_research/caiextensions)
+
+| Extension | Install command | Description | Usage |
+|-----------|---------|-------------|-----------|
+| [Report](https://gitlab.com/aliasrobotics/alias_research/caiextensions/caiextensions-report) | `pip install -e .[report]` | Generates a Report after running CAI against any target. Use the environment variable `CAI_REPORT` to specify the type of report: **generic pentesting report** `CAI_REPORT=pentesting` or **NIS2 report** `CAI_REPORT=nis2` | ```CAI_REPORT=pentesting CAI_MODEL="qwen2.5:72b" python3 cai/cli.py``` |
+| [Benchmarking](https://gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf) | `pip install -e .[pentestperf]` | Allows running CAI against dockerized Capture The Flag (CTF) challenges. Use environment variables (`CTF_NAME` and `CTF_INSIDE`) to run any CTF from [this list](https://gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf/-/blob/main/pentestperf/ctf-jsons/ctf_configs.jsonl)  | ```CTF_NAME="picoctf_static_flag" CTF_INSIDE="true" python3 cai/cli.py``` |
+| [Memory](https://gitlab.com/aliasrobotics/alias_research/caiextensions/caiextensions-memory) | `pip install -e .[memory]` | Allows using previous CAI runs and generated artifacts (e.g. scripts) for future runs |  N/A: If the same CTF or problem is already solved in a previous run, and there are any artifacts in the repository, CAI will automatically use them for future runs |
+| [Platform](https://gitlab.com/aliasrobotics/alias_research/caiextensions/caiextensions-platform) | `pip install -e .[platform]` | Allows running CAI against CTF platforms (currently only working for Hack The Box) | Run the command on the right, and dive into the UI Platform: <ul><li>```/p htb list``` to list machines</li><li>```/p htb connect``` to connect to the VPN</li><li>```/p htb spawn <machine_name>``` to start cracking your first machine</li></ul> |
+
+<details>
+<summary><b>How to install caiextensions?</b></summary>
+
+```bash
+git clone https://gitlab.com/aliasrobotics/alias_research/caiextensions/caiextensions-report.git
+```
+```bash
+cd cai
+```
+```bash
+pip3 install -e .[report]
 ```
 
-### How are tools organized?
-
-Tools are grouped in 6 major categories inspired by the security kill chain [^3]:
-
-1. Reconnaissance and weaponization - *reconnaissance*  (crypto, listing, etc)
-2. Exploitation - *exploitation*
-3. Privilege escalation - *escalation*
-4. Lateral movement - *lateral*
-5. Data exfiltration - *exfiltration*
-6. Command and control - *control*
-
-[^3]: Kamhoua, C. A., Leslie, N. O., & Weisman, M. J. (2018). Game theoretic modeling of advanced persistent threat in internet of things. Journal of Cyber Security and Information Systems.
+</details>
 
 
-### Develop
+### Reproduce CI-Setup locally
 
 To simulate the CI/CD pipeline, you can run the following in the Gitlab runner machines:
 
@@ -91,314 +127,407 @@ docker run --rm -it \
   registry.gitlab.com/aliasrobotics/alias_research/cai:latest bash
 ```
 
-### Pre-commit
-```bash
-pre-commit # files staged
-pre-commit run --all-files # all files
+
+## :triangular_ruler: Architecture:
+
+CAI is designed with the following key architectural characteristics:
+
+- **Cybersecurity oriented AI framework**: CAI is specifically designed for cybersecurity use cases, aiming at semi- and fully-automating pentesting tasks.
+- **Open source**: CAI is open source. We aim at democratizing access to AI and Cybersecurity.
+- **Lightweight**: CAI is designed to be fast, and easy to use.
+- **Modular and agent-centric design**: CAI operates on the basis of agents and agentic patterns, which allows flexibility and scalability. You can easily add the most suitable agents and pattern for your cybersecuritytarget case.
+- **Tool-integration**: CAI integrates already built-in tools, and allows the user to integrate their own tools with their own logic easily.
+- **Logging and tracing integrated**: using Phoenix, the opensource tracing and logging tool. This provides the user with a detailed traceability of the agents and their execution.
+- **Multi-Model Support**: more than 300 supported. The most popular providers:
+  - **Anthropic**: `Claude 3.7`, `Claude 3.5`, `Claude 3`, `Claude 3 Opus`
+  - **OpenAI**: `O1`, `O1 Mini`, `O3 Mini`, `GPT-4o`, `GPT-4o Audio Preview`, `GPT-4`, `GPT-4 Turbo`, `GPT-4.5 Preview`, `GPT-3.5 Turbo`
+  - **DeepSeek**: `DeepSeek V3`, `DeepSeek R1`
+  - **Ollama**: `Qwen2.5 72B`, `Qwen2.5 72B Ctx-32768`, `Qwen2.5 14B`, `Qwen2.5 14B Ctx-32768`, `Qwen2.5 32B`, `Qwen2.5 72B Instruct`, `Llama3 Latest`, `Llama3.1 70B`, `Llama3.3 70B`, `Llama3.1 8B`, `Marco-O1 7B FP16`, `DwightFoster03 Function`
+
+
+### Code structure
+
+If you want to dive deeper into the code, check the following files as a start point for using CAI:
+
+```
+.
+├── __init__.py
+├── agents                      # this is where agent live
+│       └─ one_tool.py          # an example of a single tool agent
+│
+├── cli.py                      # entrypoint for CAI CLI
+│
+├── repl                        # abstracts CLI aesthetics and commands
+│     └─ commands
+│     └─ ui
+│     └─ repl.py
+├── core.py                     # CAI class which handles chat completions, tool calls, and agent interactions
+├── types.py
+|
+├── tools
+│   ├── common.py               # definition of how tools are executed inside and outside of virtual containers
+```
+
+### Key Concepts
+CAI focuses on making cybersecurity agent **coordination** and **execution** lightweight, highly controllable, and easily testable. It accomplishes this through two primitive abstractions: `Agent`s and **handoffs**. An `Agent` encompasses `instructions` and `tools`, and can at any point choose to hand off a conversation to another `Agent`.
+
+#### 🔹 Agent
+An **Agent** is an autonomous entity designed to perform specific tasks based on given instructions.
+
+```python
+from cai.types import Agent
+from cai.core import CAI
+ctf_agent = Agent(
+    name="CTF Agent",
+    instructions="""You are a Cybersecurity expert Leader facing a CTF
+                    challenge.
+                    INSTRUCTIONS:
+                    1. Execute the generic_linux_command tool without any
+                    explanation.
+                    2. Be efficient and strategic when executing commands.
+                    3. Never assume the flag format - it could be any string
+                    """,
+    model= "gpt-4o",
+)
+
+messages = [{
+    "role": "user",
+    "content": "CTF challenge: TryMyNetwork. Target IP: 192.168.1.1"
+   }]
+
+client = CAI()
+response = client.run(agent=ctf_agent,
+                      messages=messages
+                      )
+
 ```
 
 
-## Table of Contents
 
-- [Overview](#overview)
-- [Examples](#examples)
-- [Documentation](#documentation)
-  - [Running CAI](#running-cai)
-  - [Agents](#agents)
-  - [Functions](#functions)
-  - [Streaming](#streaming)
-- [Evaluations](#evaluations)
-- [Utils](#utils)
+#### 🔹 Agentic Patterns
+**Agentic Pattern** refers to the way one or more cybersecurity agents work together. There are four main types of agentic patterns considered in CAI:
 
-# Overview
+| Agentic Pattern | Description | Code Base Example | Illustration |
+|-----------------|-------------|---------|---------|
+| **Recursive** | A single agent with handoffs to itself. That is, calling to itself as both executor and evaluator. Any agent that can be used alone may fall into this category | CodeAgent | <img src="imgs/readme_imgs/agent-pattern-recursive.png" width="200"> |
+| **Peer-to-peer (Decentralized)** | Agents share tasks and self-assign responsibilities without a central orchestrator. Any agent has the ability to call any other agent | [CTF Agent]() | <img src="imgs/readme_imgs/agent-pattern-p2p1.png" width="1500"> |
+| **Hierarchical** | A top-level agent assigns tasks to other sub-agents. There are two main types: flexible chain and hardcoded chain of execution. |  |  |
+|  | **Flexible chain**: a top-level agent assigns tasks to other agents. The order of execution depends on the top-level agent. The rest of sub-agents are not able to handoff to each other, but to return to the top-level agent. | [PlannerAgent]() | <img src="imgs/readme_imgs/agent-pattern-flexi.png" width="700">  |
+|  | **Hardcoded chain**: a chain-of-agents is defined and it is always executed in that predefined order. | [Chain-of-Thought]() | <img src="imgs/readme_imgs/agent-pattern-hardcoded-chain.png" width="1000">  |
+| **Auction-Based (Competitive Allocation)** | Agents 'bid' on tasks based on priority, capability, or cost. A decision agent evaluates them and hands off tasks to the best-fit agent | [Example]() | <img src="imgs/readme_imgs/agent-pattern-auction-based.png" width="900"> |
 
-CAI focuses on making agent **coordination** and **execution** lightweight, highly controllable, and easily testable.
+#### 🔹 How do agents work together? Functions
+Agents can use functions of two types: (1) handoff/transfer functions between agents, and (2) tools.
 
-It accomplishes this through two primitive abstractions: `Agent`s and **handoffs**. An `Agent` encompasses `instructions` and `tools`, and can at any point choose to hand off a conversation to another `Agent`.
+<details>
+<summary>Handoff/Transfer Function</summary>
 
-These primitives are powerful enough to express rich dynamics between tools and networks of agents, allowing you to build scalable, real-world solutions while avoiding a steep learning curve.
+A **handoff/transfer function** is used to transfer the conversation or task from one agent to another.
+In this case, there are two agents: the `ctf_agent` and the `flag_discriminator_agent`.
+The `ctf_agent` is the first agent, as it is instanciated in the method `run()`, with one function, `transfer_to_flag_discriminator`. Once the `ctf_agent`considers that has found the flag, it will hand off the `flag_discriminator_agent`, and it will make an inferene to check if the flag is correct.
+
+
+```python
+from cai.types import Agent
+
+ctf_agent = Agent(
+    name="CTF Agent",
+    instructions="""You are a Cybersecurity expert Leader facing a CTF
+                    challenge.
+                    INSTRUCTIONS:
+                    1. Execute the generic_linux_command tool without any
+                    explanation.
+                    2. YOU MUST USE THE flag_discriminator function to check the flag""",
+    model= "deepseek/deepseek-chat",
+    functions=[],
+)
+
+flag_discriminator_agent = Agent(
+    name="Flag Discriminator Agent",
+    instructions="You are a Cybersecurity expert facing a CTF challenge. You are in charge of checking if the flag is correct.",
+    model= "qwen2.5:14b",
+    functions=[],
+)
+
+# Define the handoff/transfer function
+def transfer_to_flag_discriminator():
+    """
+    Transfer the flag to the flag_discriminator_agent
+    to check if it is the correct flag
+    """
+    return flag_discriminator_agent
+
+
+ctf_agent.functions.append(transfer_to_flag_discriminator)
+## if you want to add multiple functions, use extend([one_tool, another_tool]) instead of append:
+# ctf_agent.functions.extend([transfer_to_flag_discriminator])
+
+from cai.core import CAI
+client = CAI()
+
+messages = [{
+    "role": "user",
+    "content": "CTF challenge: TryMyNetwork. Target IP: 192.168.1.1"
+   }]
+
+
+response = client.run(agent=ctf_agent,
+                      messages=messages
+                      )
+
+```
+</details>
+
+
+
+<details>
+<summary>Tools</summary>
+Tools are functions that agents can call to perform specific actions or retrieve information.
+
+```python
+from cai.types import Agent
+from cai.tools.common import run_command
+from cai.core import CAI
+
+ctf_agent = Agent(
+    name="CTF Agent",
+    instructions="""You are a Cybersecurity expert Leader facing a CTF
+                    challenge.
+                    INSTRUCTIONS:
+                    1. Execute the generic_linux_command tool without any
+                    explanation.
+                    2. YOU MUST USE THE flag_discriminator function to check the flag""",
+    model= "claude-3-7-sonnet-20250219",
+    functions=[],
+)
+
+# Define the first tool: hardcoded command
+def listing_tool():
+   """
+   This is a tool used list the files in the current directory
+   """
+    command = "ls -la"
+    return run_command(command, ctf=ctf)
+
+# Define the second tool: flexible command
+def generic_linux_command(command: str = "", args: str = "", ctf=None) -> str:
+    """
+    Tool to send a linux command.
+
+    Args:
+        command: the command to execute
+        args: additional arguments to pass to the command
+
+    Returns:
+        str: The output of running the linux command
+    """
+    command = f'{command} {args}'
+    return run_command(command, ctf=ctf)
+
+
+### ADD THE TOOLS TO THE AGENT
+## If you want to add multiple tools, use extend([one_tool, another_tool])
+ctf_agent.functions.extend[(listing_tool,
+                            generic_linux_command )]
+
+## If you want to add each tool one by one, use append(your_tool)
+# ctf_agent.functions.append(listing_tool)
+# ctf_agent.functions.append(generic_linux_command)
+
+client = CAI()
+
+messages = [{
+    "role": "user",
+    "content": "CTF challenge: TryMyNetwork. Target IP: 192.168.1.1"
+   }]
+
+response = client.run(agent=ctf_agent,
+                      messages=messages
+                      )
+
+```
+
+
+You may find different [tools](cai/tools). They are grouped in 6 major categories inspired by the security kill chain [^3]:
+
+1. Reconnaissance and weaponization - *reconnaissance*  (crypto, listing, etc)
+2. Exploitation - *exploitation*
+3. Privilege escalation - *escalation*
+4. Lateral movement - *lateral*
+5. Data exfiltration - *exfiltration*
+6. Command and control - *control*
+
+[^3]: Kamhoua, C. A., Leslie, N. O., & Weisman, M. J. (2018). Game theoretic modeling of advanced persistent threat in internet of things. Journal of Cyber Security and Information Systems.
+</details>
+
+#### 🔹 Interactions and Turns
+During the agentic flow (conversation), we distinguish between **interactions** and **turns**.
+
+- **Interactions**: These are the exchanges between the user and the agent, or the agent calling a function (agents or tools), or the agent iterating over themself. Each interaction involves a request and a response. This is defined in`process_interaction()` in [core.py](cai/core.py).
+
+- **Turns**: A turn represents a cycle of one ore more interactions. The end of a turn is defined by the `active_agent` being `None`. This is defined in `run()`, see [core.py](cai/core.py).
+
 
 > [!NOTE]
 > CAI Agents are not related to Assistants in the Assistants API. They are named similarly for convenience, but are otherwise completely unrelated. CAI is entirely powered by the Chat Completions API and is hence stateless between calls.
 
-## Why CAI
 
-CAI explores patterns that are lightweight, scalable, and highly customizable by design. Approaches similar to CAI are best suited for situations dealing with a large number of independent capabilities and instructions that are difficult to encode into a single prompt.
+#### 🔹 Human-In-The-Loop (HITL)
+CAI aims at both, *semi-* and *fully-automating* pentesting tasks. To cover the first case, the `cli.py` allows the user to interact with the agent at any point of the execution. To do so, ```press twice Ctrl+C```. This functionality is defined in [core.py](cai/core.py) and [shell.py](cai/repl/commands/shell.py) using `KeyboardInterrupt`.
 
-The Assistants API is a great option for developers looking for fully-hosted threads and built in memory management and retrieval. However, CAI is an educational resource for developers curious to learn about multi-agent orchestration. CAI runs (almost) entirely on the client and, much like the Chat Completions API, does not store state between calls.
 
-# Examples
+## :rocket: Quickstart
 
-Check out `/examples` for inspiration! Learn more about each one in its README.
+<details>
+<summary>How do I start using CAI?</summary>
 
-- [`basic`](examples/basic): Simple examples of fundamentals like setup, function calling, handoffs, and context variables
-- [`triage_agent`](examples/triage_agent): Simple example of setting up a basic triage step to hand off to the right agent
-- [`weather_agent`](examples/weather_agent): Simple example of function calling
-- [`airline`](examples/airline): A multi-agent setup for handling different customer service requests in an airline context.
-- [`support_bot`](examples/support_bot): A customer service bot which includes a user interface agent and a help center agent with several tools
-- [`personal_shopper`](examples/personal_shopper): A personal shopping agent that can help with making sales and refunding orders
+![cai-001-main-menu](imgs/readme_imgs/cai-001-main-menu.png)
 
+Initialize CAI and prompt any task you want to perform.
 
-## Running CAI
+</details>
 
-Start by instantiating a CAI client (which internally just instantiates an `OpenAI` client).
 
-```python
-from cai.core import CAI
+<details>
+<summary>Run CAI against any target</summary>
 
-client = CAI()
-```
+![cai-004-first-message](imgs/readme_imgs/cai-004-first-message.png)
 
-### `client.run()`
+The starting user prompt in this case is: `Target IP: 192.168.2.10, perform a full network scan`.
 
-CAI's `run()` function is analogous to the `chat.completions.create()` function in the Chat Completions API – it takes `messages` and returns `messages` and saves no state between calls. Importantly, however, it also handles Agent function execution, hand-offs, context variable references, and can take multiple turns before returning to the user.
+The agent started performing a nmap scan. You could either interact with the agent and give it more instructions, or let it run to see what it explores next.
+</details>
 
-At its core, CAI's `client.run()` implements the following loop:
+<details>
+<summary>How do I interact with the agent? Type twice CTRL + C </summary>
 
-1. Get a completion from the current Agent
-2. Execute tool calls and append results
-3. Switch Agent if necessary
-4. Update context variables, if necessary
-5. If no new function calls, return
+![cai-005-ctrl-c](imgs/readme_imgs/cai-005-ctrl-c.png)
 
-#### Arguments
+If you want to use the HITL mode, you can do it by presssing twice ```Ctrl + C```.
+This will allow you to interact (prompt) with the agent whenever you want. The agent will not lose the previous context, as it is stored in the `history` variable, which is passed to it and any agent that is called. This enables any agent to use the previous information and be more accurate and efficient.
+</details>
 
-| Argument              | Type    | Description                                                                                                                                            | Default        |
-| --------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------- |
-| **agent**             | `Agent` | The (initial) agent to be called.                                                                                                                      | (required)     |
-| **messages**          | `List`  | A list of message objects, identical to [Chat Completions `messages`](https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages) | (required)     |
-| **context_variables** | `dict`  | A dictionary of additional context variables, available to functions and Agent instructions                                                            | `{}`           |
-| **max_turns**         | `int`   | The maximum number of conversational turns allowed                                                                                                     | `float("inf")` |
-| **model_override**    | `str`   | An optional string to override the model being used by an Agent                                                                                        | `None`         |
-| **execute_tools**     | `bool`  | If `False`, interrupt execution and immediately returns `tool_calls` message when an Agent tries to call a function                                    | `True`         |
-| **stream**            | `bool`  | If `True`, enables streaming responses                                                                                                                 | `False`        |
-| **debug**             | `bool`  | If `True`, enables debug logging                                                                                                                       | `False`        |
+<details>
+<summary> Can I change the model while CAI is running? /model </summary>
 
-Once `client.run()` is finished (after potentially multiple calls to agents and tools) it will return a `Response` containing all the relevant updated state. Specifically, the new `messages`, the last `Agent` to be called, and the most up-to-date `context_variables`. You can pass these values (plus new user messages) in to your next execution of `client.run()` to continue the interaction where it left off – much like `chat.completions.create()`. (The `run_cai_cli` function implements an example of a full execution loop in `/cai/repl/repl.py`.)
+Use ```/model``` to change the model.
 
-#### `Response` Fields
+![cai-007-model-change](imgs/readme_imgs/cai-007-model-change.png)
 
-| Field                 | Type    | Description                                                                                                                                                                                                                                                                  |
-| --------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **messages**          | `List`  | A list of message objects generated during the conversation. Very similar to [Chat Completions `messages`](https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages), but with a `sender` field indicating which `Agent` the message originated from. |
-| **agent**             | `Agent` | The last agent to handle a message.                                                                                                                                                                                                                                          |
-| **context_variables** | `dict`  | The same as the input variables, plus any changes.                                                                                                                                                                                                                           |
+</details>
 
-## Agents
 
-An `Agent` simply encapsulates a set of `instructions` with a set of `functions` (plus some additional settings below), and has the capability to hand off execution to another `Agent`.
+<details>
+<summary>How can I list all the agents available? /agent </summary>
 
-While it's tempting to personify an `Agent` as "someone who does X", it can also be used to represent a very specific workflow or step defined by a set of `instructions` and `functions` (e.g. a set of steps, a complex retrieval, single step of data transformation, etc). This allows `Agent`s to be composed into a network of "agents", "workflows", and "tasks", all represented by the same primitive.
+Use ```/agent``` to list all the agents available.
 
-## `Agent` Fields
+![cai-010-agents-menu](imgs/readme_imgs/cai-010-agents-menu.png)
 
-| Field            | Type                     | Description                                                                   | Default                      |
-| ---------------- | ------------------------ | ----------------------------------------------------------------------------- | ---------------------------- |
-| **name**         | `str`                    | The name of the agent.                                                        | `"Agent"`                    |
-| **model**        | `str`                    | The model to be used by the agent.                                            | `"gpt-4o"`                   |
-| **instructions** | `str` or `func() -> str` | Instructions for the agent, can be a string or a callable returning a string. | `"You are a helpful agent."` |
-| **functions**    | `List`                   | A list of functions that the agent can call.                                  | `[]`                         |
-| **tool_choice**  | `str`                    | The tool choice for the agent, if any.                                        | `None`                       |
+</details>
 
-### Instructions
 
-`Agent` `instructions` are directly converted into the `system` prompt of a conversation (as the first message). Only the `instructions` of the active `Agent` will be present at any given time (e.g. if there is an `Agent` handoff, the `system` prompt will change, but the chat history will not.)
 
-```python
-agent = Agent(
-   instructions="You are a helpful agent."
-)
-```
+<details>
+<summary> Where can I list all the environment variables? /config </summary>
 
-The `instructions` can either be a regular `str`, or a function that returns a `str`. The function can optionally receive a `context_variables` parameter, which will be populated by the `context_variables` passed into `client.run()`.
+![cai-008-config](imgs/readme_imgs/cai-008-config.png)
+</details>
 
-```python
-def instructions(context_variables):
-   user_name = context_variables["user_name"]
-   return f"Help the user, {user_name}, do whatever they want."
 
-agent = Agent(
-   instructions=instructions
-)
-response = client.run(
-   agent=agent,
-   messages=[{"role":"user", "content": "Hi!"}],
-   context_variables={"user_name":"John"}
-)
-print(response.messages[-1]["content"])
-```
-
-```
-Hi John, how can I assist you today?
-```
-
-## Functions
-
-- CAI `Agent`s can call python functions directly.
-- Function should usually return a `str` (values will be attempted to be cast as a `str`).
-- If a function returns an `Agent`, execution will be transferred to that `Agent`.
-- If a function defines a `context_variables` parameter, it will be populated by the `context_variables` passed into `client.run()`.
-
-```python
-def greet(context_variables, language):
-   user_name = context_variables["user_name"]
-   greeting = "Hola" if language.lower() == "spanish" else "Hello"
-   print(f"{greeting}, {user_name}!")
-   return "Done"
-
-agent = Agent(
-   functions=[greet]
-)
-
-client.run(
-   agent=agent,
-   messages=[{"role": "user", "content": "Usa greet() por favor."}],
-   context_variables={"user_name": "John"}
-)
-```
-
-```
-Hola, John!
-```
-
-- If an `Agent` function call has an error (missing function, wrong argument, error) an error response will be appended to the chat so the `Agent` can recover gracefully.
-- If multiple functions are called by the `Agent`, they will be executed in that order.
-
-### Handoffs and Updating Context Variables
-
-An `Agent` can hand off to another `Agent` by returning it in a `function`.
-
-```python
-sales_agent = Agent(name="Sales Agent")
-
-def transfer_to_sales():
-   return sales_agent
-
-agent = Agent(functions=[transfer_to_sales])
-
-response = client.run(agent, [{"role":"user", "content":"Transfer me to sales."}])
-print(response.agent.name)
-```
-
-```
-Sales Agent
-```
-
-It can also update the `context_variables` by returning a more complete `Result` object. This can also contain a `value` and an `agent`, in case you want a single function to return a value, update the agent, and update the context variables (or any subset of the three).
-
-```python
-sales_agent = Agent(name="Sales Agent")
-
-def talk_to_sales():
-   print("Hello, World!")
-   return Result(
-       value="Done",
-       agent=sales_agent,
-       context_variables={"department": "sales"}
-   )
-
-agent = Agent(functions=[talk_to_sales])
-
-response = client.run(
-   agent=agent,
-   messages=[{"role": "user", "content": "Transfer me to sales"}],
-   context_variables={"user_name": "John"}
-)
-print(response.agent.name)
-print(response.context_variables)
-```
-
-```
-Sales Agent
-{'department': 'sales', 'user_name': 'John'}
-```
-
-> [!NOTE]
-> If an `Agent` calls multiple functions to hand-off to an `Agent`, only the last handoff function will be used.
-
-### Function Schemas
-
-CAI automatically converts functions into a JSON Schema that is passed into Chat Completions `tools`.
-
-- Docstrings are turned into the function `description`.
-- Parameters without default values are set to `required`.
-- Type hints are mapped to the parameter's `type` (and default to `string`).
-- Per-parameter descriptions are not explicitly supported, but should work similarly if just added in the docstring. (In the future docstring argument parsing may be added.)
-
-```python
-def greet(name, age: int, location: str = "New York"):
-   """Greets the user. Make sure to get their name and age before calling.
-
-   Args:
-      name: Name of the user.
-      age: Age of the user.
-      location: Best place on earth.
-   """
-   print(f"Hello {name}, glad you are {age} in {location}!")
-```
-
-```javascript
-{
-   "type": "function",
-   "function": {
-      "name": "greet",
-      "description": "Greets the user. Make sure to get their name and age before calling.\n\nArgs:\n   name: Name of the user.\n   age: Age of the user.\n   location: Best place on earth.",
-      "parameters": {
-         "type": "object",
-         "properties": {
-            "name": {"type": "string"},
-            "age": {"type": "integer"},
-            "location": {"type": "string"}
-         },
-         "required": ["name", "age"]
-      }
-   }
-}
-```
-
-## Streaming
-
-```python
-stream = client.run(agent, messages, stream=True)
-for chunk in stream:
-   print(chunk)
-```
-
-Uses the same events as [Chat Completions API streaming](https://platform.openai.com/docs/api-reference/streaming). See `process_and_print_streaming_response` in `/cai/repl/repl.py` as an example.
-
-Two new event types have been added:
-
-- `{"delim":"start"}` and `{"delim":"end"}`, to signal each time an `Agent` handles a single message (response or function call). This helps identify switches between `Agent`s.
-- `{"response": Response}` will return a `Response` object at the end of a stream with the aggregated (complete) response, for convenience.
-
-# Evaluations
-
-Evaluations are crucial to any project, and we encourage developers to bring their own eval suites to test the performance of their swarms. For reference, we have some examples for how to eval cai in the `airline`, `weather_agent` and `triage_agent` quickstart examples. See the READMEs for more details.
-
-# Utils
-
-Use the `run_cai_cli` to test out your cai! This will run a REPL on your command line. Supports streaming.
-
-```python
-from cai.repl import run_cai_cli
-...
-run_cai_cli(agent, stream=True)
-```
-
-# Acknowledgements
-
-CAI is developed by [Alias Robotics](https://aliasrobotics.com) and funded as part of the project XXXXX. The original agentic principles are inspired from OpenAI's [swarm](https://github.com/openai/swarm) library.
+<details>
+<summary> How to know more about the CLI? /help </summary>
+
+![cai-006-help](imgs/readme_imgs/cai-006-help.png)
+</details>
+
+
+<details>
+<summary>How can I trace the whole execution?</summary>
+The environment variable `CAI_TRACING` allows the user to set it to `CAI_TRACING=true` to enable tracing, or `CAI_TRACING=false` to disable it.
+When CAI is prompted by the first time, the user is provided with two paths, the execution log, and the tracing log.
+
+![cai-009-logs](imgs/readme_imgs/cai-009-logs.png)
+
+</details>
+
+
+<details>
+<summary>Can I expand CAI capabilities using previous run logs?</summary>
+
+Absolutely! The **memory extension** allows you to use a previously sucessful runs ( the log object is stored as a **.jsonl file in the [log](cai/logs) folder** ) in a new run against the same target.
+The user is also given the path highlighted in orange as shown below.
+
+![cai-009-logs](imgs/readme_imgs/cai-009-logs.png)
+
+How to make use of this functionality?
+
+1. Run CAI against the target. Let's assume the target name is: `target001`.
+2. Get the log file path, something like: ```logs/cai_20250408_111856.jsonl```
+3. Generate the memory using any model of your preference:
+```shell JSONL_FILE_PATH="logs/cai_20250408_111856.jsonl" CTF_INSIDE="false" CAI_MEMORY_COLLECTION="target001" CAI_MEMORY="episodic" CAI_MODEL="claude-3-5-sonnet-20241022" python3 tools/2_jsonl_to_memory.py ```
+
+The script [`tools/2_jsonl_to_memory.py`](cai/tools/2_jsonl_to_memory.py) will generate a memory collection file with the most relevant steps. The quality of the memory collection will depend on the model you use.
+
+4. Use the generated memory collection and execute a new run:
+```shell CAI_MEMORY="episodic" CAI_MODEL="gpt-4o" CAI_MEMORY_COLLECTION="target001" CAI_TRACING=false python3 cai/cli.py```
+
+</details>
+
+<details>
+<summary>Can I expand CAI capabilities using scripts or extra information?</summary>
+
+Currently, CAI supports text based information. You can add any extra information on the target you are facing by copy-pasting it directly into the system or user prompt.
+
+**How?** By adding it to the system ([`system_master_template.md`](cai/repl/templates/system_master_template.md)) or the user prompt ([`user_master_template.md`](cai/repl/templates/user_master_template.md)). You can always directly prompt the path to the model, and it will ```cat``` it.
+</details>
+
+### Environment Variables
+For using private models, you are given a [`.env.example`](.env.example) file. Copy it and rename it as `.env`. Fill in your corresponding API keys, and you are ready to use CAI.
+ <details>
+<summary>List of Environment Variables</summary>
+
+| Variable | Description |
+|----------|-------------|
+| CTF_NAME | Name of the CTF challenge to run (e.g. "picoctf_static_flag") |
+| CTF_CHALLENGE | Specific challenge name within the CTF to test |
+| CTF_SUBNET | Network subnet for the CTF container |
+| CTF_IP | IP address for the CTF container |
+| CTF_INSIDE | Whether to conquer the CTF from within container |
+| CAI_MODEL | Model to use for agents |
+| CAI_DEBUG | Set debug output level (0: Only tool outputs, 1: Verbose debug output, 2: CLI debug output) |
+| CAI_BRIEF | Enable/disable brief output mode |
+| CAI_MAX_TURNS | Maximum number of turns for agent interactions |
+| CAI_TRACING | Enable/disable OpenTelemetry tracing |
+| CAI_AGENT_TYPE | Specify the agents to use (boot2root, one_tool...) |
+| CAI_STATE | Enable/disable stateful mode |
+| CAI_MEMORY | Enable/disable memory mode (episodic, semantic, all) |
+| CAI_MEMORY_ONLINE | Enable/disable online memory mode |
+| CAI_MEMORY_OFFLINE | Enable/disable offline memory |
+| CAI_ENV_CONTEXT | Add dirs and current env to llm context |
+| CAI_MEMORY_ONLINE_INTERVAL | Number of turns between online memory updates |
+| CAI_PRICE_LIMIT | Price limit for the conversation in dollars |
+| CAI_REPORT | Enable/disable reporter mode (ctf, nis2, pentesting) |
+| CAI_SUPPORT_MODEL | Model to use for the support agent |
+| CAI_SUPPPORT_INTERVAL | Number of turns between support agent executions |
+
+</details>
+
 
 
 ## FAQ
+<details><summary>Where are all the caiextensions?</summary>
 
-### How do I install the report extension?
+See [all caiextensions](https://gitlab.com/aliasrobotics/alias_research/caiextensions)
 
-```bash
-pip install cai[report]
-```
+</details>
 
-### How do I set up SSH access for Gitlab?
+<details><summary>How do I install the report caiextension?</summary>
+
+[See here](#optional-requirements-caiextensions)
+</details>
+
+<details><summary>How do I set up SSH access for Gitlab?</summary>
 
 Generate a new SSH key
 ```bash
@@ -416,15 +545,19 @@ Copy the key and add it to Gitlab under https://gitlab.com/-/user_settings/ssh_k
 cat ~/.ssh/id_ed25519.pub
 ```
 
+</details>
 
-### How do I clear Python cache?
+
+
+<details><summary>How do I clear Python cache?</summary>
 
 ```bash
 find . -name "*.pyc" -delete && find . -name "__pycache__" -delete
 ```
 
+</details>
 
-### If host networking is not working with ollama check whether it has been disabled in Docker because you are not signed in
+<details><summary>If host networking is not working with ollama check whether it has been disabled in Docker because you are not signed in</summary>
 
 Docker in OS X behaves funny sometimes. Check if the following message has shown up:
 
@@ -436,3 +569,22 @@ To verify connection, from within the VSCode devcontainer:
 ```bash
 curl -v http://host.docker.internal:8000/api/version
 ```
+
+</details>
+
+
+## Citation
+If you want to cite our work, please use the following format
+```bibtex
+@cai{paper2025cai,
+    author = {Surname1, Name},
+    title = {Title of the paper},
+    howpublished = "\url{https://theurl.com}",
+    year = {2025}
+}
+```
+
+## Acknowledgements
+
+CAI was initially developed by [Alias Robotics](https://aliasrobotics.com) and funded as part of the project XXXXX.
+The original agentic principles are inspired from OpenAI's [swarm](https://github.com/openai/swarm) library.
