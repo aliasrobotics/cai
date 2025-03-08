@@ -1,29 +1,30 @@
+# Cybersecurity AI (`CAI`)
+
+A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity AIs (CAIs).
+
 <div align="center">
 
-                CCCCCCCCCCCCC      ++++++++   ++++++++      IIIIIIIIII
-             CCC::::::::::::C  ++++++++++       ++++++++++  I::::::::I
-           CC:::::::::::::::C ++++++++++         ++++++++++ I::::::::I
-          C:::::CCCCCCCC::::C +++++++++    ++     +++++++++ II::::::II
-         C:::::C       CCCCCC +++++++     +++++     +++++++   I::::I
+                CCCCCCCCCCCCC      ++++++++   ++++++++       IIIIIIIIII
+             CCC::::::::::::C  ++++++++++       ++++++++++   I::::::::I
+           CC:::::::::::::::C ++++++++++         ++++++++++  I::::::::I
+          C:::::CCCCCCCC::::C +++++++++    ++     +++++++++  II::::::II
+         C:::::C       CCCCC  +++++++     +++++     +++++++   I::::I
         C:::::C                +++++     +++++++     +++++    I::::I
         C:::::C                ++++                   ++++    I::::I
         C:::::C                 ++                     ++     I::::I
         C:::::C                  +   +++++++++++++++   +      I::::I
         C:::::C                    +++++++++++++++++++        I::::I
         C:::::C                     +++++++++++++++++         I::::I
-         C:::::C       CCCCCC        +++++++++++++++          I::::I
-          C:::::CCCCCCCC::::C         +++++++++++++         II::::::II
-           CC:::::::::::::::C           +++++++++           I::::::::I
-             CCC::::::::::::C             +++++             I::::::::I
-                CCCCCCCCCCCCC               ++              IIIIIIIIII
+         C:::::C       CCCCC         +++++++++++++++          I::::I
+          C:::::CCCCCCCC::::C         +++++++++++++          II::::::II
+           CC:::::::::::::::C           +++++++++            I::::::::I
+             CCC::::::::::::C             +++++              I::::::::I
+                CCCCCCCCCCCCC               ++               IIIIIIIIII
 
-                              <strong>Cybersecurity AI (CAI), v0.3.2</strong>
+                              Cybersecurity AI (CAI), v0.3.2
                                   Bug bounty-ready AI
 </div>
 
-# Cybersecurity AI (`CAI`)
-
-A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity AIs (CAIs).
 
 > [!WARNING]
 > CAI is currently under development.
