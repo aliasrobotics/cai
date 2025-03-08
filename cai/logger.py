@@ -102,9 +102,13 @@ class ExploitLogger:
         trace_id_hex = format(span_context.trace_id, "032x")
 
         # Use different project IDs based on source
+        #
+        # test_generic: UHJvamVjdDo1
+        # cli: UHJvamVjdDo5
+        # cai: UHJvamVjdDoxOA==
         project_id = ("UHJvamVjdDo1"
                       if source == "test_generic"
-                      else "UHJvamVjdDo5")
+                      else "UHJvamVjdDoxOA==")
         return f"http://11.0.0.1:6006/projects/{
             project_id}/traces/{trace_id_hex}"
 
