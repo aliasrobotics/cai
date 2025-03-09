@@ -27,11 +27,11 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
 
 
 > [!WARNING]
-> CAI is currently under development.
+> :warning: CAI is currently under development.
 >
-> Access to this library and the use of information, materials (or portions thereof), is not intended, and is prohibited, where such access or use violates applicable laws or regulations. By no means the authors encourage or promote the unauthorized tampering with running systems. This can cause serious human harm and material damages.
+> Access to this library and the use of information, materials (or portions thereof), is **<u>not intended</u>, and is <u>prohibited</u>, where such access or use violates applicable laws or regulations**. By no means the authors encourage or promote the unauthorized tampering with running systems. This can cause serious human harm and material damages.
 >
-> By no means the authors of CAI encourage or promote the unauthorized tampering with compute systems. Please don't use the source code in here to favour cybercrime. Pentest for good instead.
+> *By no means the authors of CAI encourage or promote the unauthorized tampering with compute systems. Please don't use the source code in here to favour cybercrime. <u>Pentest for good instead</u>*.
 
 
 

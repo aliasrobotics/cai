@@ -3,6 +3,7 @@ This module contains type definitions for the CAI library.
 """
 
 from typing import List, Callable, Union, Optional
+import os
 from openai.types.chat import ChatCompletionMessage  # noqa: F401, E501  # pylint: disable=import-error, unused-import
 from openai.types.chat.chat_completion_message_tool_call import (  # noqa: F401, E501  # pylint: disable=import-error, unused-import
     ChatCompletionMessageToolCall,
@@ -22,18 +23,32 @@ class Agent(BaseModel):  # pylint: disable=too-few-public-methods
     """
 
     name: str = "Agent"
-    # model: str = "gpt-4o"
-    model: str = "qwen2.5:14b"
+    _model: str = "qwen2.5:14b"  # Internal model storage
     instructions: Union[str, Callable[[], str]] = "You are a helpful agent."
     functions: List[AgentFunction] = []
     tool_choice: str = None
     parallel_tool_calls: bool = False
     structured_output_class: Optional[type] = None
     reasoning_effort: Optional[str] = "low"  # "low", "medium", "high"
-     
+
     # the agentic pattern associated
-    #    see cai/agents/__init__.py for more information   
-    pattern: Optional[str] = None 
+    #    see cai/agents/__init__.py for more information
+    pattern: Optional[str] = None
+
+    @property
+    def model(self) -> str:
+        """
+        Override the model property to always check
+        the environment variable. This ensures the agent
+        always uses the latest model setting.
+        """
+        # Otherwise use the general CAI_MODEL environment variable
+        return os.getenv('CAI_MODEL', self._model)
+
+    @model.setter
+    def model(self, value: str):
+        """Setter for the model property"""
+        self._model = value
 
 
 class Response(BaseModel):  # pylint: disable=too-few-public-methods

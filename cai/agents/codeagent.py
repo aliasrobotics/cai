@@ -15,7 +15,6 @@ interactions.
 
 # Standard library imports
 import copy
-import os
 import platform
 import re
 import signal
@@ -161,7 +160,7 @@ class CodeAgent(Agent):
     # Define model configuration for Pydantic
     model_config = {
         "arbitrary_types_allowed": True,
-        "extra": "allow",  # Allow extra attributes not defined in the model
+        "extra": "allow",
     }
 
     def __init__(  # pylint: disable=too-many-arguments,too-many-locals # noqa: E501
@@ -177,8 +176,19 @@ class CodeAgent(Agent):
         execution_timeout: int = 60,  # Default timeout of 60 seconds
         tool_choice: str = "auto",
     ):
-        """
-        Initialize a CodeAgent.
+        """Initialize a CodeAgent.
+
+        Args:
+            name: Name of the agent
+            model: Model to use for the agent
+            instructions: Instructions for the agent
+            functions: List of functions available to the agent
+            additional_authorized_imports: List of additional imports to allow
+            max_print_outputs_length: Maximum length of print outputs
+            reasoning_effort: Level of reasoning effort (low, medium, high)
+            max_steps: Maximum number of steps to execute
+            execution_timeout: Maximum time in seconds to allow for execution
+            tool_choice: Tool choice strategy
         """
         # Store CodeAgent-specific parameters as local variables first
         _additional_imports = additional_authorized_imports or []
@@ -769,14 +779,8 @@ def transfer_to_codeagent(**kwargs):  # pylint: disable=W0613
     return codeagent
 
 
-# model
-codeagent_model = os.getenv(
-    'CAI_MODEL',
-    "qwen2.5-coder:32b-instruct-fp16-ctx-32768")
-
 # agent
 codeagent = CodeAgent(
-    model=codeagent_model,
     name="CodeAgent",
     additional_authorized_imports=["*"],
     execution_timeout=150,
