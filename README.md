@@ -1,29 +1,23 @@
 # Cybersecurity AI (`CAI`)
 
+<div align="center">
+  <p>
+    <a align="center" href="" target="https://supervision.roboflow.com">
+      <img
+        width="100%"
+        src="https://media.roboflow.com/open-source/supervision/rf-supervision-banner.png?updatedAt=1678995927529"
+      >
+    </a>
+  </p>
+
+[![version](https://badge.fury.io/py/supervision.svg)](https://badge.fury.io/py/supervision)
+[![downloads](https://img.shields.io/pypi/dm/supervision)](https://pypistats.org/packages/supervision)
+[![license](https://img.shields.io/pypi/l/supervision)](https://github.com/roboflow/supervision/blob/main/LICENSE.md)
+
+
+</div>
+
 A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity AIs (CAIs).
-
-```
-
-             CCCCCCCCCCCCC      ++++++++   ++++++++       IIIIIIIIII
-          CCC::::::::::::C  ++++++++++       ++++++++++   I::::::::I
-        CC:::::::::::::::C ++++++++++         ++++++++++  I::::::::I
-       C:::::CCCCCCCC::::C +++++++++     ++    +++++++++  II::::::II
-      C:::::C       CCCCCC  +++++++     +++++     +++++++   I::::I
-      C:::::C                +++++     +++++++     +++++    I::::I
-      C:::::C                ++++                   ++++    I::::I
-      C:::::C                 ++                     ++     I::::I
-      C:::::C                  +   +++++++++++++++   +      I::::I
-      C:::::C                    +++++++++++++++++++        I::::I
-      C:::::C                     +++++++++++++++++         I::::I
-      C:::::C       CCCCCC         +++++++++++++++          I::::I
-       C:::::CCCCCCCC::::C         +++++++++++++          II::::::II
-        CC:::::::::::::::C           +++++++++            I::::::::I
-          CCC::::::::::::C             +++++              I::::::::I
-             CCCCCCCCCCCCC              ++                IIIIIIIIII
-
-                        Cybersecurity AI (CAI), v0.3.2
-                              Bug bounty-ready AI
-```
 
 
 > [!WARNING]
@@ -139,11 +133,11 @@ CAI is designed with the following key architectural characteristics:
 - **Modular and agent-centric design**: CAI operates on the basis of agents and agentic patterns, which allows flexibility and scalability. You can easily add the most suitable agents and pattern for your cybersecuritytarget case.
 - **Tool-integration**: CAI integrates already built-in tools, and allows the user to integrate their own tools with their own logic easily.
 - **Logging and tracing integrated**: using Phoenix, the opensource tracing and logging tool. This provides the user with a detailed traceability of the agents and their execution.
-- **Multi-Model Support**: more than 300 supported. The most popular providers:
+- **Multi-Model Support**: more than 300 supported and empowered by [LiteLLM](https://github.com/BerriAI/litellm). The most popular providers:
   - **Anthropic**: `Claude 3.7`, `Claude 3.5`, `Claude 3`, `Claude 3 Opus`
-  - **OpenAI**: `O1`, `O1 Mini`, `O3 Mini`, `GPT-4o`, `GPT-4o Audio Preview`, `GPT-4`, `GPT-4 Turbo`, `GPT-4.5 Preview`, `GPT-3.5 Turbo`
+  - **OpenAI**: `O1`, `O1 Mini`, `O3 Mini`, `GPT-4o`, `GPT-4.5 Preview`
   - **DeepSeek**: `DeepSeek V3`, `DeepSeek R1`
-  - **Ollama**: `Qwen2.5 72B`, `Qwen2.5 72B Ctx-32768`, `Qwen2.5 14B`, `Qwen2.5 14B Ctx-32768`, `Qwen2.5 32B`, `Qwen2.5 72B Instruct`, `Llama3 Latest`, `Llama3.1 70B`, `Llama3.3 70B`, `Llama3.1 8B`, `Marco-O1 7B FP16`, `DwightFoster03 Function`
+  - **Ollama**: `Qwen2.5 72B`, `Qwen2.5 14B`, etc
 
 
 ### Code structure
