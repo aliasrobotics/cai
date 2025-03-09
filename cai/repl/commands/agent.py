@@ -165,10 +165,7 @@ class AgentCommand(Command):
 
         # Display all agents
         for i, (name, agent) in enumerate(agents_to_display.items(), 1):
-            description = agent.instructions
-            if callable(description):
-                description = description(context_variables={})
-
+            description = agent.description
             # Clean up description - remove newlines and strip spaces
             if isinstance(description, str):
                 description = " ".join(description.split())

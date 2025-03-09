@@ -102,6 +102,7 @@ def check_mail_spoofing_vulnerability(
 dns_smtp_agent = Agent(
     model="gpt-4o",
     name="DNS_SMTP_Agent",
+    description="Agent focused on assessing spoofing DMARC.",
     instructions=(
         "You are an expert in assessing email configuration security. "
         "Inspect domains for mail spoofing vulnerabilities by checking SPF, "

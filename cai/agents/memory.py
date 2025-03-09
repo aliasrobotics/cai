@@ -148,6 +148,8 @@ semantic_builder = Agent(
     model=model,
     name="Semantic_Builder",
     instructions=ADD_MEMORY_PROMPT,
+    description="""Agent that stores semantic memories from security assessments
+                   and CTF exercises in semantic format.""",
     tool_choice="required",
     temperature=0,
     functions=[add_to_memory_semantic],
@@ -159,6 +161,8 @@ episodic_builder = Agent(
     model=model,
     name="Episodic_Builder",
     instructions=ADD_MEMORY_PROMPT,
+    description="""Agent that stores episodic memories from security assessments
+                   and CTF exercises in episodic format.""",
     tool_choice="required",
     temperature=0,
     functions=[add_to_memory_episodic],
@@ -168,6 +172,9 @@ episodic_builder = Agent(
 query_agent = Agent(
     model=model,
     name="Query_Agent",
+    description="""Agent that queries the memory system to retrieve relevant 
+                   historical information from previous security assessments
+                   and CTF exercises.""",
     instructions=QUERY_PROMPT,
     tool_choice="required",
     temperature=0,

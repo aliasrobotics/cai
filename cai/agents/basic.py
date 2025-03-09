@@ -28,6 +28,9 @@ model = os.getenv('CAI_MODEL', "qwen2.5:14b")
 ctf_agent = Agent(
     model=model,
     name="CTF agent",
+    description="""Agent focused on CTF challenges.
+                   Expert in cybersecurity and exploitation.
+                   Specializes in executing Linux commands efficiently.""",
     instructions="""You are a Cybersecurity expert Leader facing a CTF
                     challenge.
                     INSTRUCTIONS:
@@ -59,6 +62,9 @@ def transfer_to_ctf_agent(**kwargs):  # pylint: disable=W0613
 network_agent = Agent(
     model=model,
     name="Network Specialist",
+    description="""Agent specialized in network reconnaissance.
+                   Expert in using nmap and netcat for service discovery.
+                   Focuses on identifying network vulnerabilities.""",
     instructions=("""INSTRUCTIONS:
         1. You specialize in using nmap and netcat.
         INSTRUCTIONS:
@@ -86,6 +92,9 @@ def transfer_to_network_agent(**kwargs):  # pylint: disable=W0613
 crypto_agent = Agent(
     model=model,
     name="Cryptography Expert",
+    description="""Agent specialized in cryptographic analysis.
+                   Expert in decoding and analyzing encrypted data.
+                   Focuses on breaking cryptographic challenges in CTFs.""",
     instructions=("""
         INSTRUCTIONS:
         1. Your expertise is in decryption and
@@ -110,6 +119,9 @@ def transfer_to_crypto_agent(**kwargs):  # pylint: disable=W0613
 listing_agent = Agent(
     model=model,
     name="File Explorer",
+    description="""Agent specialized in filesystem navigation and exploration.
+                   Expert in finding and analyzing files and directories.
+                   Focuses on discovering hidden files and sensitive data.""",
     instructions=("""INSTRUCTIONS:
         1. You specialize in navigating file systems.
         2. Use your tools to list, read, and find files in
