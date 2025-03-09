@@ -1,0 +1,107 @@
+package main
+
+import (
+	"fmt"
+	"net"
+	"sort"
+	"sync"
+	"time"
+)
+
+func main() {
+	target := "192.168.1.1"
+	startTime := time.Now()
+	
+	fmt.Printf("Starting balanced ultra-fast port scan on %s\n", target)
+	
+	// Use a large number of concurrent goroutines but not excessive
+	maxConcurrency := 5000
+	
+	// Use a short timeout but not too short to cause false negatives
+	timeout := 100 * time.Millisecond
+	
+	// Create a thread-safe map to track open ports
+	var mu sync.Mutex
+	openPorts := make(map[int]bool)
+	
+	// Create a worker pool
+	var wg sync.WaitGroup
+	semaphore := make(chan struct{}, maxConcurrency)
+	
+	// Common ports to prioritize
+	commonPorts := []int{20, 21, 22, 23, 25, 53, 80, 110, 111, 135, 139, 143, 443, 445, 993, 995, 1723, 3306, 3389, 5900, 8080, 3517}
+	
+	// Function to scan a single port
+	scanPort := func(port int) {
+		defer wg.Done()
+		defer func() { <-semaphore }()
+		
+		address := fmt.Sprintf("%s:%d", target, port)
+		conn, err := net.DialTimeout("tcp", address, timeout)
+		
+		if err == nil {
+			mu.Lock()
+			openPorts[port] = true
+			mu.Unlock()
+			conn.Close()
+		}
+	}
+	
+	// First scan the common ports
+	for _, port := range commonPorts {
+		wg.Add(1)
+		semaphore <- struct{}{}
+		go scanPort(port)
+	}
+	
+	// Then scan all ports in batches (skipping common ports)
+	commonPortsMap := make(map[int]bool)
+	for _, port := range commonPorts {
+		commonPortsMap[port] = true
+	}
+	
+	// Scan the rest of the ports in ranges to improve efficiency
+	for startPort := 1; startPort <= 65535; startPort += 100 {
+		endPort := startPort + 99
+		if endPort > 65535 {
+			endPort = 65535
+		}
+		
+		for port := startPort; port <= endPort; port++ {
+			if commonPortsMap[port] {
+				continue // Skip common ports we already scanned
+			}
+			
+			wg.Add(1)
+			semaphore <- struct{}{}
+			go scanPort(port)
+		}
+	}
+	
+	// Wait for all scans to complete
+	wg.Wait()
+	
+	// Convert map to sorted slice for display
+	var results []int
+	for port := range openPorts {
+		results = append(results, port)
+	}
+	sort.Ints(results)
+	
+	// Print results
+	scanDuration := time.Since(startTime)
+	fmt.Printf("\nScan completed in %s\n", scanDuration)
+	fmt.Printf("Open ports on %s: ", target)
+	
+	if len(results) == 0 {
+		fmt.Println("None found")
+	} else {
+		for i, port := range results {
+			if i > 0 {
+				fmt.Print(", ")
+			}
+			fmt.Printf("%d", port)
+		}
+		fmt.Println()
+	}
+}

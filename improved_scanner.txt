@@ -1,0 +1,161 @@
+package main
+
+import (
+	"fmt"
+	"net"
+	"sort"
+	"sync"
+	"time"
+)
+
+func main() {
+	target := "192.168.1.1"
+	startTime := time.Now()
+	
+	fmt.Printf("Escaneando los 1000 puertos más comunes en %s (versión mejorada)\n", target)
+	
+	// Ajustes para mejorar la detección
+	maxConcurrency := 500 // Reducir la concurrencia para evitar sobrecarga
+	timeout := 200 * time.Millisecond // Aumentar el timeout para mejorar la detección
+	
+	// Estructura para almacenar los puertos abiertos
+	var mu sync.Mutex
+	openPorts := make(map[int]bool)
+	
+	// Control de concurrencia
+	var wg sync.WaitGroup
+	semaphore := make(chan struct{}, maxConcurrency)
+	
+	// Primero vamos a escanear puertos comunes conocidos con más atención
+	priorityPorts := []int{20, 21, 22, 23, 25, 53, 80, 110, 111, 135, 139, 143, 443, 445, 993, 995, 1723, 3306, 3389, 5900, 8080, 3517}
+	
+	// Función para escanear un puerto con reintento
+	scanPort := func(port int, priority bool) {
+		defer wg.Done()
+		defer func() { <-semaphore }()
+		
+		address := fmt.Sprintf("%s:%d", target, port)
+		
+		// Para puertos prioritarios, intentamos hasta 2 veces
+		maxAttempts := 1
+		if priority {
+			maxAttempts = 2
+		}
+		
+		for attempt := 0; attempt < maxAttempts; attempt++ {
+			conn, err := net.DialTimeout("tcp", address, timeout)
+			
+			if err == nil {
+				mu.Lock()
+				openPorts[port] = true
+				mu.Unlock()
+				conn.Close()
+				break
+			} else if attempt < maxAttempts-1 {
+				// Pequeña pausa antes de reintentar
+				time.Sleep(10 * time.Millisecond)
+			}
+		}
+	}
+	
+	// Primero escanear los puertos prioritarios
+	fmt.Println("Escaneando puertos prioritarios...")
+	for _, port := range priorityPorts {
+		wg.Add(1)
+		semaphore <- struct{}{}
+		go scanPort(port, true)
+	}
+	
+	// Esperar a que se completen los puertos prioritarios
+	wg.Wait()
+	
+	// Ahora escanear el resto de los 1000 puertos más comunes
+	fmt.Println("Escaneando puertos restantes...")
+	
+	// Generar los 1000 puertos restantes (excluyendo los prioritarios)
+	priorityPortsMap := make(map[int]bool)
+	for _, port := range priorityPorts {
+		priorityPortsMap[port] = true
+	}
+	
+	// Lista completa de puertos a escanear (top 1000)
+	var allPorts []int
+	
+	// Añadir puertos comunes según distribución estadística
+	commonRanges := []struct {
+		start, end int
+	}{
+		{1, 1024},       // Puertos privilegiados
+		{1024, 5000},    // Puertos de servicio comunes
+		{5000, 10000},   // Más puertos de servicio
+		{10000, 20000},  // Puertos de aplicación
+		{20000, 30000},  // Puertos menos comunes
+		{30000, 50000},  // Puertos raros pero a veces usados
+	}
+	
+	for _, r := range commonRanges {
+		for port := r.start; port <= r.end; port++ {
+			if !priorityPortsMap[port] {
+				allPorts = append(allPorts, port)
+				if len(allPorts) >= 1000-len(priorityPorts) {
+					break
+				}
+			}
+		}
+		if len(allPorts) >= 1000-len(priorityPorts) {
+			break
+		}
+	}
+	
+	// Escanear todos los puertos restantes
+	for _, port := range allPorts {
+		wg.Add(1)
+		semaphore <- struct{}{}
+		go scanPort(port, false)
+	}
+	
+	// Esperar a que se completen todos los escaneos
+	wg.Wait()
+	
+	// Convertir mapa a slice ordenado para mostrar
+	var results []int
+	for port := range openPorts {
+		results = append(results, port)
+	}
+	sort.Ints(results)
+	
+	// Imprimir resultados
+	scanDuration := time.Since(startTime)
+	fmt.Printf("\nEscaneo completado en %s\n", scanDuration)
+	fmt.Printf("Puertos abiertos en %s: ", target)
+	
+	if len(results) == 0 {
+		fmt.Println("Ninguno encontrado")
+	} else {
+		for i, port := range results {
+			if i > 0 {
+				fmt.Print(", ")
+			}
+			fmt.Printf("%d", port)
+		}
+		fmt.Println()
+	}
+	
+	fmt.Printf("\nTotal de puertos escaneados: %d\n", len(priorityPorts) + len(allPorts))
+	fmt.Printf("Total de puertos abiertos: %d\n", len(results))
+	
+	// Verificación adicional para puertos comunes importantes
+	fmt.Println("\nVerificación adicional de puertos críticos:")
+	criticalPorts := []int{22, 80, 443, 3517}
+	for _, port := range criticalPorts {
+		address := fmt.Sprintf("%s:%d", target, port)
+		conn, err := net.DialTimeout("tcp", address, 500*time.Millisecond) // Timeout más largo para verificación
+		
+		if err == nil {
+			fmt.Printf("Puerto %d: ABIERTO (verificado)\n", port)
+			conn.Close()
+		} else {
+			fmt.Printf("Puerto %d: cerrado o filtrado\n", port)
+		}
+	}
+}

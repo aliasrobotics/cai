@@ -1,0 +1,103 @@
+package main
+
+import (
+	"fmt"
+	"net"
+	"sort"
+	"sync"
+	"time"
+)
+
+func main() {
+	target := "192.168.1.1"
+	startTime := time.Now()
+	
+	fmt.Printf("Starting ultra-optimized port scan on %s\n", target)
+	
+	// Scan common ports first, then all remaining ports
+	commonPorts := []int{20, 21, 22, 23, 25, 53, 80, 110, 111, 135, 139, 143, 443, 445, 993, 995, 1723, 3306, 3389, 5900, 8080}
+	
+	// Use a much larger number of concurrent goroutines
+	maxConcurrency := 10000
+	
+	// Use a much shorter timeout
+	timeout := 50 * time.Millisecond
+	
+	// Create a map to track open ports
+	var mu sync.Mutex
+	openPorts := make(map[int]bool)
+	
+	// Create a worker pool
+	var wg sync.WaitGroup
+	semaphore := make(chan struct{}, maxConcurrency)
+	
+	// Function to scan a port
+	scanPort := func(port int) {
+		defer wg.Done()
+		defer func() { <-semaphore }()
+		
+		address := fmt.Sprintf("%s:%d", target, port)
+		conn, err := net.DialTimeout("tcp", address, timeout)
+		
+		if err == nil {
+			mu.Lock()
+			openPorts[port] = true
+			mu.Unlock()
+			conn.Close()
+		}
+	}
+	
+	// First scan common ports
+	for _, port := range commonPorts {
+		wg.Add(1)
+		semaphore <- struct{}{}
+		go scanPort(port)
+	}
+	
+	// Then scan remaining ports in batches
+	// We'll use a more efficient approach for the remaining ports
+	for port := 1; port <= 65535; port++ {
+		// Skip if it's a common port we already scanned
+		isCommon := false
+		for _, commonPort := range commonPorts {
+			if port == commonPort {
+				isCommon = true
+				break
+			}
+		}
+		if isCommon {
+			continue
+		}
+		
+		wg.Add(1)
+		semaphore <- struct{}{}
+		go scanPort(port)
+	}
+	
+	// Wait for all scans to complete
+	wg.Wait()
+	
+	// Convert map to sorted slice for display
+	var results []int
+	for port := range openPorts {
+		results = append(results, port)
+	}
+	sort.Ints(results)
+	
+	// Print results
+	scanDuration := time.Since(startTime)
+	fmt.Printf("\nScan completed in %s\n", scanDuration)
+	fmt.Printf("Open ports on %s: ", target)
+	
+	if len(results) == 0 {
+		fmt.Println("None found")
+	} else {
+		for i, port := range results {
+			if i > 0 {
+				fmt.Print(", ")
+			}
+			fmt.Printf("%d", port)
+		}
+		fmt.Println()
+	}
+}

@@ -1,0 +1,59 @@
+package main
+
+import (
+	"fmt"
+	"net"
+	"sync"
+	"time"
+)
+
+func main() {
+	target := "192.168.1.1"
+	var wg sync.WaitGroup
+	
+	// Channel to collect open ports
+	openPorts := make(chan int, 65535)
+	
+	// Number of concurrent goroutines
+	concurrencyLimit := 1000
+	semaphore := make(chan struct{}, concurrencyLimit)
+	
+	fmt.Printf("Starting ultra fast port scan on %s\n", target)
+	startTime := time.Now()
+	
+	// Scan all ports from 1 to 65535
+	for port := 1; port <= 65535; port++ {
+		wg.Add(1)
+		semaphore <- struct{}{} // Acquire a slot
+		
+		go func(p int) {
+			defer wg.Done()
+			defer func() { <-semaphore }() // Release the slot
+			
+			address := fmt.Sprintf("%s:%d", target, p)
+			conn, err := net.DialTimeout("tcp", address, 200*time.Millisecond)
+			
+			if err == nil {
+				openPorts <- p
+				conn.Close()
+			}
+		}(port)
+	}
+	
+	// Collect results in a separate goroutine
+	go func() {
+		wg.Wait()
+		close(openPorts)
+	}()
+	
+	// Print open ports as they're found
+	var results []int
+	for port := range openPorts {
+		results = append(results, port)
+		fmt.Printf("Port %d: Open\n", port)
+	}
+	
+	elapsedTime := time.Since(startTime)
+	fmt.Printf("\nScan completed in %s\n", elapsedTime)
+	fmt.Printf("Found %d open ports on %s\n", len(results), target)
+}

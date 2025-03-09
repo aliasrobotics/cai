@@ -819,7 +819,6 @@ def _create_token_display(  # pylint: disable=too-many-arguments,too-many-locals
 
     return tokens_text
 
-
 def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-arguments # noqa: E501
                         tool_output,
                         interaction_input_tokens,
@@ -897,10 +896,69 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
         if title_width > max_title_width:
             group_content.append(text)
 
-        group_content.extend([
-            Text(output, style="yellow"),
-            tokens_text if tokens_text else Text("")
-        ])
+        # Special handling for execute_code tool
+        if tool_name == "execute_code" and "language" in filtered_args:
+            try:
+                from rich.syntax import Syntax  # pylint: disable=import-outside-toplevel,import-error # noqa: E402,E501
+                
+                language = filtered_args.get("language", "python")
+                code = filtered_args.get("code", "")
+                
+                # Create syntax highlighted code panel
+                syntax = Syntax(code, language, theme="monokai", line_numbers=True,
+                               background_color="#272822", indent_guides=True)
+                code_panel = Panel(
+                    syntax,
+                    title="Code",
+                    border_style="arrow",
+                    title_align="left",
+                    box=ROUNDED,
+                    padding=(1, 2)
+                )
+                
+                # Create output panel
+                output_panel = Panel(
+                    Text(output, style="yellow"),
+                    title="Output",
+                    border_style="border",
+                    title_align="left",
+                    box=ROUNDED,
+                    padding=(1, 2)
+                )
+                # Don't show code in arguments for execute_code tool
+                if title_width > max_title_width:
+                    # Just show the tool name without the code in args
+                    simplified_text = Text()
+                    simplified_text.append(f"{tool_name}(", style="bold cyan")
+                    simplified_text.append("...", style="yellow")
+                    simplified_text.append(")", style="bold cyan")
+                    
+                    # Show timeout and filename in the simplified display
+                    timeout = filtered_args.get("timeout", 100)
+                    filename = filtered_args.get("filename", "exploit")
+                    simplified_text.append(
+                        f" [File: {filename} | Timeout: {timeout}s | "
+                        f"Total: {total_elapsed} | Tool: {tool_elapsed}]",
+                        style="bold magenta")
+                    
+                    group_content[0] = simplified_text
+                
+                group_content.extend([
+                    code_panel,
+                    output_panel,
+                    tokens_text if tokens_text else Text("")
+                ])
+            except Exception:  # pylint: disable=broad-exception-caught # noqa: E722,E501
+                # Fallback if syntax highlighting fails
+                group_content.extend([
+                    Text(output, style="yellow"),
+                    tokens_text if tokens_text else Text("")
+                ])
+        else:
+            group_content.extend([
+                Text(output, style="yellow"),
+                tokens_text if tokens_text else Text("")
+            ])
 
         # Create a more visually appealing panel
         main_panel = Panel(

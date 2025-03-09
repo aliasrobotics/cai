@@ -1,0 +1,47 @@
+package main
+
+import (
+	"fmt"
+	"net"
+	"sync"
+	"time"
+)
+
+func main() {
+	target := "192.168.1.1"
+	fmt.Printf("Starting ultra fast port scan on %s\n", target)
+	
+	var wg sync.WaitGroup
+	
+	// Create a channel to collect open ports
+	openPorts := make(chan int, 65535)
+	
+	// Scan all ports from 1 to 65535
+	for port := 1; port <= 65535; port++ {
+		wg.Add(1)
+		go func(p int) {
+			defer wg.Done()
+			address := fmt.Sprintf("%s:%d", target, p)
+			conn, err := net.DialTimeout("tcp", address, 500*time.Millisecond)
+			
+			if err == nil {
+				openPorts <- p
+				conn.Close()
+			}
+		}(port)
+	}
+	
+	// Wait for all goroutines to finish in a separate goroutine
+	go func() {
+		wg.Wait()
+		close(openPorts)
+	}()
+	
+	// Print open ports as they are found
+	fmt.Println("Open ports:")
+	for port := range openPorts {
+		fmt.Printf("%d/tcp open\n", port)
+	}
+	
+	fmt.Println("Scan completed")
+}

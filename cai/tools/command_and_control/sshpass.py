@@ -14,7 +14,6 @@ something that hasn't been seen in other cybersecurity frameworks yet (Feb 2025)
 
 from cai.tools.misc.cli_utils import execute_cli_command  # pylint: disable=E0401 # noqa: E501
 
-
 def run_ssh_command_with_credentials(
         host: str,
         username: str,
@@ -34,6 +33,14 @@ def run_ssh_command_with_credentials(
     Returns:
         str: Output from the remote command execution
     """
-    ssh_command = f"sshpass -p '{password}' ssh -o StrictHostKeyChecking=no {
-        username}@{host} -p {port} '{command}'"
+    # Escape special characters in password and command to prevent shell injection
+    escaped_password = password.replace("'", "'\\''")
+    escaped_command = command.replace("'", "'\\''")
+    
+    ssh_command = (
+        f"sshpass -p '{escaped_password}' "
+        f"ssh -o StrictHostKeyChecking=no "
+        f"{username}@{host} -p {port} "
+        f"'{escaped_command}'"
+    )
     return execute_cli_command(ssh_command)
