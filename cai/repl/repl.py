@@ -7,7 +7,6 @@ interacting with CAI agents.
 import json
 import os
 from importlib.resources import files
-import datetime
 import time
 
 # Third party imports
@@ -249,19 +248,7 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
     agent = starting_agent  # Set the global agent variable as well
 
     # Setup session logging to track conversation history
-    history_file, session_log, log_interaction = setup_session_logging()
-
-    # Initialize the session log file with metadata
-    with open(session_log, "w", encoding="utf-8") as f:
-        f.write(
-            f"CAI Session started at {
-                datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-        f.write(f"Version: {os.getenv('CAI_VERSION', 'unknown')}\n")
-        if ctf:
-            f.write(f"CTF: {ctf.__class__.__name__}\n")
-            if challenge:
-                f.write(f"Challenge: {challenge}\n")
-        f.write("\n")
+    history_file = setup_session_logging()
 
     # Initialize command completer with fuzzy matching for better UX
     command_completer = FuzzyCommandCompleter()
@@ -300,9 +287,6 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                 # Record command usage to improve command suggestions over time
                 if user_input.startswith('/'):
                     command_completer.record_command_usage(user_input)
-
-                # Log user input to the session log
-                log_interaction("user", user_input)
 
                 # Handle special commands (starting with / or $)
                 if user_input.startswith('/') or user_input.startswith('$'):
@@ -422,13 +406,6 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
 
                 # Generate the final report using the template
                 create_report(report_data, template)
-
-            # Log the end of the session
-            with open(session_log, "a", encoding="utf-8") as f:
-                f.write(
-                    f"\nSession ended at {
-                        datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-                    f"\n")
 
             # Display the total execution time before exiting
             display_execution_time()

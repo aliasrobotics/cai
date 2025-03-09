@@ -55,7 +55,7 @@ RUN echo "[global]" > /root/.pip/pip.conf && \
     echo "break-system-packages = true" >> /root/.pip/pip.conf
 
 RUN pip3 install --upgrade setuptools
-RUN pip3 install arize-phoenix==4.36.0
+RUN pip3 install arize-phoenix==7.6.0
 RUN pip3 install tensorflow pandas  \
                  opentelemetry-sdk opentelemetry-exporter-otlp \
                  mem0ai PyPDF2 sentence_transformers tf-keras \
