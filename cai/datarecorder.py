@@ -105,3 +105,36 @@ def load_history_from_jsonl(file_path):
                     max_length = len(record["messages"])
                     history = record["messages"]
     return history
+
+
+def get_token_stats(file_path):
+    """
+    Get token usage statistics from a JSONL file.
+
+    Args:
+        file_path (str): Path to the JSONL file
+
+    Returns:
+        tuple: (model_name, total_prompt_tokens, total_completion_tokens)
+    """
+    total_prompt_tokens = 0
+    total_completion_tokens = 0
+    model_name = None
+
+    with open(file_path, encoding='utf-8') as file:
+        for line in file:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                record = json.loads(line)
+                if "usage" in record:
+                    total_prompt_tokens += record["usage"]["prompt_tokens"]
+                    total_completion_tokens += record["usage"]["completion_tokens"]
+                if "model" in record:
+                    model_name = record["model"]
+            except Exception:  # pylint: disable=broad-except
+                print(f"Error loading line: {line}")
+                continue
+
+    return model_name, total_prompt_tokens, total_completion_tokens
