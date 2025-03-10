@@ -1,6 +1,7 @@
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
+
 def query_perplexity(query: str = "", context: str = "") -> str:
     """
     Query the Perplexity AI API with a user prompt.
