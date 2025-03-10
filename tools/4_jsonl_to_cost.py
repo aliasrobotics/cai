@@ -13,7 +13,7 @@ Environment Variables:
 
 Output:
     Displays the total cost breakdown including input tokens, output tokens,
-    input cost, output cost, and total cost in USD.
+    input cost, output cost, and total cost in USD
 """
 import os
 import sys
