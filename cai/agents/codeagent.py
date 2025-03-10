@@ -170,7 +170,7 @@ class CodeAgent(Agent):
         instructions: Union[str, Callable[[], str]] = None,
         functions: List[Callable] = None,
         additional_authorized_imports: Optional[List[str]] = None,
-        description: str = """Agent focused on writing code iteratively.
+        description: str = """Agent focused on writing and executing code.
                    State-of-the-art in code production.""",
         max_print_outputs_length: Optional[int] = None,
         reasoning_effort: Optional[str] = "medium",
