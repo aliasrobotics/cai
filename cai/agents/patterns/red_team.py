@@ -8,8 +8,8 @@ of agent relationships, where each agent can transfer context (message history)
 to another agent through handoff functions, creating a complete communication network
 for comprehensive security analysis.
 """
-from cai.agents.redteam import redteam_agent
-from cai.agents.reasoner_proto import thought_agent
+from cai.agents.red_teamer import redteam_agent
+from cai.agents.thought import thought_agent
 from cai.agents.mail import dns_smtp_agent
 
 
