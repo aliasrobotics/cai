@@ -9,6 +9,8 @@ model = os.getenv('CAI_MODEL', "qwen2.5:14b")
 one_tool_agent = Agent(
     model=model,
     name="CTF agent",
+    description="""Agent focused on conquering security challenges using generic linux commands
+                   Expert in cybersecurity and exploitation.""",
     instructions="""You are a Cybersecurity expert Leader facing a CTF
                     challenge.
                     INSTRUCTIONS:

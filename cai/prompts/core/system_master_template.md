@@ -84,53 +84,78 @@ Remember that you must follow an iterative process of executing tools and comman
 <reasoning>
 ${reasoning_content}
 </reasoning>
-
 % endif
+
 % if env_context.lower() == 'true':
 <%
     import platform
     import socket
     import os
+
     from pathlib import Path
 
-    # Get system info
+    # Attempt import of netifaces to get tun0 IP if available
+    try:
+        import netifaces
+    except ImportError:
+        netifaces = None
+
+    # Gather system info
     os_name = platform.system()
     hostname = socket.gethostname()
     ip_addr = socket.gethostbyname(hostname)
+
+    # Retrieve tun0 address if netifaces is installed and tun0 exists
+    tun0_addr = None
+    if netifaces and 'tun0' in netifaces.interfaces():
+        addrs = netifaces.ifaddresses('tun0')
+        if netifaces.AF_INET in addrs:
+            tun0_addr = addrs[netifaces.AF_INET][0].get('addr', None)
 
     # Get wordlist directories
     wordlist_path = Path('/usr/share/wordlists')
     wordlist_files = []
     if wordlist_path.exists():
-        wordlist_files = [f.name for f in wordlist_path.iterdir() if f.is_file()]
+        wordlist_files = [
+            f.name for f in wordlist_path.iterdir() if f.is_file()
+        ]
 
     seclists_path = wordlist_path / 'seclists'
     seclist_dirs = []
     if seclists_path.exists():
-        seclist_dirs = [d.name for d in seclists_path.iterdir() if d.is_dir()]
+        seclist_dirs = [
+            d.name for d in seclists_path.iterdir() if d.is_dir()
+        ]
 %>
+Environment context (in "tree" format):
+seclists
+% if seclist_dirs:
+% for dir in seclist_dirs:
+├── ${dir}
+% endfor
+% else:
+└── (No directories found in seclists)
+% endif
 
-Environment context:
-- OS: ${os_name}
-- IP Attacker: ${ip_addr}
-- Role: Attacker
+- When in doubt, list again.
+
+Attacker machine information:
+├── OS: ${os_name}
+├── Hostname: ${hostname}
+├── IP Attacker (default): ${ip_addr}
+% if tun0_addr:
+├── IP tun0: ${tun0_addr}
+% endif
+└── Role: Attacker
 
 % if wordlist_files:
-- Wordlists available:
-    % for file in wordlist_files:
-    - ${file}
-    % endfor
+Available wordlists (/usr/share/wordlists):
+% for file in wordlist_files:
+├── ${file}
+% endfor
 % endif
-
-% if seclist_dirs:
-- SecLists categories:
-    % for dir in seclist_dirs:
-    - ${dir}
-    % endfor
-% endif
-
 % endif
 
 % if artifacts:
-Some useful information: ${artifacts}
+Useful information: ${artifacts}
 % endif

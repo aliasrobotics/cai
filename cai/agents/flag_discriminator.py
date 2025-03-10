@@ -8,6 +8,7 @@ model = os.getenv('CAI_MODEL', "qwen2.5:14b")
 flag_discriminator = Agent(
     model="gpt-4o" if os.getenv('CAI_MODEL') == "o3-mini" else model,
     name="Flag discriminator",
+    description="Agent focused on extracting the flag from the output",
     instructions="""INSTRUCTIONS:
                 1. You are an agent tailored to extract the flag
                 from the output.

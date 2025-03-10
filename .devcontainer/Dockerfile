@@ -60,7 +60,7 @@ RUN pip3 install tensorflow pandas  \
                  mem0ai PyPDF2 sentence_transformers tf-keras \
                  pytest-repeat parameterized pytest-rerunfailures \
                  pytest-clarity tiktoken blobfile pytest-timeout \
-                 invoke fabric
+                 invoke fabric seclists golang-go
 
 # Install rust compiler - dependency of outlines-core
 RUN apt-get update && \

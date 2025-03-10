@@ -170,6 +170,8 @@ class CodeAgent(Agent):
         instructions: Union[str, Callable[[], str]] = None,
         functions: List[Callable] = None,
         additional_authorized_imports: Optional[List[str]] = None,
+        description: str = """Agent focused on writing and executing code.
+                   State-of-the-art in code production.""",
         max_print_outputs_length: Optional[int] = None,
         reasoning_effort: Optional[str] = "medium",
         max_steps: int = 10,
@@ -222,6 +224,7 @@ class CodeAgent(Agent):
         super().__init__(
             name=name,
             model=model,
+            description=description,
             instructions=instructions,
             functions=functions or [],
             reasoning_effort=reasoning_effort,
@@ -784,6 +787,8 @@ codeagent = CodeAgent(
     name="CodeAgent",
     additional_authorized_imports=["*"],
     execution_timeout=150,
+    description="""Agent focused on writing code iteratively.
+                   State-of-the-art in code production."""
     # functions=[],
     # tool_choice="required",  # force tool call for handoffs
     # execution_timeout=int(os.getenv('CAI_CODE_TIMEOUT', '30')),  # Get
