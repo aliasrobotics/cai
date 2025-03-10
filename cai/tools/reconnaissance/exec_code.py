@@ -93,7 +93,3 @@ def execute_code(code: str = "", language: str = "python",
     output = run_command(exec_cmd, ctf=ctf, timeout=timeout)
 
     return output
-
-
-
-
