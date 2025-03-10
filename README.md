@@ -13,6 +13,10 @@
 [![version](https://badge.fury.io/py/supervision.svg)](https://badge.fury.io/py/supervision)
 [![downloads](https://img.shields.io/pypi/dm/supervision)](https://pypistats.org/packages/supervision)
 [![license](https://img.shields.io/pypi/l/supervision)](https://github.com/roboflow/supervision/blob/main/LICENSE.md)
+[![](https://img.shields.io/badge/HTB_ranking-top_100_Spain_(6/3/25)-red.svg)](https://app.hackthebox.com/users/2268644)
+[![](https://img.shields.io/badge/HTB_ranking-top_90_Spain_(7/3/25)-red.svg)](https://app.hackthebox.com/users/2268644)
+[![](https://img.shields.io/badge/HTB_ranking-top_50_Spain_(8/3/25)-red.svg)](https://app.hackthebox.com/users/2268644)
+[![](https://img.shields.io/badge/HTB_ranking-top_30_Spain_(9/3/25)-red.svg)](https://app.hackthebox.com/users/2268644)
 
 
 </div>
@@ -373,12 +377,36 @@ CAI aims at both, *semi-* and *fully-automating* pentesting tasks. To cover the 
 
 ## :rocket: Quickstart
 
-<details>
-<summary>How do I start using CAI?</summary>
 
-![cai-001-main-menu](imgs/readme_imgs/cai-001-main-menu.png)
+To start CAI after installing it, just type `cai` in the CLI:
 
-Initialize CAI and prompt any task you want to perform.
+```bash
+└─# cai
+
+                CCCCCCCCCCCCC      ++++++++   ++++++++      IIIIIIIIII
+             CCC::::::::::::C  ++++++++++       ++++++++++  I::::::::I
+           CC:::::::::::::::C ++++++++++         ++++++++++ I::::::::I
+          C:::::CCCCCCCC::::C +++++++++    ++     +++++++++ II::::::II
+         C:::::C       CCCCCC +++++++     +++++     +++++++   I::::I
+        C:::::C                +++++     +++++++     +++++    I::::I
+        C:::::C                ++++                   ++++    I::::I
+        C:::::C                 ++                     ++     I::::I
+        C:::::C                  +   +++++++++++++++   +      I::::I
+        C:::::C                    +++++++++++++++++++        I::::I
+        C:::::C                     +++++++++++++++++         I::::I
+         C:::::C       CCCCCC        +++++++++++++++          I::::I
+          C:::::CCCCCCCC::::C         +++++++++++++         II::::::II
+           CC:::::::::::::::C           +++++++++           I::::::::I
+             CCC::::::::::::C             +++++             I::::::::I
+                CCCCCCCCCCCCC               ++              IIIIIIIIII
+
+                              Cybersecurity AI (CAI), vX.Y.Z
+                                  Bug bounty-ready AI
+
+CAI>
+```
+
+That should initialize CAI and provide a prompt to execute any security task you want to perform.
 
 </details>
 
