@@ -55,7 +55,6 @@ RUN echo "[global]" > /root/.pip/pip.conf && \
     echo "break-system-packages = true" >> /root/.pip/pip.conf
 
 RUN pip3 install --upgrade setuptools
-RUN pip3 install arize-phoenix==7.6.0
 RUN pip3 install tensorflow pandas  \
                  opentelemetry-sdk opentelemetry-exporter-otlp \
                  mem0ai PyPDF2 sentence_transformers tf-keras \
@@ -100,6 +99,7 @@ RUN apt-get update && \
 # # Activate virtual environment by default
 # RUN echo "source $VIRTUAL_ENV/bin/activate" >> ~/.bashrc
 
-# Remove system's python3-jsonschema to avoid conflicts
+# Remove system's python3 libs to avoid conflicts
 RUN apt-get remove -y python3-jsonschema && \
+    apt-get remove -y python3-numpy && \
     apt-get autoremove -y
