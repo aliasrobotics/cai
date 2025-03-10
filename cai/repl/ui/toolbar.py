@@ -50,6 +50,10 @@ def get_bottom_toolbar():
         # Get current time for the toolbar refresh indicator
         current_time = datetime.datetime.now().strftime("%H:%M")
 
+        # Add timezone information to show it's local time
+        timezone_name = datetime.datetime.now().astimezone().tzname()
+        current_time_with_tz = f"{current_time} {timezone_name}"
+
         return HTML(
             f"<ansired><b>IP:</b></ansired> <ansigreen>{
                 ip_address}</ansigreen> | "
@@ -61,7 +65,7 @@ def get_bottom_toolbar():
                 os.getenv('CAI_MODEL', 'default')}</ansigreen> | "
             f"<ansicyan><b>Max Turns:</b></ansicyan> <ansiblue>{
                 os.getenv('CAI_MAX_TURNS', 'inf')}</ansiblue> | "
-            f"<ansigray>{current_time}</ansigray>"
+            f"<ansigray>{current_time_with_tz}</ansigray>"
         )
     except Exception:  # pylint: disable=broad-except
         return ""

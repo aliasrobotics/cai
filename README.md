@@ -404,11 +404,20 @@ To start CAI after installing it, just type `cai` in the CLI:
                                   Bug bounty-ready AI
 
 CAI>
+
+IP: 192.168.2.5 | OS: Linux 6.10.14-linuxkit | Ollama: 61 models | Model: default | Max Turns: inf | 08:44 UTC
 ```
 
-That should initialize CAI and provide a prompt to execute any security task you want to perform.
+That should initialize CAI and provide a prompt to execute any security task you want to perform. The navigation bar at the bottom displays important system information:
 
-</details>
+- `IP: 192.168.2.5` - Your current IP address
+- `OS: Linux 6.10.14-linuxkit` - Your operating system and kernel version
+- `Ollama: 61 models` - Number of available Ollama local models available
+- `Model: default` - Currently selected model
+- `Max Turns: inf` - Maximum conversation turns (infinite by default)
+- `08:31` - Current time in UTC
+
+This information helps you understand your environment while working with CAI.
 
 
 <details>
