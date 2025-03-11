@@ -159,6 +159,3 @@ pentestperf
 
 # logging
 .cai
-
-# LLM dirs
-workspaces/
