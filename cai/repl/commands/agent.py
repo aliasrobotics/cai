@@ -165,7 +165,12 @@ class AgentCommand(Command):
 
         # Display all agents
         for i, (name, agent) in enumerate(agents_to_display.items(), 1):
-            description = agent.description if agent.description else agent.instructions
+            description = agent.description
+            if not description and hasattr(agent, 'instructions'):
+                if callable(agent.instructions):
+                    description = agent.instructions(context_variables={})
+                else:
+                    description = agent.instructions
             # Clean up description - remove newlines and strip spaces
             if isinstance(description, str):
                 description = " ".join(description.split())
@@ -182,7 +187,6 @@ class AgentCommand(Command):
 
             # Handle model display based on agent type
             model_display = self._get_model_display(name, agent)
-
             table.add_row(
                 str(i),
                 name,
