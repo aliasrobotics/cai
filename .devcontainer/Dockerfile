@@ -13,7 +13,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
         asciinema dnsutils \
         apt-transport-https ca-certificates \
         wget dirb gobuster whatweb gfortran \
-        cmake libopenblas-dev sshpass
+        cmake libopenblas-dev sshpass seclists \
+        golang-go
 
 # # Install Metasploit - path 1
 # RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > /tmp/msfinstall \
@@ -55,12 +56,12 @@ RUN echo "[global]" > /root/.pip/pip.conf && \
     echo "break-system-packages = true" >> /root/.pip/pip.conf
 
 RUN pip3 install --upgrade setuptools
-RUN pip3 install tensorflow pandas  \
+RUN pip3 install pandas  \
                  opentelemetry-sdk opentelemetry-exporter-otlp \
                  mem0ai PyPDF2 sentence_transformers tf-keras \
                  pytest-repeat parameterized pytest-rerunfailures \
                  pytest-clarity tiktoken blobfile pytest-timeout \
-                 invoke fabric seclists golang-go
+                 invoke fabric
 
 # Install rust compiler - dependency of outlines-core
 RUN apt-get update && \

@@ -5,9 +5,14 @@ command shadowing.
 """
 # Standard library imports
 import datetime
+import threading
+import time
+from functools import lru_cache
 from typing import (
     List,
-    Optional  # Dict and Any removed as unused
+    Optional,
+    Dict,
+    Any
 )
 
 # Third-party imports
@@ -28,6 +33,11 @@ from cai.repl.commands.base import (
 
 console = Console()
 
+# Global cache for command descriptions and subcommands
+COMMAND_DESCRIPTIONS_CACHE = None
+SUBCOMMAND_DESCRIPTIONS_CACHE = None
+ALL_COMMANDS_CACHE = None
+
 
 class FuzzyCommandCompleter(Completer):
     """Command completer with fuzzy matching for the REPL.
@@ -43,15 +53,22 @@ class FuzzyCommandCompleter(Completer):
     - Model completion for the /model command
     """
 
+    # Class-level cache for models
+    _cached_models = []
+    _cached_model_numbers = {}
+    _last_model_fetch = datetime.datetime.now() - datetime.timedelta(minutes=10)
+    _fetch_lock = threading.Lock()
+
     def __init__(self):
         """Initialize the command completer with cached model information."""
         super().__init__()
-        self.cached_models = []
-        self.cached_model_numbers = {}  # Map of numbers to model names
-        self.last_model_fetch = datetime.datetime.now() - datetime.timedelta(
-            minutes=10)
         self.command_history = {}  # Store command usage frequency
-        self.fetch_ollama_models()
+        
+        # Fetch models in background thread to avoid blocking
+        threading.Thread(
+            target=self._background_fetch_models,
+            daemon=True
+        ).start()
 
         # Styling for the completion menu
         self.completion_style = Style.from_dict({
@@ -61,74 +78,82 @@ class FuzzyCommandCompleter(Completer):
             'scrollbar.background': 'bg:#2b2b2b',
             'scrollbar.button': 'bg:#004b6b',
         })
+    
+    def _background_fetch_models(self):
+        """Fetch models in background to avoid blocking the UI."""
+        try:
+            self.fetch_ollama_models()
+        except Exception:  # pylint: disable=broad-except
+            pass
 
     def fetch_ollama_models(self):  # pylint: disable=too-many-branches,too-many-statements,inconsistent-return-statements,line-too-long # noqa: E501
         """Fetch available models from Ollama if it's running."""
         # Only fetch every 60 seconds to avoid excessive API calls
         now = datetime.datetime.now()
-        if (now - self.last_model_fetch).total_seconds() < 60:
-            return
+        
+        # Use a lock to prevent multiple threads from fetching simultaneously
+        with self._fetch_lock:
+            if (now - self._last_model_fetch).total_seconds() < 60:
+                return
+            
+            self._last_model_fetch = now
+            ollama_models = []
 
-        self.last_model_fetch = now
-        ollama_models = []
+            try:
+                # Get Ollama models with a short timeout to prevent hanging
+                api_base = get_ollama_api_base()
+                response = requests.get(
+                    f"{api_base.replace('/v1', '')}/api/tags", timeout=0.5)
 
-        try:
-            # Get Ollama models with a short timeout to prevent hanging
-            api_base = get_ollama_api_base()
-            response = requests.get(
-                f"{api_base.replace('/v1', '')}/api/tags", timeout=1)
+                if response.status_code == 200:
+                    data = response.json()
+                    if 'models' in data:
+                        models = data['models']
+                    else:
+                        # Fallback for older Ollama versions
+                        models = data.get('items', [])
 
-            if response.status_code == 200:
-                data = response.json()
-                if 'models' in data:
-                    models = data['models']
-                else:
-                    # Fallback for older Ollama versions
-                    models = data.get('items', [])
+                    ollama_models = [(model.get('name', ''), []) for model in models]
+            except Exception:  # pylint: disable=broad-except
+                # Silently fail if Ollama is not available
+                pass
 
-                return [(model.get('name', ''), []) for model in models]
-        except Exception:  # pylint: disable=broad-except
-            # Silently fail if Ollama is not available
-            # This is acceptable as Ollama is optional and we don't want to
-            # disrupt the user experience if it's not running
-            return []
+            # Standard models always available
+            standard_models = [
+                # Claude 3.7 models
+                "claude-3-7-sonnet-20250219",
 
-        # Standard models always available
-        standard_models = [
-            # Claude 3.7 models
-            "claude-3-7-sonnet-20250219",
+                # Claude 3.5 models
+                "claude-3-5-sonnet-20240620",
+                "claude-3-5-20241122",
 
-            # Claude 3.5 models
-            "claude-3-5-sonnet-20240620",
-            "claude-3-5-20241122",
+                # Claude 3 models
+                "claude-3-opus-20240229",
+                "claude-3-sonnet-20240229",
+                "claude-3-haiku-20240307",
 
-            # Claude 3 models
-            "claude-3-opus-20240229",
-            "claude-3-sonnet-20240229",
-            "claude-3-haiku-20240307",
+                # OpenAI O-series models
+                "o1",
+                "o1-mini",
+                "o3-mini",
 
-            # OpenAI O-series models
-            "o1",
-            "o1-mini",
-            "o3-mini",
+                # OpenAI GPT models
+                "gpt-4o",
+                "gpt-4-turbo",
+                "gpt-3.5-turbo",
 
-            # OpenAI GPT models
-            "gpt-4o",
-            "gpt-4-turbo",
-            "gpt-3.5-turbo",
+                # DeepSeek models
+                "deepseek-v3",
+                "deepseek-r1"
+            ]
 
-            # DeepSeek models
-            "deepseek-v3",
-            "deepseek-r1"
-        ]
+            # Combine standard models with Ollama models
+            self._cached_models = standard_models + ollama_models
 
-        # Combine standard models with Ollama models
-        self.cached_models = standard_models + ollama_models
-
-        # Create number mappings for models (1-based indexing)
-        self.cached_model_numbers = {}
-        for i, model in enumerate(self.cached_models, 1):
-            self.cached_model_numbers[str(i)] = model
+            # Create number mappings for models (1-based indexing)
+            self._cached_model_numbers = {}
+            for i, model in enumerate(self._cached_models, 1):
+                self._cached_model_numbers[str(i)] = model
 
     def record_command_usage(self, command: str):
         """Record command usage for command shadowing.
@@ -147,34 +172,51 @@ class FuzzyCommandCompleter(Completer):
             else:
                 self.command_history[main_command] = 1
 
+    @lru_cache(maxsize=1)
     def get_command_descriptions(self):
         """Get descriptions for all commands.
 
         Returns:
             A dictionary mapping command names to descriptions
         """
-        return {cmd.name: cmd.description for cmd in COMMANDS.values()}
+        global COMMAND_DESCRIPTIONS_CACHE
+        if COMMAND_DESCRIPTIONS_CACHE is None:
+            COMMAND_DESCRIPTIONS_CACHE = {cmd.name: cmd.description for cmd in COMMANDS.values()}
+        return COMMAND_DESCRIPTIONS_CACHE
 
+    @lru_cache(maxsize=1)
     def get_subcommand_descriptions(self):
         """Get descriptions for all subcommands.
 
         Returns:
             A dictionary mapping command paths to descriptions
         """
-        descriptions = {}
-        for cmd in COMMANDS.values():
-            for subcmd in cmd.get_subcommands():
-                key = f"{cmd.name} {subcmd}"
-                descriptions[key] = cmd.get_subcommand_description(subcmd)
-        return descriptions
+        global SUBCOMMAND_DESCRIPTIONS_CACHE
+        if SUBCOMMAND_DESCRIPTIONS_CACHE is None:
+            descriptions = {}
+            for cmd in COMMANDS.values():
+                for subcmd in cmd.get_subcommands():
+                    key = f"{cmd.name} {subcmd}"
+                    descriptions[key] = cmd.get_subcommand_description(subcmd)
+            SUBCOMMAND_DESCRIPTIONS_CACHE = descriptions
+        return SUBCOMMAND_DESCRIPTIONS_CACHE
 
+    @lru_cache(maxsize=1)
     def get_all_commands(self):
         """Get all commands and their subcommands.
 
         Returns:
             A dictionary mapping command names to lists of subcommand names
         """
-        return {cmd.name: cmd.get_subcommands() for cmd in COMMANDS.values()}
+        global ALL_COMMANDS_CACHE
+        if ALL_COMMANDS_CACHE is None:
+            ALL_COMMANDS_CACHE = {cmd.name: cmd.get_subcommands() for cmd in COMMANDS.values()}
+        return ALL_COMMANDS_CACHE
+
+    # Cache for command suggestions to avoid recalculating
+    _command_suggestions_cache = {}
+    _command_suggestions_last_update = 0
+    _command_suggestions_update_interval = 1.0  # Update every second
 
     def get_command_suggestions(self, current_word: str) -> List[Completion]:
         """Get command suggestions with fuzzy matching.
@@ -185,6 +227,15 @@ class FuzzyCommandCompleter(Completer):
         Returns:
             A list of completions for commands
         """
+        # Check cache first
+        current_time = time.time()
+        cache_key = current_word
+        
+        if (cache_key in self._command_suggestions_cache and
+                current_time - self._command_suggestions_last_update < 
+                self._command_suggestions_update_interval):
+            return self._command_suggestions_cache[cache_key]
+        
         suggestions = []
 
         # Get command descriptions
@@ -240,9 +291,73 @@ class FuzzyCommandCompleter(Completer):
                         f"{cmd} - {cmd_description}"),
                     style="fg:ansigreen"
                 ))
-
+        
+        # Update cache
+        self._command_suggestions_cache[cache_key] = suggestions
+        self._command_suggestions_last_update = current_time
+        
         return suggestions
 
+    # Cache for command shadow
+    _command_shadow_cache = {}
+    _command_shadow_last_update = 0
+    _command_shadow_update_interval = 0.2  # Update every 200ms
+
+    @lru_cache(maxsize=100)
+    def _get_command_shadow_cached(self, text: str) -> Optional[str]:
+        """Cached version of command shadow lookup."""
+        if not text or not text.startswith('/'):
+            return None
+
+        # Find commands that start with the current input
+        matching_commands = []
+        for cmd, count in self.command_history.items():
+            if cmd.startswith(text) and cmd != text:
+                matching_commands.append((cmd, count))
+
+        # Sort by usage count (descending)
+        matching_commands.sort(key=lambda x: x[1], reverse=True)
+
+        # Return the most frequently used command
+        if matching_commands:
+            return matching_commands[0][0]
+
+        return None
+
+    def get_command_shadow(self, text: str) -> Optional[str]:
+        """Get a command shadow suggestion based on command history.
+
+        This method returns a suggestion for command shadowing based on
+        the current input and command usage history.
+
+        Args:
+            text: The current input text
+
+        Returns:
+            A suggested command completion or None if no suggestion
+        """
+        # Check cache first
+        current_time = time.time()
+        
+        if (text in self._command_shadow_cache and
+                current_time - self._command_shadow_last_update < 
+                self._command_shadow_update_interval):
+            return self._command_shadow_cache[text]
+        
+        # Get shadow from cached function
+        result = self._get_command_shadow_cached(text)
+        
+        # Update cache
+        self._command_shadow_cache[text] = result
+        self._command_shadow_last_update = current_time
+        
+        return result
+
+    # Cache for subcommand suggestions
+    _subcommand_suggestions_cache = {}
+    _subcommand_suggestions_last_update = 0
+    _subcommand_suggestions_update_interval = 1.0  # Update every second
+    
     def get_subcommand_suggestions(
             self, cmd: str, current_word: str) -> List[Completion]:
         """Get subcommand suggestions with fuzzy matching.
@@ -254,6 +369,15 @@ class FuzzyCommandCompleter(Completer):
         Returns:
             A list of completions for subcommands
         """
+        # Check cache first
+        current_time = time.time()
+        cache_key = f"{cmd}:{current_word}"
+        
+        if (cache_key in self._subcommand_suggestions_cache and
+                current_time - self._subcommand_suggestions_last_update < 
+                self._subcommand_suggestions_update_interval):
+            return self._subcommand_suggestions_cache[cache_key]
+            
         suggestions = []
 
         # If using an alias, get the real command
@@ -289,7 +413,11 @@ class FuzzyCommandCompleter(Completer):
                             f"{subcmd_description}"),
                         style="fg:ansiyellow"
                     ))
-
+        
+        # Update cache
+        self._subcommand_suggestions_cache[cache_key] = suggestions
+        self._subcommand_suggestions_last_update = current_time
+        
         return suggestions
 
     def get_model_suggestions(self, current_word: str) -> List[Completion]:
@@ -304,7 +432,7 @@ class FuzzyCommandCompleter(Completer):
         suggestions = []
 
         # First try to complete model numbers
-        for num, model_name in self.cached_model_numbers.items():
+        for num, model_name in self._cached_model_numbers.items():
             if num.startswith(current_word):
                 suggestions.append(Completion(
                     num,
@@ -316,7 +444,7 @@ class FuzzyCommandCompleter(Completer):
                 ))
 
         # Then try to complete model names
-        for model in self.cached_models:
+        for model in self._cached_models:
             if model.startswith(current_word):
                 suggestions.append(Completion(
                     model,
@@ -335,36 +463,6 @@ class FuzzyCommandCompleter(Completer):
                 ))
 
         return suggestions
-
-    def get_command_shadow(self, text: str) -> Optional[str]:
-        """Get a command shadow suggestion based on command history.
-
-        This method returns a suggestion for command shadowing based on
-        the current input and command usage history.
-
-        Args:
-            text: The current input text
-
-        Returns:
-            A suggested command completion or None if no suggestion
-        """
-        if not text or not text.startswith('/'):
-            return None
-
-        # Find commands that start with the current input
-        matching_commands = []
-        for cmd, count in self.command_history.items():
-            if cmd.startswith(text) and cmd != text:
-                matching_commands.append((cmd, count))
-
-        # Sort by usage count (descending)
-        matching_commands.sort(key=lambda x: x[1], reverse=True)
-
-        # Return the most frequently used command
-        if matching_commands:
-            return matching_commands[0][0]
-
-        return None
 
     # pylint: disable=unused-argument
     def get_completions(self, document, complete_event):
