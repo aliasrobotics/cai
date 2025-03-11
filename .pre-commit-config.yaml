@@ -12,6 +12,7 @@ repos:
     rev: v4.6.0
     hooks:
       - id: check-added-large-files
+        exclude: ^(media)/
       - id: debug-statements
       - id: check-merge-conflict
       - id: check-case-conflict
