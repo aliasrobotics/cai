@@ -99,6 +99,8 @@ RUN apt-get update && \
 # # Activate virtual environment by default
 # RUN echo "source $VIRTUAL_ENV/bin/activate" >> ~/.bashrc
 
+RUN cargo install --git https://github.com/asciinema/agg
+
 # Remove system's python3 libs to avoid conflicts
 RUN apt-get remove -y python3-jsonschema && \
     apt-get remove -y python3-numpy && \

@@ -6,6 +6,10 @@ This allows reviewing conversations in a more readable format.
 Usage:
     JSONL_FILE_PATH="path/to/file.jsonl" REPLAY_DELAY="0.5" python3 tools/5_jsonl_to_replay.py
 
+Usage with asciinema rec, generating a .cast file and then converting it to a gif:
+    asciinema rec --command="JSONL_FILE_PATH=\"/workspace/caiextensions-memory/caiextensions/memory/it/htb/challenges/insomnia/cai_20250307_114836.jsonl\" REPLAY_DELAY=\"0.5\" python3 tools/5_jsonl_to_replay.py" --overwrite
+    agg -i /tmp/tmp6c4dxoac-ascii.cast -o demo.gif
+
 Environment Variables:
     JSONL_FILE_PATH: Path to the JSONL file containing conversation history (required)
     REPLAY_DELAY: Time in seconds to wait between actions (default: 0.5)
