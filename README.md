@@ -77,16 +77,6 @@ You might be wondering if releasing CAI *in-the-wild* given its capabilities and
 2. **Transparency in AI Security Capabilities**: Based on our research results, understanding of the technology, and dissection of top technical reports, we argue that current LLM vendors are undermining their cybersecurity capabilities. This is extremely dangerous and misleading. By developing CAI openly, we provide a transparent benchmark of what AI systems can actually do in cybersecurity contexts, enabling more informed decisions about security postures.
 
 CAI is built on the following core principles:
-
-- **Security-first design**: CAI is purpose-built for cybersecurity applications, with a focus on ethical penetration testing and vulnerability assessment.
-- **Open accessibility**: We're committed to democratizing access to advanced AI security tools through open-source development.
-- **Efficiency and usability**: The framework is lightweight and designed for intuitive use by security professionals.
-- **Flexible agent architecture**: Our modular, agent-centric design allows for customization to specific security testing scenarios.
-- **Seamless tool integration**: CAI comes with built-in tool support and makes it easy to integrate custom security tools.
-- **Comprehensive traceability**: Phoenix-powered logging and tracing provides detailed visibility into agent activities.
-- **Broad model compatibility**: CAI supports 300+ models through [LiteLLM](https://github.com/BerriAI/litellm), including:
-
-
 - **Cybersecurity oriented AI framework**: CAI is specifically designed for cybersecurity use cases, aiming at semi- and fully-automating offensive and defensive security tasks.
 - **Open source, free for research**: CAI is open source and free for research purposes. We aim at democratizing access to AI and Cybersecurity. For professional or commercial use, including on-premise deployments, dedicated technical support and custom extensions [reach out](mailto:research@aliasrobotics.com) to obtain a license.
 - **Lightweight**: CAI is designed to be fast, and easy to use.
