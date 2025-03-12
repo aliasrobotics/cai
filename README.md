@@ -105,19 +105,19 @@ pip install git+https://gitlab.com/aliasrobotics/alias_research/cai.git  # requi
 
 
 ```
-                      ┌───────────────┐
-                      │  BabyNaptime  │
-                      └───────┬───────┘
+                      ┌───────────────┐           ┌───────────┐
+                      │   CAI (cli)   │─────────▶ │   REPL    │
+                      └───────┬───────┘           └───────────┘
                               │
                               ▼
 ┌───────────┐           ┌───────────┐           ┌───────────┐
-│    LLM    │◀─────────▶│   Agent   │─────────▶ │  Caller   │
+│    LLM    │◀─────────▶│  Patterns │─────────▶ │   Agents  │
 └───────────┘           └─────┬─────┘           └───────────┘
                               │                        │
                               │                        ▼
-┌───────────┐           ┌─────┴──────┐           ┌───────────┐
-│  Reporter │◀──────────│ Summarizer │           │ Tool APIs │
-└───────────┘           └────────────┘           └───────────┘
+┌────────────┐           ┌────┴──────┐           ┌───────────┐
+│ Extensions │◀─────────▶│  Tracing  │           │   Tools   │
+└────────────┘           └───────────┘           └───────────┘
                                                       │
                               ┌─────────────────┬─────┴─────┬─────────────────┐
                               ▼                 ▼           ▼                 ▼
@@ -132,22 +132,25 @@ pip install git+https://gitlab.com/aliasrobotics/alias_research/cai.git  # requi
 If you want to dive deeper into the code, check the following files as a start point for using CAI:
 
 ```
-.
+cai
 ├── __init__.py
-├── agents                      # this is where agent live
-│       └─ one_tool.py          # an example of a single tool agent
 │
-├── cli.py                      # entrypoint for CAI CLI
+├── cli.py                        # entrypoint for CLI
+├── core.py                     # core implementation and agentic flow
+├── types.py                   # main abstractions and classes
+├── util.py                      # utility functions
 │
-├── repl                        # abstracts CLI aesthetics and commands
-│     └─ commands
-│     └─ ui
-│     └─ repl.py
-├── core.py                     # CAI class which handles chat completions, tool calls, and agent interactions
-├── types.py
-|
-├── tools
-│   ├── common.py               # definition of how tools are executed inside and outside of virtual containers
+├── repl                          # CLI aesthetics and commands
+│   ├── commands
+│   └── ui
+├── agents                      # agent implementations
+│   ├── one_tool.py      # agent, one agent per file
+│   └── patterns            # agentic patterns, one per file
+│
+├── tools                        # agent tools
+│   ├── common.py
+
+caiextensions                      # out of tree Python extensions
 ```
 
 ### Key Concepts
@@ -653,4 +656,4 @@ If you want to cite our work, please use the following format
 
 ## Acknowledgements
 
-CAI was initially developed by [Alias Robotics](https://aliasrobotics.com) and funded as part of the project XXXXX. The original agentic principles are inspired from OpenAI's [swarm](https://github.com/openai/swarm) library. This project also makes use of other relevant open source building blocks including [`LiteLLM`](https://github.com/BerriAI/litellm), and [`phoenix`](https://github.com/Arize-ai/phoenix)
+CAI was initially developed by [Alias Robotics](https://aliasrobotics.com) and co-funded by the European EIC accelerator project RIS (GA 101161136) - HORIZON-EIC-2023-ACCELERATOR-01 call. The original agentic principles are inspired from OpenAI's [`swarm`](https://github.com/openai/swarm) library. This project also makes use of other relevant open source building blocks including [`LiteLLM`](https://github.com/BerriAI/litellm), and [`phoenix`](https://github.com/Arize-ai/phoenix)
