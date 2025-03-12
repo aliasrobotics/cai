@@ -237,7 +237,7 @@ class CodeAgent(Agent):
         object.__setattr__(self, 'max_print_outputs_length', _max_print_length)
         object.__setattr__(self, 'max_steps', _max_steps)
         object.__setattr__(self, 'execution_timeout', _execution_timeout)
-        object.__setattr__(self, 'context_variables', {})
+        object.__setattr__(self, 'context_variables', {'__name__': '__main__'})
         object.__setattr__(self, 'step_number', 0)
 
         # Initialize the Python interpreter
@@ -285,6 +285,12 @@ Important guidelines:
 - Maintain variables in memory across interactions - your state persists
 - Your code execution has a timeout of {self.execution_timeout} seconds
     - avoid infinite loops or long-running operations
+- The variable __name__ is set to "__main__" so you can use standard
+Python patterns like:
+  ```python
+  if __name__ == "__main__":
+      main()
+  ```
 
 Here's an example of a good response:```python
 # Let's solve this step by step
@@ -354,6 +360,9 @@ I'll execute your code and show you the results.
         """
         if context_variables:
             self.context_variables.update(context_variables)
+
+        # Ensure __name__ is set to "__main__" to simulate script execution
+        self.context_variables["__name__"] = "__main__"
 
         # Extract the latest user message
         user_messages = [
@@ -534,6 +543,9 @@ I'll execute your code and show you the results.
             # Fix the code if needed (e.g., ensure final_answer is properly
             # used)
             code = fix_final_answer_code(code)
+
+            # Add __name__ to context_variables to simulate script execution
+            self.context_variables["__name__"] = "__main__"
 
             # Execute the code with timeout
             if debug:
