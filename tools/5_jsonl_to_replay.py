@@ -8,7 +8,7 @@ Usage:
 
 Usage with asciinema rec, generating a .cast file and then converting it to a gif:
     asciinema rec --command="JSONL_FILE_PATH=\"/workspace/caiextensions-memory/caiextensions/memory/it/htb/challenges/insomnia/cai_20250307_114836.jsonl\" REPLAY_DELAY=\"0.5\" python3 tools/5_jsonl_to_replay.py" --overwrite
-    agg -i /tmp/tmp6c4dxoac-ascii.cast -o demo.gif
+    agg /tmp/tmp6c4dxoac-ascii.cast demo.gif
 
 Environment Variables:
     JSONL_FILE_PATH: Path to the JSONL file containing conversation history (required)
@@ -19,7 +19,8 @@ import json
 import os
 import sys
 import time
-from typing import Dict, List
+from typing import Dict, List, Tuple
+from cai.datarecorder import get_token_stats
 
 # Add the parent directory to the path to import cai modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -46,7 +47,7 @@ def load_jsonl(file_path: str) -> List[Dict]:
     return data
 
 
-def replay_conversation(messages: List[Dict], replay_delay: float = 0.5) -> None:
+def replay_conversation(messages: List[Dict], replay_delay: float = 0.5, usage: Tuple[str, int, int] = None) -> None:
     """
     Replay a conversation from a list of messages, printing in real-time.
     
@@ -55,6 +56,7 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5) -> None
         replay_delay: Time in seconds to wait between actions
     """
     turn_counter = 0
+    interaction_counter = 0
     debug = 2  # Always set debug to 2
     
     if not messages:
@@ -64,6 +66,10 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5) -> None
     print(color(f"Replaying conversation with {len(messages)} messages...", 
                 fg="green"))
     
+
+    # extract the usage stats from the usage tuple
+    file_model, total_input_tokens, total_output_tokens = usage
+
     for i, message in enumerate(messages):
         # Add delay between actions
         if i > 0:
@@ -72,7 +78,7 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5) -> None
         role = message.get("role", "")
         content = message.get("content", "")
         sender = message.get("sender", role)
-        model = message.get("model", "unknown")
+        model = message.get("model", file_model)
         
         # Skip system messages
         if role == "system":
@@ -81,20 +87,10 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5) -> None
         # Handle user messages
         if role == "user":
             # Use cli_print_agent_messages for user messages
-            cli_print_agent_messages(
-                "User",
-                content,
-                turn_counter,
-                model,
-                debug,
-                interaction_input_tokens=message.get("input_tokens", 0),
-                interaction_output_tokens=message.get("output_tokens", 0),
-                interaction_reasoning_tokens=message.get("reasoning_tokens", 0),
-                total_input_tokens=message.get("total_input_tokens", 0),
-                total_output_tokens=message.get("total_output_tokens", 0),
-                total_reasoning_tokens=message.get("total_reasoning_tokens", 0)
-            )
+            print(color(f"CAI> ", fg="cyan") + f"{content}")
+
             turn_counter += 1
+            interaction_counter = 0
             
         # Handle assistant messages
         elif role == "assistant":
@@ -106,14 +102,14 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5) -> None
                 cli_print_agent_messages(
                     sender, 
                     content, 
-                    turn_counter, 
+                    interaction_counter, 
                     model, 
                     debug,
                     interaction_input_tokens=message.get("input_tokens", 0),
                     interaction_output_tokens=message.get("output_tokens", 0),
                     interaction_reasoning_tokens=message.get("reasoning_tokens", 0),
-                    total_input_tokens=message.get("total_input_tokens", 0),
-                    total_output_tokens=message.get("total_output_tokens", 0),
+                    total_input_tokens=total_input_tokens,
+                    total_output_tokens=total_output_tokens,
                     total_reasoning_tokens=message.get("total_reasoning_tokens", 0)
                 )
                 
@@ -130,8 +126,8 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5) -> None
                         message.get("input_tokens", 0),  # interaction_input_tokens
                         message.get("output_tokens", 0),  # interaction_output_tokens
                         message.get("reasoning_tokens", 0),  # interaction_reasoning_tokens
-                        message.get("total_input_tokens", 0),  # total_input_tokens
-                        message.get("total_output_tokens", 0),  # total_output_tokens
+                        total_input_tokens,  # total_input_tokens
+                        total_output_tokens,  # total_output_tokens
                         message.get("total_reasoning_tokens", 0),  # total_reasoning_tokens
                         model,
                         debug
@@ -141,16 +137,17 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5) -> None
                 cli_print_agent_messages(
                     sender, 
                     content, 
-                    turn_counter, 
+                    interaction_counter, 
                     model, 
                     debug,
                     interaction_input_tokens=message.get("input_tokens", 0),
                     interaction_output_tokens=message.get("output_tokens", 0),
                     interaction_reasoning_tokens=message.get("reasoning_tokens", 0),
-                    total_input_tokens=message.get("total_input_tokens", 0),
-                    total_output_tokens=message.get("total_output_tokens", 0),
+                    total_input_tokens=total_input_tokens,
+                    total_output_tokens=total_output_tokens,
                     total_reasoning_tokens=message.get("total_reasoning_tokens", 0)
                 )
+            interaction_counter += 1  # iterate the interaction counter
         
         # Handle tool messages
         elif role == "tool":
@@ -162,8 +159,8 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5) -> None
                 message.get("input_tokens", 0),
                 message.get("output_tokens", 0),
                 message.get("reasoning_tokens", 0),
-                message.get("total_input_tokens", 0),
-                message.get("total_output_tokens", 0),
+                total_input_tokens,
+                total_output_tokens,
                 message.get("total_reasoning_tokens", 0),
                 model,
                 debug
@@ -174,14 +171,14 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5) -> None
             cli_print_state(
                 sender,  # agent_name
                 content,  # message
-                turn_counter,  # counter
+                interaction_counter,  # counter
                 model,  # model
                 debug,  # debug
                 message.get("input_tokens", 0),  # interaction_input_tokens
                 message.get("output_tokens", 0),  # interaction_output_tokens
                 message.get("reasoning_tokens", 0),  # interaction_reasoning_tokens
-                message.get("total_input_tokens", 0),  # total_input_tokens
-                message.get("total_output_tokens", 0),  # total_output_tokens
+                total_input_tokens,  # total_input_tokens
+                total_output_tokens,  # total_output_tokens
                 message.get("total_reasoning_tokens", 0)  # total_reasoning_tokens
             )
         
@@ -190,17 +187,17 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5) -> None
             cli_print_agent_messages(
                 sender or role,
                 content,
-                turn_counter,
+                interaction_counter,
                 model,
                 debug,
                 interaction_input_tokens=message.get("input_tokens", 0),
                 interaction_output_tokens=message.get("output_tokens", 0),
                 interaction_reasoning_tokens=message.get("reasoning_tokens", 0),
-                total_input_tokens=message.get("total_input_tokens", 0),
-                total_output_tokens=message.get("total_output_tokens", 0),
+                total_input_tokens=total_input_tokens,
+                total_output_tokens=total_output_tokens,
                 total_reasoning_tokens=message.get("total_reasoning_tokens", 0)
             )
-            
+                    
         # Force flush stdout to ensure immediate printing
         sys.stdout.flush()
 
@@ -223,9 +220,11 @@ def main():
         # Load the JSONL file using the proper function from datarecorder
         messages = load_history_from_jsonl(jsonl_file_path)
         print(color(f"Loaded {len(messages)} messages from JSONL file", fg="blue"))
-        
+
+        usage = get_token_stats(jsonl_file_path)
+                
         # Generate the replay with live printing
-        replay_conversation(messages, replay_delay)
+        replay_conversation(messages, replay_delay, usage)
         
         print(color("Replay completed successfully", fg="green"))
             
