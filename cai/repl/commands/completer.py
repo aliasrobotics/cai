@@ -445,20 +445,21 @@ class FuzzyCommandCompleter(Completer):
 
         # Then try to complete model names
         for model in self._cached_models:
-            if model.startswith(current_word):
+            model_name = model[0] if isinstance(model, tuple) else model            
+            if model_name.startswith(current_word):
                 suggestions.append(Completion(
-                    model,
+                    model_name,
                     start_position=-len(current_word),
                     display=HTML(
-                        f"<ansimagenta><b>{model}</b></ansimagenta>"),
+                        f"<ansimagenta><b>{model_name}</b></ansimagenta>"),
                     style="fg:ansimagenta bold"
                 ))
-            elif (current_word.lower() in model.lower() and
-                  not model.startswith(current_word)):
+            elif (current_word.lower() in model_name.lower() and
+                  not model_name.startswith(current_word)):
                 suggestions.append(Completion(
-                    model,
+                    model_name,
                     start_position=-len(current_word),
-                    display=HTML(f"<ansimagenta>{model}</ansimagenta>"),
+                    display=HTML(f"<ansimagenta>{model_name}</ansimagenta>"),
                     style="fg:ansimagenta"
                 ))
 
