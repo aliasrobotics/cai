@@ -106,21 +106,21 @@ pip install git+https://gitlab.com/aliasrobotics/alias_research/cai.git  # requi
 CAI focuses on making cybersecurity agent **coordination** and **execution** lightweight, highly controllable, and useful for humans. To do so it builds upon 7 pillars: `Agent`s, `Tools`, `Handoffs`, `Patterns`, `Turns`, `Tracing` and `HITL`.
 
 ```
-                      ┌───────────────┐           ┌───────────┐
-                      │      HITL     │◀─────────▶│   Turns   │
-                      └───────┬───────┘           └───────────┘
-                              │
-                              ▼
+                  ┌───────────────┐           ┌───────────┐
+                  │      HITL     │◀─────────▶│   Turns   │
+                  └───────┬───────┘           └───────────┘
+                          │
+                          ▼
 ┌───────────┐       ┌───────────┐       ┌───────────┐      ┌───────────┐
 │  Patterns │◀─────▶│  Handoffs │◀────▶ │   Agents  │◀────▶│    LLMs   │
 └───────────┘       └─────┬─────┘       └───────────┘      └───────────┘
-                          │                     │
-                          │                     ▼
+                          │                   │
+                          │                   ▼
 ┌────────────┐       ┌────┴──────┐       ┌───────────┐
 │ Extensions │◀─────▶│  Tracing  │       │   Tools   │
 └────────────┘       └───────────┘       └───────────┘
-                                                │
-                          ┌─────────────┬───────┴──┬─────────────┐
+                                              │
+                          ┌─────────────┬─────┴────┬─────────────┐
                           ▼             ▼          ▼             ▼
                     ┌───────────┐┌───────────┐┌────────────┐┌───────────┐
                     │ LinuxCmd  ││ WebSearch ││    Code    ││ SSHTunnel │
@@ -163,14 +163,7 @@ from cai.types import Agent
 from cai.core import CAI
 ctf_agent = Agent(
     name="CTF Agent",
-    instructions="""You are a Cybersecurity expert Leader facing a CTF
-                    challenge.
-                    INSTRUCTIONS:
-                    1. Execute the generic_linux_command tool without any
-                    explanation.
-                    2. Be efficient and strategic when executing commands.
-                    3. Never assume the flag format - it could be any string
-                    """,
+    instructions="""You are a Cybersecurity expert Leader""",
     model= "gpt-4o",
 )
 
@@ -209,12 +202,7 @@ def generic_linux_command(command: str = "", args: str = "", ctf=None) -> str:
 
 ctf_agent = Agent(
     name="CTF Agent",
-    instructions="""You are a Cybersecurity expert Leader facing a CTF
-                    challenge.
-                    INSTRUCTIONS:
-                    1. Execute the generic_linux_command tool without any
-                    explanation.
-                    2. YOU MUST USE THE flag_discriminator function to check the flag""",
+    instructions="""You are a Cybersecurity expert Leader""",
     model= "claude-3-7-sonnet-20250219",
     functions=[listing_tool, generic_linux_command])
 
@@ -250,12 +238,7 @@ from cai.core import CAI
 
 ctf_agent = Agent(
     name="CTF Agent",
-    instructions="""You are a Cybersecurity expert Leader facing a CTF
-                    challenge.
-                    INSTRUCTIONS:
-                    1. Execute the generic_linux_command tool without any
-                    explanation.
-                    2. YOU MUST USE THE flag_discriminator function to check the flag""",
+    instructions="""You are a Cybersecurity expert Leader""",
     model= "deepseek/deepseek-chat",
     functions=[],
 )
