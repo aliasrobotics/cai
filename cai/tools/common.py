@@ -289,7 +289,7 @@ def _run_local(command, stdout=False, timeout=100):
 
 def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arguments # noqa: E501
                 async_mode=False, session_id=None,
-                timeout=100, ssh=False):
+                timeout=100):
     """
     Run command either in CTF container or on the local attacker machine
 
@@ -330,7 +330,7 @@ def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arg
         return _run_ctf(ctf, command, stdout, timeout)
     
     # Check if SSH environment variables are set
-    if all(os.environ.get(var) for var in ['SSH_USER', 'SSH_HOST']) and ssh:
+    if all(os.environ.get(var) for var in ['SSH_USER', 'SSH_HOST']):
         return _run_ssh(command, stdout, timeout)
     
     return _run_local(command, stdout, timeout)

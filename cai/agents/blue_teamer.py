@@ -1,4 +1,8 @@
-"""Blue Team Base Agent"""
+"""Blue Team Base Agent
+SSH_PASS
+SSH_HOST
+SSH_USER
+"""
 import os
 from mako.template import Template  # pylint: disable=import-error
 from cai.types import Agent  # pylint: disable=import-error
