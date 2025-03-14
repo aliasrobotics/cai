@@ -36,7 +36,6 @@ def generic_linux_command(command: str = "",
         ctf: CTF environment object
         async_mode: Force async session
         session_id: Existing session ID
-        ssh: ONLY FOR BLUE TEAM
 
     Returns:
         Command output, session ID, or status message
