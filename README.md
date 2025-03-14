@@ -368,7 +368,7 @@ During the agentic flow (conversation), we distinguish between **interactions** 
 
 CAI implements AI observability by adopting the OpenTelemetry standard and to do so, it leverages [Phoenix](https://github.com/Arize-ai/phoenix) which provides comprehensive tracing capabilities through OpenTelemetry-based instrumentation, allowing you to monitor and analyze your security operations in real-time. This integration enables detailed visibility into agent interactions, tool usage, and attack vectors throughout penetration testing workflows, making it easier to debug complex exploitation chains, track vulnerability discovery processes, and optimize agent performance for more effective security assessments.
 
-![](img/tracing.png)
+![](media/tracing.png)
 
 ### 🔹 Human-In-The-Loop (HITL)
 
