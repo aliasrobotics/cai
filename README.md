@@ -111,20 +111,20 @@ CAI focuses on making cybersecurity agent **coordination** and **execution** lig
                       └───────┬───────┘           └───────────┘
                               │
                               ▼
-┌───────────┐           ┌───────────┐           ┌───────────┐          ┌───────────┐
-│  Patterns │◀─────────▶│  Handoffs │◀────────▶ │   Agents  │◀────────▶│    LLMs   │
-└───────────┘           └─────┬─────┘           └───────────┘          └───────────┘
-                              │                        │
-                              │                        ▼
-┌────────────┐           ┌────┴──────┐           ┌───────────┐
-│ Extensions │◀─────────▶│  Tracing  │           │   Tools   │
-└────────────┘           └───────────┘           └───────────┘
-                                                      │
-                              ┌─────────────────┬─────┴─────┬─────────────────┐
-                              ▼                 ▼           ▼                 ▼
-                        ┌───────────┐    ┌───────────┐┌────────────┐    ┌───────────┐
-                        │ LinuxCmd  │    │ WebSearch ││    Code    │    │ SSHTunnel │
-                        └───────────┘    └───────────┘└────────────┘    └───────────┘
+┌───────────┐         ┌───────────┐         ┌───────────┐        ┌───────────┐
+│  Patterns │◀───────▶│  Handoffs │◀──────▶ │   Agents  │◀──────▶│    LLMs   │
+└───────────┘         └─────┬─────┘         └───────────┘        └───────────┘
+                              │                     │
+                              │                     ▼
+┌────────────┐           ┌────┴──────┐         ┌───────────┐
+│ Extensions │◀─────────▶│  Tracing  │         │   Tools   │
+└────────────┘           └───────────┘         └───────────┘
+                                                  │
+                              ┌─────────────┬─────┴─────┬─────────────┐
+                              ▼             ▼           ▼             ▼
+                        ┌───────────┐┌───────────┐┌────────────┐┌───────────┐
+                        │ LinuxCmd  ││ WebSearch ││    Code    ││ SSHTunnel │
+                        └───────────┘└───────────┘└────────────┘└───────────┘
 ```
 
 
@@ -431,8 +431,6 @@ To start CAI after installing it, just type `cai` in the CLI:
                                   Bug bounty-ready AI
 
 CAI>
-
-IP: 192.168.2.5 | OS: Linux 6.10.14-linuxkit | Ollama: 61 models | Model: default | Max Turns: inf | 08:44 UTC
 ```
 
 That should initialize CAI and provide a prompt to execute any security task you want to perform. The navigation bar at the bottom displays important system information. This information helps you understand your environment while working with CAI.
@@ -688,9 +686,9 @@ Currently, CAI supports text based information. You can add any extra informatio
 If you want to cite our work, please use the following format
 ```bibtex
 @cai{paper2025cai,
-    author = {Surname1, Name},
-    title = {Title of the paper},
-    howpublished = "\url{https://theurl.com}",
+    author = {Mayoral-Vilches, Víctor and Navarrete-Lozano, Luis Javier and Sanz, María and Salas, Lidia and Crespo-Álvarez, Martiño},
+    title = {CAI, a framework for building bug bounty-ready Cybersecurity AIs},
+    howpublished = "\url{https://gitlab.com/aliasrobotics/alias_research/cai}",
     year = {2025}
 }
 ```
