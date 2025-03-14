@@ -67,7 +67,7 @@
 																		// requirements in container
 	// Install cai via "pip3 install -e ."
 	// Extensions, NOTE: only one postCreateCommand is allowed, so we need to install all extensions here
-	"postCreateCommand": "pip3 install -e /workspace/ && pip3 install -e '/workspace/caiextensions-report' && pip3 install '/workspace/pentestperf' && pip3 install -e /workspace/caiextensions-memory/ && pip3 install -e /workspace/caiextensions-platform/",
+	"postCreateCommand": "pip3 install -e /workspace/[report,pentestperf,memory,platform]",
 
 	// MSF setup, and RAG setup
 	"postStartCommand": [
