@@ -41,8 +41,6 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
     - [Ethical principles behind CAI](#ethical-principles-behind-cai)
   - [:nut\_and\_bolt: Install](#nut_and_bolt-install)
   - [:triangular\_ruler: Architecture:](#triangular_ruler-architecture)
-    - [Code structure](#code-structure)
-    - [Key Concepts](#key-concepts)
       - [🔹 Agent](#-agent)
       - [🔹 Agentic Patterns](#-agentic-patterns)
       - [🔹 How do agents work together? Functions](#-how-do-agents-work-together-functions)
@@ -104,6 +102,49 @@ pip install git+https://gitlab.com/aliasrobotics/alias_research/cai.git  # requi
 ## :triangular_ruler: Architecture:
 
 
+
+
+CAI focuses on making cybersecurity agent **coordination** and **execution** lightweight, highly controllable, and useful for humans. To do so it builds upon 7 pillars: `Agent`s, `Patterns`, `Handoffs`, `Tools`, `Turns`, `Tracing` and `HITL`.
+
+
+At its core, CAI abstracts its cybersecurity behavior via agents and agentic patterns. An Agent in an intelligent system that interacts with some environment. More technically, and agent is anything that can be viewed as perceiving
+its environment through sensors and acting upon that environment through
+actuators (Russel & Norvig, AI: A Modern Approach). In cybersecurity,
+an Agent interacts with systems and networks, using peripherals and
+network interfaces as sensors, and executing network actions as
+actuators.
+
+An Agentic Pattern is a structured design paradigm in artificial
+intelligence systems where autonomous or semi-autonomous agents operate
+within a "defined interaction framework" to achieve a goal. These
+patterns specify the organization, coordination, and communication
+methods among agents, guiding decision-making, task execution,
+and delegation.
+
+An agentic pattern (`AP`) can be formally defined as a tuple:
+
+
+\\[
+AP = (A, H, D, C, E)
+\\]
+
+where:
+
+- **\\(A\\) (Agents):** A set of autonomous entities, \\( A = \\{a_1, a_2, ..., a_n\\} \\), each with defined roles, capabilities, and internal states.
+- **\\(H\\) (Handoffs):** A function \\( H: A \times T \to A \\) that governs how tasks \\( T \\) are transferred between agents based on predefined logic (e.g., rules, negotiation, bidding).
+- **\\(D\\) (Decision Mechanism):** A decision function \\( D: S \to A \\) where \\( S \\) represents system states, and \\( D \\) determines which agent takes action at any given time.
+- **\\(C\\) (Communication Protocol):** A messaging function \\( C: A \times A \to M \\), where \\( M \\) is a message space, defining how agents share information.
+- **\\(E\\) (Execution Model):** A function \\( E: A \times I \to O \\) where \\( I \\) is the input space and \\( O \\) is the output space, defining how agents perform tasks.
+
+| **Agentic Pattern** | **Description** |
+|--------------------|------------------------|
+| `Swarm` (Decentralized) | Agents share tasks and self-assign responsibilities without a central orchestrator. Handoffs occur dynamically. *An example of a peer-to-peer agentic pattern is the `CTF Agentic Pattern`, which involves a team of agents working together to solve a CTF challenge with dynamic handoffs.* |
+| `Hierarchical` | A top-level agent (e.g., "PlannerAgent") assigns tasks via structured handoffs to specialized sub-agents. Alternatively, the structure of the agents is harcoded into the agentic pattern with pre-defined handoffs. |
+| `Chain-of-Thought` (Sequential Workflow) | A structured pipeline where Agent A produces an output, hands it to Agent B for reuse or refinement, and so on. Handoffs follow a linear sequence. *An example of a chain-of-thought agentic pattern is the `ReasonerAgent`, which involves a Reasoning-type LLM that provides context to the main agent to solve a CTF challenge with a linear sequence.*[^1] |
+| `Auction-Based` (Competitive Allocation) | Agents "bid" on tasks based on priority, capability, or cost. A decision agent evaluates bids and hands off tasks to the best-fit agent. |
+| `Recursive` | A single agent continuously refines its own output, treating itself as both executor and evaluator, with handoffs (internal or external) to itself. *An example of a recursive agentic pattern is the `CodeAgent` (when used as a recursive agent), which continuously refines its own output by executing code and updating its own instructions.* |
+
+
 ```
                       ┌───────────────┐           ┌───────────┐
                       │   CAI (cli)   │─────────▶ │   REPL    │
@@ -126,8 +167,6 @@ pip install git+https://gitlab.com/aliasrobotics/alias_research/cai.git  # requi
                         └───────────┘    └───────────┘└────────────┘    └───────────┘
 ```
 
-
-### Code structure
 
 If you want to dive deeper into the code, check the following files as a start point for using CAI:
 
@@ -153,8 +192,6 @@ cai
 caiextensions                      # out of tree Python extensions
 ```
 
-### Key Concepts
-CAI focuses on making cybersecurity agent **coordination** and **execution** lightweight, highly controllable, and easily testable. It accomplishes this through two primitive abstractions: `Agent`s and **handoffs**. An `Agent` encompasses `instructions` and `tools`, and can at any point choose to hand off a conversation to another `Agent`.
 
 #### 🔹 Agent
 An **Agent** is an autonomous entity designed to perform specific tasks based on given instructions.
@@ -333,7 +370,7 @@ response = client.run(agent=ctf_agent,
 ```
 
 
-You may find different [tools](cai/tools). They are grouped in 6 major categories inspired by the security kill chain [^3]:
+You may find different [tools](cai/tools). They are grouped in 6 major categories inspired by the security kill chain [^2]:
 
 1. Reconnaissance and weaponization - *reconnaissance*  (crypto, listing, etc)
 2. Exploitation - *exploitation*
@@ -342,7 +379,6 @@ You may find different [tools](cai/tools). They are grouped in 6 major categorie
 5. Data exfiltration - *exfiltration*
 6. Command and control - *control*
 
-[^3]: Kamhoua, C. A., Leslie, N. O., & Weisman, M. J. (2018). Game theoretic modeling of advanced persistent threat in internet of things. Journal of Cyber Security and Information Systems.
 </details>
 
 #### 🔹 Interactions and Turns
@@ -657,3 +693,8 @@ If you want to cite our work, please use the following format
 ## Acknowledgements
 
 CAI was initially developed by [Alias Robotics](https://aliasrobotics.com) and co-funded by the European EIC accelerator project RIS (GA 101161136) - HORIZON-EIC-2023-ACCELERATOR-01 call. The original agentic principles are inspired from OpenAI's [`swarm`](https://github.com/openai/swarm) library. This project also makes use of other relevant open source building blocks including [`LiteLLM`](https://github.com/BerriAI/litellm), and [`phoenix`](https://github.com/Arize-ai/phoenix)
+
+
+<!-- Footnotes -->
+[^1]: Arguably, the Chain-of-Thought agentic pattern is a special case of the Hierarchical agentic pattern.
+[^2]: Kamhoua, C. A., Leslie, N. O., & Weisman, M. J. (2018). Game theoretic modeling of advanced persistent threat in internet of things. Journal of Cyber Security and Information Systems.
