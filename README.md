@@ -393,25 +393,25 @@ To start CAI after installing it, just type `cai` in the CLI:
 ```bash
 └─# cai
 
-                CCCCCCCCCCCCC      ++++++++   ++++++++      IIIIIIIIII
-             CCC::::::::::::C  ++++++++++       ++++++++++  I::::::::I
-           CC:::::::::::::::C ++++++++++         ++++++++++ I::::::::I
-          C:::::CCCCCCCC::::C +++++++++    ++     +++++++++ II::::::II
-         C:::::C       CCCCCC +++++++     +++++     +++++++   I::::I
-        C:::::C                +++++     +++++++     +++++    I::::I
-        C:::::C                ++++                   ++++    I::::I
-        C:::::C                 ++                     ++     I::::I
-        C:::::C                  +   +++++++++++++++   +      I::::I
-        C:::::C                    +++++++++++++++++++        I::::I
-        C:::::C                     +++++++++++++++++         I::::I
-         C:::::C       CCCCCC        +++++++++++++++          I::::I
-          C:::::CCCCCCCC::::C         +++++++++++++         II::::::II
-           CC:::::::::::::::C           +++++++++           I::::::::I
-             CCC::::::::::::C             +++++             I::::::::I
-                CCCCCCCCCCCCC               ++              IIIIIIIIII
+          CCCCCCCCCCCCC      ++++++++   ++++++++      IIIIIIIIII
+       CCC::::::::::::C  ++++++++++       ++++++++++  I::::::::I
+     CC:::::::::::::::C ++++++++++         ++++++++++ I::::::::I
+    C:::::CCCCCCCC::::C +++++++++    ++     +++++++++ II::::::II
+   C:::::C       CCCCCC +++++++     +++++     +++++++   I::::I
+  C:::::C                +++++     +++++++     +++++    I::::I
+  C:::::C                ++++                   ++++    I::::I
+  C:::::C                 ++                     ++     I::::I
+  C:::::C                  +   +++++++++++++++   +      I::::I
+  C:::::C                    +++++++++++++++++++        I::::I
+  C:::::C                     +++++++++++++++++         I::::I
+   C:::::C       CCCCCC        +++++++++++++++          I::::I
+    C:::::CCCCCCCC::::C         +++++++++++++         II::::::II
+     CC:::::::::::::::C           +++++++++           I::::::::I
+       CCC::::::::::::C             +++++             I::::::::I
+          CCCCCCCCCCCCC               ++              IIIIIIIIII
 
-                              Cybersecurity AI (CAI), vX.Y.Z
-                                  Bug bounty-ready AI
+                      Cybersecurity AI (CAI), vX.Y.Z
+                          Bug bounty-ready AI
 
 CAI>
 ```
