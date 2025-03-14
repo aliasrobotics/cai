@@ -542,6 +542,13 @@ Copy the key and add it to Gitlab under https://gitlab.com/-/user_settings/ssh_k
 cat ~/.ssh/id_ed25519.pub
 ```
 
+To verify it:
+```bash
+ssh -T git@gitlab.com
+Welcome to GitLab, @vmayoral!
+```
+
+
 </details>
 
 
