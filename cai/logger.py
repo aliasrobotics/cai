@@ -27,7 +27,7 @@ from openinference.semconv.trace import SpanAttributes  # pylint: disable=import
 import cai.tools as tools  # pylint: disable=consider-using-from-import  # noqa: E501
 
 # Instrument OpenAI if tracing is enabled
-if os.getenv("CAI_TRACING", "true").lower() == "true":
+if os.getenv("CAI_TRACING", "false").lower() == "true":
 
     # Context variable to store the current span
     current_span = contextvars.ContextVar("current_span", default=None)
@@ -352,5 +352,5 @@ class ExploitLogger:
 
 # Create a global instance of ExploitLogger
 exploit_logger = ExploitLogger(
-    tracing=os.getenv("CAI_TRACING", "true").lower() == "true"
+    tracing=os.getenv("CAI_TRACING", "false").lower() == "true"
 )

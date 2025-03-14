@@ -100,6 +100,7 @@ from wasabi import color  # pylint: disable=import-error
 
 from cai import (
     is_pentestperf_available,
+    is_caiextensions_platform_available,
     cai_initial_agent
 )
 from cai.repl import run_cai_cli
@@ -112,6 +113,9 @@ if is_pentestperf_available():
 
 def initialize_platforms():
     """Initialize and register available platforms."""
+    if not is_caiextensions_platform_available():
+        return
+
     try:
         from caiextensions.platform.base import platform_manager  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
 

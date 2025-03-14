@@ -313,7 +313,10 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 # Fix for empty content in messages for Anthropic models
                 create_params["messages"] = [
                     msg if msg.get("content") not in [None, ""] else
-                    {**msg, "content": "Empty content block"} for msg in create_params["messages"]
+                    {
+                        **msg,
+                        "content": "Empty content block"
+                    } for msg in create_params["messages"]
                 ]
                 litellm_completion = litellm.completion(**create_params)
             else:
@@ -835,7 +838,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # as the logging URL has a harcoded bit which is
         # dependent on the file that invokes it
         #
-        if os.getenv("CAI_TRACING", "true").lower() == "true":
+        if os.getenv("CAI_TRACING", "false").lower() == "true":
             # Get logging URL based on source
             logging_url = exploit_logger.get_logger_url(source=self.source)
             print(

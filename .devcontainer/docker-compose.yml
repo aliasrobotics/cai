@@ -9,6 +9,7 @@ services:
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile
+    # platform: linux/amd64  # TODO: uncomment this when we have a x86_64 machine
     volumes:
       # Mount the root folder that contains .git
       - ..:/workspace:cached
