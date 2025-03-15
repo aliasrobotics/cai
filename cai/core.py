@@ -378,14 +378,21 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             self.total_output_tokens += (
                 self.interaction_output_tokens
             )
-            
-        interaction_cost = litellm.completion_cost(
+
+        try:
+            interaction_cost = litellm.completion_cost(
                 completion_response=litellm_completion,
                 model=create_params["model"]
             )
-        self.total_cost += float(interaction_cost)
-        # Store the interaction cost for display in CLI functions
-        self.interaction_cost = interaction_cost if 'interaction_cost' in locals() else 0.0
+            self.total_cost += float(interaction_cost)
+            # Store the interaction cost for display in CLI functions
+            self.interaction_cost = interaction_cost
+        except Exception as e:
+            print(f"Error calculating interaction cost: {e}")
+            self.interaction_cost = 0.0
+            # If the error is about unmapped model, set cost to 0
+            if "model isn't mapped yet" in str(e):
+                self.total_cost += 0.0
 
         return litellm_completion
 
