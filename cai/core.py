@@ -191,6 +191,16 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                                      else []))):
                 messages.append(msg)
 
+        # Add support for prompt caching for claude (not automatically applied)
+        # https://www.anthropic.com/news/token-saving-updates
+        # We need to add only a cache_control to the last message (automatic use of largest cached prefix)
+        if agent.model.startswith("claude") and len(messages) > 0:
+            # Create a copy of the last message and add cache_control to it
+            # It's important to create a copy to avoid modifying the original message
+            last_msg = messages[-1].copy() 
+            last_msg["cache_control"] = {"type": "ephemeral"}
+            messages[-1] = last_msg
+
         # --------------------------------
         # Debug
         # --------------------------------
@@ -267,6 +277,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 )
             else:
                 litellm_completion = litellm.completion(**create_params)
+                # TODO: Remove this line, this is here just to verify prompt caching is working, but we don't currently calculate the cost correctly
+                print("Last interaction's cost calculated by litellm (supports promtp caching):", litellm.completion_cost(completion_response=litellm_completion, model=agent.model))
+
+            
+
 
         except litellm.exceptions.BadRequestError as e:
             if "LLM Provider NOT provided" in str(e):
@@ -939,7 +954,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 # This is part of the support system to be added to the
                 # master template of agents and prompts
                 reasoner_interval = int(
-                    os.getenv("CAI_SUPPPORT_INTERVAL", "5"))
+                    os.getenv("CAI_SUPPORT_INTERVAL", "5"))
                 if (n_turn != 0 and
                     n_turn % reasoner_interval == 0 and
                         os.getenv("CAI_SUPPORT_MODEL") is not None):
@@ -965,6 +980,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             all_costs = calculate_conversation_cost(
                 self.total_input_tokens, self.total_output_tokens, agent.model
             )
+            
             self.total_cost = all_costs["total_cost"]
             if active_agent is None and self.force_until_flag and self.total_cost < float(  # noqa: E501 # pylint: disable=line-too-long
                     os.getenv("CAI_PRICE_LIMIT", "1")):
