@@ -276,13 +276,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             else:
                 litellm_completion = litellm.completion(**create_params)
 
-            # Calculate cost using litellm.completion_cost
-            interaction_cost = litellm.completion_cost(
-                completion_response=litellm_completion,
-                model=create_params["model"]
-            )
-            self.total_cost += float(interaction_cost)
-
         except litellm.exceptions.BadRequestError as e:
             if "LLM Provider NOT provided" in str(e):
                 # Create a copy of params to avoid overwriting the original
@@ -292,12 +285,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 ollama_params["custom_llm_provider"] = "openai"
                 try:
                     litellm_completion = litellm.completion(**ollama_params)
-                    # Calculate cost for ollama
-                    interaction_cost = litellm.completion_cost(
-                        completion_response=litellm_completion,
-                        model=ollama_params["model"]
-                    )
-                    self.total_cost += float(interaction_cost)
                 except litellm.exceptions.BadRequestError as e:  # pylint: disable=W0621,C0301 # noqa: E501
                     #
                     # CTRL C handler for ollama models
@@ -307,12 +294,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                             create_params["messages"])
                         litellm_completion = litellm.completion(
                             **create_params)
-                        # Calculate cost after fixing message list
-                        interaction_cost = litellm.completion_cost(
-                            completion_response=litellm_completion,
-                            model=create_params["model"]
-                        )
-                        self.total_cost += float(interaction_cost)
                     else:
                         raise e
             elif "An assistant message with 'tool_calls'" in str(e) or "`tool_use` blocks must be followed by a user message with `tool_result`" in str(e):  # noqa: E501 # pylint: disable=C0301
@@ -323,12 +304,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 create_params["messages"] = fix_message_list(
                     create_params["messages"])
                 litellm_completion = litellm.completion(**create_params)
-                # Calculate cost after fixing message list
-                interaction_cost = litellm.completion_cost(
-                    completion_response=litellm_completion,
-                    model=create_params["model"]
-                )
-                self.total_cost += float(interaction_cost)
             # this captures an error related to the fact
             # that the messages list contains an empty
             # content position
@@ -340,12 +315,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     {**msg, "content": ""} for msg in create_params["messages"]
                 ]
                 litellm_completion = litellm.completion(**create_params)
-                # Calculate cost after fixing message list
-                interaction_cost = litellm.completion_cost(
-                    completion_response=litellm_completion,
-                    model=create_params["model"]
-                )
-                self.total_cost += float(interaction_cost)
             # Handle Anthropic error for empty text content blocks
             elif "text content blocks must be non-empty" in str(e):
                 print(f"Error: {str(e)}")
@@ -358,12 +327,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     } for msg in create_params["messages"]
                 ]
                 litellm_completion = litellm.completion(**create_params)
-                # Calculate cost after fixing message list
-                interaction_cost = litellm.completion_cost(
-                    completion_response=litellm_completion,
-                    model=create_params["model"]
-                )
-                self.total_cost += float(interaction_cost)
             else:
                 raise e
 
@@ -371,12 +334,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             print("Rate Limit Error:" + str(e))
             time.sleep(60)
             litellm_completion = litellm.completion(**create_params)
-            # Calculate cost after rate limit retry
-            interaction_cost = litellm.completion_cost(
-                completion_response=litellm_completion,
-                model=create_params["model"]
-            )
-            self.total_cost += float(interaction_cost)
 
         except Exception:  # pylint: disable=W0718
             ollama_params = create_params.copy()
@@ -384,12 +341,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             ollama_params["custom_llm_provider"] = "openai"
             try:
                 litellm_completion = litellm.completion(**ollama_params)
-                # Calculate cost for ollama fallback
-                interaction_cost = litellm.completion_cost(
-                    completion_response=litellm_completion,
-                    model=ollama_params["model"]
-                )
-                self.total_cost += float(interaction_cost)
             except Exception as e:  # pylint: disable=W0718
                 print("Error: " + str(e))
                 return None
@@ -427,7 +378,12 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             self.total_output_tokens += (
                 self.interaction_output_tokens
             )
-
+            
+        interaction_cost = litellm.completion_cost(
+                completion_response=litellm_completion,
+                model=create_params["model"]
+            )
+        self.total_cost += float(interaction_cost)
         # Store the interaction cost for display in CLI functions
         self.interaction_cost = interaction_cost if 'interaction_cost' in locals() else 0.0
 

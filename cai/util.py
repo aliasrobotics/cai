@@ -779,41 +779,43 @@ def _create_token_display(  # pylint: disable=too-many-arguments,too-many-locals
     Create a Text object displaying token usage information
     with enhanced formatting.
     """
-    tokens_text = Text(justify="right")
+    tokens_text = Text(justify="left")
 
-    # Current interaction tokens with enhanced styling
-    tokens_text.append("\n", style="bold")
-    tokens_text.append("(tokens)", style="")
-    tokens_text.append(" Interaction: ", style="bold")
+    # Create a more compact, horizontal display
+    tokens_text.append(" ", style="bold")  # Small padding
+    
+    # Current interaction tokens
+    tokens_text.append("Current: ", style="bold")
     tokens_text.append(f"I:{interaction_input_tokens} ", style="green")
     tokens_text.append(f"O:{interaction_output_tokens} ", style="red")
     tokens_text.append(f"R:{interaction_reasoning_tokens} ", style="yellow")
-
-    # Use provided interaction cost
-    current_cost = (
-        float(interaction_cost) 
-        if interaction_cost is not None 
-        else 0.0
-    )
+    
+    # Current cost
+    current_cost = float(interaction_cost) if interaction_cost is not None else 0.0
     tokens_text.append(f"(${current_cost:.4f}) ", style="bold")
-    # Total tokens with enhanced styling
-    tokens_text.append("\n", style="bold")
-    tokens_text.append("| Total: ", style="bold")
+    
+    # Separator
+    tokens_text.append("| ", style="dim")
+    
+    # Total tokens
+    tokens_text.append("Total: ", style="bold")
     tokens_text.append(f"I:{total_input_tokens} ", style="green")
     tokens_text.append(f"O:{total_output_tokens} ", style="red")
     tokens_text.append(f"R:{total_reasoning_tokens} ", style="yellow")
-
-    # Use provided total cost if available
+    
+    # Total cost
     total_cost_value = float(total_cost) if total_cost is not None else 0.0
     tokens_text.append(f"(${total_cost_value:.4f}) ", style="bold")
-
-    # Context usage with enhanced styling
-    context_pct = interaction_input_tokens / \
-        get_model_input_tokens(model) * 100
-    tokens_text.append("| Context: ", style="bold")
+    
+    # Separator
+    tokens_text.append("| ", style="dim")
+    
+    # Context usage
+    context_pct = interaction_input_tokens / get_model_input_tokens(model) * 100
+    tokens_text.append("Context: ", style="bold")
     tokens_text.append(f"{context_pct:.1f}% ", style="bold")
-
-    # Enhanced context indicator
+    
+    # Context indicator
     if context_pct < 50:
         indicator = "🟩"
         color_local = "green"
@@ -823,11 +825,8 @@ def _create_token_display(  # pylint: disable=too-many-arguments,too-many-locals
     else:
         indicator = "🟥"
         color_local = "red"
-
-    tokens_text.append(
-        f"{indicator} ({get_model_input_tokens(model)})",
-        style=color_local
-    )
+    
+    tokens_text.append(f"{indicator}", style=color_local)
 
     return tokens_text
 
