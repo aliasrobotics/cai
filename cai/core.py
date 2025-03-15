@@ -939,7 +939,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 # This is part of the support system to be added to the
                 # master template of agents and prompts
                 reasoner_interval = int(
-                    os.getenv("CAI_SUPPPORT_INTERVAL", "5"))
+                    os.getenv("CAI_SUPPORT_INTERVAL", "5"))
                 if (n_turn != 0 and
                     n_turn % reasoner_interval == 0 and
                         os.getenv("CAI_SUPPORT_MODEL") is not None):
