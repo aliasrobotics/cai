@@ -29,9 +29,6 @@ from cai import (
     transfer_to_state_agent,
 )
 from cai.state.common import StateAgent
-from cai.cost.llm_cost import (
-    calculate_conversation_cost
-)
 from cai.agents.meta.reasoner_support import create_reasoner_agent
 from .agents.codeagent import CodeAgent
 from .util import (
@@ -124,6 +121,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.interaction_input_tokens = 0
         self.interaction_output_tokens = 0
         self.interaction_reasoning_tokens = 0
+        self.interaction_cost = 0.0
         self.max_chars_per_message = 5000  # number of characters
         self.last_reasoning_content = ""
 
@@ -277,11 +275,13 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 )
             else:
                 litellm_completion = litellm.completion(**create_params)
-                # TODO: Remove this line, this is here just to verify prompt caching is working, but we don't currently calculate the cost correctly
-                print("Last interaction's cost calculated by litellm (supports promtp caching):", litellm.completion_cost(completion_response=litellm_completion, model=agent.model))
 
-            
-
+            # Calculate cost using litellm.completion_cost
+            interaction_cost = litellm.completion_cost(
+                completion_response=litellm_completion,
+                model=create_params["model"]
+            )
+            self.total_cost += float(interaction_cost)
 
         except litellm.exceptions.BadRequestError as e:
             if "LLM Provider NOT provided" in str(e):
@@ -292,6 +292,12 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 ollama_params["custom_llm_provider"] = "openai"
                 try:
                     litellm_completion = litellm.completion(**ollama_params)
+                    # Calculate cost for ollama
+                    interaction_cost = litellm.completion_cost(
+                        completion_response=litellm_completion,
+                        model=ollama_params["model"]
+                    )
+                    self.total_cost += float(interaction_cost)
                 except litellm.exceptions.BadRequestError as e:  # pylint: disable=W0621,C0301 # noqa: E501
                     #
                     # CTRL C handler for ollama models
@@ -301,6 +307,12 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                             create_params["messages"])
                         litellm_completion = litellm.completion(
                             **create_params)
+                        # Calculate cost after fixing message list
+                        interaction_cost = litellm.completion_cost(
+                            completion_response=litellm_completion,
+                            model=create_params["model"]
+                        )
+                        self.total_cost += float(interaction_cost)
                     else:
                         raise e
             elif "An assistant message with 'tool_calls'" in str(e) or "`tool_use` blocks must be followed by a user message with `tool_result`" in str(e):  # noqa: E501 # pylint: disable=C0301
@@ -311,6 +323,12 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 create_params["messages"] = fix_message_list(
                     create_params["messages"])
                 litellm_completion = litellm.completion(**create_params)
+                # Calculate cost after fixing message list
+                interaction_cost = litellm.completion_cost(
+                    completion_response=litellm_completion,
+                    model=create_params["model"]
+                )
+                self.total_cost += float(interaction_cost)
             # this captures an error related to the fact
             # that the messages list contains an empty
             # content position
@@ -322,6 +340,12 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     {**msg, "content": ""} for msg in create_params["messages"]
                 ]
                 litellm_completion = litellm.completion(**create_params)
+                # Calculate cost after fixing message list
+                interaction_cost = litellm.completion_cost(
+                    completion_response=litellm_completion,
+                    model=create_params["model"]
+                )
+                self.total_cost += float(interaction_cost)
             # Handle Anthropic error for empty text content blocks
             elif "text content blocks must be non-empty" in str(e):
                 print(f"Error: {str(e)}")
@@ -334,6 +358,12 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     } for msg in create_params["messages"]
                 ]
                 litellm_completion = litellm.completion(**create_params)
+                # Calculate cost after fixing message list
+                interaction_cost = litellm.completion_cost(
+                    completion_response=litellm_completion,
+                    model=create_params["model"]
+                )
+                self.total_cost += float(interaction_cost)
             else:
                 raise e
 
@@ -341,6 +371,12 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             print("Rate Limit Error:" + str(e))
             time.sleep(60)
             litellm_completion = litellm.completion(**create_params)
+            # Calculate cost after rate limit retry
+            interaction_cost = litellm.completion_cost(
+                completion_response=litellm_completion,
+                model=create_params["model"]
+            )
+            self.total_cost += float(interaction_cost)
 
         except Exception:  # pylint: disable=W0718
             ollama_params = create_params.copy()
@@ -348,6 +384,12 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             ollama_params["custom_llm_provider"] = "openai"
             try:
                 litellm_completion = litellm.completion(**ollama_params)
+                # Calculate cost for ollama fallback
+                interaction_cost = litellm.completion_cost(
+                    completion_response=litellm_completion,
+                    model=ollama_params["model"]
+                )
+                self.total_cost += float(interaction_cost)
             except Exception as e:  # pylint: disable=W0718
                 print("Error: " + str(e))
                 return None
@@ -386,7 +428,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 self.interaction_output_tokens
             )
 
-        # print(litellm_completion)  # debug
+        # Store the interaction cost for display in CLI functions
+        self.interaction_cost = interaction_cost if 'interaction_cost' in locals() else 0.0
+
         return litellm_completion
 
     def handle_function_result(self, result, debug) -> Result:
@@ -598,7 +642,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 total_output_tokens=self.total_output_tokens,
                 total_reasoning_tokens=self.total_reasoning_tokens,
                 model=agent.model,
-                debug=debug)
+                debug=debug,
+                interaction_cost=self.interaction_cost,
+                total_cost=self.total_cost)
 
             partial_response.context_variables.update(result.context_variables)
             if result.agent:
@@ -654,7 +700,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             interaction_reasoning_tokens=self.interaction_reasoning_tokens,
             total_input_tokens=self.total_input_tokens,
             total_output_tokens=self.total_output_tokens,
-            total_reasoning_tokens=self.total_reasoning_tokens
+            total_reasoning_tokens=self.total_reasoning_tokens,
+            interaction_cost=self.interaction_cost,
+            total_cost=self.total_cost
         )
 
         # Register in the graph
@@ -758,7 +806,15 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                                          message.content,
                                          n_turn,
                                          active_agent.model,
-                                         debug)
+                                         debug,
+                                         interaction_input_tokens=self.interaction_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                         interaction_output_tokens=self.interaction_output_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                         interaction_reasoning_tokens=self.interaction_reasoning_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                         total_input_tokens=self.total_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                         total_output_tokens=self.total_output_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                         total_reasoning_tokens=self.total_reasoning_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                         interaction_cost=self.interaction_cost,
+                                         total_cost=self.total_cost)
             else:
                 cli_print_state(active_agent.name,
                                 message.content,
@@ -770,7 +826,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                                 interaction_reasoning_tokens=self.interaction_reasoning_tokens,  # noqa: E501  # pylint: disable=line-too-long
                                 total_input_tokens=self.total_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
                                 total_output_tokens=self.total_output_tokens,  # noqa: E501  # pylint: disable=line-too-long
-                                total_reasoning_tokens=self.total_reasoning_tokens)  # noqa: E501  # pylint: disable=line-too-long
+                                total_reasoning_tokens=self.total_reasoning_tokens,  # noqa: E501  # pylint: disable=line-too-long
+                                interaction_cost=self.interaction_cost,
+                                total_cost=self.total_cost)
             debug_print(debug, "Ending turn.", brief=self.brief)
 
             # Register in the graph
@@ -977,11 +1035,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
             # Check if the flag is found in the last tool output
             # Accountability
-            all_costs = calculate_conversation_cost(
-                self.total_input_tokens, self.total_output_tokens, agent.model
-            )
-            
-            self.total_cost = all_costs["total_cost"]
             if active_agent is None and self.force_until_flag and self.total_cost < float(  # noqa: E501 # pylint: disable=line-too-long
                     os.getenv("CAI_PRICE_LIMIT", "1")):
                 # Check if the flag is found in the last tool output
