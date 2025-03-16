@@ -349,7 +349,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # --------------------------------
         if self.rec_training_data:
             self.rec_training_data.rec_training_data(
-                create_params, litellm_completion)
+                create_params, litellm_completion, self.total_cost)
 
         # --------------------------------
         # Token counts
@@ -387,11 +387,14 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             self.total_cost += float(interaction_cost)
             # Store the interaction cost for display in CLI functions
             self.interaction_cost = interaction_cost
+            # Add cost to litellm_completion for DataRecorder
+            litellm_completion.cost = interaction_cost
         except Exception as e:
             self.interaction_cost = 0.0
             # If the error is about unmapped model, set cost to 0
             if "model isn't mapped yet" in str(e):
                 self.total_cost += 0.0
+                litellm_completion.cost = 0.0
             else:
                 print(e)    
 

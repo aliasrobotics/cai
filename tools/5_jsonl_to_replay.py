@@ -47,13 +47,14 @@ def load_jsonl(file_path: str) -> List[Dict]:
     return data
 
 
-def replay_conversation(messages: List[Dict], replay_delay: float = 0.5, usage: Tuple[str, int, int] = None) -> None:
+def replay_conversation(messages: List[Dict], replay_delay: float = 0.5, usage: Tuple[str, int, int, float] = None) -> None:
     """
     Replay a conversation from a list of messages, printing in real-time.
     
     Args:
         messages: List of message dictionaries
         replay_delay: Time in seconds to wait between actions
+        usage: Tuple containing (model_name, total_input_tokens, total_output_tokens, total_cost)
     """
     turn_counter = 0
     interaction_counter = 0
@@ -68,7 +69,9 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5, usage: 
     
 
     # extract the usage stats from the usage tuple
-    file_model, total_input_tokens, total_output_tokens = usage
+    file_model, total_input_tokens, total_output_tokens, total_cost = usage
+
+    print(color(f"Total cost: ${total_cost:.6f}", fg="cyan"))
 
     for i, message in enumerate(messages):
         # Add delay between actions
@@ -110,7 +113,9 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5, usage: 
                     interaction_reasoning_tokens=message.get("reasoning_tokens", 0),
                     total_input_tokens=total_input_tokens,
                     total_output_tokens=total_output_tokens,
-                    total_reasoning_tokens=message.get("total_reasoning_tokens", 0)
+                    total_reasoning_tokens=message.get("total_reasoning_tokens", 0),
+                    interaction_cost=message.get("interaction_cost", 0.0),
+                    total_cost=total_cost
                 )
                 
                 # Print each tool call
@@ -130,7 +135,9 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5, usage: 
                         total_output_tokens,  # total_output_tokens
                         message.get("total_reasoning_tokens", 0),  # total_reasoning_tokens
                         model,
-                        debug
+                        debug,
+                        interaction_cost=message.get("interaction_cost", 0.0),
+                        total_cost=total_cost
                     )
             else:
                 # Print regular assistant message
@@ -145,7 +152,9 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5, usage: 
                     interaction_reasoning_tokens=message.get("reasoning_tokens", 0),
                     total_input_tokens=total_input_tokens,
                     total_output_tokens=total_output_tokens,
-                    total_reasoning_tokens=message.get("total_reasoning_tokens", 0)
+                    total_reasoning_tokens=message.get("total_reasoning_tokens", 0),
+                    interaction_cost=message.get("interaction_cost", 0.0),
+                    total_cost=total_cost
                 )
             interaction_counter += 1  # iterate the interaction counter
         
@@ -163,7 +172,9 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5, usage: 
                 total_output_tokens,
                 message.get("total_reasoning_tokens", 0),
                 model,
-                debug
+                debug,
+                interaction_cost=message.get("interaction_cost", 0.0),
+                total_cost=total_cost
             )
             
         # Handle state messages
@@ -179,7 +190,9 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5, usage: 
                 message.get("reasoning_tokens", 0),  # interaction_reasoning_tokens
                 total_input_tokens,  # total_input_tokens
                 total_output_tokens,  # total_output_tokens
-                message.get("total_reasoning_tokens", 0)  # total_reasoning_tokens
+                message.get("total_reasoning_tokens", 0),  # total_reasoning_tokens
+                interaction_cost=message.get("interaction_cost", 0.0),
+                total_cost=total_cost
             )
         
         # Handle any other message types
@@ -195,7 +208,9 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5, usage: 
                 interaction_reasoning_tokens=message.get("reasoning_tokens", 0),
                 total_input_tokens=total_input_tokens,
                 total_output_tokens=total_output_tokens,
-                total_reasoning_tokens=message.get("total_reasoning_tokens", 0)
+                total_reasoning_tokens=message.get("total_reasoning_tokens", 0),
+                interaction_cost=message.get("interaction_cost", 0.0),
+                total_cost=total_cost
             )
                     
         # Force flush stdout to ensure immediate printing
@@ -221,7 +236,14 @@ def main():
         messages = load_history_from_jsonl(jsonl_file_path)
         print(color(f"Loaded {len(messages)} messages from JSONL file", fg="blue"))
 
+        # Get token stats and cost from the JSONL file
         usage = get_token_stats(jsonl_file_path)
+        file_model, total_input_tokens, total_output_tokens, total_cost = usage
+        
+        print(color(f"Model: {file_model}", fg="blue"))
+        print(color(f"Total input tokens: {total_input_tokens:,}", fg="blue"))
+        print(color(f"Total output tokens: {total_output_tokens:,}", fg="blue"))
+        print(color(f"Total cost: ${total_cost:.6f}", fg="blue"))
                 
         # Generate the replay with live printing
         replay_conversation(messages, replay_delay, usage)
