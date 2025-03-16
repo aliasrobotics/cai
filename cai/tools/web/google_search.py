@@ -118,18 +118,3 @@ def _perform_search(query: str, num_results: int = 10,
     
     return results
 
-def make_google_search(query: str, dorks = False) -> List[Dict[str, str]]:
-    """
-    Search Google for information.
-    
-    Args:
-        query: The search query to look up on Google.
-        dorks: Whether to use Google dorks for advanced searching.
-            Default is False.
-            
-    Returns:
-        A list of search results. Each result contains URL, title, and snippet.
-    """
-    if dorks:
-        return google_dork_search(query)
-    return google_search(query)

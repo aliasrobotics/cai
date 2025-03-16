@@ -2,6 +2,11 @@ import os
 from openai import OpenAI
 from dotenv import load_dotenv
 
+from cai.tools.web.google_search import (
+    google_dork_search, 
+    google_search
+)
+
 def query_perplexity(query: str = "", context: str = "") -> str:
     """
     Query the Perplexity AI API with a user prompt.
@@ -51,7 +56,7 @@ def query_perplexity(query: str = "", context: str = "") -> str:
     return response.choices[0].message.content
 
 
-def search_web(context: str = "", query: str = "") -> str:
+def make_web_search_with_explanation(context: str = "", query: str = "") -> str:
     """
     Executes an intelligent web search via the AI service for relevant
     cybersecurity and CTF-related information. This function sends the
@@ -68,3 +73,19 @@ def search_web(context: str = "", query: str = "") -> str:
         str: Search result.
     """
     return query_perplexity(query, context)
+
+def make_google_search(query: str, dorks = False) -> str:
+    """
+    Search Google for information.
+    
+    Args:
+        query: The search query to look up on Google.
+        dorks: Whether to use Google dorks for advanced searching.
+            Default is False.
+            
+    Returns:
+        A list of search results. Each result contains URL, title, and snippet.
+    """
+    if dorks:
+        return google_dork_search(query)
+    return google_search(query)
