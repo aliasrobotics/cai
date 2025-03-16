@@ -18,7 +18,6 @@ Output:
 import os
 import sys
 from cai.datarecorder import get_token_stats
-from cai.cost.llm_cost import calculate_conversation_cost
 from cai import util
 
 

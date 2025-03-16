@@ -24,11 +24,6 @@
   variables:
     TEST_PATH: tests/tools/reconnaissance/test_filesystem.py
 
-💰 costs test_costs_llm_cost:
-  <<: *run_test
-  variables:
-    TEST_PATH: tests/costs/test_token_cost.py
-
 🏗️ architecture test_architecture_core:
   <<: *run_test
   variables:
