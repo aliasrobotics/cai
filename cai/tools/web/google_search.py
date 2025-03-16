@@ -49,11 +49,15 @@ def google_dork_search(dork_query: str, num_results: int = 100) -> str:
         str: A formatted string containing URLs from the dork search results.
     """
     results = _perform_search(dork_query, num_results, is_dork=True)
-    return "\n".join(results)
-
+    formatted_results = ""
+    
+    for result in results:
+        formatted_results += f"{result['url']}\n"
+    
+    return formatted_results
 
 def _perform_search(query: str, num_results: int = 10, 
-                   is_dork: bool = False) -> List[str] or List[Dict[str, str]]:
+                   is_dork: bool = False) -> List[Dict[str, str]]:
     """
     Helper function to perform Google searches.
 
@@ -63,8 +67,9 @@ def _perform_search(query: str, num_results: int = 10,
         is_dork (bool): Whether this is a dork search.
 
     Returns:
-        List[str] or List[Dict[str, str]]: For dork searches, returns a list of URLs.
-        For regular searches, returns a list of dictionaries with URLs, titles, and snippets.
+        List[Dict[str, str]]: For regular searches, returns a list of dictionaries 
+        with URLs, titles, and snippets. For dork searches, returns a list of 
+        dictionaries with only URLs.
     """
     load_dotenv()
     api_key = os.getenv("GOOGLE_SEARCH_API_KEY") 
@@ -89,7 +94,7 @@ def _perform_search(query: str, num_results: int = 10,
     
     # Google API returns max 10 results per request, so we need to make multiple
     # requests with different start indices to get more results
-    for start_index in range(1, num_results + 1, 10):
+    for start_index in range(1, min(num_results + 1, 101), 10):  # Google API limits to 100 results total
         if start_index > 1:
             params["start"] = start_index
             
@@ -108,7 +113,9 @@ def _perform_search(query: str, num_results: int = 10,
                 break
                 
             if is_dork:
-                results.append(item["link"])
+                results.append({
+                    "url": item["link"]
+                })
             else:
                 results.append({
                     "url": item["link"],
@@ -117,4 +124,3 @@ def _perform_search(query: str, num_results: int = 10,
                 })
     
     return results
-
