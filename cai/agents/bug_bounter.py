@@ -1,5 +1,6 @@
 """Red Team Base Agent"""
 import os
+from dotenv import load_dotenv
 from mako.template import Template  # pylint: disable=import-error
 from cai.types import Agent  # pylint: disable=import-error
 from cai.tools.command_and_control.sshpass import (  # pylint: disable=import-error # noqa: E501
@@ -17,6 +18,12 @@ from cai.tools.reconnaissance.exec_code import (  # pylint: disable=import-error
     execute_code
 )
 
+from cai.tools.reconnaissance.shodan import (  # pylint: disable=import-error # noqa: E501
+    shodan_search,
+    shodan_host_info
+)
+
+load_dotenv()
 # Prompts
 bug_bounter_system_prompt = Template(  # nosec B702
     filename="cai/prompts/system_bug_bounter.md"
@@ -25,6 +32,8 @@ bug_bounter_system_prompt = Template(  # nosec B702
 functions = [
     generic_linux_command,
     execute_code,
+    shodan_search,
+    shodan_host_info
 ]
 
 if os.getenv('GOOGLE_SEARCH_API_KEY') and os.getenv('GOOGLE_SEARCH_CX'):
