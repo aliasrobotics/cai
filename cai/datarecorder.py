@@ -18,13 +18,21 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
     """
 
     def __init__(self):
-
         os.makedirs('logs', exist_ok=True)
         self.filename = f'logs/cai_{datetime.now().astimezone(
             pytz.timezone("Europe/Madrid")).strftime("%Y%m%d_%H%M%S")}.jsonl'
+        # Inicializar el coste total acumulado
+        self.total_cost = 0.0
 
-    def rec_training_data(self, create_params, msg) -> None:
-        """Records a single training data entry to the JSONL file"""
+    def rec_training_data(self, create_params, msg, total_cost=None) -> None:
+        """
+        Records a single training data entry to the JSONL file
+        
+        Args:
+            create_params: Parameters used for the LLM call
+            msg: Response from the LLM
+            total_cost: Optional total accumulated cost from CAI instance
+        """
         request_data = {
             "model": create_params["model"],
             "messages": create_params["messages"],
@@ -35,6 +43,17 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
                 "tools": create_params["tools"],
                 "tool_choice": create_params["tool_choice"],
             })
+
+        # Obtener el coste de la interacción
+        interaction_cost = 0.0
+        if hasattr(msg, "cost"):
+            interaction_cost = float(msg.cost)
+        
+        # Usar el total_cost proporcionado o actualizar el interno
+        if total_cost is not None:
+            self.total_cost = float(total_cost)
+        else:
+            self.total_cost += interaction_cost
 
         completion_data = {
             "id": msg.id,
@@ -62,6 +81,10 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
                 "prompt_tokens": msg.usage.prompt_tokens,
                 "completion_tokens": msg.usage.completion_tokens,
                 "total_tokens": msg.usage.total_tokens
+            },
+            "cost": {
+                "interaction_cost": interaction_cost,
+                "total_cost": self.total_cost
             }
         }
 
@@ -115,11 +138,14 @@ def get_token_stats(file_path):
         file_path (str): Path to the JSONL file
 
     Returns:
-        tuple: (model_name, total_prompt_tokens, total_completion_tokens)
+        tuple: (model_name, total_prompt_tokens, total_completion_tokens, 
+                total_cost)
     """
     total_prompt_tokens = 0
     total_completion_tokens = 0
+    total_cost = 0.0
     model_name = None
+    last_total_cost = 0.0
 
     with open(file_path, encoding='utf-8') as file:
         for line in file:
@@ -131,10 +157,20 @@ def get_token_stats(file_path):
                 if "usage" in record:
                     total_prompt_tokens += record["usage"]["prompt_tokens"]
                     total_completion_tokens += record["usage"]["completion_tokens"]
+                if "cost" in record:
+                    if isinstance(record["cost"], dict):
+                        # Si cost es un diccionario, obtener total_cost
+                        last_total_cost = record["cost"].get("total_cost", 0.0)
+                    else:
+                        # Si cost es un valor directo
+                        last_total_cost = float(record["cost"])
                 if "model" in record:
                     model_name = record["model"]
-            except Exception:  # pylint: disable=broad-except
-                print(f"Error loading line: {line}")
+            except Exception as e:  # pylint: disable=broad-except
+                print(f"Error loading line: {line}: {e}")
                 continue
 
-    return model_name, total_prompt_tokens, total_completion_tokens
+    # Usar el último total_cost encontrado como el total
+    total_cost = last_total_cost
+
+    return model_name, total_prompt_tokens, total_completion_tokens, total_cost
