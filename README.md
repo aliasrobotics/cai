@@ -449,7 +449,7 @@ For using private models, you are given a [`.env.example`](.env.example) file. C
 | CAI_PRICE_LIMIT | Price limit for the conversation in dollars |
 | CAI_REPORT | Enable/disable reporter mode (ctf, nis2, pentesting) |
 | CAI_SUPPORT_MODEL | Model to use for the support agent |
-| CAI_SUPPPORT_INTERVAL | Number of turns between support agent executions |
+| CAI_SUPPORT_INTERVAL | Number of turns between support agent executions |
 
 </details>
 

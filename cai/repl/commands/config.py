@@ -119,7 +119,7 @@ ENV_VARS = {
         "default": "o3-mini"
     },
     21: {
-        "name": "CAI_SUPPPORT_INTERVAL",
+        "name": "CAI_SUPPORT_INTERVAL",
         "description": "Number of turns between support agent executions",
         "default": "5"
     },
