@@ -342,8 +342,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             try:
                 litellm_completion = litellm.completion(**ollama_params)
             except Exception as e:  # pylint: disable=W0718
-                print("Error: " + str(e))
-                return None
+                try:
+                    litellm_completion = litellm.completion(**create_params)
+                except Exception as e:  # pylint: disable=W0718
+                    print("Error: " + str(e))
+                    return None
         # --------------------------------
         # Training data
         # --------------------------------
