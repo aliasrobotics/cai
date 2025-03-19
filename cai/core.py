@@ -316,7 +316,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 ]
                 litellm_completion = litellm.completion(**create_params)
             # Handle Anthropic error for empty text content blocks
-            elif "text content blocks must be non-empty" in str(e):
+            elif "text content blocks must be non-empty" in str(e) or "cache_control cannot be set for empty text blocks" in str(e):
                 print(f"Error: {str(e)}")
                 # Fix for empty content in messages for Anthropic models
                 create_params["messages"] = [
@@ -342,8 +342,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             try:
                 litellm_completion = litellm.completion(**ollama_params)
             except Exception as e:  # pylint: disable=W0718
-                print("Error: " + str(e))
-                return None
+                try:
+                    litellm_completion = litellm.completion(**create_params)
+                except Exception as e:  # pylint: disable=W0718
+                    print("Error: " + str(e))
+                    return None
         # --------------------------------
         # Training data
         # --------------------------------
