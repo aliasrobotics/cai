@@ -47,14 +47,15 @@ def load_jsonl(file_path: str) -> List[Dict]:
     return data
 
 
-def replay_conversation(messages: List[Dict], replay_delay: float = 0.5, usage: Tuple[str, int, int, float] = None) -> None:
+def replay_conversation(messages: List[Dict], replay_delay: float = 0.5, usage: Tuple = None) -> None:
     """
     Replay a conversation from a list of messages, printing in real-time.
     
     Args:
         messages: List of message dictionaries
         replay_delay: Time in seconds to wait between actions
-        usage: Tuple containing (model_name, total_input_tokens, total_output_tokens, total_cost)
+        usage: Tuple containing (model_name, total_input_tokens, total_output_tokens, 
+               total_cost, active_time, idle_time)
     """
     turn_counter = 0
     interaction_counter = 0
@@ -67,10 +68,22 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5, usage: 
     print(color(f"Replaying conversation with {len(messages)} messages...", 
                 fg="green"))
     
-
-    # extract the usage stats from the usage tuple
-    file_model, total_input_tokens, total_output_tokens, total_cost = usage
-
+    # Extract the usage stats from the usage tuple
+    # Handle both old format (4 elements) and new format (6 elements with timing)
+    file_model = usage[0]
+    total_input_tokens = usage[1]
+    total_output_tokens = usage[2]
+    total_cost = usage[3]
+    
+    # Check if timing information is available
+    active_time = usage[4] if len(usage) > 4 else 0
+    idle_time = usage[5] if len(usage) > 5 else 0
+    
+    # Display timing information if available
+    if active_time > 0 or idle_time > 0:
+        print(color(f"Active time: {active_time:.2f}s", fg="cyan"))
+        print(color(f"Idle time: {idle_time:.2f}s", fg="cyan"))
+    
     print(color(f"Total cost: ${total_cost:.6f}", fg="cyan"))
 
     for i, message in enumerate(messages):
@@ -238,12 +251,17 @@ def main():
 
         # Get token stats and cost from the JSONL file
         usage = get_token_stats(jsonl_file_path)
-        file_model, total_input_tokens, total_output_tokens, total_cost = usage
         
-        print(color(f"Model: {file_model}", fg="blue"))
-        print(color(f"Total input tokens: {total_input_tokens:,}", fg="blue"))
-        print(color(f"Total output tokens: {total_output_tokens:,}", fg="blue"))
-        print(color(f"Total cost: ${total_cost:.6f}", fg="blue"))
+        # Display model and token information
+        print(color(f"Model: {usage[0]}", fg="blue"))
+        print(color(f"Total input tokens: {usage[1]:,}", fg="blue"))
+        print(color(f"Total output tokens: {usage[2]:,}", fg="blue"))
+        print(color(f"Total cost: ${usage[3]:.6f}", fg="blue"))
+        
+        # Display timing information if available (new format)
+        if len(usage) > 4:
+            print(color(f"Active time: {usage[4]:.2f}s", fg="blue"))
+            print(color(f"Idle time: {usage[5]:.2f}s", fg="blue"))
                 
         # Generate the replay with live printing
         replay_conversation(messages, replay_delay, usage)

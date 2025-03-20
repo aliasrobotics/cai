@@ -1033,25 +1033,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 n_turn += 1
 
             except KeyboardInterrupt:
-                from cai.util import get_active_time, get_idle_time, get_elapsed_time
                 print("\nCtrl+C pressed")
-                
-                # Display timing statistics
-                try:
-                    # Try to use repl's display function for better formatting
-                    from cai.repl.repl import display_execution_time
-                    display_execution_time()
-                except ImportError:
-                    # Fall back to simple console output
-                    print(color("\n=== Session Statistics ===", fg="cyan"))
-                    print(f"Total elapsed time: {get_elapsed_time()}")
-                    print(f"Active execution time: {get_active_time()}")
-                    print(f"Idle waiting time: {get_idle_time()}")
-                    print(f"Total cost: ${self.total_cost:.4f}")
-                    print(f"Total tokens: {self.total_input_tokens + self.total_output_tokens}")
-                    print("========================\n")
-                
-                n_turn += 1
                 break
 
             # Check if the flag is found in the last tool output
