@@ -263,6 +263,10 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         if any(x in agent.model for x in ["claude"]):
             litellm.modify_params = True
 
+        # Fix for Gemini models: Remove unsupported parameters
+        if any(x in agent.model for x in ["gemini"]):
+            create_params.pop("parallel_tool_calls", None)
+
         # --------------------------------
         # Inference
         # --------------------------------
