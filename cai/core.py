@@ -713,7 +713,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         #
         # For now, return the same CodeAgent
         return active_agent
-
     @exploit_logger.log_agent()
     def process_interaction(self, active_agent, history, context_variables,  # pylint: disable=too-many-arguments,too-many-locals,too-many-statements,too-many-branches # noqa: E501
                             model_override, stream, debug,
@@ -769,6 +768,31 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         history.append(
             json.loads(message.model_dump_json())
         )  # to avoid OpenAI types (?)
+
+        # Check if model is alias01 or if content contains a tool_call
+        is_alias01 = active_agent.model == "alias01"
+        has_tool_call_text = message.content and "<tool_call>" in message.content
+        
+        # Parse tool call from content if needed
+        if (is_alias01 or has_tool_call_text) and not message.tool_calls:
+            if has_tool_call_text:
+                # Extract tool call from content
+                tool_call_start = message.content.find("<tool_call>")
+                tool_call_end = message.content.find("</tool_call>")
+                if tool_call_start != -1 and tool_call_end != -1:
+                    tool_call_text = message.content[tool_call_start + 11:tool_call_end].strip()
+                    try:
+                        tool_call_data = json.loads(tool_call_text)
+                        # Create a synthetic tool call
+                        tool_call = ChatCompletionMessageToolCall(
+                            id=f"call_{n_turn}",
+                            type="function",
+                            function={"name": tool_call_data.get("name", ""),
+                                     "arguments": tool_call_data.get("arguments", "{}")}
+                        )
+                        message.tool_calls = [tool_call]
+                    except json.JSONDecodeError:
+                        debug_print(debug, "Failed to parse tool call from content", brief=self.brief)
 
         if not message.tool_calls or not execute_tools:
             if not isinstance(active_agent, StateAgent):
@@ -920,7 +944,10 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 execute_tools=execute_tools,
                 n_turn=n_turn
             ) -> Tuple[Agent, None]:
-                return self.process_interaction(
+                from cai.util import start_active_time, start_idle_time
+                # Mark the start of active processing
+                start_active_time()
+                result = self.process_interaction(
                     agent,
                     history,
                     context_variables,
@@ -930,6 +957,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     execute_tools,
                     n_turn
                 )
+                # Mark the start of idle time (waiting for user/next step)
+                start_idle_time()
+                return result
 
             try:
                 # --------------------------------
@@ -999,7 +1029,24 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 n_turn += 1
 
             except KeyboardInterrupt:
+                from cai.util import get_active_time, get_idle_time, get_elapsed_time
                 print("\nCtrl+C pressed")
+                
+                # Display timing statistics
+                try:
+                    # Try to use repl's display function for better formatting
+                    from cai.repl.repl import display_execution_time
+                    display_execution_time()
+                except ImportError:
+                    # Fall back to simple console output
+                    print(color("\n=== Session Statistics ===", fg="cyan"))
+                    print(f"Total elapsed time: {get_elapsed_time()}")
+                    print(f"Active execution time: {get_active_time()}")
+                    print(f"Idle waiting time: {get_idle_time()}")
+                    print(f"Total cost: ${self.total_cost:.4f}")
+                    print(f"Total tokens: {self.total_input_tokens + self.total_output_tokens}")
+                    print("========================\n")
+                
                 n_turn += 1
                 break
 
