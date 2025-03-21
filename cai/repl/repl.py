@@ -109,8 +109,8 @@ def get_timing_metrics():
     }
 
 
-def display_execution_time(metrics=None):
-    """Display the total execution time in a hacker-like style."""    
+def display_execution_time(metrics=None, logging_path=None):
+    """Display the total execution time in a hacker-like style."""
     if START_TIME is None:
         return
 
@@ -123,6 +123,8 @@ def display_execution_time(metrics=None):
     content.append(f"Session Time: {metrics['session_time']}")
     content.append(f"Active Time: {metrics['active_time']}")
     content.append(f"Idle Time: {metrics['idle_time']}")
+    if logging_path:
+        content.append(f"Log available at: {logging_path}")
 
     if metrics['llm_time'] != "0.0s":
         content.append(
@@ -136,7 +138,7 @@ def display_execution_time(metrics=None):
         border_style="blue",
         box=ROUNDED,
         padding=(0, 1),
-        title="[bold]Session Statistics[/bold]",
+        title="[bold]Session Summary[/bold]",
         title_align="left"
     )
     console.print(time_panel)
@@ -443,5 +445,6 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                 create_report(report_data, template)
 
             # Display session statistics
-            display_execution_time()
+            display_execution_time(
+                logging_path=client.rec_training_data.filename)
             break
