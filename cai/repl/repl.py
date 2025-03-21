@@ -109,13 +109,14 @@ def get_timing_metrics():
     }
 
 
-def display_execution_time():
-    """Display the total execution time in a hacker-like style."""
+def display_execution_time(metrics=None):
+    """Display the total execution time in a hacker-like style."""    
     if START_TIME is None:
         return
 
     # Get all timing metrics
-    metrics = get_timing_metrics()
+    if metrics is None:
+        metrics = get_timing_metrics()
 
     # Create a panel for the execution time
     content = []
