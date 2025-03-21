@@ -21,10 +21,15 @@ import sys
 import time
 from typing import Dict, List, Tuple
 from cai.datarecorder import get_token_stats
-
+from cai.repl.repl import display_execution_time as original_display_execution_time
 # Add the parent directory to the path to import cai modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from rich.console import Console  # Import Console from rich
+from rich.panel import Panel  # Import Panel from rich
+from rich.box import ROUNDED  # Import ROUNDED from rich
+from rich.text import Text  # Import Text from rich
+from rich.console import Group  # Import Group from rich
 from cai.util import (
     cli_print_agent_messages,
     cli_print_tool_call,
@@ -32,6 +37,39 @@ from cai.util import (
     color
 )
 from cai.datarecorder import load_history_from_jsonl
+
+# Initialize console object for rich printing
+console = Console()
+
+
+# Create our own display_execution_time function that uses our local console
+def display_execution_time(metrics=None):
+    """Display the total execution time with our local console."""
+    if metrics is None:
+        return
+    
+    # Create a panel for the execution time
+    content = []
+    content.append(f"Session Time: {metrics['session_time']}")
+    content.append(f"Active Time: {metrics['active_time']}")
+    content.append(f"Idle Time: {metrics['idle_time']}")
+
+    if metrics.get('llm_time') and metrics['llm_time'] != "0.0s":
+        content.append(
+            f"LLM Processing Time: [bold yellow]{
+                metrics['llm_time']}[/bold yellow] "
+            f"[dim]({metrics['llm_percentage']:.1f}% of session)[/dim]"
+        )
+
+    time_panel = Panel(
+        Group(*[Text(line) for line in content]),
+        border_style="blue",
+        box=ROUNDED,
+        padding=(0, 1),
+        title="[bold]Session Statistics[/bold]",
+        title_align="left"
+    )
+    console.print(time_panel)
 
 
 def load_jsonl(file_path: str) -> List[Dict]:
@@ -47,14 +85,15 @@ def load_jsonl(file_path: str) -> List[Dict]:
     return data
 
 
-def replay_conversation(messages: List[Dict], replay_delay: float = 0.5, usage: Tuple[str, int, int, float] = None) -> None:
+def replay_conversation(messages: List[Dict], replay_delay: float = 0.5, usage: Tuple = None) -> None:
     """
     Replay a conversation from a list of messages, printing in real-time.
     
     Args:
         messages: List of message dictionaries
         replay_delay: Time in seconds to wait between actions
-        usage: Tuple containing (model_name, total_input_tokens, total_output_tokens, total_cost)
+        usage: Tuple containing (model_name, total_input_tokens, total_output_tokens, 
+               total_cost, active_time, idle_time)
     """
     turn_counter = 0
     interaction_counter = 0
@@ -67,10 +106,22 @@ def replay_conversation(messages: List[Dict], replay_delay: float = 0.5, usage: 
     print(color(f"Replaying conversation with {len(messages)} messages...", 
                 fg="green"))
     
-
-    # extract the usage stats from the usage tuple
-    file_model, total_input_tokens, total_output_tokens, total_cost = usage
-
+    # Extract the usage stats from the usage tuple
+    # Handle both old format (4 elements) and new format (6 elements with timing)
+    file_model = usage[0]
+    total_input_tokens = usage[1]
+    total_output_tokens = usage[2]
+    total_cost = usage[3]
+    
+    # Check if timing information is available
+    active_time = usage[4] if len(usage) > 4 else 0
+    idle_time = usage[5] if len(usage) > 5 else 0
+    
+    # Display timing information if available
+    if active_time > 0 or idle_time > 0:
+        print(color(f"Active time: {active_time:.2f}s", fg="cyan"))
+        print(color(f"Idle time: {idle_time:.2f}s", fg="cyan"))
+    
     print(color(f"Total cost: ${total_cost:.6f}", fg="cyan"))
 
     for i, message in enumerate(messages):
@@ -238,17 +289,41 @@ def main():
 
         # Get token stats and cost from the JSONL file
         usage = get_token_stats(jsonl_file_path)
-        file_model, total_input_tokens, total_output_tokens, total_cost = usage
         
-        print(color(f"Model: {file_model}", fg="blue"))
-        print(color(f"Total input tokens: {total_input_tokens:,}", fg="blue"))
-        print(color(f"Total output tokens: {total_output_tokens:,}", fg="blue"))
-        print(color(f"Total cost: ${total_cost:.6f}", fg="blue"))
+        # Display timing information if available (new format)
+        if len(usage) > 4:
+            print(color(f"Active time: {usage[4]:.2f}s", fg="blue"))
+            print(color(f"Idle time: {usage[5]:.2f}s", fg="blue"))
                 
         # Generate the replay with live printing
-        replay_conversation(messages, replay_delay, usage)
-        
+        replay_conversation(messages, replay_delay, usage)        
         print(color("Replay completed successfully", fg="green"))
+
+        # Display the total cost
+        active_time = usage[4] if len(usage) > 4 else 0
+        idle_time = usage[5] if len(usage) > 5 else 0
+        total_time = active_time + idle_time
+        
+        # Format time values as strings with units
+        def format_time(seconds):
+            """Format time in seconds to a human-readable string."""
+            if seconds < 60:
+                return f"{seconds:.1f}s"
+            if seconds < 3600:
+                minutes = seconds / 60
+                return f"{minutes:.1f}m"
+            hours = seconds / 3600
+            return f"{hours:.1f}h"
+        
+        metrics = {
+            'session_time': format_time(total_time),
+            'llm_time': "0.0s",
+            'llm_percentage': 0,
+            'active_time': format_time(active_time),
+            'idle_time': format_time(idle_time)
+        }
+        display_execution_time(metrics)
+
             
     except FileNotFoundError:
         print(color(f"Error: File {jsonl_file_path} not found", fg="red"))

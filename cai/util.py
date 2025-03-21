@@ -34,6 +34,10 @@ from cai.types import (
 # Global timing variables
 GLOBAL_START_TIME = None
 LAST_TOOL_TIME = None
+ACTIVE_TIME = 0.0
+IDLE_TIME = 0.0
+LAST_STATE_CHANGE = None
+IS_ACTIVE = False
 
 
 def format_time(seconds):
@@ -51,14 +55,54 @@ def format_time(seconds):
 
 def initialize_global_timer():
     """Initialize the global timer."""
-    global GLOBAL_START_TIME  # pylint: disable=global-statement
+    global GLOBAL_START_TIME, LAST_STATE_CHANGE, IS_ACTIVE  # pylint: disable=global-statement
     GLOBAL_START_TIME = time.time()
+    LAST_STATE_CHANGE = time.time()
+    IS_ACTIVE = False
 
 
 def reset_global_timer():
     """Reset the global timer."""
-    global GLOBAL_START_TIME  # pylint: disable=global-statement
+    global GLOBAL_START_TIME, ACTIVE_TIME, IDLE_TIME  # pylint: disable=global-statement
     GLOBAL_START_TIME = None
+    ACTIVE_TIME = 0.0
+    IDLE_TIME = 0.0
+
+
+def start_active_time():
+    """Mark the start of active execution time."""
+    global LAST_STATE_CHANGE, IS_ACTIVE, IDLE_TIME  # pylint: disable=global-statement
+    current_time = time.time()
+    if LAST_STATE_CHANGE is not None and not IS_ACTIVE:
+        IDLE_TIME += current_time - LAST_STATE_CHANGE
+    LAST_STATE_CHANGE = current_time
+    IS_ACTIVE = True
+
+
+def start_idle_time():
+    """Mark the start of idle time."""
+    global LAST_STATE_CHANGE, IS_ACTIVE, ACTIVE_TIME  # pylint: disable=global-statement
+    current_time = time.time()
+    if LAST_STATE_CHANGE is not None and IS_ACTIVE:
+        ACTIVE_TIME += current_time - LAST_STATE_CHANGE
+    LAST_STATE_CHANGE = current_time
+    IS_ACTIVE = False
+
+
+def get_active_time():
+    """Get total active execution time."""
+    active = ACTIVE_TIME
+    if IS_ACTIVE and LAST_STATE_CHANGE is not None:
+        active += time.time() - LAST_STATE_CHANGE
+    return format_time(active)
+
+
+def get_idle_time():
+    """Get total idle waiting time."""
+    idle = IDLE_TIME
+    if not IS_ACTIVE and LAST_STATE_CHANGE is not None:
+        idle += time.time() - LAST_STATE_CHANGE
+    return format_time(idle)
 
 
 def get_elapsed_time():

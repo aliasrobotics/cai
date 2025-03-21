@@ -6,6 +6,7 @@ import os  # pylint: disable=import-error
 from datetime import datetime
 import json
 import pytz  # pylint: disable=import-error
+from cai.util import get_active_time, get_idle_time
 
 
 class DataRecorder:  # pylint: disable=too-few-public-methods
@@ -55,6 +56,29 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
         else:
             self.total_cost += interaction_cost
 
+        # Get timing metrics (without units, just numeric values)
+        active_time_str = get_active_time()
+        idle_time_str = get_idle_time()
+        
+        # Convert string time to seconds for storage
+        def time_str_to_seconds(time_str):
+            if "h" in time_str:
+                parts = time_str.split()
+                hours = float(parts[0].replace("h", ""))
+                minutes = float(parts[1].replace("m", ""))
+                seconds = float(parts[2].replace("s", ""))
+                return hours * 3600 + minutes * 60 + seconds
+            elif "m" in time_str:
+                parts = time_str.split()
+                minutes = float(parts[0].replace("m", ""))
+                seconds = float(parts[1].replace("s", ""))
+                return minutes * 60 + seconds
+            else:
+                return float(time_str.replace("s", ""))
+        
+        active_time_seconds = time_str_to_seconds(active_time_str)
+        idle_time_seconds = time_str_to_seconds(idle_time_str)
+
         completion_data = {
             "id": msg.id,
             "object": "chat.completion",
@@ -85,6 +109,10 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
             "cost": {
                 "interaction_cost": interaction_cost,
                 "total_cost": self.total_cost
+            },
+            "timing": {
+                "active_seconds": active_time_seconds,
+                "idle_seconds": idle_time_seconds
             }
         }
 
@@ -139,13 +167,15 @@ def get_token_stats(file_path):
 
     Returns:
         tuple: (model_name, total_prompt_tokens, total_completion_tokens, 
-                total_cost)
+                total_cost, active_time, idle_time)
     """
     total_prompt_tokens = 0
     total_completion_tokens = 0
     total_cost = 0.0
     model_name = None
     last_total_cost = 0.0
+    last_active_time = 0.0
+    last_idle_time = 0.0
 
     with open(file_path, encoding='utf-8') as file:
         for line in file:
@@ -164,6 +194,10 @@ def get_token_stats(file_path):
                     else:
                         # Si cost es un valor directo
                         last_total_cost = float(record["cost"])
+                if "timing" in record:
+                    if isinstance(record["timing"], dict):
+                        last_active_time = record["timing"].get("active_seconds", 0.0)
+                        last_idle_time = record["timing"].get("idle_seconds", 0.0)
                 if "model" in record:
                     model_name = record["model"]
             except Exception as e:  # pylint: disable=broad-except
@@ -173,4 +207,5 @@ def get_token_stats(file_path):
     # Usar el último total_cost encontrado como el total
     total_cost = last_total_cost
 
-    return model_name, total_prompt_tokens, total_completion_tokens, total_cost
+    return (model_name, total_prompt_tokens, total_completion_tokens, 
+            total_cost, last_active_time, last_idle_time)

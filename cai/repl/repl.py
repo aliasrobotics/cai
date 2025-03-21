@@ -29,7 +29,12 @@ from cai import (
     is_caiextensions_platform_available
 )
 from cai.core import CAI  # pylint: disable=import-error
-from cai.util import GLOBAL_START_TIME, format_time
+from cai.util import (
+    GLOBAL_START_TIME,
+    format_time,
+    get_active_time,
+    get_idle_time
+)
 # Import command system
 from cai.repl.commands import (
     handle_command as commands_handle_command,
@@ -68,32 +73,62 @@ def get_elapsed_time():
     return format_time(elapsed)
 
 
-def display_execution_time():
-    """Display the total execution time in a hacker-like style."""
-    if START_TIME is None:
-        return
+def get_timing_metrics():
+    """Get the timing metrics for display in reports or statistics.
 
+    Returns:
+        dict: Dictionary containing all timing metrics and statistics
+    """
     current_time = time.time()
-    session_elapsed = current_time - START_TIME
+
+    # Calculate session time
+    session_elapsed = current_time - START_TIME if START_TIME else 0
     session_time_str = format_time(session_elapsed)
 
-    # Get global LLM time from CAI instantiation
+    # Calculate LLM time
     llm_time = None
+    llm_time_str = "0.0s"
+    llm_percentage = 0
+
     if GLOBAL_START_TIME is not None:
         llm_time = current_time - GLOBAL_START_TIME
         llm_time_str = format_time(llm_time)
         llm_percentage = (llm_time / session_elapsed) * \
             100 if session_elapsed > 0 else 0
 
+    # Get active and idle times
+    active_time_str = get_active_time()
+    idle_time_str = get_idle_time()
+
+    return {
+        'session_time': session_time_str,
+        'llm_time': llm_time_str,
+        'llm_percentage': llm_percentage,
+        'active_time': active_time_str,
+        'idle_time': idle_time_str
+    }
+
+
+def display_execution_time(metrics=None):
+    """Display the total execution time in a hacker-like style."""    
+    if START_TIME is None:
+        return
+
+    # Get all timing metrics
+    if metrics is None:
+        metrics = get_timing_metrics()
+
     # Create a panel for the execution time
     content = []
-    content.append(
-        f"Session Time: {session_time_str}")  # noqa: E501 #pylint: disable=line-too-long
-    if llm_time:
+    content.append(f"Session Time: {metrics['session_time']}")
+    content.append(f"Active Time: {metrics['active_time']}")
+    content.append(f"Idle Time: {metrics['idle_time']}")
+
+    if metrics['llm_time'] != "0.0s":
         content.append(
             f"LLM Processing Time: [bold yellow]{
-                llm_time_str}[/bold yellow] "
-            f"[dim]({llm_percentage:.1f}% of session)[/dim]"
+                metrics['llm_time']}[/bold yellow] "
+            f"[dim]({metrics['llm_percentage']:.1f}% of session)[/dim]"
         )
 
     time_panel = Panel(
@@ -407,6 +442,6 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                 # Generate the final report using the template
                 create_report(report_data, template)
 
-            # Display the total execution time before exiting
+            # Display session statistics
             display_execution_time()
             break
