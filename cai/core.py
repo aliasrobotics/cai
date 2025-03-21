@@ -915,7 +915,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         context_variables = copy.deepcopy(context_variables)
         history = copy.deepcopy(messages)
         n_turn = 0
-
+        start_active_time()
         while len(history) - self.init_len < max_turns and active_agent and self.total_cost < float(  # noqa: E501 # pylint: disable=line-too-long
                 os.getenv("CAI_PRICE_LIMIT", "100")):
 
@@ -933,9 +933,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 execute_tools=execute_tools,
                 n_turn=n_turn
             ) -> Tuple[Agent, None]:
-
-                # Mark the start of active processing
-                start_active_time()
                 result = self.process_interaction(
                     agent,
                     history,
@@ -946,8 +943,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     execute_tools,
                     n_turn
                 )
-                # Mark the start of idle time (waiting for user/next step)
-                start_idle_time()
                 return result
 
             try:
@@ -1055,6 +1050,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 break
 
         execution_time = time.time() - start_time
+        start_idle_time()
 
         return Response(
             messages=history[self.init_len:],
