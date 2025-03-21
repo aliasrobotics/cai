@@ -12,38 +12,28 @@ and local modules.
 # Standard library imports
 import copy
 import json
+import os
+import time
 from collections import defaultdict
 from typing import List, Tuple
-# Package/library imports
-import time
-import os
+
+# Third-party imports
+from dotenv import load_dotenv  # pylint: disable=import-error # noqa: E501
 import litellm  # pylint: disable=import-error
 from mako.template import Template  # pylint: disable=import-error
-from dotenv import load_dotenv  # pylint: disable=import-error # noqa: E501
 from wasabi import color  # pylint: disable=import-error
-from cai.logger import exploit_logger
-from cai import graph
+
 # Local imports
-from cai.datarecorder import DataRecorder
 from cai import (
+    graph,
     transfer_to_state_agent,
 )
-from cai.state.common import StateAgent
+from cai.agents.codeagent import CodeAgent
 from cai.agents.meta.reasoner_support import create_reasoner_agent
-from .agents.codeagent import CodeAgent
-from .util import (
-    function_to_json,
-    debug_print,
-    cli_print_agent_messages,
-    cli_print_tool_call,
-    fix_message_list,
-    cli_print_state,
-    get_ollama_api_base,
-    check_flag,
-    cli_print_codeagent_output,
-    initialize_global_timer,
-)
-from .types import (
+from cai.datarecorder import DataRecorder
+from cai.logger import exploit_logger
+from cai.state.common import StateAgent
+from cai.types import (
     Agent,
     AgentFunction,
     ChatCompletionMessage,
@@ -51,6 +41,20 @@ from .types import (
     Response,
     Result,
 )
+from cai.util import (
+    check_flag,
+    cli_print_agent_messages,
+    cli_print_codeagent_output,
+    cli_print_state,
+    cli_print_tool_call,
+    debug_print,
+    fix_message_list,
+    function_to_json,
+    get_ollama_api_base,
+    initialize_global_timer,
+)
+from cai.util import start_active_time, start_idle_time
+
 
 __CTX_VARS_NAME__ = "context_variables"
 litellm.suppress_debug_info = True
@@ -191,11 +195,13 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         # Add support for prompt caching for claude (not automatically applied)
         # https://www.anthropic.com/news/token-saving-updates
-        # We need to add only a cache_control to the last message (automatic use of largest cached prefix)
+        # We need to add only a cache_control to the last message (automatic
+        # use of largest cached prefix)
         if agent.model.startswith("claude") and len(messages) > 0:
             # Create a copy of the last message and add cache_control to it
-            # It's important to create a copy to avoid modifying the original message
-            last_msg = messages[-1].copy() 
+            # It's important to create a copy to avoid modifying the original
+            # message
+            last_msg = messages[-1].copy()
             last_msg["cache_control"] = {"type": "ephemeral"}
             messages[-1] = last_msg
 
@@ -300,7 +306,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                             **create_params)
                     else:
                         raise e
-            elif "An assistant message with 'tool_calls'" in str(e) or "`tool_use` blocks must be followed by a user message with `tool_result`" in str(e):  # noqa: E501 # pylint: disable=C0301
+            elif ("An assistant message with 'tool_calls'" in str(e) or
+                  "`tool_use` blocks must be followed by a user message with `tool_result`" in str(e)):  # noqa: E501 # pylint: disable=C0301
                 print(f"Error: {str(e)}")
                 # EDGE CASE: Report Agent CTRL C error
                 # This fix CTRL C error when message list is incomplete
@@ -319,8 +326,10 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                     {**msg, "content": ""} for msg in create_params["messages"]
                 ]
                 litellm_completion = litellm.completion(**create_params)
+
             # Handle Anthropic error for empty text content blocks
-            elif "text content blocks must be non-empty" in str(e) or "cache_control cannot be set for empty text blocks" in str(e):
+            elif ("text content blocks must be non-empty" in str(e) or
+                  "cache_control cannot be set for empty text blocks" in str(e)):  # noqa
                 print(f"Error: {str(e)}")
                 # Fix for empty content in messages for Anthropic models
                 create_params["messages"] = [
@@ -345,11 +354,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             ollama_params["custom_llm_provider"] = "openai"
             try:
                 litellm_completion = litellm.completion(**ollama_params)
-            except Exception as e:  # pylint: disable=W0718
+            except Exception as e:  # pylint: disable=W0718  # noqa
                 try:
                     litellm_completion = litellm.completion(**create_params)
-                except Exception as e:  # pylint: disable=W0718
-                    print("Error: " + str(e))
+                except Exception as execp:  # pylint: disable=W0718
+                    print("Error: " + str(execp))
                     return None
         # --------------------------------
         # Training data
@@ -396,14 +405,14 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             self.interaction_cost = interaction_cost
             # Add cost to litellm_completion for DataRecorder
             litellm_completion.cost = interaction_cost
-        except Exception as e:
+        except Exception as e:  # pylint: disable=W0718
             self.interaction_cost = 0.0
             # If the error is about unmapped model, set cost to 0
             if "model isn't mapped yet" in str(e):
                 self.total_cost += 0.0
                 litellm_completion.cost = 0.0
             else:
-                print(e)    
+                print(e)
 
         return litellm_completion
 
@@ -717,6 +726,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         #
         # For now, return the same CodeAgent
         return active_agent
+
     @exploit_logger.log_agent()
     def process_interaction(self, active_agent, history, context_variables,  # pylint: disable=too-many-arguments,too-many-locals,too-many-statements,too-many-branches # noqa: E501
                             model_override, stream, debug,
@@ -773,31 +783,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             json.loads(message.model_dump_json())
         )  # to avoid OpenAI types (?)
 
-        # Check if model is alias01 or if content contains a tool_call
-        is_alias01 = active_agent.model == "alias01"
-        has_tool_call_text = message.content and "<tool_call>" in message.content
-        
-        # Parse tool call from content if needed
-        if (is_alias01 or has_tool_call_text) and not message.tool_calls:
-            if has_tool_call_text:
-                # Extract tool call from content
-                tool_call_start = message.content.find("<tool_call>")
-                tool_call_end = message.content.find("</tool_call>")
-                if tool_call_start != -1 and tool_call_end != -1:
-                    tool_call_text = message.content[tool_call_start + 11:tool_call_end].strip()
-                    try:
-                        tool_call_data = json.loads(tool_call_text)
-                        # Create a synthetic tool call
-                        tool_call = ChatCompletionMessageToolCall(
-                            id=f"call_{n_turn}",
-                            type="function",
-                            function={"name": tool_call_data.get("name", ""),
-                                     "arguments": tool_call_data.get("arguments", "{}")}
-                        )
-                        message.tool_calls = [tool_call]
-                    except json.JSONDecodeError:
-                        debug_print(debug, "Failed to parse tool call from content", brief=self.brief)
-
         if not message.tool_calls or not execute_tools:
             if not isinstance(active_agent, StateAgent):
                 cli_print_agent_messages(active_agent.name,
@@ -811,7 +796,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                                          total_input_tokens=self.total_input_tokens,  # noqa: E501  # pylint: disable=line-too-long
                                          total_output_tokens=self.total_output_tokens,  # noqa: E501  # pylint: disable=line-too-long
                                          total_reasoning_tokens=self.total_reasoning_tokens,  # noqa: E501  # pylint: disable=line-too-long
-                                         interaction_cost=self.interaction_cost,
+                                         interaction_cost=self.interaction_cost,  # noqa
                                          total_cost=self.total_cost)
             else:
                 cli_print_state(active_agent.name,
@@ -948,7 +933,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 execute_tools=execute_tools,
                 n_turn=n_turn
             ) -> Tuple[Agent, None]:
-                from cai.util import start_active_time, start_idle_time
+
                 # Mark the start of active processing
                 start_active_time()
                 result = self.process_interaction(

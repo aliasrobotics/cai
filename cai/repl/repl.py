@@ -30,8 +30,8 @@ from cai import (
 )
 from cai.core import CAI  # pylint: disable=import-error
 from cai.util import (
-    GLOBAL_START_TIME, 
-    format_time, 
+    GLOBAL_START_TIME,
+    format_time,
     get_active_time,
     get_idle_time
 )
@@ -75,31 +75,31 @@ def get_elapsed_time():
 
 def get_timing_metrics():
     """Get the timing metrics for display in reports or statistics.
-    
+
     Returns:
         dict: Dictionary containing all timing metrics and statistics
     """
     current_time = time.time()
-    
+
     # Calculate session time
     session_elapsed = current_time - START_TIME if START_TIME else 0
     session_time_str = format_time(session_elapsed)
-    
+
     # Calculate LLM time
     llm_time = None
     llm_time_str = "0.0s"
     llm_percentage = 0
-    
+
     if GLOBAL_START_TIME is not None:
         llm_time = current_time - GLOBAL_START_TIME
         llm_time_str = format_time(llm_time)
         llm_percentage = (llm_time / session_elapsed) * \
             100 if session_elapsed > 0 else 0
-    
+
     # Get active and idle times
     active_time_str = get_active_time()
     idle_time_str = get_idle_time()
-    
+
     return {
         'session_time': session_time_str,
         'llm_time': llm_time_str,
@@ -116,16 +116,17 @@ def display_execution_time():
 
     # Get all timing metrics
     metrics = get_timing_metrics()
-    
+
     # Create a panel for the execution time
     content = []
     content.append(f"Session Time: {metrics['session_time']}")
     content.append(f"Active Time: {metrics['active_time']}")
     content.append(f"Idle Time: {metrics['idle_time']}")
-    
+
     if metrics['llm_time'] != "0.0s":
         content.append(
-            f"LLM Processing Time: [bold yellow]{metrics['llm_time']}[/bold yellow] "
+            f"LLM Processing Time: [bold yellow]{
+                metrics['llm_time']}[/bold yellow] "
             f"[dim]({metrics['llm_percentage']:.1f}% of session)[/dim]"
         )
 
@@ -368,9 +369,6 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                 agent = response.agent
                 current_agent = response.agent
         except KeyboardInterrupt:
-            # Display session statistics
-            display_execution_time()
-            
             # Handle report generation when user interrupts the session
             if is_caiextensions_report_available and os.getenv("CAI_REPORT"):
                 # Show a spinner while generating the report
@@ -443,6 +441,6 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                 # Generate the final report using the template
                 create_report(report_data, template)
 
-            # Display the total execution time before exiting
+            # Display session statistics
             display_execution_time()
             break
