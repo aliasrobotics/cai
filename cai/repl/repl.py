@@ -532,5 +532,5 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                 hasattr(client.rec_training_data, 'filename') and
                     os.getenv('CAI_TELEMETRY', 'true').lower() != 'false'):
                 upload_logs_anonymously(
-                    client.rec_training_data.filename, debug=debug)
+                    client.rec_training_data.filename, debug=False)
             break
