@@ -59,6 +59,7 @@ from cai.agents.flag_discriminator import (
 from cai.state.pydantic import state_agent
 from cai.types import Agent
 
+from dotenv import load_dotenv  # pylint: disable=import-error # noqa: E501
 
 # Extend the search path for namespace packages (allows merging)
 __path__ = pkgutil.extend_path(__path__, __name__)
@@ -191,6 +192,7 @@ def transfer_to_state_agent():
 ########################################################
 # MAIN
 ########################################################
+load_dotenv()
 cai_agent = os.getenv('CAI_AGENT_TYPE', "one_tool_agent").lower()
 # Get all available agents
 available_agents = get_available_agents()
