@@ -266,9 +266,10 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             create_params.pop("parallel_tool_calls", None)
             # See https://platform.openai.com/docs/api-reference/chat/create#chat-create-reasoning_effort  # noqa: E501  # pylint: disable=line-too-long
             create_params["reasoning_effort"] = agent.reasoning_effort
+        if any(x in agent.model for x in ["claude"]): 
+            litellm.modify_params = True
         if (any(x in agent.model for x in ["claude", "thinking"]) and 
             all(x in agent.model for x in ["claude", "thinking"])):
-            litellm.modify_params = True
             create_params["max_tokens"] = 64000
             create_params["thinking"] = {"type": "enabled", "budget_tokens": 16000}
             create_params["temperature"] = 1
