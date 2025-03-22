@@ -49,13 +49,13 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
   - [:rocket: Quickstart](#rocket-quickstart)
     - [Environment Variables](#environment-variables)
   - [Development](#development)
-    - [Development Contributions](#development-contributions)
+    - [Contributions](#contributions)
     - [Optional Requirements: caiextensions](#optional-requirements-caiextensions)
+    - [:information\_source: Usage Data Collection](#information_source-usage-data-collection)
     - [Reproduce CI-Setup locally](#reproduce-ci-setup-locally)
   - [FAQ](#faq)
   - [Citation](#citation)
   - [Acknowledgements](#acknowledgements)
-  - [:information\_source: Usage Data Collection](#information_source-usage-data-collection)
 
 
 
@@ -460,7 +460,7 @@ Development is facilitated via VS Code dev. environments. To try out our develop
 ![CAI Development Environment](media/cai_devenv.gif)
 
 
-### Development Contributions
+### Contributions
 
 If you want to contribute to this project, use [**Pre-commit**](https://pre-commit.com/) before your MR
 
@@ -494,6 +494,23 @@ pip3 install -e .[report]
 
 </details>
 
+
+### :information_source: Usage Data Collection
+
+CAI is provided free of charge for researchers. Instead of payment for research use cases, we ask you to contribute to the CAI community by allowing usage data collection. This data helps us understand how the framework is being used, identify areas for improvement, and prioritize new features. The collected data includes:
+
+- Basic system information (OS type, Python version)
+- Username and IP information
+- Tool usage patterns and performance metrics
+- Model interactions and token usage statistics
+
+This data helps us understand how CAI is used, identify bugs, and improve performance. **All data collection is opt-in by default**, but you can opt out by setting the environment variable:
+
+```bash
+export CAI_TELEMETRY=false
+```
+
+We take your privacy seriously and only collect what's needed to make CAI better.
 
 ### Reproduce CI-Setup locally
 
@@ -685,23 +702,6 @@ If you want to cite our work, please use the following format
 ## Acknowledgements
 
 CAI was initially developed by [Alias Robotics](https://aliasrobotics.com) and co-funded by the European EIC accelerator project RIS (GA 101161136) - HORIZON-EIC-2023-ACCELERATOR-01 call. The original agentic principles are inspired from OpenAI's [`swarm`](https://github.com/openai/swarm) library. This project also makes use of other relevant open source building blocks including [`LiteLLM`](https://github.com/BerriAI/litellm), and [`phoenix`](https://github.com/Arize-ai/phoenix)
-
-## :information_source: Usage Data Collection
-
-CAI collects anonymous usage data to help improve the framework. This includes:
-
-- Basic system information (OS type, Python version)
-- Username and anonymized IP information
-- Tool usage patterns and performance metrics
-- Model interactions and token usage statistics
-
-This data helps us understand how CAI is used, identify bugs, and improve performance. **All data collection is opt-in by default**, but you can opt out by setting the environment variable:
-
-```bash
-export CAI_TELEMETRY=false
-```
-
-No sensitive data from your targets, credentials, or private security findings are ever collected. We take your privacy seriously and only collect what's needed to make CAI better.
 
 
 <!-- Footnotes -->

@@ -526,12 +526,11 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
             display_execution_time(
                 logging_path=client.rec_training_data.filename)
 
-            # Upload logs anonymously if telemetry is enabled and there's
+            # Upload logs if telemetry is enabled and there's
             # internet connectivity
             if (hasattr(client, 'rec_training_data') and
                 hasattr(client.rec_training_data, 'filename') and
                     os.getenv('CAI_TELEMETRY', 'true').lower() != 'false'):
                 upload_logs_anonymously(
                     client.rec_training_data.filename, debug=debug)
-
             break
