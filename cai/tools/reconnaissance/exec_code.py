@@ -42,7 +42,8 @@ def execute_code(code: str = "", language: str = "python",
         "rust": "rs",
         "csharp": "cs",
         "java": "java",
-        "kotlin": "kt"
+        "kotlin": "kt",
+        "solidity": "sol"
     }
     ext = extensions.get(language.lower(), "txt")
     full_filename = f"{filename}.{ext}"
@@ -87,6 +88,10 @@ def execute_code(code: str = "", language: str = "python",
         # For Kotlin, compile first
         run_command(f"kotlinc {full_filename} -include-runtime -d {filename}.jar", ctf=ctf)
         exec_cmd = f"java -jar {filename}.jar"
+    elif language.lower() == "solidity":
+        # For Solidity, compile with solc
+        run_command(f"mkdir -p {filename}_build", ctf=ctf)
+        exec_cmd = f"npx solc --bin --abi --optimize -o {filename}_build {full_filename}"
     else:
         return f"Unsupported language: {language}"
 

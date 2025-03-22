@@ -4,35 +4,20 @@ Provides utilities for recording and retrieving key information discovered
 during CTF progression.
 """
 
-
-def thought(breakdowns: str = "", reflection: str = "",  # pylint: disable=too-many-arguments  # noqa: E501
-            action: str = "", next_step: str = "", key_clues: str = "",
-            ctf=None) -> str:  # pylint: disable=unused-argument  # noqa: E501
+def think(thought: str) -> str:  # pylint: disable=unused-argument
     """
-    Tool used to express detailed thoughts and analysis during boot2root CTF.
-
+    Use the tool to think about something.
+    
+    It will not obtain new information or change the database, but just append
+    the thought to the log. Use it when complex reasoning or some cache memory
+    is needed.
+    
     Args:
-        breakdowns: Detailed breakdown of current situation/findings
-        reflection: Reflections on progress and insights gained
-        action: Current or planned actions
-        next_step: Next steps to take
-        key_clues: Important clues or hints discovered
-        ctf: CTF object to use for context
+        thought: A thought to think about.
     Returns:
-        str: Formatted string containing the provided thoughts and analysis
+        str: The thought that was processed
     """
-    output = []
-    if breakdowns:
-        output.append(f"Thought: {breakdowns}")
-    if reflection:
-        output.append(f"Reflection: {reflection}")
-    if action:
-        output.append(f"Action: {action}")
-    if next_step:
-        output.append(f"Next Step: {next_step}")
-    if key_clues:
-        output.append(f"Key Clues: {key_clues}")
-    return "\n".join(output)
+    return f"{thought}"
 
 
 def write_key_findings(findings: str) -> str:
