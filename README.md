@@ -38,6 +38,7 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
     - [:bust\_in\_silhouette: Why CAI?](#bust_in_silhouette-why-cai)
     - [Ethical principles behind CAI](#ethical-principles-behind-cai)
   - [:nut\_and\_bolt: Install](#nut_and_bolt-install)
+    - [Ubuntu 24](#ubuntu-24)
   - [:triangular\_ruler: Architecture:](#triangular_ruler-architecture)
     - [🔹 Agent](#-agent)
     - [🔹 Tools](#-tools)
@@ -97,6 +98,19 @@ CAI is built on the following core principles:
 
 ```shell
 pip install git+https://gitlab.com/aliasrobotics/alias_research/cai.git  # requires Python 3.10+
+```
+^ Temporarily broken (not loading agents)
+
+### Ubuntu 24
+You can install CAI in Ubuntu 24 with the following commands:
+```shell
+sudo apt update
+sudo apt install python3.12-venv
+python3 -m venv myenv
+source myenv/bin/activate
+git clone git@gitlab.com:aliasrobotics/alias_research/cai.git
+cd cai
+pip3 install -e .[report,pentestperf,memory,platform]cai
 ```
 
 
