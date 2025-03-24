@@ -90,8 +90,11 @@ def main():
     
     # Get token stats from JSONL file
     try:
-        file_model, total_input_tokens, total_output_tokens, total_cost = get_token_stats(
-            jsonl_file_path)
+        token_stats = get_token_stats(jsonl_file_path)
+        file_model = token_stats[0]
+        total_input_tokens = token_stats[1]
+        total_output_tokens = token_stats[2]
+        total_cost = token_stats[3]
     except Exception as e:
         print(f"Error loading JSONL file: {e}")
         sys.exit(1)
