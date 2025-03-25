@@ -247,7 +247,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             create_params["parallel_tool_calls"] = agent.parallel_tool_calls
             create_params["tools"] = tools
             create_params["tool_choice"] = agent.tool_choice
-            create_params["stream_options"] = {"include_usage": True}
+            if (agent.model != "deepseek/deepseek-chat" 
+                and model_override != "deepseek/deepseek-chat"):
+                create_params["stream_options"] = {"include_usage": True}
             if not isinstance(agent, CodeAgent):  # Don't set temperature for CodeAgent  # noqa: E501
                 create_params["temperature"] = 0.7
         # Refer to https://docs.litellm.ai/docs/completion/json_mode
@@ -278,7 +280,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             create_params["reasoning_effort"] = agent.reasoning_effort
         if any(x in agent.model for x in ["claude"]):
             litellm.modify_params = True
-
         # Fix for Gemini models: Remove unsupported parameters
         if any(x in agent.model for x in ["gemini"]):
             create_params.pop("parallel_tool_calls", None)
@@ -287,6 +288,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # Inference
         # --------------------------------
         try:
+            # print(create_params) debug
             if os.getenv("OLLAMA", "").lower() == "true":
                 litellm_completion = litellm.completion(
                     **create_params,
