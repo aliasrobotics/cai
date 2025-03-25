@@ -112,42 +112,26 @@ class TestFunctionCallBenchmarksBasic:
         """
         Test that the Agent model property is correctly set and accessed.
         """
-        # Save original environment variable if it exists
-        original_model = os.environ.get('CAI_MODEL')
-        
-        try:
-            # Clear environment variable to ensure it doesn't affect our test
-            if 'CAI_MODEL' in os.environ:
-                del os.environ['CAI_MODEL']
-            
-            # Create agent with explicit model
-            test_agent = Agent(
-                model="o3-mini",
-                name="Model Property Test Agent",
-                instructions="You are an agent that tests model property functionality."
-            )
+        # Create agent with explicit model
+        test_agent = Agent(
+            model="o3-mini",
+            name="Model Property Test Agent",
+            instructions="You are an agent that tests model property functionality."
+        )
 
-            # Test that the model property returns the expected value
-            assert test_agent.model == "o3-mini", f"Expected 'o3-mini', got '{test_agent.model}'"
-            print(f"✅ Model property correctly returned: {test_agent.model}")
-            
-            # Test changing the model
-            test_agent.model = "another-model"
-            assert test_agent.model == "another-model", f"Expected 'another-model', got '{test_agent.model}'"
-            print(f"✅ Model property correctly updated: {test_agent.model}")
-            
-            # Test environment variable override
-            os.environ['CAI_MODEL'] = "env-model"
-            test_agent = Agent(
-                name="Environment Model Test Agent",
-                instructions="You are an agent that tests environment model override."
-            )
-            assert test_agent.model == "env-model", f"Expected 'env-model', got '{test_agent.model}'"
-            print(f"✅ Environment variable correctly overrides default: {test_agent.model}")
-            
-        finally:
-            # Restore original environment variable
-            if original_model is not None:
-                os.environ['CAI_MODEL'] = original_model
-            elif 'CAI_MODEL' in os.environ:
-                del os.environ['CAI_MODEL']
+        # Test that the model property returns the expected value
+        assert test_agent.model == "o3-mini", f"Expected 'o3-mini', got '{test_agent.model}'"
+        print(f"✅ Model property correctly returned: {test_agent.model}")
+        
+        # Test changing the model
+        test_agent.model = "another-model"
+        assert test_agent.model == "another-model", f"Expected 'another-model', got '{test_agent.model}'"
+        print(f"✅ Model property correctly updated: {test_agent.model}")
+        
+        # Test default model when none specified
+        test_agent = Agent(
+            name="Default Model Test Agent", 
+            instructions="You are an agent that tests default model functionality."
+        )
+        assert test_agent.model == "qwen2.5:14b", f"Expected 'qwen2.5:14b', got '{test_agent.model}'"
+        print(f"✅ Default model correctly used: {test_agent.model}")

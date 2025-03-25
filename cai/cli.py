@@ -198,6 +198,8 @@ def run_with_env():
         else:
             state_agent = None
 
+        # TODO: we should create a new Agent here instead of using the one initialized in agents/__init__.py which is not using the model from the environment variables
+        cai_initial_agent.model = os.getenv('CAI_MODEL', "qwen2.5:14b")
         # Run interactive loop with CTF and state agent if available
         run_cai_cli(
             cai_initial_agent,
