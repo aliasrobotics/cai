@@ -223,17 +223,23 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # Process all tools in a single loop
         for tool in tools:
             params = tool["function"]["parameters"]
-            
+
             # Hide context_variables from model
             params["properties"].pop(__CTX_VARS_NAME__, None)
             if __CTX_VARS_NAME__ in params["required"]:
                 params["required"].remove(__CTX_VARS_NAME__)
-            
-            # Fix for Gemini: ensure all OBJECT type parameters have non-empty properties
+
+            # Fix for Gemini: ensure all OBJECT type parameters have non-empty
+            # properties
             if any(x in agent.model for x in ["gemini"]):
-                # If parameters itself is an object with empty properties, add a dummy property
-                if params.get("type") == "object" and not params.get("properties"):
-                    params["properties"] = {"_dummy": {"type": "string", "description": "Dummy property for Gemini API"}}
+                # If parameters itself is an object with empty properties, add
+                # a dummy property
+                if params.get("type") == "object" and not params.get(
+                        "properties"):
+                    params["properties"] = {
+                        "_dummy": {
+                            "type": "string",
+                            "description": "Dummy property for Gemini API"}}
 
         # --------------------------------
         # Inference parameters
@@ -247,8 +253,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             create_params["parallel_tool_calls"] = agent.parallel_tool_calls
             create_params["tools"] = tools
             create_params["tool_choice"] = agent.tool_choice
-            if (agent.model != "deepseek/deepseek-chat" 
-                and model_override != "deepseek/deepseek-chat"):
+            if (agent.model != "deepseek/deepseek-chat"
+                    and model_override != "deepseek/deepseek-chat"):
                 create_params["stream_options"] = {"include_usage": True}
             if not isinstance(agent, CodeAgent):  # Don't set temperature for CodeAgent  # noqa: E501
                 create_params["temperature"] = 0.7
@@ -283,6 +289,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # Fix for Gemini models: Remove unsupported parameters
         if any(x in agent.model for x in ["gemini"]):
             create_params.pop("parallel_tool_calls", None)
+        if any(x in agent.model for x in ["deepseek/deepseek-chat"]):
+            create_params.pop("parallel_tool_calls", None)
+            litellm.drop_params = True
 
         # --------------------------------
         # Inference
@@ -927,7 +936,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         context_variables = copy.deepcopy(context_variables)
         history = copy.deepcopy(messages)
         n_turn = 0
-        
+
         start_active_time()
         while len(history) - self.init_len < max_turns and active_agent and self.total_cost < float(  # noqa: E501 # pylint: disable=line-too-long
                 os.getenv("CAI_PRICE_LIMIT", "100")):
