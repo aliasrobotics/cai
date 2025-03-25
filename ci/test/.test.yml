@@ -1,4 +1,3 @@
-
 .use_base_container: &use_base_container
   stage: test
   image: "${CI_REGISTRY_IMAGE}:latest"

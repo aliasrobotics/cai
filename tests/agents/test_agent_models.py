@@ -2,6 +2,7 @@ import pytest
 import tempfile
 import shutil
 import statistics
+import os
 from pathlib import Path
 from typing import List, Union
 from cai.core import CAI, Agent
@@ -106,3 +107,31 @@ class TestFunctionCallBenchmarksBasic:
 
         print(f"\nOverall success rate: {total * 100:.1f}%")
         assert total >= 0.5, "Success rate below 50%"
+
+    def test_agent_model_property(self):
+        """
+        Test that the Agent model property is correctly set and accessed.
+        """
+        # Create agent with explicit model
+        test_agent = Agent(
+            model="o3-mini",
+            name="Model Property Test Agent",
+            instructions="You are an agent that tests model property functionality."
+        )
+
+        # Test that the model property returns the expected value
+        assert test_agent.model == "o3-mini", f"Expected 'o3-mini', got '{test_agent.model}'"
+        print(f"✅ Model property correctly returned: {test_agent.model}")
+        
+        # Test changing the model
+        test_agent.model = "another-model"
+        assert test_agent.model == "another-model", f"Expected 'another-model', got '{test_agent.model}'"
+        print(f"✅ Model property correctly updated: {test_agent.model}")
+        
+        # Test default model when none specified
+        test_agent = Agent(
+            name="Default Model Test Agent", 
+            instructions="You are an agent that tests default model functionality."
+        )
+        assert test_agent.model == "qwen2.5:14b", f"Expected 'qwen2.5:14b', got '{test_agent.model}'"
+        print(f"✅ Default model correctly used: {test_agent.model}")

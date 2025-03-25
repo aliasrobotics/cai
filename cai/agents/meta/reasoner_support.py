@@ -35,7 +35,8 @@ def create_reasoner_agent(
         Agent: A configured Reasoner Agent instance.
     """
     # Use environment variable for model if not specified
-    model = os.getenv("CAI_SUPPORT_MODEL", "o3-mini")
+    if model is None:
+        model = os.getenv("CAI_SUPPORT_MODEL", "o3-mini")
 
     # Default instructions for the reasoner agent
     default_instructions = Template(  # nosec

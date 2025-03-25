@@ -132,6 +132,8 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # training data
         if log_training_data:
             self.rec_training_data = DataRecorder()
+        else:
+            self.rec_training_data = None
 
         # memory attributes
         self.episodic_rag = (os.getenv("CAI_MEMORY", "?").lower() == "episodic"
