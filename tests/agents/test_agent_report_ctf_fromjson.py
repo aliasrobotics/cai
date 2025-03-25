@@ -3,7 +3,7 @@ import os
 import json
 #from caiextensions.report.common.nis2.nis2 import load_history_from_jsonl
 from cai.core import CAI
-from caiextensions.report.ctf.ctf_reporter_agent import reporter_agent # pylint: disable=import-error  
+from caiextensions.report.common.ctf.ctf_reporter_agent import reporter_agent # pylint: disable=import-error  
 from cai.datarecorder import load_history_from_jsonl # pylint: disable=import-error # noqa: E501
 
 
