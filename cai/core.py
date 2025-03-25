@@ -218,12 +218,20 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # Tools
         # --------------------------------
         tools = [function_to_json(f) for f in agent.functions if callable(f)]
-        # hide context_variables from model
+        # Process all tools in a single loop
         for tool in tools:
             params = tool["function"]["parameters"]
+            
+            # Hide context_variables from model
             params["properties"].pop(__CTX_VARS_NAME__, None)
             if __CTX_VARS_NAME__ in params["required"]:
                 params["required"].remove(__CTX_VARS_NAME__)
+            
+            # Fix for Gemini: ensure all OBJECT type parameters have non-empty properties
+            if any(x in agent.model for x in ["gemini"]):
+                # If parameters itself is an object with empty properties, add a dummy property
+                if params.get("type") == "object" and not params.get("properties"):
+                    params["properties"] = {"_dummy": {"type": "string", "description": "Dummy property for Gemini API"}}
 
         # --------------------------------
         # Inference parameters
