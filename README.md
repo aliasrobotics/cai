@@ -30,8 +30,6 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
 >
 > *By no means the authors of CAI encourage or promote the unauthorized tampering with compute systems. Please don't use the source code in here for cybercrime. <u>Pentest for good instead</u>*.
 
-
-
 ## :bookmark: Table of Contents
 
 - [Cybersecurity AI (`CAI`)](#cybersecurity-ai-cai)
@@ -40,6 +38,7 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
     - [:bust\_in\_silhouette: Why CAI?](#bust_in_silhouette-why-cai)
     - [Ethical principles behind CAI](#ethical-principles-behind-cai)
   - [:nut\_and\_bolt: Install](#nut_and_bolt-install)
+    - [Ubuntu 24](#ubuntu-24)
   - [:triangular\_ruler: Architecture:](#triangular_ruler-architecture)
     - [🔹 Agent](#-agent)
     - [🔹 Tools](#-tools)
@@ -51,8 +50,9 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
   - [:rocket: Quickstart](#rocket-quickstart)
     - [Environment Variables](#environment-variables)
   - [Development](#development)
-    - [Development Contributions](#development-contributions)
+    - [Contributions](#contributions)
     - [Optional Requirements: caiextensions](#optional-requirements-caiextensions)
+    - [:information\_source: Usage Data Collection](#information_source-usage-data-collection)
     - [Reproduce CI-Setup locally](#reproduce-ci-setup-locally)
   - [FAQ](#faq)
   - [Citation](#citation)
@@ -98,6 +98,19 @@ CAI is built on the following core principles:
 
 ```shell
 pip install git+https://gitlab.com/aliasrobotics/alias_research/cai.git  # requires Python 3.10+
+```
+^ Temporarily broken (not loading agents)
+
+### Ubuntu 24
+You can install CAI in Ubuntu 24 with the following commands:
+```shell
+sudo apt update
+sudo apt install python3.12-venv
+python3 -m venv myenv
+source myenv/bin/activate
+git clone git@gitlab.com:aliasrobotics/alias_research/cai.git
+cd cai
+pip3 install -e .[report,pentestperf,memory,platform]cai
 ```
 
 
@@ -461,7 +474,7 @@ Development is facilitated via VS Code dev. environments. To try out our develop
 ![CAI Development Environment](media/cai_devenv.gif)
 
 
-### Development Contributions
+### Contributions
 
 If you want to contribute to this project, use [**Pre-commit**](https://pre-commit.com/) before your MR
 
@@ -495,6 +508,23 @@ pip3 install -e .[report]
 
 </details>
 
+
+### :information_source: Usage Data Collection
+
+CAI is provided free of charge for researchers. Instead of payment for research use cases, we ask you to contribute to the CAI community by allowing usage data collection. This data helps us understand how the framework is being used, identify areas for improvement, and prioritize new features. The collected data includes:
+
+- Basic system information (OS type, Python version)
+- Username and IP information
+- Tool usage patterns and performance metrics
+- Model interactions and token usage statistics
+
+This data helps us understand how CAI is used, identify bugs, and improve performance. **All data collection is opt-in by default**, but you can opt out by setting the environment variable:
+
+```bash
+export CAI_TELEMETRY=false
+```
+
+We take your privacy seriously and only collect what's needed to make CAI better.
 
 ### Reproduce CI-Setup locally
 
