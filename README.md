@@ -110,7 +110,7 @@ python3 -m venv myenv
 source myenv/bin/activate
 git clone git@gitlab.com:aliasrobotics/alias_research/cai.git
 cd cai
-pip3 install -e .[report,pentestperf,memory,platform]cai
+pip3 install -e .[report,pentestperf,memory,platform]
 ```
 
 

@@ -314,91 +314,119 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # --------------------------------
         # Inference
         # --------------------------------
-        try:
-            # print(create_params) debug
-            if os.getenv("OLLAMA", "").lower() == "true":
-                litellm_completion = litellm.completion(
-                    **create_params,
-                    api_base=get_ollama_api_base(),
-                    custom_llm_provider="openai"
-                )
-            else:
-                litellm_completion = litellm.completion(**create_params)
+        # We keep trying when we reach the rate limit
+        while True:
+            litellm_completion = None
+            try:
+                # print(create_params) debug
+                if os.getenv("OLLAMA", "").lower() == "true":
+                    litellm_completion = litellm.completion(
+                        **create_params,
+                        api_base=get_ollama_api_base(),
+                        custom_llm_provider="openai"
+                    )
+                else:
+                    litellm_completion = litellm.completion(**create_params)
+            except litellm.exceptions.BadRequestError as e:
+                if "LLM Provider NOT provided" in str(e):
+                    # Create a copy of params to avoid overwriting the original
+                    # ones
+                    ollama_params = create_params.copy()
+                    ollama_params["api_base"] = get_ollama_api_base()
+                    ollama_params["custom_llm_provider"] = "openai"
+                    try:
+                        litellm_completion = litellm.completion(**ollama_params)
+                    except litellm.exceptions.BadRequestError as e:  # pylint: disable=W0621,C0301 # noqa: E501
+                        #
+                        # CTRL C handler for ollama models
+                        #
+                        if "invalid message content type" in str(e):
+                            create_params["messages"] = fix_message_list(
+                                create_params["messages"])
+                            litellm_completion = litellm.completion(
+                                **create_params)
+                        else:
+                            raise e
+                elif ("An assistant message with 'tool_calls'" in str(e) or
+                    "`tool_use` blocks must be followed by a user message with `tool_result`" in str(e)):  # noqa: E501 # pylint: disable=C0301
+                    print(f"Error: {str(e)}")
+                    # EDGE CASE: Report Agent CTRL C error
+                    # This fix CTRL C error when message list is incomplete
+                    # When a tool is not finished but the LLM generates a tool call
+                    create_params["messages"] = fix_message_list(
+                        create_params["messages"])
+                    litellm_completion = litellm.completion(**create_params)
+                # this captures an error related to the fact
+                # that the messages list contains an empty
+                # content position
+                elif "expected a string, got null" in str(e):
+                    print(f"Error: {str(e)}")
+                    # Fix for null content in messages
+                    create_params["messages"] = [
+                        msg if msg.get("content") is not None else
+                        {**msg, "content": ""} for msg in create_params["messages"]
+                    ]
+                    litellm_completion = litellm.completion(**create_params)
 
-        except litellm.exceptions.BadRequestError as e:
-            if "LLM Provider NOT provided" in str(e):
-                # Create a copy of params to avoid overwriting the original
-                # ones
+                # Handle Anthropic error for empty text content blocks
+                elif ("text content blocks must be non-empty" in str(e) or
+                    "cache_control cannot be set for empty text blocks" in str(e)):  # noqa
+                    print(f"Error: {str(e)}")
+                    # Fix for empty content in messages for Anthropic models
+                    create_params["messages"] = [
+                        msg if msg.get("content") not in [None, ""] else
+                        {
+                            **msg,
+                            "content": "Empty content block"
+                        } for msg in create_params["messages"]
+                    ]
+                    litellm_completion = litellm.completion(**create_params)
+                else:
+                    raise e
+            except litellm.exceptions.RateLimitError as e:
+                print("Rate Limit Error:" + str(e))
+                # Try to extract retry delay from error response or use default
+                retry_delay = 60  # Default delay in seconds
+                try:
+                    # Extract the JSON part from the error message
+                    json_str = str(e.message).split('VertexAIException - ')[-1]
+                    error_details = json.loads(json_str)
+                    
+                    retry_info = next(
+                        (detail for detail in error_details.get('error', {}).get('details', [])
+                         if detail.get('@type') == 'type.googleapis.com/google.rpc.RetryInfo'),
+                        None
+                    )
+                    if retry_info and 'retryDelay' in retry_info:
+                        retry_delay = int(retry_info['retryDelay'].rstrip('s'))
+                except Exception as parse_error:
+                    print(f"Could not parse retry delay, using default: {parse_error}")
+                
+                print(f"Waiting {retry_delay} seconds before retrying...")
+                time.sleep(retry_delay)
+
+            except Exception:  # pylint: disable=W0718
                 ollama_params = create_params.copy()
                 ollama_params["api_base"] = get_ollama_api_base()
                 ollama_params["custom_llm_provider"] = "openai"
                 try:
                     litellm_completion = litellm.completion(**ollama_params)
-                except litellm.exceptions.BadRequestError as e:  # pylint: disable=W0621,C0301 # noqa: E501
-                    #
-                    # CTRL C handler for ollama models
-                    #
-                    if "invalid message content type" in str(e):
-                        create_params["messages"] = fix_message_list(
-                            create_params["messages"])
-                        litellm_completion = litellm.completion(
-                            **create_params)
-                    else:
-                        raise e
-            elif ("An assistant message with 'tool_calls'" in str(e) or
-                  "`tool_use` blocks must be followed by a user message with `tool_result`" in str(e)):  # noqa: E501 # pylint: disable=C0301
-                print(f"Error: {str(e)}")
-                # EDGE CASE: Report Agent CTRL C error
-                # This fix CTRL C error when message list is incomplete
-                # When a tool is not finished but the LLM generates a tool call
-                create_params["messages"] = fix_message_list(
-                    create_params["messages"])
-                litellm_completion = litellm.completion(**create_params)
-            # this captures an error related to the fact
-            # that the messages list contains an empty
-            # content position
-            elif "expected a string, got null" in str(e):
-                print(f"Error: {str(e)}")
-                # Fix for null content in messages
-                create_params["messages"] = [
-                    msg if msg.get("content") is not None else
-                    {**msg, "content": ""} for msg in create_params["messages"]
-                ]
-                litellm_completion = litellm.completion(**create_params)
+                except Exception as e:  # pylint: disable=W0718  # noqa
+                    try:
+                        litellm_completion = litellm.completion(**create_params)
+                    except Exception as execp:  # pylint: disable=W0718
+                        print("Error: " + str(execp))
+                        return None
+            # Gemini 2.5 Pro is special and sometimes returns empty completions <3
+            # Maybe something Google fixes in the future
+            if create_params["model"] == "gemini/gemini-2.5-pro-exp-03-25":
+                if litellm_completion and len(litellm_completion.choices) == 0:
+                    # We just need to retry
+                    continue
+            # If we get a valid completion, we exit the loop
+            if litellm_completion:
+                break
 
-            # Handle Anthropic error for empty text content blocks
-            elif ("text content blocks must be non-empty" in str(e) or
-                  "cache_control cannot be set for empty text blocks" in str(e)):  # noqa
-                print(f"Error: {str(e)}")
-                # Fix for empty content in messages for Anthropic models
-                create_params["messages"] = [
-                    msg if msg.get("content") not in [None, ""] else
-                    {
-                        **msg,
-                        "content": "Empty content block"
-                    } for msg in create_params["messages"]
-                ]
-                litellm_completion = litellm.completion(**create_params)
-            else:
-                raise e
-
-        except litellm.exceptions.RateLimitError as e:
-            print("Rate Limit Error:" + str(e))
-            time.sleep(60)
-            litellm_completion = litellm.completion(**create_params)
-
-        except Exception:  # pylint: disable=W0718
-            ollama_params = create_params.copy()
-            ollama_params["api_base"] = get_ollama_api_base()
-            ollama_params["custom_llm_provider"] = "openai"
-            try:
-                litellm_completion = litellm.completion(**ollama_params)
-            except Exception as e:  # pylint: disable=W0718  # noqa
-                try:
-                    litellm_completion = litellm.completion(**create_params)
-                except Exception as execp:  # pylint: disable=W0718
-                    print("Error: " + str(execp))
-                    return None
         # --------------------------------
         # Training data
         # --------------------------------
