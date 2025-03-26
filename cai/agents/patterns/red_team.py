@@ -10,16 +10,6 @@ for comprehensive security analysis.
 """
 from cai.agents.red_teamer import redteam_agent
 from cai.agents.thought import thought_agent
-from cai.agents.mail import dns_smtp_agent
-
-
-def transfer_to_dns_agent():
-    """
-    Use THIS always for DNS scans and domain reconnaissance
-    about dmarc and dkim registers
-    """
-    return dns_smtp_agent
-
 
 def redteam_agent_handoff(ctf=None):  # pylint: disable=unused-argument
     """
@@ -38,8 +28,6 @@ def thought_agent_handoff(ctf=None):  # pylint: disable=unused-argument
 
 
 # Register handoff functions to enable inter-agent communication pathways
-redteam_agent.functions.append(transfer_to_dns_agent)
-dns_smtp_agent.functions.append(redteam_agent_handoff)
 thought_agent.functions.append(redteam_agent_handoff)
 
 # Initialize the swarm pattern with the thought agent as the entry point

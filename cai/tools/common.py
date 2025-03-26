@@ -2,7 +2,6 @@
 Basic utilities for executing tools
 inside or outside of virtual containers.
 """
-
 import subprocess  # nosec B404
 import threading
 import os
@@ -227,6 +226,42 @@ def _run_ctf(ctf, command, stdout=False, timeout=100):
         return f"Error executing CTF command: {str(e)}"
 
 
+def _run_ssh(command, stdout=False, timeout=100):
+    try:
+        ssh_user = os.environ.get('SSH_USER')
+        ssh_host = os.environ.get('SSH_HOST')
+        ssh_pass = os.environ.get('SSH_PASS')
+        
+        if ssh_pass:
+            # Use sshpass if password is provided
+            ssh_cmd = f"sshpass -p '{ssh_pass}' ssh {ssh_user}@{ssh_host} '{command}'"
+        else:
+            # Use regular SSH if no password (assuming key-based auth)
+            ssh_cmd = f"ssh {ssh_user}@{ssh_host} '{command}'"
+        
+        result = subprocess.run(
+            ssh_cmd,
+            shell=True,  # nosec B602
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=timeout)
+        
+        output = result.stdout if result.stdout else result.stderr
+        if stdout:
+            print("\033[32m" + output + "\033[0m")
+        return output
+    except subprocess.TimeoutExpired as e:
+        error_output = e.stdout.decode() if e.stdout else str(e)
+        if stdout:
+            print("\033[32m" + error_output + "\033[0m")
+        return error_output
+    except Exception as e:  # pylint: disable=broad-except
+        error_msg = f"Error executing SSH command: {e}"
+        print(color(error_msg, fg="red"))
+        return error_msg
+
+
 def _run_local(command, stdout=False, timeout=100):
     try:
         # nosec B602 - shell=True is required for command chaining
@@ -293,4 +328,9 @@ def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arg
     # Otherwise, run command normally
     if ctf:
         return _run_ctf(ctf, command, stdout, timeout)
+    
+    # Check if SSH environment variables are set
+    if all(os.environ.get(var) for var in ['SSH_USER', 'SSH_HOST']):
+        return _run_ssh(command, stdout, timeout)
+    
     return _run_local(command, stdout, timeout)

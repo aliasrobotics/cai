@@ -10,7 +10,8 @@ from cai.tools.common import (run_command,
 def generic_linux_command(command: str = "",
                           args: str = "", ctf=None,
                           async_mode: bool = False,
-                          session_id: str = None) -> str:
+                          session_id: str = None,
+                         ) -> str:
     """
     Execute Linux commands with support for interactive sessions.
 
