@@ -10,7 +10,7 @@ from cai.tools.reconnaissance.generic_linux_command import (  # pylint: disable=
     generic_linux_command
 )
 from cai.tools.web.search_web import (  # pylint: disable=import-error # noqa: E501
-    search_web
+    make_web_search_with_explanation,
 )
 
 from cai.tools.reconnaissance.exec_code import (  # pylint: disable=import-error # noqa: E501
@@ -28,9 +28,10 @@ functions = [
     execute_code,
 ]
 
-# Add search_web function if PERPLEXITY_API_KEY environment variable is set
+# Add make_web_search_with_explanation function if PERPLEXITY_API_KEY environment variable is set
 if os.getenv('PERPLEXITY_API_KEY'):
-    functions.append(search_web)
+    functions.append(make_web_search_with_explanation)
+    
 
 redteam_agent = Agent(
     name="Red Team Agent",

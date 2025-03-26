@@ -2,6 +2,9 @@
 This module contains type definitions for the CAI library.
 """
 
+import warnings
+warnings.filterwarnings("ignore", message="Support for class-based `config` is deprecated")
+
 from typing import List, Callable, Union, Optional
 import os
 from openai.types.chat import ChatCompletionMessage  # noqa: F401, E501  # pylint: disable=import-error, unused-import
@@ -11,7 +14,7 @@ from openai.types.chat.chat_completion_message_tool_call import (  # noqa: F401,
 )
 
 # Third-party imports
-from pydantic import BaseModel  # pylint: disable=import-error
+from pydantic import BaseModel, Field  # pylint: disable=import-error
 from cai.state import State
 
 AgentFunction = Callable[[], Union[str, "Agent", dict, State]]
@@ -23,7 +26,7 @@ class Agent(BaseModel):  # pylint: disable=too-few-public-methods
     """
 
     name: str = "Agent"
-    _model: str = "qwen2.5:14b"  # Internal model storage
+    model: str = "qwen2.5:14b"  # Default model
     instructions: Union[str, Callable[[], str]] = "You are a helpful agent."
     functions: List[AgentFunction] = []
     description: str = None
@@ -35,22 +38,6 @@ class Agent(BaseModel):  # pylint: disable=too-few-public-methods
     # the agentic pattern associated
     #    see cai/agents/__init__.py for more information
     pattern: Optional[str] = None
-
-    @property
-    def model(self) -> str:
-        """
-        Override the model property to always check
-        the environment variable. This ensures the agent
-        always uses the latest model setting.
-        """
-        # Otherwise use the general CAI_MODEL environment variable
-        return os.getenv('CAI_MODEL', self._model)
-
-    @model.setter
-    def model(self, value: str):
-        """Setter for the model property"""
-        self._model = value
-
 
 class Response(BaseModel):  # pylint: disable=too-few-public-methods
     """

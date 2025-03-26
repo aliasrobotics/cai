@@ -68,7 +68,13 @@ Usage Examples:
 
     # Run against a CTF
     CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" \
-        CAI_MODEL="qwen2.5:14b" CAI_TRACING="true" python3 cai/cli.py
+        CAI_AGENT_TYPE="one_tool_agent" CAI_MODEL="qwen2.5:14b" \
+        CAI_TRACING="false" python3 cai/cli.py
+
+    # Run a harder CTF
+    CTF_NAME="hackableii" CAI_AGENT_TYPE="redteam_agent" \
+        CTF_INSIDE="False" CAI_MODEL="deepseek/deepseek-chat" \
+        CAI_TRACING="false" python3 cai/cli.py
 
     # Run without a target in human-in-the-loop mode, generating a report
     CAI_TRACING=False CAI_REPORT=pentesting CAI_MODEL="gpt-4o" \
@@ -100,6 +106,7 @@ from wasabi import color  # pylint: disable=import-error
 
 from cai import (
     is_pentestperf_available,
+    is_caiextensions_platform_available,
     cai_initial_agent
 )
 from cai.repl import run_cai_cli
@@ -112,6 +119,9 @@ if is_pentestperf_available():
 
 def initialize_platforms():
     """Initialize and register available platforms."""
+    if not is_caiextensions_platform_available():
+        return
+
     try:
         from caiextensions.platform.base import platform_manager  # pylint: disable=import-error,import-outside-toplevel,unused-import,line-too-long,no-name-in-module # noqa: E501
 
@@ -194,6 +204,10 @@ def run_with_env():
         else:
             state_agent = None
 
+        # TODO: we should create a new Agent here instead of using the one
+        # initialized in agents/__init__.py which is not using the model from
+        # the environment variables
+        cai_initial_agent.model = os.getenv('CAI_MODEL', "qwen2.5:14b")
         # Run interactive loop with CTF and state agent if available
         run_cai_cli(
             cai_initial_agent,

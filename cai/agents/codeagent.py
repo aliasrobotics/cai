@@ -65,9 +65,26 @@ class CodeExecutionTimeoutError(CodeAgentException):
 
 
 # Define a timeout handler function
-def timeout_handler(signum, frame):
-    """Signal handler for timeouts."""
-    raise TimeoutError("Code execution timed out")
+def timeout_handler(signum, frame):  # pylint: disable=unused-argument # noqa
+    """
+    Signal handler for timeouts.
+
+    This handler is designed to be used with SIGALRM but can handle
+    other signals gracefully. It raises a TimeoutError to indicate
+    that the code execution has timed out.
+
+    Args:
+        signum (int): The signal number
+        frame (frame): The current stack frame
+
+    Raises:
+        TimeoutError: Always raised to indicate timeout
+    """
+    if signum == signal.SIGALRM:  # pylint: disable=no-else-raise # noqa: E702
+        raise TimeoutError("Code execution timed out")
+    else:  # pylint: disable=no-else-raise # noqa: E702
+        # Handle other signals gracefully
+        raise TimeoutError(f"Code execution interrupted by signal {signum}")
 
 
 # Define a class for thread-based timeout (for Windows compatibility)
@@ -237,7 +254,7 @@ class CodeAgent(Agent):
         object.__setattr__(self, 'max_print_outputs_length', _max_print_length)
         object.__setattr__(self, 'max_steps', _max_steps)
         object.__setattr__(self, 'execution_timeout', _execution_timeout)
-        object.__setattr__(self, 'context_variables', {})
+        object.__setattr__(self, 'context_variables', {'__name__': '__main__'})
         object.__setattr__(self, 'step_number', 0)
 
         # Initialize the Python interpreter
@@ -285,6 +302,12 @@ Important guidelines:
 - Maintain variables in memory across interactions - your state persists
 - Your code execution has a timeout of {self.execution_timeout} seconds
     - avoid infinite loops or long-running operations
+- The variable __name__ is set to "__main__" so you can use standard
+Python patterns like:
+  ```python
+  if __name__ == "__main__":
+      main()
+  ```
 
 Here's an example of a good response:```python
 # Let's solve this step by step
@@ -320,6 +343,52 @@ I'll execute your code and show you the results.
             func_name = func.__name__
             self.python_executor.static_tools[func_name] = func
 
+    def _setup_signal_handlers(self):
+        """
+        Set up signal handlers for the CodeAgent.
+
+        This method sets up signal handlers to ensure that the agent
+        can handle interruptions gracefully. It's particularly important
+        for long-running code executions.
+
+        Returns:
+            dict: A dictionary of original signal handlers that were replaced
+        """
+        original_handlers = {}
+
+        # Only set up signal handlers on Unix-like systems
+        if platform.system() != "Windows":
+            # Save original handlers
+            original_handlers[signal.SIGINT] = signal.getsignal(signal.SIGINT)
+            original_handlers[signal.SIGTERM] = signal.getsignal(
+                signal.SIGTERM)
+
+            # Define a handler for SIGINT and SIGTERM
+            def signal_handler(signum, frame):  # pylint: disable=unused-argument # noqa
+                # Restore original handlers
+                for sig, handler in original_handlers.items():
+                    signal.signal(sig, handler)
+                # Raise an exception to interrupt execution
+                raise KeyboardInterrupt(
+                    f"Execution interrupted by signal {signum}")
+
+            # Set up handlers
+            signal.signal(signal.SIGINT, signal_handler)
+            signal.signal(signal.SIGTERM, signal_handler)
+
+        return original_handlers
+
+    def _restore_signal_handlers(self, original_handlers):
+        """
+        Restore original signal handlers.
+
+        Args:
+            original_handlers (dict): Dictionary of original signal handlers
+        """
+        if platform.system() != "Windows":
+            for sig, handler in original_handlers.items():
+                signal.signal(sig, handler)
+
     def process_interaction(
         self,
         cai_instance: object,
@@ -354,6 +423,9 @@ I'll execute your code and show you the results.
         """
         if context_variables:
             self.context_variables.update(context_variables)
+
+        # Ensure __name__ is set to "__main__" to simulate script execution
+        self.context_variables["__name__"] = "__main__"
 
         # Extract the latest user message
         user_messages = [
@@ -523,6 +595,9 @@ I'll execute your code and show you the results.
             CodeExecutionError: If code execution fails
             CodeExecutionTimeoutError: If code execution times out
         """
+        # Set up signal handlers
+        original_handlers = self._setup_signal_handlers()
+
         try:
             if debug:
                 print(
@@ -534,6 +609,9 @@ I'll execute your code and show you the results.
             # Fix the code if needed (e.g., ensure final_answer is properly
             # used)
             code = fix_final_answer_code(code)
+
+            # Add __name__ to context_variables to simulate script execution
+            self.context_variables["__name__"] = "__main__"
 
             # Execute the code with timeout
             if debug:
@@ -612,20 +690,39 @@ I'll execute your code and show you the results.
                 output, execution_logs, is_final_answer = thread.result
             else:
                 # Unix implementation using signals
-                original_handler = signal.getsignal(signal.SIGALRM)
-                signal.signal(signal.SIGALRM, timeout_handler)
-                signal.alarm(self.execution_timeout)
+                # Use a more robust approach with a context manager for signal
+                # handling
+                class SignalTimeout:
+                    """
+                    Context manager for handling signals
+                    """
+
+                    def __init__(self, seconds):
+                        self.seconds = seconds
+                        self.original_handler = None
+
+                    def __enter__(self):
+                        self.original_handler = signal.getsignal(
+                            signal.SIGALRM)
+                        signal.signal(signal.SIGALRM, timeout_handler)
+                        signal.alarm(self.seconds)
+                        return self
+
+                    def __exit__(self, exc_type, exc_val, exc_tb):
+                        # Always reset the alarm and restore the original
+                        # handler
+                        signal.alarm(0)
+                        signal.signal(signal.SIGALRM, self.original_handler)
+                        # Don't suppress exceptions
+                        return False
 
                 try:
-                    # Execute the code with timeout
-                    output, execution_logs, is_final_answer = (
-                        self.python_executor(
-                            code, self.context_variables))
-                    # Disable the alarm if execution completes
-                    signal.alarm(0)
+                    # Execute the code with timeout using context manager
+                    with SignalTimeout(self.execution_timeout):
+                        output, execution_logs, is_final_answer = (
+                            self.python_executor(
+                                code, self.context_variables))
                 except TimeoutError:
-                    # Reset the signal handler
-                    signal.signal(signal.SIGALRM, original_handler)
                     # Get execution logs if available
                     execution_logs = ""
                     if (hasattr(
@@ -668,9 +765,41 @@ I'll execute your code and show you the results.
                         value=result_message,
                         context_variables=self.context_variables
                     )
-                finally:
-                    # Reset the signal handler
-                    signal.signal(signal.SIGALRM, original_handler)
+                except Exception as e:
+                    # Handle any other exceptions that might occur
+                    # during execution. Get execution logs if available
+                    execution_logs = ""
+                    if (hasattr(
+                        self.python_executor, "state") and
+                            "_print_outputs" in self.python_executor.state):
+                        execution_logs = str(
+                            self.python_executor.state.get(
+                                "_print_outputs", ""))
+
+                    error_message = (
+                        f"Code execution failed: {type(e).__name__}: {
+                            str(e)}")
+                    if debug:
+                        print(
+                            color(
+                                "❌ Code execution failed:",
+                                fg="red",
+                                bold=True))
+                        print(color(f"{error_message}", fg="red"))
+
+                        if execution_logs:
+                            print(
+                                color(
+                                    "📋 Logs before error:",
+                                    fg="yellow",
+                                    bold=True))
+                            print(color(f"{execution_logs}", fg="yellow"))
+
+                    error_message += (
+                        f"\n\nExecution logs before error:\n```\n{
+                            execution_logs}\n```")
+
+                    raise CodeExecutionError(error_message)  # pylint: disable=raise-missing-from # noqa
 
             # Prepare the result message
             result_message = (
@@ -741,6 +870,9 @@ I'll execute your code and show you the results.
                 execution_logs}\n```"
 
             raise CodeExecutionError(error_message)  # pylint: disable=raise-missing-from # noqa: E702,E501
+        finally:
+            # Always restore original signal handlers
+            self._restore_signal_handlers(original_handlers)
 
     def run(self, messages: List[Dict],
             context_variables: Dict = None, debug: bool = True) -> Result:
@@ -762,19 +894,38 @@ I'll execute your code and show you the results.
             Result: A Result object containing the execution
                 result and updated context
         """
-        # Update step number
-        self.step_number += 1  # pylint: disable=no-member # noqa: E702
-        if self.step_number > self.max_steps:  # pylint: disable=no-member # noqa: E702,E501
+        # Set up signal handlers
+        original_handlers = self._setup_signal_handlers()
+
+        try:
+            # Update step number
+            self.step_number += 1  # pylint: disable=no-member # noqa: E702
+            if self.step_number > self.max_steps:  # pylint: disable=no-member # noqa: E702,E501
+                return Result(
+                    value="Reached maximum number of steps in CodeAgent. "
+                    "Stopping execution.",
+                    context_variables=self.context_variables
+                )
+
+            # Process the conversation
+            result, _, _ = self.process_interaction(
+                None, messages, context_variables, debug)
+            return result
+        except Exception as e:  # pylint: disable=broad-exception-caught # noqa
+            # Handle any exceptions that might occur during execution
+            error_message = f"Agent execution failed: {type(e).__name__}: {
+                str(e)}"
+            if debug:
+                print(color("❌ Agent execution failed:", fg="red", bold=True))
+                print(color(f"{error_message}", fg="red"))
+
             return Result(
-                value="Reached maximum number of steps in CodeAgent. "
-                "Stopping execution.",
+                value=error_message,
                 context_variables=self.context_variables
             )
-
-        # Process the conversation
-        result, _, _ = self.process_interaction(
-            messages, context_variables, debug)
-        return result
+        finally:
+            # Always restore original signal handlers
+            self._restore_signal_handlers(original_handlers)
 
 
 def transfer_to_codeagent(**kwargs):  # pylint: disable=W0613

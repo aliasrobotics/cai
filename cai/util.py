@@ -25,7 +25,6 @@ from rich.tree import Tree  # pylint: disable=import-error
 from wasabi import color  # pylint: disable=import-error
 
 # Local imports
-from cai.cost.llm_cost import calculate_conversation_cost
 from cai.graph import Node, get_default_graph
 from cai.types import (
     Agent,
@@ -35,6 +34,10 @@ from cai.types import (
 # Global timing variables
 GLOBAL_START_TIME = None
 LAST_TOOL_TIME = None
+ACTIVE_TIME = 0.0
+IDLE_TIME = 0.0
+LAST_STATE_CHANGE = None
+IS_ACTIVE = False
 
 
 def format_time(seconds):
@@ -52,14 +55,54 @@ def format_time(seconds):
 
 def initialize_global_timer():
     """Initialize the global timer."""
-    global GLOBAL_START_TIME  # pylint: disable=global-statement
+    global GLOBAL_START_TIME, LAST_STATE_CHANGE, IS_ACTIVE  # pylint: disable=global-statement
     GLOBAL_START_TIME = time.time()
+    LAST_STATE_CHANGE = time.time()
+    IS_ACTIVE = False
 
 
 def reset_global_timer():
     """Reset the global timer."""
-    global GLOBAL_START_TIME  # pylint: disable=global-statement
+    global GLOBAL_START_TIME, ACTIVE_TIME, IDLE_TIME  # pylint: disable=global-statement
     GLOBAL_START_TIME = None
+    ACTIVE_TIME = 0.0
+    IDLE_TIME = 0.0
+
+
+def start_active_time():
+    """Mark the start of active execution time."""
+    global LAST_STATE_CHANGE, IS_ACTIVE, IDLE_TIME  # pylint: disable=global-statement
+    current_time = time.time()
+    if LAST_STATE_CHANGE is not None and not IS_ACTIVE:
+        IDLE_TIME += current_time - LAST_STATE_CHANGE
+    LAST_STATE_CHANGE = current_time
+    IS_ACTIVE = True
+
+
+def start_idle_time():
+    """Mark the start of idle time."""
+    global LAST_STATE_CHANGE, IS_ACTIVE, ACTIVE_TIME  # pylint: disable=global-statement
+    current_time = time.time()
+    if LAST_STATE_CHANGE is not None and IS_ACTIVE:
+        ACTIVE_TIME += current_time - LAST_STATE_CHANGE
+    LAST_STATE_CHANGE = current_time
+    IS_ACTIVE = False
+
+
+def get_active_time():
+    """Get total active execution time."""
+    active = ACTIVE_TIME
+    if IS_ACTIVE and LAST_STATE_CHANGE is not None:
+        active += time.time() - LAST_STATE_CHANGE
+    return format_time(active)
+
+
+def get_idle_time():
+    """Get total idle waiting time."""
+    idle = IDLE_TIME
+    if not IS_ACTIVE and LAST_STATE_CHANGE is not None:
+        idle += time.time() - LAST_STATE_CHANGE
+    return format_time(idle)
 
 
 def get_elapsed_time():
@@ -378,7 +421,9 @@ def cli_print_agent_messages(agent_name, message, counter, model, debug,  # pyli
                              interaction_reasoning_tokens=None,
                              total_input_tokens=None,
                              total_output_tokens=None,
-                             total_reasoning_tokens=None):
+                             total_reasoning_tokens=None,
+                             interaction_cost=None,
+                             total_cost=None):
     """Print agent messages/thoughts with enhanced visual formatting."""
     if not debug:
         return
@@ -433,7 +478,9 @@ def cli_print_agent_messages(agent_name, message, counter, model, debug,  # pyli
             total_input_tokens,
             total_output_tokens,
             total_reasoning_tokens,
-            model
+            model,
+            interaction_cost,
+            total_cost
         )
         text.append(tokens_text)
 
@@ -454,7 +501,9 @@ def cli_print_agent_messages(agent_name, message, counter, model, debug,  # pyli
 def cli_print_state(agent_name, message, counter, model, debug,  # pylint: disable=too-many-arguments,too-many-locals,unused-argument # noqa: E501
                     interaction_input_tokens, interaction_output_tokens,
                     interaction_reasoning_tokens, total_input_tokens,
-                    total_output_tokens, total_reasoning_tokens):
+                    total_output_tokens, total_reasoning_tokens,
+                    interaction_cost=None,
+                    total_cost=None):
     """Print network state messages with enhanced visual formatting."""
     if not debug:
         return
@@ -494,7 +543,9 @@ def cli_print_state(agent_name, message, counter, model, debug,  # pylint: disab
             total_input_tokens,
             total_output_tokens,
             total_reasoning_tokens,
-            model
+            model,
+            interaction_cost,
+            total_cost
         )
 
     group_content = []
@@ -545,7 +596,9 @@ def cli_print_codeagent_output(agent_name, message_content, code, counter, model
                                interaction_reasoning_tokens=None,
                                total_input_tokens=None,
                                total_output_tokens=None,
-                               total_reasoning_tokens=None):
+                               total_reasoning_tokens=None,
+                               interaction_cost=None,
+                               total_cost=None):
     """
     Print CodeAgent output with both the generated code and execution results.
 
@@ -562,6 +615,8 @@ def cli_print_codeagent_output(agent_name, message_content, code, counter, model
         total_input_tokens: Total input tokens used
         total_output_tokens: Total output tokens used
         total_reasoning_tokens: Total reasoning tokens used
+        interaction_cost: Cost of the current interaction
+        total_cost: Total accumulated cost
     """
     if not debug:
         return
@@ -616,7 +671,9 @@ def cli_print_codeagent_output(agent_name, message_content, code, counter, model
             total_input_tokens,
             total_output_tokens,
             total_reasoning_tokens,
-            model
+            model,
+            interaction_cost,
+            total_cost
         )
 
     # Print header
@@ -758,50 +815,51 @@ def _create_token_display(  # pylint: disable=too-many-arguments,too-many-locals
     total_input_tokens,
     total_output_tokens,
     total_reasoning_tokens,
-    model
+    model,
+    interaction_cost=0.0,
+    total_cost=None
 ) -> Text:  # noqa: E501
     """
     Create a Text object displaying token usage information
     with enhanced formatting.
     """
-    tokens_text = Text(justify="right")
+    tokens_text = Text(justify="left")
 
-    # Current interaction tokens with enhanced styling
-    tokens_text.append("\n", style="bold")
-    tokens_text.append("(tokens)", style="")
-    tokens_text.append(" Interaction: ", style="bold")
+    # Create a more compact, horizontal display
+    tokens_text.append(" ", style="bold")  # Small padding
+    
+    # Current interaction tokens
+    tokens_text.append("Current: ", style="bold")
     tokens_text.append(f"I:{interaction_input_tokens} ", style="green")
     tokens_text.append(f"O:{interaction_output_tokens} ", style="red")
     tokens_text.append(f"R:{interaction_reasoning_tokens} ", style="yellow")
-
-    # Calculate and display current interaction cost
-    current_costs = calculate_conversation_cost(
-        interaction_input_tokens,
-        interaction_output_tokens,
-        model
-    )
-    tokens_text.append(f"(${current_costs['total_cost']:.4f}) ", style="bold")
-
-    # Total tokens with enhanced styling
-    tokens_text.append("| Total: ", style="bold")
+    
+    # Current cost
+    current_cost = float(interaction_cost) if interaction_cost is not None else 0.0
+    tokens_text.append(f"(${current_cost:.4f}) ", style="bold")
+    
+    # Separator
+    tokens_text.append("| ", style="dim")
+    
+    # Total tokens
+    tokens_text.append("Total: ", style="bold")
     tokens_text.append(f"I:{total_input_tokens} ", style="green")
     tokens_text.append(f"O:{total_output_tokens} ", style="red")
     tokens_text.append(f"R:{total_reasoning_tokens} ", style="yellow")
-
-    total_costs = calculate_conversation_cost(
-        total_input_tokens,
-        total_output_tokens,
-        model
-    )
-    tokens_text.append(f"(${total_costs['total_cost']:.4f}) ", style="bold")
-
-    # Context usage with enhanced styling
-    context_pct = interaction_input_tokens / \
-        get_model_input_tokens(model) * 100
-    tokens_text.append("| Context: ", style="bold")
+    
+    # Total cost
+    total_cost_value = float(total_cost) if total_cost is not None else 0.0
+    tokens_text.append(f"(${total_cost_value:.4f}) ", style="bold")
+    
+    # Separator
+    tokens_text.append("| ", style="dim")
+    
+    # Context usage
+    context_pct = interaction_input_tokens / get_model_input_tokens(model) * 100
+    tokens_text.append("Context: ", style="bold")
     tokens_text.append(f"{context_pct:.1f}% ", style="bold")
-
-    # Enhanced context indicator
+    
+    # Context indicator
     if context_pct < 50:
         indicator = "🟩"
         color_local = "green"
@@ -811,11 +869,8 @@ def _create_token_display(  # pylint: disable=too-many-arguments,too-many-locals
     else:
         indicator = "🟥"
         color_local = "red"
-
-    tokens_text.append(
-        f"{indicator} ({get_model_input_tokens(model)})",
-        style=color_local
-    )
+    
+    tokens_text.append(f"{indicator}", style=color_local)
 
     return tokens_text
 
@@ -828,7 +883,9 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
                         total_output_tokens,
                         total_reasoning_tokens,
                         model,
-                        debug):
+                        debug,
+                        interaction_cost=None,
+                        total_cost=None):
     """Print tool call information with enhanced visual formatting."""
     if not debug:
         return
@@ -885,7 +942,9 @@ def cli_print_tool_call(tool_name, tool_args,  # pylint: disable=R0914,too-many-
                 total_input_tokens,
                 total_output_tokens,
                 total_reasoning_tokens,
-                model
+                model,
+                interaction_cost,
+                total_cost
             )
 
         # Handle panel width and content
@@ -1169,8 +1228,7 @@ def check_flag(output, ctf, challenge=None):
     challenge = (
         challenge_key
         if challenge_key in challenges
-        else (challenges[0] if len(challenges) > 0 else None)
-    )
+        else (challenges[0] if len(challenges) > 0 else None))
     if ctf:
         if ctf.check_flag(
             output, challenge
