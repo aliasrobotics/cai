@@ -10,7 +10,7 @@ import json
 import os
 import re
 from datetime import datetime
-from typing import Any
+from typing import Dict, Any, Callable, Type, Literal
 
 # Third-party imports
 from litellm.types.utils import Message  # pylint: disable=import-error
@@ -1148,64 +1148,222 @@ def merge_chunk(final_response: dict, delta: dict) -> None:
         merge_fields(final_response["tool_calls"][index], tool_calls[0])
 
 
-def function_to_json(func) -> dict:
+def function_to_json(
+    func: Callable,
+    format: Literal['gemini', 'original'] = 'original'
+) -> Dict[str, Any]:
     """
     Converts a Python function into a JSON-serializable dictionary
-    that describes the function's signature, including its name,
-    description, and parameters.
+    describing its signature. Supports multiple output formats.
 
     Args:
-        func: The function to be converted.
+        func: The function to convert.
+        format: The desired output format.
+            'gemini': Schema compatible with Google Gemini Function Calling
+                      (FunctionDeclaration).
+            'original': The original nested structure with a top-level 'type'.
+            Defaults to 'gemini'.
 
     Returns:
-        A dictionary representing the function's signature in JSON format.
+        A dictionary representing the function's signature in the specified format.
+
+    Raises:
+        ValueError: If the function signature cannot be obtained or if an
+                    unsupported format is requested.
+        KeyError: If an unknown type annotation is encountered for a parameter.
+        TypeError: If a type annotation is not a valid type.
     """
-    type_map = {
+
+    # Map Python types to OpenAPI/JSON schema types
+    # Ref: https://swagger.io/docs/specification/data-models/data-types/
+    # Ref: https://cloud.google.com/vertex-ai/docs/generative-ai/tool-use/function-calling#function-declaration
+    type_map: Dict[Type, str] = {
         str: "string",
         int: "integer",
         float: "number",
         bool: "boolean",
-        list: "array",
-        dict: "object",
-        type(None): "null",
+        list: "array",   # Note: Further details (items type) might be needed
+        dict: "object",  # Note: Further details (properties) might be needed
+        type(None): "null", # Rarely used for parameters
     }
+
     try:
         signature = inspect.signature(func)
+        func_description = inspect.getdoc(func) or "" # Cleaned function docstring
     except ValueError as e:
         raise ValueError(
             f"Failed to get signature for function {func.__name__}: {str(e)}"
         ) from e
-    parameters = {}
+
+    parameters_properties: Dict[str, Dict[str, Any]] = {}
+    required_params: list[str] = []
+
+    # --- Attempt to parse parameter descriptions from docstring (basic) ---
+    # Assumes a simple Google Style or reStructuredText format.
+    # For robust parsing, consider libraries like 'docstring_parser'.
+    param_descriptions = {}
+    if func_description:
+        try:
+            doc_lines = func_description.strip().split('\n')
+            in_args_section = False
+            current_param = None
+            param_desc_buffer = []
+
+            for line in doc_lines:
+                stripped_line = line.strip()
+                # Detect start of standard Args/Parameters sections
+                if stripped_line.lower().startswith(('args:', 'arguments:', 'parameters:')):
+                    in_args_section = True
+                    continue
+                # Detect end of section or change in indentation
+                if in_args_section and (not stripped_line or not line.startswith('    ')):
+                     # Process the last parameter's description buffer
+                    if current_param and param_desc_buffer:
+                         param_descriptions[current_param] = " ".join(param_desc_buffer).strip()
+                    in_args_section = False
+                    current_param = None
+                    param_desc_buffer = []
+                    # Don't process this line further if it ended the section unless it starts a new param
+                    if not stripped_line or not line.startswith('    '):
+                         continue # Skip blank lines or lines outside the args section indent
+
+                if in_args_section:
+                    # reST style: :param param_name: Description
+                    if stripped_line.startswith((':param', ':parameter')):
+                        # Process previous parameter's description buffer
+                        if current_param and param_desc_buffer:
+                           param_descriptions[current_param] = " ".join(param_desc_buffer).strip()
+                        param_desc_buffer = [] # Reset buffer
+
+                        parts = stripped_line.split(':', 2)
+                        if len(parts) >= 3:
+                           # Extract param name (robustness could be improved)
+                           name_part = parts[1].strip()
+                           # Handle ':param type param_name:' format too
+                           potential_name = name_part.split()[-1]
+                           current_param = potential_name
+                           param_desc_buffer.append(parts[2].strip())
+                        else:
+                            current_param = None # Malformed line
+                    # Google/Numpy style: param_name (type): Description
+                    # Or just param_name: Description (simpler assumption)
+                    elif ':' in stripped_line and not stripped_line.startswith(':'):
+                         # Process previous parameter's description buffer
+                         if current_param and param_desc_buffer:
+                            param_descriptions[current_param] = " ".join(param_desc_buffer).strip()
+                         param_desc_buffer = [] # Reset buffer
+
+                         parts = stripped_line.split(':', 1)
+                         param_name_part = parts[0].strip()
+                         # Try to extract name, ignoring potential type hints in ()
+                         current_param = param_name_part.split('(')[0].strip()
+                         if len(parts) > 1:
+                             param_desc_buffer.append(parts[1].strip())
+
+                    # Handle continuation lines for the current parameter description
+                    elif current_param and stripped_line:
+                         param_desc_buffer.append(stripped_line)
+
+
+            # Process the very last parameter's description buffer if loop finishes
+            if current_param and param_desc_buffer:
+               param_descriptions[current_param] = " ".join(param_desc_buffer).strip()
+
+        except Exception as e:
+            # Ignore docstring parsing errors, not critical but log potentially
+            # print(f"Warning: Could not fully parse docstring for parameter descriptions in {func.__name__}: {e}")
+            param_descriptions = {} # Reset if parsing fails badly
+    # --- End of parameter description parsing ---
+
+
     for param in signature.parameters.values():
-        # Skip the ctf parameter
+        # Skip the 'ctf' parameter if present (as per original logic)
         if param.name == "ctf":
             continue
-        try:
-            param_type = type_map.get(param.annotation, "string")
-        except KeyError as e:
-            raise KeyError(
-                f"Unknown type annotation {param.annotation} for parameter {param.name}: {str(e)}"  # noqa: E501 # pylint: disable=C0301
-            ) from e
-        parameters[param.name] = {"type": param_type}
 
-    required = [
-        param.name
-        for param in signature.parameters.values()
-        if param.default == inspect._empty and param.name != "ctf"  # pylint: disable=protected-access # noqa: E501
-    ]
-    return {
-        "type": "function",
-        "function": {
-            "name": func.__name__,
-            "description": func.__doc__ or "",
-            "parameters": {
-                "type": "object",
-                "properties": parameters,
-                "required": required,
-            },
-        },
+        # Determine if the parameter is required
+        is_required = param.default == inspect.Parameter.empty
+        if is_required:
+            required_params.append(param.name)
+
+        # Get parameter type annotation
+        param_type_annotation = param.annotation
+        param_schema_type = "string" # Default if no annotation
+
+        if param_type_annotation != inspect.Parameter.empty:
+            # Handle generic types like list[str] or dict[str, int] (simplified)
+            origin_type = getattr(param_type_annotation, '__origin__', None)
+            param_base_type = origin_type if origin_type else param_type_annotation
+
+            # Check if it's a valid type before lookup
+            if not isinstance(param_base_type, type) and not origin_type:
+                # Could be a typing alias like typing.List, etc.
+                # Attempt mapping anyway, might fail if not in type_map
+                 pass # Fall through to the type_map lookup
+
+            try:
+                param_schema_type = type_map[param_base_type]
+            except KeyError as e:
+                 # Provide more context in the error
+                raise KeyError(
+                    f"Unknown type annotation '{param_type_annotation}' (base type: {param_base_type}) "
+                    f"for parameter '{param.name}' in function '{func.__name__}'. "
+                    f"Supported base types: {list(type_map.keys())}"
+                ) from e
+            except TypeError as e:
+                # Catch cases where annotation is not a type (e.g., a string literal)
+                 raise TypeError(
+                    f"Invalid type annotation '{param_type_annotation}' for parameter '{param.name}' "
+                    f"in function '{func.__name__}'. Expected a type (like str, int, list[str]), "
+                    f"but got {type(param_type_annotation)}."
+                 ) from e
+
+        # Build the schema for this parameter, including description
+        parameter_schema: Dict[str, Any] = {
+            "type": param_schema_type,
+            "description": param_descriptions.get(param.name, "") # Use parsed description or empty string
+        }
+
+        # (Optional) Add 'items' detail for arrays if type hint specifies it
+        # Example: list[str] -> {"type": "array", "items": {"type": "string"}}
+        if param_schema_type == "array" and origin_type and hasattr(param_type_annotation, '__args__') and param_type_annotation.__args__:
+            item_type_annotation = param_type_annotation.__args__[0]
+            item_origin_type = getattr(item_type_annotation, '__origin__', None)
+            item_base_type = item_origin_type if item_origin_type else item_type_annotation
+            if item_base_type in type_map:
+                 parameter_schema["items"] = {"type": type_map[item_base_type]}
+            # Add nested handling here if needed (e.g., list[list[int]])
+
+        parameters_properties[param.name] = parameter_schema
+
+
+    # --- Construct the final output based on the requested format ---
+    common_parameters_block = {
+        "type": "object",
+        "properties": parameters_properties,
+        "required": required_params, # Include even if empty for Gemini
     }
 
+    if format == 'gemini':
+        # Gemini FunctionDeclaration Schema
+        return {
+            "name": func.__name__,
+            "description": func_description,
+            "parameters": common_parameters_block,
+        }
+    elif format == 'original':
+        # Original nested schema
+         # For this format, descriptions within properties are an enhancement
+        return {
+            "type": "function",
+            "function": {
+                "name": func.__name__,
+                "description": func_description,
+                "parameters": common_parameters_block,
+            },
+        }
+    else:
+        raise ValueError(f"Unsupported format: '{format}'. Choose 'gemini' or 'original'.")
 
 def check_flag(output, ctf, challenge=None):
     """
@@ -1446,3 +1604,74 @@ def create_graph_from_history(history):
             i += 1
         turn += 1
     return graph
+def flatten_gemini_fields(args_obj):
+    if not isinstance(args_obj, dict):
+        return args_obj
+    
+    # Check if this is a fields-style dictionary at any nesting level
+    if 'fields' in args_obj:
+        fields_data = args_obj['fields']
+        # Process different formats of fields data
+        if isinstance(fields_data, dict):
+            # Single field case: {key: command, value: {string_value: ls}}
+            key = fields_data.get('key')
+            value_data = fields_data.get('value', {})
+            
+            # Handle case where value is another nested structure
+            if isinstance(value_data, dict) and 'struct_value' in value_data:
+                # Recursively process the struct_value
+                return flatten_gemini_fields(value_data['struct_value'])
+            
+            # Extract simple value types
+            value = (value_data.get('string_value', 
+                   value_data.get('number_value',
+                   value_data.get('bool_value', None))))
+            
+            if key and value is not None:
+                return {key: value}
+            
+        elif isinstance(fields_data, list):
+            # Multiple fields case
+            result = {}
+            for field in fields_data:
+                if isinstance(field, dict):
+                    key = field.get('key')
+                    value_data = field.get('value', {})
+                    
+                    # Handle nested struct_value
+                    if isinstance(value_data, dict) and 'struct_value' in value_data:
+                        nested_result = flatten_gemini_fields(value_data['struct_value'])
+                        if isinstance(nested_result, dict):
+                            result.update(nested_result)
+                        continue
+                    
+                    # Extract simple value types
+                    value = (value_data.get('string_value', 
+                           value_data.get('number_value',
+                           value_data.get('bool_value', None))))
+                    
+                    if key and value is not None:
+                        result[key] = value
+            
+            return result
+    
+    # Process all dictionary items to handle any nested fields
+    result = {}
+    for key, value in args_obj.items():
+        if key == 'struct_value' and isinstance(value, dict):
+            # Direct struct_value processing
+            nested_result = flatten_gemini_fields(value)
+            if isinstance(nested_result, dict):
+                result.update(nested_result)
+        elif isinstance(value, dict):
+            # Recursively process nested dictionaries
+            nested_result = flatten_gemini_fields(value)
+            if isinstance(nested_result, dict) and key == 'fields':
+                # If this is a fields key with a dict result, merge it up
+                result.update(nested_result)
+            else:
+                result[key] = nested_result
+        else:
+            result[key] = value
+    
+    return result

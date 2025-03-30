@@ -52,6 +52,7 @@ from cai.util import (
     function_to_json,
     get_ollama_api_base,
     initialize_global_timer,
+    flatten_gemini_fields,
 )
 from cai.util import start_active_time, start_idle_time
 
@@ -204,10 +205,13 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 messages.append(msg)
 
         # Add support for prompt caching for claude (not automatically applied)
+        # Gemini supports it too
         # https://www.anthropic.com/news/token-saving-updates
         # We need to add only a cache_control to the last message (automatic
         # use of largest cached prefix)
-        if agent.model.startswith("claude") and len(messages) > 0:
+        if ((agent.model.startswith("claude") or 
+             "gemini" in agent.model) and 
+            len(messages) > 0):
             # Create a copy of the last message and add cache_control to it
             # It's important to create a copy to avoid modifying the original
             # message
@@ -227,7 +231,16 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # --------------------------------
         # Tools
         # --------------------------------
-        tools = [function_to_json(f) for f in agent.functions if callable(f)]
+        tools = []
+        for f in agent.functions:
+            if callable(f):
+                if "gemini" in (model_override or agent.model):
+                    # Gemini format
+                    tool = function_to_json(f)
+                    tool["function"]["name"] = tool["function"].get("name", "").replace("-", "_")
+                    tools.append(tool)
+                else:
+                    tools.append(function_to_json(f))
         # Process all tools in a single loop
         for tool in tools:
             params = tool["function"]["parameters"]
@@ -236,18 +249,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             params["properties"].pop(__CTX_VARS_NAME__, None)
             if __CTX_VARS_NAME__ in params["required"]:
                 params["required"].remove(__CTX_VARS_NAME__)
-
-            # Fix for Gemini: ensure all OBJECT type parameters have non-empty
-            # properties
-            if any(x in agent.model for x in ["gemini"]):
-                # If parameters itself is an object with empty properties, add
-                # a dummy property
-                if params.get("type") == "object" and not params.get(
-                        "properties"):
-                    params["properties"] = {
-                        "_dummy": {
-                            "type": "string",
-                            "description": "Dummy property for Gemini API"}}
 
         # --------------------------------
         # Inference parameters
@@ -261,8 +262,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             create_params["parallel_tool_calls"] = agent.parallel_tool_calls
             create_params["tools"] = tools
             create_params["tool_choice"] = agent.tool_choice
-            if (agent.model != "deepseek/deepseek-chat"
-                    and model_override != "deepseek/deepseek-chat"):
+            if "gemini" in create_params["model"]:
+                create_params.pop("parallel_tool_calls", None)
+            elif "deepseek" in create_params["model"]:
+                create_params.pop("parallel_tool_calls", None)
+            else:
                 create_params["stream_options"] = {"include_usage": True}
             if not isinstance(agent, CodeAgent):  # Don't set temperature for CodeAgent  # noqa: E501
                 create_params["temperature"] = 0.7
@@ -552,6 +556,17 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 continue
             try:
                 args = json.loads(tool_call.function.arguments)
+                # Handle potential nested 'fields' format from some models (e.g., Gemini)
+                # This function recursively flattens nested fields structures of any depth
+                if isinstance(args, dict):
+                    transformed_args = flatten_gemini_fields(args)
+                    if transformed_args != args:
+                        debug_print(
+                            debug,
+                            f"Transformed Gemini nested args: {args} -> {transformed_args}",
+                            brief=self.brief
+                        )
+                        args = transformed_args
             except json.JSONDecodeError:
                 debug_print(
                     debug,
@@ -819,6 +834,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         )  # to avoid OpenAI types (?)
 
         if not message.tool_calls or not execute_tools:
+        
             if not isinstance(active_agent, StateAgent):
                 cli_print_agent_messages(active_agent.name,
                                          message.content,
