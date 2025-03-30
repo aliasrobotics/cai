@@ -219,7 +219,16 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         # --------------------------------
         # Tools
         # --------------------------------
-        tools = [function_to_json(f) for f in agent.functions if callable(f)]
+        tools = []
+        for f in agent.functions:
+            if callable(f):
+                if "gemini" in (model_override or agent.model):
+                    # Gemini format
+                    tool = function_to_json(f)
+                    tool["function"]["name"] = tool["function"].get("name", "").replace("-", "_")
+                    tools.append(tool)
+                else:
+                    tools.append(function_to_json(f))
         # Process all tools in a single loop
         for tool in tools:
             params = tool["function"]["parameters"]
@@ -228,18 +237,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             params["properties"].pop(__CTX_VARS_NAME__, None)
             if __CTX_VARS_NAME__ in params["required"]:
                 params["required"].remove(__CTX_VARS_NAME__)
-
-            # Fix for Gemini: ensure all OBJECT type parameters have non-empty
-            # properties
-            if any(x in agent.model for x in ["gemini"]):
-                # If parameters itself is an object with empty properties, add
-                # a dummy property
-                if params.get("type") == "object" and not params.get(
-                        "properties"):
-                    params["properties"] = {
-                        "_dummy": {
-                            "type": "string",
-                            "description": "Dummy property for Gemini API"}}
 
         # --------------------------------
         # Inference parameters
@@ -253,8 +250,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             create_params["parallel_tool_calls"] = agent.parallel_tool_calls
             create_params["tools"] = tools
             create_params["tool_choice"] = agent.tool_choice
-            if (agent.model != "deepseek/deepseek-chat"
-                    and model_override != "deepseek/deepseek-chat"):
+            if "gemini" in create_params["model"]:
+                create_params.pop("parallel_tool_calls", None)
+            elif "deepseek" in create_params["model"]:
+                create_params.pop("parallel_tool_calls", None)
+            else:
                 create_params["stream_options"] = {"include_usage": True}
             if not isinstance(agent, CodeAgent):  # Don't set temperature for CodeAgent  # noqa: E501
                 create_params["temperature"] = 0.7
