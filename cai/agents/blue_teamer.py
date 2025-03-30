@@ -13,14 +13,13 @@ from cai.tools.command_and_control.sshpass import (  # pylint: disable=import-er
 from cai.tools.reconnaissance.generic_linux_command import (  # pylint: disable=import-error # noqa: E501
     generic_linux_command
 )
-from cai.tools.web.search_web import (  # pylint: disable=import-error # noqa: E501
-    search_web
-)
 
 from cai.tools.reconnaissance.exec_code import (  # pylint: disable=import-error # noqa: E501
     execute_code
 )
-
+from cai.tools.web.search_web import (  # pylint: disable=import-error # noqa: E501
+    make_web_search_with_explanation,
+)
 # Prompts
 blueteam_agent_system_prompt = Template(  # nosec B702
     filename="cai/prompts/system_blue_team_agent.md"
@@ -32,9 +31,8 @@ functions = [
     execute_code,
 ]
 
-# Add search_web function if PERPLEXITY_API_KEY environment variable is set
 if os.getenv('PERPLEXITY_API_KEY'):
-    functions.append(search_web)
+    functions.append(make_web_search_with_explanation)
 
 blueteam_agent = Agent(
     name="Blue Team Agent",
@@ -45,3 +43,6 @@ blueteam_agent = Agent(
     functions=functions,
     parallel_tool_calls=False,
 )
+
+def transfer_to_blue_teamer():
+    return blueteam_agent
