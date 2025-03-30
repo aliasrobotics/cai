@@ -52,6 +52,7 @@ from cai.util import (
     function_to_json,
     get_ollama_api_base,
     initialize_global_timer,
+    flatten_gemini_fields,
 )
 from cai.util import start_active_time, start_idle_time
 
@@ -549,79 +550,6 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 args = json.loads(tool_call.function.arguments)
                 # Handle potential nested 'fields' format from some models (e.g., Gemini)
                 # This function recursively flattens nested fields structures of any depth
-                def flatten_gemini_fields(args_obj):
-                    if not isinstance(args_obj, dict):
-                        return args_obj
-                    
-                    # Check if this is a fields-style dictionary at any nesting level
-                    if 'fields' in args_obj:
-                        fields_data = args_obj['fields']
-                        # Process different formats of fields data
-                        if isinstance(fields_data, dict):
-                            # Single field case: {key: command, value: {string_value: ls}}
-                            key = fields_data.get('key')
-                            value_data = fields_data.get('value', {})
-                            
-                            # Handle case where value is another nested structure
-                            if isinstance(value_data, dict) and 'struct_value' in value_data:
-                                # Recursively process the struct_value
-                                return flatten_gemini_fields(value_data['struct_value'])
-                            
-                            # Extract simple value types
-                            value = (value_data.get('string_value', 
-                                   value_data.get('number_value',
-                                   value_data.get('bool_value', None))))
-                            
-                            if key and value is not None:
-                                return {key: value}
-                            
-                        elif isinstance(fields_data, list):
-                            # Multiple fields case
-                            result = {}
-                            for field in fields_data:
-                                if isinstance(field, dict):
-                                    key = field.get('key')
-                                    value_data = field.get('value', {})
-                                    
-                                    # Handle nested struct_value
-                                    if isinstance(value_data, dict) and 'struct_value' in value_data:
-                                        nested_result = flatten_gemini_fields(value_data['struct_value'])
-                                        if isinstance(nested_result, dict):
-                                            result.update(nested_result)
-                                        continue
-                                    
-                                    # Extract simple value types
-                                    value = (value_data.get('string_value', 
-                                           value_data.get('number_value',
-                                           value_data.get('bool_value', None))))
-                                    
-                                    if key and value is not None:
-                                        result[key] = value
-                            
-                            return result
-                    
-                    # Process all dictionary items to handle any nested fields
-                    result = {}
-                    for key, value in args_obj.items():
-                        if key == 'struct_value' and isinstance(value, dict):
-                            # Direct struct_value processing
-                            nested_result = flatten_gemini_fields(value)
-                            if isinstance(nested_result, dict):
-                                result.update(nested_result)
-                        elif isinstance(value, dict):
-                            # Recursively process nested dictionaries
-                            nested_result = flatten_gemini_fields(value)
-                            if isinstance(nested_result, dict) and key == 'fields':
-                                # If this is a fields key with a dict result, merge it up
-                                result.update(nested_result)
-                            else:
-                                result[key] = nested_result
-                        else:
-                            result[key] = value
-                    
-                    return result
-                
-                # Apply the recursive flattening to the args
                 if isinstance(args, dict):
                     transformed_args = flatten_gemini_fields(args)
                     if transformed_args != args:
