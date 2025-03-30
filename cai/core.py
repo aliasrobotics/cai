@@ -178,11 +178,19 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         context_variables = defaultdict(str, context_variables)
 
+        # Get the absolute path to the template file
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        template_path = os.path.join(base_dir, "cai", "prompts", "core", master_template)
+        
+        # Check if the file exists
+        if not os.path.exists(template_path):
+            raise FileNotFoundError(f"Template file not found: {template_path}")
+
         # --------------------------------
         # Messages
         # --------------------------------
         messages = [{"role": "system", "content": Template(  # nosec: B702
-            filename=f"cai/prompts/core/{master_template}").render(
+            filename=template_path).render(
                 agent=agent,
                 ctf_instructions=history[0]["content"],
                 context_variables=context_variables,
