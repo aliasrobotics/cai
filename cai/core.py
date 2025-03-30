@@ -196,10 +196,13 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 messages.append(msg)
 
         # Add support for prompt caching for claude (not automatically applied)
+        # Gemini supports it too
         # https://www.anthropic.com/news/token-saving-updates
         # We need to add only a cache_control to the last message (automatic
         # use of largest cached prefix)
-        if agent.model.startswith("claude") and len(messages) > 0:
+        if ((agent.model.startswith("claude") or 
+             "gemini" in agent.model) and 
+            len(messages) > 0):
             # Create a copy of the last message and add cache_control to it
             # It's important to create a copy to avoid modifying the original
             # message

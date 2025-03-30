@@ -145,11 +145,11 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
             "choices": [{
                 "index": 0,
                 "message": {
-                    "role": msg.choices[0].message.role,
-                    "content": msg.choices[0].message.content,
-                    "tool_calls": [t.model_dump() for t in (msg.choices[0].message.tool_calls or [])]  # pylint: disable=line-too-long  # noqa: E501
+                    "role": msg.choices[0].message.role if hasattr(msg, "choices") and msg.choices else "assistant",
+                    "content": msg.choices[0].message.content if hasattr(msg, "choices") and msg.choices else None,
+                    "tool_calls": [t.model_dump() for t in (msg.choices[0].message.tool_calls or [])] if hasattr(msg, "choices") and msg.choices else []  # pylint: disable=line-too-long  # noqa: E501
                 },
-                "finish_reason": msg.choices[0].finish_reason
+                "finish_reason": msg.choices[0].finish_reason if hasattr(msg, "choices") and msg.choices else "stop"
             }],
             "usage": {
                 "prompt_tokens": msg.usage.prompt_tokens,
