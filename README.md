@@ -93,26 +93,49 @@ CAI is built on the following core principles:
 
 ## :nut_and_bolt: Install
 
+### OS X
+```bash
+brew update && \
+    brew install git python@3.12
 
-:warning: :warning: **Discouraged for now**, refer to the [Development](#development) section for dev. install instructions.
+# Clone CAI's source code 
+git clone https://github.com/aliasrobotics/CAI && cd CAI
 
-```shell
-pip install git+https://gitlab.com/aliasrobotics/alias_research/cai.git  # requires Python 3.10+
+# Create virtual environment
+python3 -m venv cai_env
+
+# Install the package from the local directory
+source cai_env/bin/activate && pip3 install -e .
+
+# Generate a .env file and set up
+cp .env.example .env  # edit here your keys/models
+
+# Launch CAI
+cai  
 ```
-^ Temporarily broken (not loading agents)
 
-### Ubuntu 24
-You can install CAI in Ubuntu 24 with the following commands:
-```shell
-sudo apt update
-sudo apt install python3.12-venv
-python3 -m venv myenv
-source myenv/bin/activate
-git clone git@gitlab.com:aliasrobotics/alias_research/cai.git
-cd cai
-pip3 install -e .[report,pentestperf,memory,platform]
+### Ubuntu 24.04
+```bash
+sudo apt-get update && \
+    sudo apt-get install -y git python3-pip python3.12-venv
+
+# Clone CAI's source code 
+git clone https://github.com/aliasrobotics/CAI && cd CAI
+
+# Create virtual environment
+python3 -m venv cai_env
+
+# Install the package from the local directory
+source cai_env/bin/activate && pip3 install -e .
+
+# Generate a .env file and set up
+cp .env.example .env  # edit here your keys/models
+
+# Launch CAI
+cai  
 ```
 
+Refer to the [Development](#development) section for dev. install instructions.
 
 ## :triangular_ruler: Architecture:
 
