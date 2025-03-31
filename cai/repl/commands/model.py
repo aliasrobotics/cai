@@ -67,6 +67,49 @@ class ModelCommand(Command):
         # Define model categories and their models for easy reference
         # pylint: disable=invalid-name
         MODEL_CATEGORIES = {
+            "Google Gemini 2.0": [
+                {
+                    "name": "gemini/gemini-2.0-pro-exp-02-05",
+                    "description": (
+                        "Current SOTA model from Google, comparable to Claude"
+                        " 3.7"
+                    )
+                },
+                {
+                    "name": "gemini/gemini-2.0-flash",
+                    "description": "Fast and capable Gemini 2.0 model"
+                },
+                {
+                    "name": "gemini/gemini-2.0-flash-lite",
+                    "description": "Lighter version of Gemini 2.0 Flash"
+                },
+                {
+                    "name": "gemini/gemini-2.0-flash-001",
+                    "description": "Specific version of Gemini 2.0 Flash"
+                },
+                {
+                    "name": "gemini/gemini-2.0-flash-exp",
+                    "description": "Experimental version of Gemini 2.0 Flash"
+                },
+                {
+                    "name": "gemini/gemini-2.0-flash-lite-preview-02-05",
+                    "description": "Preview version of Gemini 2.0 Flash Lite"
+                },
+                {
+                    "name": "gemini/gemini-2.0-flash-thinking-exp",
+                    "description": (
+                        "Experimental Gemini 2.0 Flash with thinking "
+                        "capabilities"
+                    )
+                },
+                {
+                    "name": "gemini/gemini-2.0-flash-thinking-exp-01-21",
+                    "description": (
+                        "Specific experimental version of Gemini 2.0 Flash "
+                        "with thinking"
+                    )
+                }
+            ],
             "Claude 3.7": [
                 {
                     "name": "claude-3-7-sonnet-20250219",
@@ -221,13 +264,20 @@ class ModelCommand(Command):
                 if output_cost is not None:
                     output_cost_per_million = output_cost * 1000000
 
+                # Determine provider
+                provider = "Unknown"
+                if "claude" in model["name"]:
+                    provider = "Anthropic"
+                elif "deepseek" in model["name"]:
+                    provider = "DeepSeek"
+                elif "gemini" in model["name"]:
+                    provider = "Google"
+                elif "gpt" in model["name"] or "o1" in model["name"] or "o3" in model["name"]: # noqa E501
+                    provider = "OpenAI"
+
                 ALL_MODELS.append({
                     "name": model["name"],
-                    "provider": (
-                        "Anthropic" if "claude" in model["name"]
-                        else "DeepSeek" if "deepseek" in model["name"]
-                        else "OpenAI"
-                    ),
+                    "provider": provider,
                     "category": category,
                     "description": model["description"],
                     "input_cost": input_cost_per_million,
