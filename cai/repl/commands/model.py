@@ -67,7 +67,13 @@ class ModelCommand(Command):
         # Define model categories and their models for easy reference
         # pylint: disable=invalid-name
         MODEL_CATEGORIES = {
-            "Google Gemini 2.0": [
+            "Google Gemini 2.X": [
+                {
+                    "name": "gemini/gemini-2.5-pro-exp-03-25",
+                    "description": (
+                        "Advanced model with enhanced reasoning, SOTA comparable to Claude 3.7"
+                    )
+                },
                 {
                     "name": "gemini/gemini-2.0-pro-exp-02-05",
                     "description": (
