@@ -1,5 +1,5 @@
 """
-Common functionality shared between state agent implementations.
+Common functionality shared between state agents implementations.
 """
 from cai.types import Agent
 
@@ -19,6 +19,8 @@ def get_base_instructions(state, initial_history):
     Returns:
         str: Base instruction template
     """
+    history_str = "\n".join(f"- {msg['content']}" for msg in initial_history)
+    
     return f"""
     The last state of the network is:
     ----------------------------
@@ -30,7 +32,7 @@ def get_base_instructions(state, initial_history):
     prompt and history. Take into account the initial messages to build
     the state:
     ----------------------------
-    {"\n".join(f"- {msg['content']}" for msg in initial_history)}
+    {history_str}
     ----------------------------
     Carefully assess the flags and/or results encountered with regard the
     initial messages.
