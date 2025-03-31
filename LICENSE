@@ -1,21 +1,23 @@
-MIT License
+# LICENSE
 
-Copyright (c) 2024 OpenAI
+This project is a combination of open-source components under the MIT License and proprietary additions licensed for research purposes only.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+## 1. MIT-Licensed Components
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Portions of this project are derived from openai/swarm, available under the MIT License. The original MIT-licensed code can be found in the upstream repository.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Full MIT License included in the separate file [`LICENSE-MIT`](LICENSE-MIT).
+
+---
+
+## 2. Proprietary Additions
+
+All additions, modifications, and new components authored by Alias Robotics S.L. — found across the source code and particularly under `cai` — are licensed as follows:
+
+### Research-Use License
+
+Copyright (c) [2025] Alias Robotics S.L.
+
+Permission is granted to use, copy, and modify these components solely for **non-commercial research and academic purposes**, provided that this copyright notice and license are retained in all copies.
+
+**Commercial, professional, or production use of these components is strictly prohibited without a commercial license.** To obtain a commercial license, please contact: https://aliasrobotics.com.
