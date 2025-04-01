@@ -5,9 +5,7 @@ from cai.types import Agent  # pylint: disable=import-error
 from cai.tools.command_and_control.sshpass import (  # pylint: disable=import-error # noqa: E501
     run_ssh_command_with_credentials
 )
-from cai.tools.misc.reasoning import (  # pylint: disable=import-error # noqa: E501
-    think
-)
+
 from cai.tools.reconnaissance.generic_linux_command import (  # pylint: disable=import-error # noqa: E501
     generic_linux_command
 )
