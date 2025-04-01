@@ -37,7 +37,7 @@ var/
 wheels/
 *.egg-info/
 .installed.cfg
-*.eggc
+*.egg
 workspaces/
 MANIFEST
 
