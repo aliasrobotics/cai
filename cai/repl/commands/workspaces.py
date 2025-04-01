@@ -51,7 +51,7 @@ class WorkspaceCommand(Command):
         """Display the current workspace name."""
         current_workspace = get_env_var_value("CAI_WORKSPACE")
         if current_workspace and current_workspace != "Not set":
-            console.print(f"Current workspace: [bold green]{current_workspace}[/]")
+            console.print(f"Current workspace: [bold green]{current_workspace}[/] [green](workspace/{current_workspace})[/]")
         else:
             console.print("No workspace is currently set.")
             console.print("Use [yellow]/workspace set <name>[/yellow] to set one.")
@@ -104,7 +104,7 @@ class WorkspaceCommand(Command):
                 new_filename = new_recorder.filename # Get the path of the new log file
 
                 console.print(
-                    f"Workspace set to: [bold green]{workspace_name}[/]\n"
+                    f"Workspace set to: [bold green]{workspace_name}[/] [green](workspace/{workspace_name})[/]\n"
                     "Data recorder instance updated.\n"
                     f"Logging will now use file: [cyan]{new_filename}[/]"
                 )
