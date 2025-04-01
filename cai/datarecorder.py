@@ -23,8 +23,15 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
     responses during execution in a single JSONL file.
     """
 
-    def __init__(self):
-        os.makedirs('logs', exist_ok=True)
+    def __init__(self, workspace_name: str | None = None):
+        """
+        Initializes the DataRecorder.
+
+        Args:
+            workspace_name (str | None): The name of the current workspace.
+        """
+        log_dir = 'logs'
+        os.makedirs(log_dir, exist_ok=True)
 
         # Get current username
         try:
@@ -70,8 +77,16 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
             pass
 
         # Create filename with username, OS info, and IP
-        self.filename = f'logs/cai_{datetime.now().astimezone(
-            pytz.timezone("Europe/Madrid")).strftime("%Y%m%d_%H%M%S")}_{username}_{os_info}_{public_ip.replace(".", "_")}.jsonl'  # noqa: E501  # pylint: disable=line-too-long
+        timestamp = datetime.now().astimezone(
+            pytz.timezone("Europe/Madrid")).strftime("%Y%m%d_%H%M%S")
+        base_filename = f'cai_{timestamp}_{username}_{os_info}_{public_ip.replace(".", "_")}.jsonl'
+
+        if workspace_name:
+            self.filename = os.path.join(
+                log_dir, f'{workspace_name}_{base_filename}'
+            )
+        else:
+            self.filename = os.path.join(log_dir, base_filename)
 
         # Inicializar el coste total acumulado
         self.total_cost = 0.0

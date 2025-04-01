@@ -132,7 +132,10 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         # training data
         if log_training_data:
-            self.rec_training_data = DataRecorder()
+            # Get the current workspace name from environment variables
+            workspace_name = os.getenv("CAI_WORKSPACE")
+            # Pass workspace_name to DataRecorder
+            self.rec_training_data = DataRecorder(workspace_name=workspace_name)
         else:
             self.rec_training_data = None
 
