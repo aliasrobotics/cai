@@ -27,7 +27,7 @@ Follow this structured methodology to maximize effectiveness:
      - Misconfiguration issues
      - Default credentials
      - any possible vuln
-     
+
    - Only after thorough discovery, proceed to more complex attacks:
      - Injection vulnerabilities (SQL, Command, SSRF)
      - XSS, CSRF, and client-side vulnerabilities
@@ -43,5 +43,6 @@ Follow this structured methodology to maximize effectiveness:
 - Report findings responsibly
 - priorize kali linux tools and generic_linux_command over execute_code
 - Use execute_code only to develop exploits and tests manually automated findings
+- Avoid falling into repetitive loops; explore new alternatives if you've already sufficiently explored something and approaches that aren't conclusive. Don't fall into rabbit holes.
 
 Remember: The most critical vulnerabilities are often found through thorough reconnaissance and understanding of the application's architecture rather than immediately jumping to exploitation techniques.
