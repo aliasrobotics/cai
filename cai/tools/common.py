@@ -17,7 +17,7 @@ ACTIVE_SESSIONS = {}
 
 def _get_workspace_dir() -> str:
     """Determines the target workspace directory based on env var."""
-    base_dir = "/workspace/workspaces"
+    base_dir = os.getenv("CAI_WORKSPACE_DIR", "/workspace/workspaces")
     workspace_name = os.getenv("CAI_WORKSPACE")
     if workspace_name:
         # Basic validation - allow alphanumeric, underscore, hyphen
