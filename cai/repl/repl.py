@@ -222,9 +222,9 @@ def upload_logs_anonymously(log_file_path, debug=False):
         return False
 
 
-def handle_command(command, args=None):
+def handle_command(command, args=None, messages=None):
     """Handle CLI commands using the new command system."""
-    return commands_handle_command(command, args)
+    return commands_handle_command(command, args, messages)
 
 
 def get_messages():
@@ -313,7 +313,7 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
     from rich.text import Text
     
     help_text = Text.assemble(
-        ("CAI Command Reference", "bold cyan"), "\n\n",
+        ("CAI Command Reference", "bold cyan underline"), "\n\n",
         ("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", "dim"), "\n",
         ("WORKSPACE", "bold yellow"), "\n",
         ("  /ws set [NAME]", "green"), " - Set current workspace directory\n\n",
@@ -330,14 +330,74 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
         ("  /shell or $", "green"), " - Run system shell commands\n",
         ("  [message]", "green"), " - Any text without commands will be sent as a prompt\n",
         ("  /help", "green"), " - Display complete command reference\n",
+        ("  /flush or /clear", "green"), " - Clear the conversation history\n",
         ("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", "dim"), "\n",
     )
     
+    # Get current environment variable values
+    current_model = os.getenv('CAI_MODEL', "qwen2.5:14b")
+    current_agent_type = os.getenv('CAI_AGENT_TYPE', "one_tool_agent")
+    
+    config_text = Text.assemble(
+        ("Quick Start Configuration", "bold cyan underline"), "\n\n",
+        ("1. Configure .env file with your settings", "yellow"), "\n",
+        ("2. Select an agent: ", "yellow"), f"by default: CAI_AGENT_TYPE={current_agent_type}\n",
+        ("3. Select a model: ", "yellow"), f"by default: CAI_MODEL={current_model}\n\n",
+        ("Basic Usage:", "bold yellow"), "\n",
+        ("  1. /model", "green"), " - View all available models first\n",
+        ("  2. /agent", "green"), " - View all available agents first\n",
+        ("  3. /model 10", "green"), " - Then select your preferred model\n",
+        ("  4. /agent 7", "green"), " - Then select your preferred agent\n",
+        ("  5. Attack 192.168.1.1", "green"), " - Example prompt for target attack\n\n",
+        ("  /help", "green"), " - Display complete command reference\n\n",
+        ("Common Environment Variables:", "bold yellow"), "\n",
+        ("  CAI_MODEL", "green"), f" - Model to use (default: {current_model})\n",
+        ("  CAI_AGENT_TYPE", "green"), f" - Agent type (default: {current_agent_type})\n",
+        ("  CAI_DEBUG", "green"), f" - Debug level (default: {os.getenv('CAI_DEBUG', '1')})\n",
+        ("  CAI_MAX_TURNS", "green"), f" - Max conversation turns (default: {os.getenv('CAI_MAX_TURNS', 'inf')})\n",
+        ("  CAI_TRACING", "green"), f" - Enable tracing (default: {os.getenv('CAI_TRACING', 'true')})\n",
+    )
+    
+    # Create additional tips panels
+    ollama_tip = Panel(
+        "To use Ollama models, configure OLLAMA_API_BASE\n"
+        "before startup.\n\n"
+        "Default: host.docker.internal:8000/v1",
+        title="[bold yellow]Ollama Configuration[/bold yellow]",
+        border_style="yellow",
+        padding=(1, 2),
+        title_align="center"
+    )
+    
+    context_tip = Panel(
+        "As security exercises progress, LLM quality may\n"
+        "degrade, especially if progress stalls.\n\n"
+        "It's often better to clear the context window\n"
+        "or restart CAI rather than waiting until\n"
+        "context usage reaches 100%.",
+        title="[bold yellow]Performance Tip[/bold yellow]",
+        border_style="yellow",
+        padding=(1, 2),
+        title_align="center"
+    )
+    
+    # Combine tips into a group
+    tips_group = Group(ollama_tip, context_tip)
+    
+    # Create a three-column panel layout
+    from rich.columns import Columns
+    
     console.print(Panel(
-        help_text,
+        Columns(
+            [help_text, config_text, tips_group],
+            column_first=True,
+            expand=True,
+            align="center"
+        ),
         title="[bold]CAI Quick Guide[/bold]",
         border_style="blue",
-        padding=(1, 2)
+        padding=(1, 2),
+        title_align="center"
     ))
 
     # Check for active VPN connection
@@ -442,7 +502,7 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
                     args = parts[1:] if len(parts) > 1 else None
 
                     # Process the command with the handler
-                    if handle_command(command, args):
+                    if handle_command(command, args, messages):
                         continue  # Command was handled, continue
                         # to next iteration
 

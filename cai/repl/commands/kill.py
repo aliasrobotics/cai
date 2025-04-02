@@ -5,6 +5,7 @@ This module provides commands for terminating active processes or sessions.
 import os
 import signal
 from typing import (
+    Dict,
     List,
     Optional
 )
@@ -26,22 +27,24 @@ class KillCommand(Command):
             aliases=["/k"]
         )
 
-    def handle(self, args: Optional[List[str]] = None) -> bool:
+    def handle(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Handle the kill command.
 
         Args:
             args: Optional list of command arguments
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully, False otherwise
         """
         return self.handle_kill_command(args)
 
-    def handle_kill_command(self, args: List[str]) -> bool:
+    def handle_kill_command(self, args: List[str], messages: Optional[List[Dict]] = None) -> bool:
         """Kill a background process by PID.
 
         Args:
             args: List containing the PID to kill
+            messages: Optional list of conversation messages
 
         Returns:
             bool: True if the process was killed successfully

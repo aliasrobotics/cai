@@ -2,7 +2,7 @@
 Help command for CAI REPL.
 This module provides commands for displaying help information.
 """
-from typing import List, Optional
+from typing import Dict, List, Optional
 try:
     from rich.console import Console
     from rich.table import Table
@@ -147,7 +147,7 @@ class HelpCommand(Command):
             self.handle_config
         )
 
-    def handle_memory(self, _: Optional[List[str]] = None) -> bool:
+    def handle_memory(self, _: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Show help for memory commands."""
         # Get the memory command and show its help
         memory_cmd = next((cmd for cmd in COMMANDS.values()
@@ -160,7 +160,7 @@ class HelpCommand(Command):
         self.handle_help_memory()
         return True
 
-    def handle_agents(self, _: Optional[List[str]] = None) -> bool:
+    def handle_agents(self, _: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Show help for agent-related features."""
         console.print(Panel(
             "Agents are autonomous AI assistants that can perform specific "
@@ -180,7 +180,7 @@ class HelpCommand(Command):
         ))
         return True
 
-    def handle_graph(self, _: Optional[List[str]] = None) -> bool:
+    def handle_graph(self, _: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Show help for graph visualization."""
         console.print(Panel(
             "Graph visualization helps you understand the relationships "
@@ -201,7 +201,7 @@ class HelpCommand(Command):
         ))
         return True
 
-    def handle_platform(self, _: Optional[List[str]] = None) -> bool:
+    def handle_platform(self, _: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Show help for platform-specific features."""
         platform_cmd = next(
             (cmd for cmd in COMMANDS.values() if cmd.name == "/platform"),
@@ -227,7 +227,7 @@ class HelpCommand(Command):
         ))
         return True
 
-    def handle_shell(self, _: Optional[List[str]] = None) -> bool:
+    def handle_shell(self, _: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Show help for shell command execution."""
         console.print(Panel(
             "Shell commands allow you to execute system commands directly.\n\n"
@@ -249,7 +249,7 @@ class HelpCommand(Command):
         ))
         return True
 
-    def handle_env(self, _: Optional[List[str]] = None) -> bool:
+    def handle_env(self, _: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Show help for environment variables."""
         console.print(Panel(
             "Environment variables control CAI's behavior.\n\n"
@@ -272,19 +272,19 @@ class HelpCommand(Command):
         ))
         return True
 
-    def handle_aliases(self, _: Optional[List[str]] = None) -> bool:
+    def handle_aliases(self, _: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Show all command aliases."""
         return self.handle_help_aliases()
 
-    def handle_model(self, _: Optional[List[str]] = None) -> bool:
+    def handle_model(self, _: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Show help for model selection."""
         return self.handle_help_model()
 
-    def handle_turns(self, _: Optional[List[str]] = None) -> bool:
+    def handle_turns(self, _: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Show help for managing turns."""
         return self.handle_help_turns()
 
-    def handle_config(self, _: Optional[List[str]] = None) -> bool:
+    def handle_config(self, _: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Display help for config commands.
 
         Args:
@@ -295,8 +295,8 @@ class HelpCommand(Command):
         """
         return self.handle_help_config()
 
-    def handle_no_args(self) -> bool:
-        """Handle the command when no arguments are provided."""
+    def handle_no_args(self, messages: Optional[List[Dict]] = None) -> bool:
+        """Show general help information when no arguments are provided."""
         return self.handle_help()
 
     def _print_command_table(
