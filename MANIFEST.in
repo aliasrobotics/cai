@@ -1,0 +1,31 @@
+include README.md
+include LICENSE
+include DISCLAIMER
+include LICENSE-MIT
+
+# Include all markdown prompt templates
+recursive-include cai/prompts *.md
+
+# Include image files
+recursive-include media *.png
+recursive-include media *.jpg
+recursive-include media *.gif
+
+# Include other necessary files
+include pyproject.toml
+include setup.cfg
+include pytest.ini
+include .env.example
+
+# Exclude these files/directories
+recursive-exclude workspaces *
+recursive-exclude .vscode *
+recursive-exclude .idea *
+recursive-exclude report *
+recursive-exclude __pycache__ *
+recursive-exclude .vagrant *
+recursive-exclude .git *
+recursive-exclude build *
+recursive-exclude dist *
+recursive-exclude *.egg-info *
+recursive-exclude .pytest_cache * 
