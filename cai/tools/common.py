@@ -273,18 +273,17 @@ def _run_ctf(ctf, command, stdout=False, timeout=100, workspace_dir=None):
 
 def _run_ssh(command, stdout=False, timeout=100, workspace_dir=None):
     """Runs command via SSH, changing to workspace_dir first."""
-    target_dir = workspace_dir or _get_workspace_dir()
     ssh_user = os.environ.get('SSH_USER')
     ssh_host = os.environ.get('SSH_HOST')
     ssh_pass = os.environ.get('SSH_PASS')
 
     # Prepare the command to be executed remotely
-    remote_command = f"mkdir -p '{target_dir}' && cd '{target_dir}' && {command}"
-    original_cmd_for_msg = command # For logging
+    remote_command = f"{command}"
+    original_cmd_for_msg = command  # For logging
 
     if ssh_pass:
         # Use sshpass if password is provided
-        ssh_cmd = f"sshpass -p '{ssh_pass}' ssh {ssh_user}@{ssh_host} '{remote_command}'" # noqa E501
+        ssh_cmd = f"sshpass -p '{ssh_pass}' ssh {ssh_user}@{ssh_host} '{remote_command}'"  # noqa E501
     else:
         # Use regular SSH if no password (assuming key-based auth)
         ssh_cmd = f"ssh {ssh_user}@{ssh_host} '{remote_command}'"
@@ -300,15 +299,15 @@ def _run_ssh(command, stdout=False, timeout=100, workspace_dir=None):
 
         output = result.stdout if result.stdout else result.stderr
         if stdout:
-            print(f"\033[32m({ssh_user}@{ssh_host}:{target_dir}) $ {original_cmd_for_msg}\n{output}\033[0m") # noqa E501
+            print(f"\033[32m({ssh_user}@{ssh_host}) $ {original_cmd_for_msg}\n{output}\033[0m")  # noqa E501
         return output
     except subprocess.TimeoutExpired as e:
         error_output = e.stdout.decode() if e.stdout else str(e)
         if stdout:
-             print(f"\033[32m({ssh_user}@{ssh_host}:{target_dir}) $ {original_cmd_for_msg}\nTIMEOUT\n{error_output}\033[0m") # noqa E501
+            print(f"\033[32m({ssh_user}@{ssh_host}) $ {original_cmd_for_msg}\nTIMEOUT\n{error_output}\033[0m")  # noqa E501
         return f"Timeout executing SSH command: {error_output}"
     except Exception as e:  # pylint: disable=broad-except
-        error_msg = f"Error executing SSH command '{original_cmd_for_msg}' on {ssh_host}: {e}" # noqa E501
+        error_msg = f"Error executing SSH command '{original_cmd_for_msg}' on {ssh_host}: {e}"  # noqa E501
         print(color(error_msg, fg="red"))
         return error_msg
 

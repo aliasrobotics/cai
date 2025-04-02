@@ -96,13 +96,13 @@ def get_user_input(
 
     # Get user input with all features
     return prompt(
-        [('class:prompt', 'CAI> ')],
+        [('class:prompt', 'CAI> ')],  # Simple prompt text without toolbar
         completer=command_completer,
         style=create_prompt_style(),
         history=FileHistory(str(history_file)),
         auto_suggest=AutoSuggestFromHistory(),
         key_bindings=key_bindings,
-        bottom_toolbar=toolbar_func,
+        bottom_toolbar=toolbar_func,  # This is correct - toolbar only at the bottom
         complete_in_thread=True,
         complete_while_typing=True,  # Enable real-time completion
         enable_system_prompt=True,  # Enable shadow prediction
