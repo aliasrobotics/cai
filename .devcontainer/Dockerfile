@@ -79,10 +79,10 @@ RUN wget https://raw.githubusercontent.com/adfoster-r7/metasploit-info/master/in
 # NOTE: align dev env in Linux
 # work
 # RUN echo "192.168.2.1 host.docker.internal" >> /etc/hosts
-RUN apt-get update
 # Update and upgrade packages
 # Preconfigure console-setup and install kali-linux-headless fixers
-RUN echo "console-setup console-setup/variant select Latin1 and Latin5 - western Europe and Turkic languages" | debconf-set-selections && \
+RUN apt-get update && \
+    echo "console-setup console-setup/variant select Latin1 and Latin5 - western Europe and Turkic languages" | debconf-set-selections && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends kali-linux-headless
 
 # Update pip again -> python3 -m pip install --upgrade pip causes crashes
