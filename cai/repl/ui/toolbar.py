@@ -65,7 +65,8 @@ def update_toolbar_in_background():
         workspace_path = ""
         if workspace_name:
             # Construct the standard workspace path
-            standard_workspace_path = os.path.join("/workspace/workspaces", workspace_name)
+            base_dir = os.getenv("CAI_WORKSPACE_DIR", "workspaces")
+            standard_workspace_path = os.path.join(base_dir, workspace_name)
             
             # Check if the standard path exists
             if os.path.isdir(standard_workspace_path):
