@@ -64,7 +64,7 @@
                        model="Python Code",
                        debug=2)
     artifacts = None
-    if is_caiextensions_memory_available() and os.getenv('CTF_NAME'):
+    if is_caiextensions_memory_available() and os.getenv('CTF_NAME') and os.getenv("CTF_ARTIFACTS"):
         from caiextensions.memory import get_artifacts
         artifacts = get_artifacts(os.getenv('CTF_NAME').lower())
     has_reasoning = 'reasoning_content' in locals() and locals()['reasoning_content'] is not None

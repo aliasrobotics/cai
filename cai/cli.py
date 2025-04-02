@@ -55,7 +55,8 @@ Environment Variables
             (default: "o3-mini")
         CAI_SUPPORT_INTERVAL: Number of turns between support agent
             executions (default: "5")
-
+        CTF_ARTIFACTS: Enable/disable artifacts mode (default: "false")
+            only if you have caiextensions-memory installed
     Extensions (only applicable if the right extension is installed):
 
         "report"
@@ -94,6 +95,16 @@ Usage Examples:
         CAI_MODEL="o3-mini" CAI_MEMORY_ONLINE_INTERVAL="3" \
         CAI_MEMORY_ONLINE="False" CTF_INSIDE="False" \
         CTF_HINTS="False" python3 cai/cli.py
+
+    # Run without artifacts 
+    CTF_NAME="android-dropper" CAI_AGENT_TYPE="one_tool_agent" \
+        CAI_MODEL="gemini/gemini-2.5-pro-exp-03-25" CAI_TRACING="false" \
+        CTF_INSIDE="false" python3 cai/cli.py 
+
+    # Run with artifacts 
+    CTF_NAME="android-dropper" CAI_AGENT_TYPE="one_tool_agent" \
+        CAI_MODEL="gemini/gemini-2.5-pro-exp-03-25" CAI_TRACING="false" \
+        CTF_INSIDE="false" CTF_ARTIFACTS="true" python3 cai/cli.py 
 """
 # Standard library imports
 import os
