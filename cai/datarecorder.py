@@ -178,7 +178,9 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
             "timing": {
                 "active_seconds": active_time_seconds,
                 "idle_seconds": idle_time_seconds
-            }
+            },
+            "timestamp_iso": datetime.now().astimezone(
+                pytz.timezone("Europe/Madrid")).isoformat()
         }
 
         # Append both request and completion to the instance's jsonl file
