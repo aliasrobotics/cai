@@ -334,7 +334,25 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 else:
                     litellm_completion = litellm.completion(**create_params)
             except litellm.exceptions.BadRequestError as e:
-                if "LLM Provider NOT provided" in str(e):
+                # Check if it's a context window exceeded error
+                if ("context window" in str(e).lower() or 
+                    "prompt is too long" in str(e).lower() or 
+                    "window exceeded" in str(e).lower()):
+                    print(f"\033[33mContext window exceeded: {str(e)}\033[0m")
+                    print("\033[33mTrimming conversation history to fit context window...\033[0m")
+                    
+                    # Keep system prompt, first user message, and the most recent messages
+                    if len(messages) > 12:
+                        preserved_messages = [messages[0], messages[1]]  # System prompt and first message
+                        preserved_messages.extend(messages[-10:])  # Last 10 messages
+                        create_params["messages"] = preserved_messages
+                        print(f"\033[33mReduced history from {len(messages)} to {len(preserved_messages)} messages\033[0m")
+                        # Retry with smaller context
+                        continue
+                    else:
+                        # If we can't trim further, raise the exception
+                        raise e
+                elif "LLM Provider NOT provided" in str(e):
                     # Create a copy of params to avoid overwriting the original
                     # ones
                     ollama_params = create_params.copy()
