@@ -307,6 +307,38 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
 
     # Display CAI banner and welcome message
     display_banner(console)
+    
+    # Display help panel instead
+    from rich.panel import Panel
+    from rich.text import Text
+    
+    help_text = Text.assemble(
+        ("CAI Command Reference", "bold cyan"), "\n\n",
+        ("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", "dim"), "\n",
+        ("WORKSPACE", "bold yellow"), "\n",
+        ("  /ws set [NAME]", "green"), " - Set current workspace directory\n\n",
+        ("AGENT MANAGEMENT", "bold yellow"), "\n",
+        ("  /agent [NAME]", "green"), " - Switch to specific agent by name\n",
+        ("  /agent 1 2 3", "green"), " - Switch to agent by position number\n",
+        ("  /agent", "green"), " - Display list of all available agents\n\n",
+        ("MODEL SELECTION", "bold yellow"), "\n",
+        ("  /model [NAME]", "green"), " - Change to a different model by name\n",
+        ("  /model 1", "green"), " - Change model by position number\n",
+        ("  /model", "green"), " - Show all available models\n\n",
+        ("INPUT & EXECUTION", "bold yellow"), "\n",
+        ("  ESC + ENTER", "green"), " - Enter multi-line input mode\n",
+        ("  /shell or $", "green"), " - Run system shell commands\n",
+        ("  [message]", "green"), " - Any text without commands will be sent as a prompt\n",
+        ("  /help", "green"), " - Display complete command reference\n",
+        ("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", "dim"), "\n",
+    )
+    
+    console.print(Panel(
+        help_text,
+        title="[bold]CAI Quick Guide[/bold]",
+        border_style="blue",
+        padding=(1, 2)
+    ))
 
     # Check for active VPN connection
     if is_caiextensions_platform_available():

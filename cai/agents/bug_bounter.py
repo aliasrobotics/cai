@@ -22,7 +22,7 @@ from cai.tools.reconnaissance.shodan import (  # pylint: disable=import-error # 
     shodan_search,
     shodan_host_info
 )
-
+from cai.tools.misc.reasoning import think  # pylint: disable=import-error
 load_dotenv()
 # Prompts
 bug_bounter_system_prompt = Template(  # nosec B702
@@ -32,6 +32,7 @@ bug_bounter_system_prompt = Template(  # nosec B702
 functions = [
     generic_linux_command,
     execute_code,
+    think,
     shodan_search,
     shodan_host_info
 ]

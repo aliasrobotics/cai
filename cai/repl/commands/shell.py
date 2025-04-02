@@ -43,7 +43,7 @@ class ShellCommand(Command):
         return self.handle_shell_command(args)
 
     def handle_shell_command(self, command_args: List[str]) -> bool:
-        """Execute a shell command that can be interrupted with CTRL+C.
+        """Execute a shell command, potentially changing directory first.
 
         Args:
             command_args: The shell command and its arguments
@@ -55,8 +55,40 @@ class ShellCommand(Command):
             console.print("[red]Error: No command specified[/red]")
             return False
 
-        shell_command = " ".join(command_args)
-        console.print(f"[blue]Executing:[/blue] {shell_command}")
+        original_command = " ".join(command_args)
+        shell_command_to_execute = original_command
+        
+        # Get workspace path from environment variable
+        workspace_name = os.getenv("CAI_WORKSPACE", "")
+        effective_cwd = None
+
+        # Check if workspace is set
+        if workspace_name:
+            # Construct the standard workspace path
+            standard_workspace_path = os.path.join("/workspace/workspaces", workspace_name)
+            
+            # Check if the standard path exists
+            if os.path.isdir(standard_workspace_path):
+                effective_cwd = standard_workspace_path
+            elif os.path.isdir(workspace_name):
+                # Fallback to direct path if it exists
+                effective_cwd = workspace_name
+            else:
+                # Fallback to current directory
+                console.print(f"[yellow]Warning: Workspace '{workspace_name}' not found at standard location.[/yellow]")
+                effective_cwd = os.getcwd()
+            
+            # For os.system when using async commands, prepend cd
+            if effective_cwd != os.getcwd():
+                shell_command_to_execute = f"cd {effective_cwd!r} && {original_command}"
+                console.print(f"[dim]Running in workspace: {effective_cwd}[/dim]")
+            else:
+                console.print(f"[dim]Running in current directory: {effective_cwd}[/dim]")
+        else:
+            effective_cwd = os.getcwd()
+            console.print(f"[dim]Running in current directory: {effective_cwd}[/dim]")
+
+        console.print(f"[blue]Executing:[/blue] {original_command}")
 
         # Save original signal handler
         original_sigint_handler = signal.getsignal(signal.SIGINT)
@@ -70,35 +102,38 @@ class ShellCommand(Command):
 
             signal.signal(signal.SIGINT, shell_sigint_handler)
 
-            # Check if this is a command that should run asynchronously
+            # Determine if the *original* command suggests async execution
             async_commands = [
-                'nc',
-                'netcat',
-                'ncat',
-                'telnet',
-                'ssh',
-                'python -m http.server']
-            is_async = any(cmd in shell_command for cmd in async_commands)
+                'nc', 'netcat', 'ncat', 'telnet', 'ssh',
+                'python -m http.server'
+            ]
+            is_async = any(cmd in original_command for cmd in async_commands)
 
             if is_async:
-                # For async commands, use os.system to allow terminal
-                # interaction
+                # For async commands, use os.system. It respects the shell's cd
                 console.print(
                     "[yellow]Running in async mode "
-                    "(Ctrl+C to return to REPL)[/yellow]")
-                os.system(shell_command)  # nosec B605
+                    "(Ctrl+C to return to REPL)[/yellow]"
+                )
+                # os.system runs in a subshell, inheriting the environment
+                # The shell handles the `cd ... && ...` part correctly.
+                os.system(shell_command_to_execute)  # nosec B605
                 console.print(
-                    "[green]Async command completed or detached[/green]")
+                    "[green]Async command completed or detached[/green]"
+                )
                 return True
 
-            # For regular commands, use the standard approach
+            # For regular commands, use subprocess.Popen
+            # Pass the potentially modified command (with cd)
+            # Use cwd parameter for Popen for reliability
             process = subprocess.Popen(  # nosec B602 # pylint: disable=consider-using-with # noqa: E501
-                shell_command,
-                shell=True,
+                original_command, # Execute original command directly
+                shell=True,       # Shell handles cd if present in command_to_execute
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 universal_newlines=True,
-                bufsize=1
+                bufsize=1,
+                cwd=effective_cwd # Set the current working directory explicitly
             )
 
             # Show output in real time
