@@ -11,6 +11,8 @@ import os
 import re
 from datetime import datetime
 from typing import Dict, Any, Callable, Type, Literal
+import importlib.resources
+import pathlib
 
 # Third-party imports
 from litellm.types.utils import Message  # pylint: disable=import-error
@@ -1604,6 +1606,7 @@ def create_graph_from_history(history):
             i += 1
         turn += 1
     return graph
+
 def flatten_gemini_fields(args_obj):
     if not isinstance(args_obj, dict):
         return args_obj
@@ -1675,3 +1678,62 @@ def flatten_gemini_fields(args_obj):
             result[key] = value
     
     return result
+
+def get_template_content(template_path):
+    """
+    Load a prompt template content from the package resources without rendering it.
+    
+    Args:
+        template_path: Path to the template file relative to the cai package,
+                      e.g., "prompts/system_bug_bounter.md"
+    
+    Returns:
+        The raw template content as a string
+    """
+    try:
+        # Normalize the path - remove 'cai/' prefix if it exists
+        if template_path.startswith('cai/'):
+            template_path = template_path[4:]  # Remove the 'cai/' prefix
+        
+        # Get the template file from package resources
+        template_path_parts = template_path.split('/')
+        package_path = ['cai'] + template_path_parts[:-1]
+        package = '.'.join(package_path)
+        filename = template_path_parts[-1]
+        
+        # Read the content from the package resources
+        # Handle different importlib.resources APIs between Python versions
+        try:
+            # Python 3.9+ API
+            template_content = importlib.resources.read_text(package, filename)
+        except (TypeError, AttributeError):
+            # Fallback for Python 3.8 and earlier
+            with importlib.resources.path(package, filename) as path:
+                template_content = pathlib.Path(path).read_text(encoding='utf-8')
+        
+        return template_content
+    except Exception as e:
+        debug_print(1, f"Failed to load template content '{template_path}': {str(e)}")
+        raise ValueError(f"Failed to load template content '{template_path}': {str(e)}")
+
+def load_prompt_template(template_path, **template_vars):
+    """
+    Load a prompt template from the package resources and render it with the given variables.
+    
+    Args:
+        template_path: Path to the template file relative to the cai package,
+                      e.g., "prompts/system_bug_bounter.md"
+        **template_vars: Variables to use when rendering the template
+    
+    Returns:
+        The rendered template as a string
+    """
+    try:
+        template_content = get_template_content(template_path)
+        
+        # Render the template
+        from mako.template import Template
+        return Template(text=template_content).render(**template_vars)
+    except Exception as e:
+        debug_print(1, f"Failed to render template '{template_path}': {str(e)}")
+        raise ValueError(f"Failed to render template '{template_path}': {str(e)}")

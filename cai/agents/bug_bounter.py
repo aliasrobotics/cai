@@ -1,8 +1,8 @@
 """Red Team Base Agent"""
 import os
 from dotenv import load_dotenv
-from mako.template import Template  # pylint: disable=import-error
 from cai.types import Agent  # pylint: disable=import-error
+from cai.util import load_prompt_template  # Add this import
 from cai.tools.command_and_control.sshpass import (  # pylint: disable=import-error # noqa: E501
     run_ssh_command_with_credentials
 )
@@ -25,9 +25,7 @@ from cai.tools.reconnaissance.shodan import (  # pylint: disable=import-error # 
 from cai.tools.misc.reasoning import think  # pylint: disable=import-error
 load_dotenv()
 # Prompts
-bug_bounter_system_prompt = Template(  # nosec B702
-    filename="cai/prompts/system_bug_bounter.md"
-).render()
+bug_bounter_system_prompt = load_prompt_template("prompts/system_bug_bounter.md")
 # Define functions list based on available API keys
 functions = [
     generic_linux_command,

@@ -1,7 +1,7 @@
 """Red Team Base Agent"""
 import os
-from mako.template import Template  # pylint: disable=import-error
 from cai.types import Agent  # pylint: disable=import-error
+from cai.util import load_prompt_template  # Add this import
 from cai.tools.command_and_control.sshpass import (  # pylint: disable=import-error # noqa: E501
     run_ssh_command_with_credentials
 )
@@ -18,9 +18,7 @@ from cai.tools.reconnaissance.exec_code import (  # pylint: disable=import-error
 )
 
 # Prompts
-redteam_agent_system_prompt = Template(  # nosec B702
-    filename="cai/prompts/system_red_team_agent.md"
-).render()
+redteam_agent_system_prompt = load_prompt_template("prompts/system_red_team_agent.md")
 # Define functions list based on available API keys
 functions = [
     generic_linux_command,
