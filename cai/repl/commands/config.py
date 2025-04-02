@@ -123,6 +123,11 @@ ENV_VARS = {
         "description": "Number of turns between support agent executions",
         "default": "5"
     },
+    22: {
+        "name": "CAI_WORKSPACE",
+        "description": "Name of the current workspace (affects log file naming)",
+        "default": None  # Default to no workspace
+    },
 }
 
 

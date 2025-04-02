@@ -16,9 +16,9 @@ toolbar_last_refresh = [datetime.datetime.now()]
 
 # Cache for toolbar data
 toolbar_cache = {
-    'html': "",
+    'html': None,
     'last_update': datetime.datetime.now(),
-    'refresh_interval': 60  # Refresh every 60 seconds
+    'refresh_interval': 5  # Refresh every 5 seconds
 }
 
 # Cache for system information that rarely changes
@@ -58,27 +58,24 @@ def update_toolbar_in_background():
         os_name = sys_info['os_name']
         os_version = sys_info['os_version']
 
-        # Get Ollama information
-        ollama_status = "unavailable"
-        try:
-            # Get Ollama models with a short timeout to prevent hanging
-            api_base = os.getenv(
-                "OLLAMA_API_BASE",
-                "http://host.docker.internal:8000/v1")
-            response = requests.get(
-                f"{api_base.replace('/v1', '')}/api/tags", timeout=0.5)
-
-            if response.status_code == 200:
-                data = response.json()
-                if 'models' in data:
-                    ollama_models = len(data['models'])
-                else:
-                    # Fallback for older Ollama versions
-                    ollama_models = len(data.get('items', []))
-                ollama_status = f"{ollama_models} models"
-        except Exception:  # pylint: disable=broad-except
-            # Silently fail if Ollama is not available
-            ollama_status = "unavailable"
+        # Get current logical workspace name from environment variable
+        workspace_name = os.getenv("CAI_WORKSPACE", "")
+        
+        # Get full workspace path
+        workspace_path = ""
+        if workspace_name:
+            # Construct the standard workspace path
+            standard_workspace_path = os.path.join("/workspace/workspaces", workspace_name)
+            
+            # Check if the standard path exists
+            if os.path.isdir(standard_workspace_path):
+                workspace_path = standard_workspace_path
+            elif os.path.isdir(workspace_name):
+                # Fallback to direct path if it exists
+                workspace_path = os.path.abspath(workspace_name)
+            else:
+                # Not a valid directory, but show the expected path anyway
+                workspace_path = standard_workspace_path
 
         # Get current time for the toolbar refresh indicator
         current_time = datetime.datetime.now().strftime("%H:%M")
@@ -87,38 +84,53 @@ def update_toolbar_in_background():
         timezone_name = datetime.datetime.now().astimezone().tzname()
         current_time_with_tz = f"{current_time} {timezone_name}"
 
-        # Update the cache
-        toolbar_cache['html'] = HTML(
-            f"<ansired><b>IP:</b></ansired> <ansigreen>{
-                ip_address}</ansigreen> | "
-            f"<ansiyellow><b>OS:</b></ansiyellow> <ansiblue>{
-                os_name} {os_version}</ansiblue> | "
-            f"<ansicyan><b>Ollama:</b></ansicyan> <ansimagenta>{
-                ollama_status}</ansimagenta> | "
-            f"<ansiyellow><b>Model:</b></ansiyellow> <ansigreen>{
-                os.getenv('CAI_MODEL', 'default')}</ansigreen> | "
-            f"<ansicyan><b>Max Turns:</b></ansicyan> <ansiblue>{
-                os.getenv('CAI_MAX_TURNS', 'inf')}</ansiblue> | "
-            f"<ansigray>{current_time_with_tz}</ansigray>"
-        )
+        # Build the toolbar content
+        parts = []
+        
+        # IP Address
+        parts.append("<ansired><b>IP:</b></ansired> ")
+        parts.append(f"<ansigreen>{ip_address}</ansigreen>")
+        parts.append(" │ ")
+        
+        # OS Info
+        parts.append("<ansiyellow><b>OS:</b></ansiyellow> ")
+        parts.append(f"<ansiblue>{os_name} {os_version}</ansiblue>")
+        parts.append(" │ ")
+        
+        # Workspace (only if set)
+        if workspace_name:
+            parts.append("<ansimagenta><b>Workspace:</b></ansimagenta> ")
+            # Always display the path, even if it's just the name
+            parts.append(f"<ansiwhite>{workspace_path}</ansiwhite>")
+            parts.append(" │ ")
+        
+        # Model
+        parts.append("<ansiyellow><b>Model:</b></ansiyellow> ")
+        parts.append(f"<ansigreen>{os.getenv('CAI_MODEL', 'default')}</ansigreen>")
+        parts.append(" │ ")
+        
+        # Time
+        parts.append(f"<ansigray>{current_time_with_tz}</ansigray>")
+        
+        # Join everything and create HTML formatted text
+        toolbar_html = "".join(parts)
+        toolbar_cache['html'] = HTML(toolbar_html)
         toolbar_cache['last_update'] = datetime.datetime.now()
-    except Exception:  # pylint: disable=broad-except
+        
+    except Exception as e:  # pylint: disable=broad-except
         # If there's an error, set a simple toolbar
-        toolbar_cache['html'] = HTML(
-            f"<ansigray>{datetime.datetime.now().strftime('%H:%M')}</ansigray>"
-        )
+        error_time = datetime.datetime.now().strftime('%H:%M')
+        toolbar_cache['html'] = HTML(f"<ansigray>Error: {str(e)[:30]}... {error_time}</ansigray>")
 
 
 def get_bottom_toolbar():
     """Get the bottom toolbar with system information (cached)."""
     # If the toolbar is empty, initialize it
-    if not toolbar_cache['html']:
+    if toolbar_cache['html'] is None:
         # Create a simple initial toolbar while the full one loads
         current_time = datetime.datetime.now().strftime("%H:%M")
-        timezone_name = datetime.datetime.now().astimezone().tzname()
-        toolbar_cache['html'] = HTML(
-            f"<ansigray>Loading system information... {current_time} {timezone_name}</ansigray>"
-        )
+        toolbar_cache['html'] = HTML(f"<ansigray>Loading... {current_time}</ansigray>")
+        
         # Start background update
         threading.Thread(
             target=update_toolbar_in_background,
@@ -130,7 +142,7 @@ def get_bottom_toolbar():
 
 
 def get_toolbar_with_refresh():
-    """Get toolbar with refresh control (once per minute)."""
+    """Get toolbar with refresh control."""
     now = datetime.datetime.now()
     seconds_elapsed = (now - toolbar_cache['last_update']).total_seconds()
     
