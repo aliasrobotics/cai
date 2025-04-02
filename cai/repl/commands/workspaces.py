@@ -3,7 +3,7 @@ Workspace command for CAI.
 """
 # Standard library imports
 import os
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 # Third party imports
 from rich.console import Console  # pylint: disable=import-error
@@ -43,21 +43,21 @@ class WorkspaceCommand(Command):
             self.handle_get
         )
 
-    def handle_no_args(self) -> bool:
+    def handle_no_args(self, messages: Optional[List[Dict]] = None) -> bool:
         """Handle the command when no arguments are provided."""
-        return self.handle_get(None)
+        return self.handle_get(None, messages)
 
-    def handle_get(self, _: Optional[List[str]] = None) -> bool:
+    def handle_get(self, _: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Display the current workspace name."""
         current_workspace = get_env_var_value("CAI_WORKSPACE")
         if current_workspace and current_workspace != "Not set":
             console.print(f"Current workspace: [bold green]{current_workspace}[/] [green](workspace/{current_workspace})[/]")
         else:
             console.print("No workspace is currently set.")
-            console.print("Use [yellow]/workspace set <name>[/yellow] to set one.")
+            console.print("Use [yellow]/workspace set <n>[/yellow] to set one.")
         return True
 
-    def handle_set(self, args: Optional[List[str]] = None) -> bool:
+    def handle_set(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Set the current workspace name and update the data recorder."""
         if not args or len(args) != 1:
             console.print(

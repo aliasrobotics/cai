@@ -3,6 +3,7 @@ Platform command for CAI REPL.
 This module provides commands for interacting with platform-specific features.
 """
 from typing import (
+    Dict,
     List,
     Optional
 )
@@ -62,11 +63,12 @@ class PlatformCommand(Command):
                             self.handle_platform_command([p, c] + (args or []))
                     )
 
-    def handle(self, args: Optional[List[str]] = None) -> bool:
+    def handle(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Handle the platform command.
 
         Args:
             args: Optional list of command arguments
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully, False otherwise
@@ -75,9 +77,9 @@ class PlatformCommand(Command):
             console.print("[red]Platform extensions are not available[/red]")
             return False
 
-        return self.handle_platform_command(args)
+        return self.handle_platform_command(args, messages)
 
-    def handle_list(self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
+    def handle_list(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
         """Handle /platform list command."""
         if not is_caiextensions_platform_available():
             console.print("[red]Platform extensions are not available[/red]")
@@ -94,7 +96,7 @@ class PlatformCommand(Command):
         return True
 
     def handle_platform_command(
-            self, args: Optional[List[str]] = None) -> bool:
+            self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Handle platform specific commands."""
         if not is_caiextensions_platform_available():
             console.print("[red]Platform extensions are not available[/red]")
@@ -133,12 +135,13 @@ class PlatformCommand(Command):
         return True
 
     def handle_vpn_status(
-            self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
+            self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
         """
         Check the status of the VPN connection.
 
         Args:
             args: Optional list of command arguments (not used)
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully, False otherwise
@@ -177,12 +180,13 @@ class PlatformCommand(Command):
             return False
 
     def handle_keep_vpn(
-            self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
+            self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
         """
         Set the VPN to remain active even when the program is interrupted.
 
         Args:
             args: Optional list of command arguments (not used)
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully, False otherwise

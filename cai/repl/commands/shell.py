@@ -6,6 +6,7 @@ import os
 import signal
 import subprocess  # nosec B404
 from typing import (
+    Dict,
     List,
     Optional
 )
@@ -27,11 +28,12 @@ class ShellCommand(Command):
             aliases=["/s", "$"]
         )
 
-    def handle(self, args: Optional[List[str]] = None) -> bool:
+    def handle(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Handle the shell command.
 
         Args:
             args: Optional list of command arguments
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully, False otherwise
@@ -41,12 +43,12 @@ class ShellCommand(Command):
             return False
 
         return self.handle_shell_command(args)
-
-    def handle_shell_command(self, command_args: List[str]) -> bool:
+    def handle_shell_command(self, command_args: List[str], messages: Optional[List[Dict]] = None) -> bool:
         """Execute a shell command, potentially changing directory first.
 
         Args:
             command_args: The shell command and its arguments
+            messages: Optional list of conversation messages
 
         Returns:
             bool: True if the command was executed successfully
@@ -64,18 +66,16 @@ class ShellCommand(Command):
 
         # Check if workspace is set
         if workspace_name:
-            # Construct the standard workspace path
-            standard_workspace_path = os.path.join("/workspace/workspaces", workspace_name)
+            # Construct the workspace path
+            base_dir = os.getenv("CAI_WORKSPACE_DIR", "workspaces")
+            workspace_path = os.path.join(base_dir, workspace_name)
             
-            # Check if the standard path exists
-            if os.path.isdir(standard_workspace_path):
-                effective_cwd = standard_workspace_path
-            elif os.path.isdir(workspace_name):
-                # Fallback to direct path if it exists
-                effective_cwd = workspace_name
+            # Check if the workspace path exists
+            if os.path.isdir(workspace_path):
+                effective_cwd = workspace_path
             else:
                 # Fallback to current directory
-                console.print(f"[yellow]Warning: Workspace '{workspace_name}' not found at standard location.[/yellow]")
+                console.print(f"[yellow]Warning: Workspace '{workspace_name}' not found at {workspace_path}.[/yellow]")
                 effective_cwd = os.getcwd()
             
             # For os.system when using async commands, prepend cd
@@ -168,7 +168,6 @@ class ShellCommand(Command):
         finally:
             # Restore original signal handler
             signal.signal(signal.SIGINT, original_sigint_handler)
-
 
 # Register the command
 register_command(ShellCommand())
