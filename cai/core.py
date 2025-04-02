@@ -109,6 +109,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.init_len = 0  # initial length of history
         self.source = source  # Store the source
 
+        # Flag to track if we've shown the empty content error
+        self.empty_content_error_shown = False
+
         # graph
         self._graph = graph.get_default_graph()
 
@@ -374,7 +377,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 # Handle Anthropic error for empty text content blocks
                 elif ("text content blocks must be non-empty" in str(e) or
                     "cache_control cannot be set for empty text blocks" in str(e)):  # noqa
-                    print(f"Error: {str(e)}")
+                    # Only print the error message the first time it happens
+                    if not self.empty_content_error_shown:
+                        print(f"Error: {str(e)}")
+                        self.empty_content_error_shown = True
+                    
                     # Fix for empty content in messages for Anthropic models
                     create_params["messages"] = [
                         msg if msg.get("content") not in [None, ""] else
