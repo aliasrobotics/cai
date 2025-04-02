@@ -100,7 +100,7 @@ brew update && \
     brew install git python@3.12
 
 # Clone CAI's source code 
-git clone https://github.com/aliasrobotics/CAI && cd CAI
+git clone https://github.com/aliasrobotics/cai && cd cai
 
 # Create virtual environment
 python3 -m venv cai_env
@@ -121,7 +121,7 @@ sudo apt-get update && \
     sudo apt-get install -y git python3-pip python3.12-venv
 
 # Clone CAI's source code 
-git clone https://github.com/aliasrobotics/CAI && cd CAI
+git clone https://github.com/aliasrobotics/cai && cd cai
 
 # Create virtual environment
 python3 -m venv cai_env
