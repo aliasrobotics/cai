@@ -4,6 +4,7 @@ This module provides commands for displaying environment variables.
 """
 import os
 from typing import (
+    Dict,
     List,
     Optional
 )
@@ -26,19 +27,23 @@ class EnvCommand(Command):
             aliases=["/e"]
         )
 
-    def handle(self, args: Optional[List[str]] = None) -> bool:
+    def handle(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Handle the env command.
 
         Args:
             args: Optional list of command arguments
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully, False otherwise
         """
         return self.handle_env_command()
 
-    def handle_env_command(self) -> bool:
+    def handle_env_command(self, messages: Optional[List[Dict]] = None) -> bool:
         """Display environment variables starting with CAI or CTF.
+
+        Args:
+            messages: Optional list of conversation messages
 
         Returns:
             bool: True if the command was executed successfully

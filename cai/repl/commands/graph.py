@@ -3,6 +3,7 @@ Graph command for CAI REPL.
 This module provides commands for visualizing the agent interaction graph.
 """
 from typing import (
+    Dict,
     List,
     Optional
 )
@@ -24,18 +25,19 @@ class GraphCommand(Command):
             aliases=["/g"]
         )
 
-    def handle(self, args: Optional[List[str]] = None) -> bool:
+    def handle(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Handle the graph command.
 
         Args:
             args: Optional list of command arguments
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully, False otherwise
         """
         return self.handle_graph_show()
 
-    def handle_graph_show(self) -> bool:
+    def handle_graph_show(self, messages: Optional[List[Dict]] = None) -> bool:
         """Handle /graph show command"""
         from cai.repl.repl import client  # pylint: disable=import-error
 

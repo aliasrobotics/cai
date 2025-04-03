@@ -9,7 +9,7 @@ import inspect
 import os
 import sys
 
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 # Third-party imports
 from rich.console import Console  # pylint: disable=import-error
@@ -122,32 +122,34 @@ class AgentCommand(Command):
         """
         return self._subcommands.get(subcommand, "")
 
-    def handle(self, args: Optional[List[str]] = None) -> bool:
+    def handle(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Handle the agent command.
 
         Args:
             args: Optional list of command arguments
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully, False otherwise
         """
         if not args:
-            return self.handle_list(args)
+            return self.handle_list(args, messages)
 
         subcommand = args[0]
         if subcommand in self._subcommands:
             handler = getattr(self, f"handle_{subcommand}", None)
             if handler:
-                return handler(args[1:] if len(args) > 1 else None)
+                return handler(args[1:] if len(args) > 1 else None, messages)
 
         # If not a subcommand, try to select an agent by name
-        return self.handle_select(args)
+        return self.handle_select(args, messages)
 
-    def handle_list(self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
+    def handle_list(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
         """Handle /agent list command.
 
         Args:
             args: Optional list of command arguments (not used)
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully
@@ -199,11 +201,12 @@ class AgentCommand(Command):
         console.print(table)
         return True
 
-    def handle_select(self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=too-many-branches,line-too-long # noqa: E501
+    def handle_select(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:  # pylint: disable=too-many-branches,line-too-long # noqa: E501
         """Handle /agent select command.
 
         Args:
             args: Optional list of command arguments
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully, False otherwise
@@ -281,11 +284,12 @@ class AgentCommand(Command):
         console.print("[red]Error: REPL module not initialized[/red]")
         return False
 
-    def handle_info(self, args: Optional[List[str]] = None) -> bool:
+    def handle_info(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Handle /agent info command.
 
         Args:
             args: Optional list of command arguments
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully, False otherwise

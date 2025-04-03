@@ -2,6 +2,7 @@
 History command for CAI REPL.
 This module provides commands for displaying conversation history.
 """
+from typing import Dict, List, Optional
 from rich.console import Console  # pylint: disable=import-error
 from rich.table import Table  # pylint: disable=import-error
 
@@ -21,15 +22,20 @@ class HistoryCommand(Command):
             aliases=["/h"]
         )
 
-    def handle_no_args(self) -> bool:
+    def handle_no_args(self, messages: Optional[List[Dict]] = None) -> bool:
         """Handle the command when no arguments are provided.
+
+        Args:
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully, False otherwise
         """
         # Access messages directly from repl.py's global scope
         try:
-            from cai.repl.repl import messages  # pylint: disable=import-outside-toplevel  # noqa: E501
+            from cai.repl.repl import messages as repl_messages  # pylint: disable=import-outside-toplevel  # noqa: E501
+            if messages is None:
+                messages = repl_messages
         except ImportError:
             console.print(
                 "[red]Error: Could not access conversation history[/red]")

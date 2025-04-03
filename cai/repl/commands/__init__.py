@@ -5,9 +5,13 @@ in the CAI REPL.
 """
 from typing import (
     Dict,
-    List,
+    List
 )
 
+# Third-party imports
+from rich.console import Console  # pylint: disable=import-error
+
+# Local imports
 from cai.repl.commands.completer import (
     FuzzyCommandCompleter
 )
@@ -38,8 +42,13 @@ from cai.repl.commands import (  # pylint: disable=import-error,unused-import,li
     agent,
     history,
     config,
-    workspaces
+    workspaces,
+    flush
 )
+
+
+# Initialize console for rich formatting
+console = Console()  # Define console globally
 
 # Define helper functions
 
