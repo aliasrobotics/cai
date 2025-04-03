@@ -15,6 +15,7 @@ from typing import Dict, List, Optional
 from rich.console import Console  # pylint: disable=import-error
 from rich.markdown import Markdown  # pylint: disable=import-error
 from rich.table import Table  # pylint: disable=import-error
+from rich import box  # pylint: disable=import-error
 
 # Local imports
 from cai.agents import get_available_agents, get_agent_module
@@ -277,12 +278,84 @@ class AgentCommand(Command):
 
                 console.print(
                     f"[green]Switched to agent: {agent_name}[/green]")
+                
+                # Display agent summary information in a Rich table
+                self._display_agent_summary(agent_name, agent)
+                
                 visualize_agent_graph(agent)
                 return True
             console.print("[red]Error: CAI client not initialized[/red]")
             return False
         console.print("[red]Error: REPL module not initialized[/red]")
         return False
+
+    def _display_agent_summary(self, agent_name: str, agent: Agent) -> None:
+        """Display a compact summary of the selected agent in a Rich table.
+        
+        Args:
+            agent_name: Name of the agent
+            agent: Agent instance
+        """
+        table = Table(
+            title=f"Agent: {agent_name}",
+            box=box.SIMPLE_HEAD,
+            show_header=True,
+            padding=(0, 1),
+            collapse_padding=True,
+            title_style="bold cyan",
+            header_style="bold"
+        )
+        
+        table.add_column("Property", style="cyan", width=10)
+        table.add_column("Value", style="green", max_width=70, overflow="fold")
+        
+        # Add agent name
+        table.add_row("Name", agent_name)
+        
+        # Add description
+        description = agent.description
+        if not description and hasattr(agent, 'instructions'):
+            if callable(agent.instructions):
+                try:
+                    description = agent.instructions(context_variables={})
+                except:  # pylint: disable=bare-except
+                    description = agent.instructions
+            else:
+                description = agent.instructions
+                
+        # Clean up description - remove newlines and strip spaces
+        if isinstance(description, str):
+            description = " ".join(description.split())
+            if len(description) > 80:
+                description = description[:77] + "..."
+        table.add_row("Description", description or "No description available")
+        
+        # Add system prompt (more compact)
+        system_prompt = ""
+        if hasattr(agent, 'system_prompt'):
+            system_prompt = agent.system_prompt
+        elif hasattr(agent, 'instructions'):
+            if callable(agent.instructions):
+                try:
+                    system_prompt = agent.instructions(context_variables={})
+                except:  # pylint: disable=bare-except
+                    system_prompt = agent.instructions
+            else:
+                system_prompt = agent.instructions
+        
+        if isinstance(system_prompt, str):
+            # Remove excess whitespace and format more compactly
+            system_prompt = " ".join([line.strip() for line in 
+                                    system_prompt.split("\n") if line.strip()])
+            # Even shorter preview for compactness
+            if len(system_prompt) > 600:
+                system_prompt = system_prompt[:597] + "..."
+        else:
+            system_prompt = "No system prompt available"
+        
+        table.add_row("System", system_prompt)
+        
+        console.print(table)
 
     def handle_info(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Handle /agent info command.
