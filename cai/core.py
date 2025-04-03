@@ -53,6 +53,8 @@ from cai.util import (
     get_ollama_api_base,
     initialize_global_timer,
     flatten_gemini_fields,
+    get_template_content,
+    load_prompt_template,
 )
 from cai.util import start_active_time, start_idle_time
 
@@ -108,6 +110,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.brief = False
         self.init_len = 0  # initial length of history
         self.source = source  # Store the source
+
+        # Flag to track if we've shown the empty content error
+        self.empty_content_error_shown = False
 
         # graph
         self._graph = graph.get_default_graph()
@@ -182,23 +187,18 @@ class CAI:  # pylint: disable=too-many-instance-attributes
 
         context_variables = defaultdict(str, context_variables)
 
-        # Get the absolute path to the template file
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        template_path = os.path.join(base_dir, "cai", "prompts", "core", master_template)
+        # Use the template loading utility instead of hardcoded paths
+        template_path = f"prompts/core/{master_template}"
         
-        # Check if the file exists
-        if not os.path.exists(template_path):
-            raise FileNotFoundError(f"Template file not found: {template_path}")
-
         # --------------------------------
         # Messages
         # --------------------------------
-        messages = [{"role": "system", "content": Template(  # nosec: B702
-            filename=template_path).render(
-                agent=agent,
-                ctf_instructions=history[0]["content"],
-                context_variables=context_variables,
-                reasoning_content=self.last_reasoning_content)
+        messages = [{"role": "system", "content": load_prompt_template(
+            template_path,
+            agent=agent,
+            ctf_instructions=history[0]["content"],
+            context_variables=context_variables,
+            reasoning_content=self.last_reasoning_content)
         }]
         for msg in history:
             if (msg.get("sender") not in ["Report Agent", "Reasoner Agent"] and
@@ -331,7 +331,25 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 else:
                     litellm_completion = litellm.completion(**create_params)
             except litellm.exceptions.BadRequestError as e:
-                if "LLM Provider NOT provided" in str(e):
+                # Check if it's a context window exceeded error
+                if ("context window" in str(e).lower() or 
+                    "prompt is too long" in str(e).lower() or 
+                    "window exceeded" in str(e).lower()):
+                    print(f"\033[33mContext window exceeded: {str(e)}\033[0m")
+                    print("\033[33mTrimming conversation history to fit context window...\033[0m")
+                    
+                    # Keep system prompt, first user message, and the most recent messages
+                    if len(messages) > 12:
+                        preserved_messages = [messages[0], messages[1]]  # System prompt and first message
+                        preserved_messages.extend(messages[-10:])  # Last 10 messages
+                        create_params["messages"] = preserved_messages
+                        print(f"\033[33mReduced history from {len(messages)} to {len(preserved_messages)} messages\033[0m")
+                        # Retry with smaller context
+                        continue
+                    else:
+                        # If we can't trim further, raise the exception
+                        raise e
+                elif "LLM Provider NOT provided" in str(e):
                     # Create a copy of params to avoid overwriting the original
                     # ones
                     ollama_params = create_params.copy()
@@ -374,7 +392,11 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 # Handle Anthropic error for empty text content blocks
                 elif ("text content blocks must be non-empty" in str(e) or
                     "cache_control cannot be set for empty text blocks" in str(e)):  # noqa
-                    print(f"Error: {str(e)}")
+                    # Only print the error message the first time it happens
+                    if not self.empty_content_error_shown:
+                        print(f"Error: {str(e)}")
+                        self.empty_content_error_shown = True
+                    
                     # Fix for empty content in messages for Anthropic models
                     create_params["messages"] = [
                         msg if msg.get("content") not in [None, ""] else

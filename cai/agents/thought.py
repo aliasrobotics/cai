@@ -6,13 +6,11 @@ using reasoner as a tool call
 support meta agent may better @cai.agents.meta.reasoner_support
 """
 from cai.tools.misc.reasoning import thought
-from mako.template import Template  # pylint: disable=import-error
 from cai.types import Agent  # pylint: disable=import-error
+from cai.util import load_prompt_template  # Add this import
 import os
 
-thought_agent_system_prompt = Template(  # nosec B702
-    filename="cai/prompts/system_thought_router.md"
-).render()
+thought_agent_system_prompt = load_prompt_template("prompts/system_thought_router.md")
 
 # Thought Process Agent for analysis and planning
 thought_agent = Agent(
