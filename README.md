@@ -138,6 +138,33 @@ cai
 
 Refer to the [Development](#development) section for dev. install instructions.
 
+## :nut_and_bolt: Setup .env
+
+The .env.example file provides a template for configuring your personal LLM API keys to work with Anthropic, OpenAI, and other providers.
+
+Structure of .env.example:
+
+`
+OPENAI_API_KEY="sk-123"
+ANTHROPIC_API_KEY=""
+OLLAMA=""
+PROMPT_TOOLKIT_NO_CPR=1
+`
+
+When cai runs, it loads the .env file to retrieve API keys for connecting to different models.
+
+:warning: Important:
+
+The OPENAI_API_KEY must not be left blank. It should contain either "sk-123" (as a placeholder) or your actual API key.
+
+cai supports multiple models, each requiring different API keys. Attempting to use a model without a valid key will result in an error.
+
+## :nut_and_bolt: Defaults
+
+If no agent or model is specified when running cai, Ollama will be used by default.
+
+Ollama is an open-source model that can be installed locally by any user.
+
 ## :triangular_ruler: Architecture:
 
 CAI focuses on making cybersecurity agent **coordination** and **execution** lightweight, highly controllable, and useful for humans. To do so it builds upon 7 pillars: `Agent`s, `Tools`, `Handoffs`, `Patterns`, `Turns`, `Tracing` and `HITL`.
