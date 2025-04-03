@@ -3,6 +3,7 @@ Memory command for CAI REPL.
 This module provides commands for managing memory collections.
 """
 from typing import (
+    Dict,
     List,
     Optional
 )
@@ -51,7 +52,7 @@ class MemoryCommand(Command):
             "Create a new memory collection",
             self.handle_create)
 
-    def handle_list(self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
+    def handle_list(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
         """Handle /memory list command"""
         try:
             db = QdrantConnector()
@@ -76,7 +77,7 @@ class MemoryCommand(Command):
             print(f"Error listing collections: {e}")
             return False
 
-    def handle_load(self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
+    def handle_load(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
         """Handle /memory load command"""
         if not args:
             console.print("[red]Error: Collection name required[/red]")
@@ -100,7 +101,7 @@ class MemoryCommand(Command):
             print(f"Error setting memory collection: {e}")
             return False
 
-    def handle_delete(self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
+    def handle_delete(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
         """Handle /memory delete command"""
         if not args:
             console.print("[red]Error: Collection name required[/red]")
@@ -121,7 +122,7 @@ class MemoryCommand(Command):
             print(f"Error deleting collection: {e}")
             return False
 
-    def handle_create(self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
+    def handle_create(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
         """Handle /memory create command"""
         if not args:
             console.print("[red]Error: Collection name required[/red]")
@@ -151,7 +152,7 @@ class MemoryCommand(Command):
             print(f"Error creating collection: {e}")
             return False
 
-    def handle_no_args(self) -> bool:  # pylint: disable=unused-argument # noqa: E501
+    def handle_no_args(self, messages: Optional[List[Dict]] = None) -> bool:  # pylint: disable=unused-argument # noqa: E501
         """Handle the command when no arguments are provided."""
         # Show memory help
         self.show_help()

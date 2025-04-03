@@ -3,7 +3,7 @@ Config command for CAI via environmental variables.
 """
 # Standard library imports
 import os
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 # Third party imports
 from rich.console import Console  # pylint: disable=import-error
@@ -190,19 +190,23 @@ class ConfigCommand(Command):
             self.handle_get
         )
 
-    def handle_no_args(self) -> bool:
+    def handle_no_args(self, messages: Optional[List[Dict]] = None) -> bool:
         """Handle the command when no arguments are provided.
+
+        Args:
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully, False otherwise
         """
-        return self.handle_list(None)
+        return self.handle_list(None, messages)
 
-    def handle_list(self, _: Optional[List[str]] = None) -> bool:
+    def handle_list(self, _: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """List all environment variables and their values.
 
         Args:
             _: Ignored arguments
+            messages: Optional list of conversation messages
 
         Returns:
             True if successful
@@ -237,11 +241,12 @@ class ConfigCommand(Command):
         )
         return True
 
-    def handle_get(self, args: Optional[List[str]] = None) -> bool:
+    def handle_get(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Get the value of an environment variable by its number.
 
         Args:
             args: Command arguments [var_number]
+            messages: Optional list of conversation messages
 
         Returns:
             True if successful, False otherwise
@@ -276,11 +281,12 @@ class ConfigCommand(Command):
             )
             return False
 
-    def handle_set(self, args: Optional[List[str]] = None) -> bool:
+    def handle_set(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Set an environment variable by its number.
 
         Args:
             args: Command arguments [var_number, value]
+            messages: Optional list of conversation messages
 
         Returns:
             True if successful, False otherwise

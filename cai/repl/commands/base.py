@@ -62,27 +62,32 @@ class Command:
         """
         return self.subcommands.get(subcommand, {}).get("description", "")
 
-    def handle(self, args: Optional[List[str]] = None) -> bool:
+    def handle(self, args: Optional[List[str]] = None,
+               messages: Optional[List[Dict]] = None) -> bool:
         """Handle the command.
 
         Args:
             args: Optional list of command arguments
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully, False otherwise
         """
         if not args:
-            return self.handle_no_args()
+            return self.handle_no_args(messages)
 
         subcommand = args[0]
         if subcommand in self.subcommands:
             handler = self.subcommands[subcommand]["handler"]
-            return handler(args[1:] if len(args) > 1 else None)
+            return handler(args[1:] if len(args) > 1 else None, messages)
 
         return self.handle_unknown_subcommand(subcommand)
 
-    def handle_no_args(self) -> bool:
+    def handle_no_args(self, messages: Optional[List[Dict]] = None) -> bool:
         """Handle the command when no arguments are provided.
+
+        Args:
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully, False otherwise
@@ -121,7 +126,7 @@ def register_command(command: Command) -> None:
         command: The command to register
     """
     COMMANDS[command.name] = command
-
+    
     # Register aliases
     for alias in command.aliases:
         COMMAND_ALIASES[alias] = command.name
@@ -142,18 +147,20 @@ def get_command(name: str) -> Optional[Command]:
     return COMMANDS.get(name)
 
 
-def handle_command(command: str, args: Optional[List[str]] = None) -> bool:
+def handle_command(
+        command: str, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:  # noqa: E501
     """Handle a command.
 
     Args:
         command: The command name or alias
         args: Optional list of command arguments
+        messages: Optional list of conversation messages
 
     Returns:
         True if the command was handled successfully, False otherwise
     """
     cmd = get_command(command)
     if cmd:
-        return cmd.handle(args)
+        return cmd.handle(args, messages)
 
     return False

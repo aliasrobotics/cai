@@ -5,7 +5,7 @@ This module provides commands for viewing and changing the current LLM model.
 import os
 import datetime
 # Standard library imports
-from typing import List, Optional  # Dict and Any removed as unused
+from typing import Dict, List, Optional  # Dict and Any removed as unused
 
 # Third-party imports
 import requests  # pylint: disable=import-error
@@ -42,11 +42,12 @@ class ModelCommand(Command):
             datetime.datetime.now() - datetime.timedelta(minutes=10)
         )
 
-    def handle(self, args: Optional[List[str]] = None) -> bool:
+    def handle(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Handle the model command.
 
         Args:
             args: Optional list of command arguments
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully, False otherwise
@@ -54,12 +55,13 @@ class ModelCommand(Command):
         return self.handle_model_command(args)
 
     # pylint: disable=too-many-locals,too-many-branches,too-many-statements
-    def handle_model_command(self, args: List[str]) -> bool:
+    def handle_model_command(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Change the model used by CAI.
 
         Args:
             args: List containing the model name to use or a number to select
                 from the list
+            messages: Optional list of conversation messages
 
         Returns:
             bool: True if the model was changed successfully
@@ -325,6 +327,7 @@ class ModelCommand(Command):
                 "Output Cost ($/M)",
                 style="red",
                 justify="right")
+            model_table.add_column("API Key Env Var", style="dim")
             model_table.add_column("Description", style="white")
 
             # Add all predefined models with numbers
@@ -338,6 +341,18 @@ class ModelCommand(Command):
                     f"${model['output_cost']:.2f}"
                     if model['output_cost'] is not None else "Unknown"
                 )
+                
+                # Determine API Key Env Var
+                api_key_var = "N/A"
+                provider_lower = model["provider"].lower()
+                if provider_lower == "google":
+                    api_key_var = "GEMINI_API_KEY"
+                elif provider_lower == "anthropic":
+                    api_key_var = "ANTHROPIC_API_KEY"
+                elif provider_lower == "openai":
+                    api_key_var = "OPENAI_API_KEY"
+                elif provider_lower == "deepseek":
+                    api_key_var = "DEEPSEEK_API_KEY"
 
                 model_table.add_row(
                     str(i),
@@ -346,6 +361,7 @@ class ModelCommand(Command):
                     model["category"],
                     input_cost_str,
                     output_cost_str,
+                    api_key_var,
                     model["description"]
                 )
 
@@ -397,6 +413,7 @@ class ModelCommand(Command):
                             "Local",
                             "Free",
                             "Free",
+                            "OLLAMA_API_BASE",
                             model_description
                         )
 
@@ -413,6 +430,7 @@ class ModelCommand(Command):
                     "Local",
                     "Free",
                     "Free",
+                    "OLLAMA_API_BASE",
                     "Local Llama 3 model (if installed)")
                 model_table.add_row(str(start_index + 1),
                                     "mistral",
@@ -420,6 +438,7 @@ class ModelCommand(Command):
                                     "Local",
                                     "Free",
                                     "Free",
+                                    "OLLAMA_API_BASE",
                                     "Local Mistral model (if installed)")
                 model_table.add_row(str(start_index + 2),
                                     "...",
@@ -427,6 +446,7 @@ class ModelCommand(Command):
                                     "Local",
                                     "Free",
                                     "Free",
+                                    "OLLAMA_API_BASE",
                                     "Other local models (if installed)")
 
             console.print(model_table)
@@ -491,11 +511,12 @@ class ModelShowCommand(Command):
             aliases=["/mod-show"]
         )
 
-    def handle(self, args: Optional[List[str]] = None) -> bool:  # pylint: disable=too-many-locals,too-many-branches,too-many-statements,line-too-long # noqa: E501
+    def handle(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:  # pylint: disable=too-many-locals,too-many-branches,too-many-statements,line-too-long # noqa: E501
         """Handle the model-show command.
 
         Args:
             args: Optional list of command arguments
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully, False otherwise
@@ -554,6 +575,7 @@ class ModelShowCommand(Command):
                 "Output Cost ($/M)",
                 style="red",
                 justify="right")
+            model_table.add_column("API Key Env Var", style="dim")
             model_table.add_column("Features", style="white")
 
             # Count models for summary
@@ -585,10 +607,117 @@ class ModelShowCommand(Command):
                     provider = "OpenAI"
                 elif provider == "openai":
                     provider = "OpenAI"
-                elif "/" in model_name:
-                    # Extract provider from model name
-                    provider = model_name.split("/")[0].capitalize()
-
+                elif provider == "anthropic":
+                    provider = "Anthropic"
+                elif provider == "bedrock": # Bedrock often proxies Anthropic/others
+                    # Try to guess based on name for Bedrock
+                    if "claude" in model_name.lower():
+                        provider = "Anthropic (Bedrock)"
+                    # Add other Bedrock providers if needed
+                    else:
+                        provider = "AWS Bedrock"
+                elif "gemini" in model_name.lower():
+                     provider = "Google"
+                elif "deepseek" in model_name.lower():
+                     provider = "DeepSeek"
+                elif "groq" in model_name.lower():
+                     provider = "Groq"
+                elif "azure" in model_name.lower():
+                     provider = "Azure OpenAI"
+                elif "perplexity" in model_name.lower():
+                     provider = "Perplexity"
+                elif "cohere" in model_name.lower():
+                    provider = "Cohere"
+                elif "together_ai" in model_name.lower():
+                    provider = "Together AI"
+                elif "huggingface" in model_name.lower():
+                    provider = "HuggingFace"
+                elif "mistral" in model_name.lower():
+                    provider = "Mistral AI"
+                elif "databricks" in model_name.lower():
+                    provider = "Databricks"
+                elif "cloudflare" in model_name.lower():
+                    provider = "Cloudflare"
+                elif "voyage" in model_name.lower():
+                    provider = "Voyage AI"
+                elif "replicate" in model_name.lower():
+                    provider = "Replicate"
+                elif "anyscale" in model_name.lower():
+                    provider = "Anyscale"
+                elif "vertex" in model_name.lower():
+                    provider = "Google Vertex AI"
+                elif "nvidia" in model_name.lower():
+                    provider = "NVIDIA"
+                elif "ai21" in model_name.lower():
+                    provider = "AI21"
+                elif "nlp_cloud" in model_name.lower():
+                    provider = "NLP Cloud"
+                elif "aleph_alpha" in model_name.lower():
+                    provider = "Aleph Alpha"
+                elif "baseten" in model_name.lower():
+                    provider = "Baseten"
+                elif "petals" in model_name.lower():
+                    provider = "Petals"
+                elif "marqo" in model_name.lower():
+                    provider = "Marqo"
+                elif "openrouter" in model_name.lower():
+                    provider = "OpenRouter"
+                elif "cloudflare" in model_name.lower():
+                    provider = "Cloudflare"
+                elif "palm" in model_name.lower(): # Older Google
+                    provider = "Google PaLM"
+                elif "ollama" in model_name.lower():
+                    provider = "Ollama"
+                elif "databricks" in model_name.lower():
+                    provider = "Databricks"
+                elif "maritaca" in model_name.lower():
+                    provider = "Maritaca"
+                elif "clarifai" in model_name.lower():
+                    provider = "Clarifai"
+                elif "fireworks_ai" in model_name.lower():
+                    provider = "Fireworks AI"
+                elif provider == "Unknown" and "/" in model_name:
+                    # Fallback: Extract provider from model name if structure is provider/model
+                    provider_guess = model_name.split("/")[0].capitalize()
+                    if provider_guess:
+                        provider = provider_guess
+                    
+                # Determine API Key Var
+                api_key_var = "N/A"
+                provider_lower = provider.lower()
+                if "google" in provider_lower or "vertex" in provider_lower or "palm" in provider_lower:
+                    api_key_var = "GOOGLE_API_KEY"
+                elif "anthropic" in provider_lower or ("bedrock" in provider_lower and "claude" in model_name.lower()):
+                    api_key_var = "ANTHROPIC_API_KEY"
+                elif "openai" in provider_lower or "azure" in provider_lower:
+                    api_key_var = "OPENAI_API_KEY"
+                elif "deepseek" in provider_lower:
+                    api_key_var = "DEEPSEEK_API_KEY"
+                elif "cohere" in provider_lower:
+                    api_key_var = "COHERE_API_KEY"
+                elif "groq" in provider_lower:
+                    api_key_var = "GROQ_API_KEY"
+                elif "together_ai" in provider_lower:
+                    api_key_var = "TOGETHER_API_KEY"
+                elif "perplexity" in provider_lower:
+                    api_key_var = "PERPLEXITY_API_KEY"
+                elif "mistral" in provider_lower:
+                    api_key_var = "MISTRAL_API_KEY"
+                elif "huggingface" in provider_lower:
+                    api_key_var = "HUGGINGFACE_API_KEY"
+                elif "ai21" in provider_lower:
+                    api_key_var = "AI21_API_KEY"
+                elif "replicate" in provider_lower:
+                    api_key_var = "REPLICATE_API_KEY"
+                elif "voyage" in provider_lower:
+                    api_key_var = "VOYAGE_API_KEY"
+                elif "bedrock" in provider_lower: # Catch-all for other Bedrock
+                    api_key_var = "AWS Keys (Configured)"
+                elif "ollama" in provider_lower:
+                    api_key_var = "OLLAMA_API_BASE"
+                elif provider != "Unknown" and provider != "Ollama": # Many other providers exist
+                    api_key_var = f"{provider.upper().replace(' ', '_')}_API_KEY"
+                    
                 # Get max tokens
                 max_tokens = model_info.get("max_tokens", "N/A")
 
@@ -643,6 +772,7 @@ class ModelShowCommand(Command):
                     str(max_tokens),
                     input_cost_str,
                     output_cost_str,
+                    api_key_var,
                     features_str
                 )
 
@@ -674,6 +804,10 @@ class ModelShowCommand(Command):
                                 search_term not in model_name.lower()):
                             continue
 
+                        # Skip if showing only supported models (Ollama doesn't report this)
+                        if show_only_supported:
+                             continue
+                             
                         total_models += 1
                         displayed_models += 1
 
@@ -700,6 +834,7 @@ class ModelShowCommand(Command):
                             "Varies",
                             "Free",
                             "Free",
+                            "OLLAMA_API_BASE",
                             model_description
                         )
 

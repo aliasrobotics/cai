@@ -3,7 +3,7 @@ Exit command for CAI REPL.
 This module provides the command to exit the REPL.
 """
 import sys
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from cai.repl.commands.base import Command, register_command
 
@@ -19,11 +19,12 @@ class ExitCommand(Command):
             aliases=["/q", "/quit"]
         )
 
-    def handle(self, args: Optional[List[str]] = None) -> bool:
+    def handle(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
         """Handle the exit command.
 
         Args:
             args: Optional list of command arguments
+            messages: Optional list of conversation messages
 
         Returns:
             True if the command was handled successfully, False otherwise
