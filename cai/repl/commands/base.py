@@ -126,7 +126,7 @@ def register_command(command: Command) -> None:
         command: The command to register
     """
     COMMANDS[command.name] = command
-    print(command.name)
+    
     # Register aliases
     for alias in command.aliases:
         COMMAND_ALIASES[alias] = command.name
