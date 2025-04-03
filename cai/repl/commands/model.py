@@ -57,7 +57,7 @@ class ModelCommand(Command):
 
     # pylint: disable=too-many-locals,too-many-branches,too-many-statements
     def handle_model_command(
-            self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:  # noqa E501
+            self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:  # noqa: E501
         """Change the model used by CAI.
 
         Args:
@@ -283,7 +283,7 @@ class ModelCommand(Command):
                     provider = "DeepSeek"
                 elif "gemini" in model["name"]:
                     provider = "Google"
-                elif "gpt" in model["name"] or "o1" in model["name"] or "o3" in model["name"]:  # noqa E501
+                elif "gpt" in model["name"] or "o1" in model["name"] or "o3" in model["name"]:  # noqa: E501
                     provider = "OpenAI"
 
                 ALL_MODELS.append({
