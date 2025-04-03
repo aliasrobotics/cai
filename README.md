@@ -99,7 +99,7 @@ CAI is built on the following core principles:
 brew update && \
     brew install git python@3.12
 
-# Clone CAI's source code 
+# Clone CAI's source code
 git clone https://github.com/aliasrobotics/CAI && cd CAI
 
 # Create virtual environment
@@ -112,7 +112,7 @@ source cai_env/bin/activate && pip3 install -e .
 cp .env.example .env  # edit here your keys/models
 
 # Launch CAI
-cai  
+cai
 ```
 
 ### Ubuntu 24.04
@@ -120,7 +120,7 @@ cai
 sudo apt-get update && \
     sudo apt-get install -y git python3-pip python3.12-venv
 
-# Clone CAI's source code 
+# Clone CAI's source code
 git clone https://github.com/aliasrobotics/CAI && cd CAI
 
 # Create virtual environment
@@ -133,7 +133,7 @@ source cai_env/bin/activate && pip3 install -e .
 cp .env.example .env  # edit here your keys/models
 
 # Launch CAI
-cai  
+cai
 ```
 
 Refer to the [Development](#development) section for dev. install instructions.
@@ -487,6 +487,8 @@ For using private models, you are given a [`.env.example`](.env.example) file. C
 | CAI_REPORT | Enable/disable reporter mode (ctf, nis2, pentesting) |
 | CAI_SUPPORT_MODEL | Model to use for the support agent |
 | CAI_SUPPORT_INTERVAL | Number of turns between support agent executions |
+| CAI_WORKSPACE | Defines the name of the workspace |
+| CAI_WORKSPACE_DIR | Specifies the directory path where the workspace is located |
 
 </details>
 

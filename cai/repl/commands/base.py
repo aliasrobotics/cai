@@ -62,7 +62,8 @@ class Command:
         """
         return self.subcommands.get(subcommand, {}).get("description", "")
 
-    def handle(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
+    def handle(self, args: Optional[List[str]] = None,
+               messages: Optional[List[Dict]] = None) -> bool:
         """Handle the command.
 
         Args:
@@ -125,7 +126,7 @@ def register_command(command: Command) -> None:
         command: The command to register
     """
     COMMANDS[command.name] = command
-
+    print(command.name)
     # Register aliases
     for alias in command.aliases:
         COMMAND_ALIASES[alias] = command.name
@@ -146,7 +147,8 @@ def get_command(name: str) -> Optional[Command]:
     return COMMANDS.get(name)
 
 
-def handle_command(command: str, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
+def handle_command(
+        command: str, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:  # noqa: E501
     """Handle a command.
 
     Args:
