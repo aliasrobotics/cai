@@ -103,7 +103,7 @@ brew update && \
 git clone https://github.com/aliasrobotics/cai && cd cai
 
 # Create virtual environment
-python3 -m venv cai_env
+python3.12 -m venv cai_env
 
 # Install the package from the local directory
 source cai_env/bin/activate && pip3 install -e .
