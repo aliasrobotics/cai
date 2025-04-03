@@ -487,6 +487,8 @@ For using private models, you are given a [`.env.example`](.env.example) file. C
 | CAI_REPORT | Enable/disable reporter mode (ctf, nis2, pentesting) |
 | CAI_SUPPORT_MODEL | Model to use for the support agent |
 | CAI_SUPPORT_INTERVAL | Number of turns between support agent executions |
+| CAI_WORKSPACE | Defines the name of the workspace |
+| CAI_WORKSPACE_DIR | Specifies the directory path where the workspace is located |
 
 </details>
 
