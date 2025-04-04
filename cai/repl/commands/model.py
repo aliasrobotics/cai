@@ -42,7 +42,8 @@ class ModelCommand(Command):
             datetime.datetime.now() - datetime.timedelta(minutes=10)
         )
 
-    def handle(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
+    def handle(self, args: Optional[List[str]] = None,
+               messages: Optional[List[Dict]] = None) -> bool:
         """Handle the model command.
 
         Args:
@@ -55,7 +56,8 @@ class ModelCommand(Command):
         return self.handle_model_command(args)
 
     # pylint: disable=too-many-locals,too-many-branches,too-many-statements
-    def handle_model_command(self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:
+    def handle_model_command(
+            self, args: Optional[List[str]] = None, messages: Optional[List[Dict]] = None) -> bool:  # noqa: E501
         """Change the model used by CAI.
 
         Args:
@@ -73,7 +75,8 @@ class ModelCommand(Command):
                 {
                     "name": "gemini/gemini-2.5-pro-exp-03-25",
                     "description": (
-                        "Advanced model with enhanced reasoning, SOTA comparable to Claude 3.7"
+                        """Advanced model with enhanced reasoning,
+                         SOTA comparable to Claude 3.7"""
                     )
                 },
                 {
@@ -280,7 +283,7 @@ class ModelCommand(Command):
                     provider = "DeepSeek"
                 elif "gemini" in model["name"]:
                     provider = "Google"
-                elif "gpt" in model["name"] or "o1" in model["name"] or "o3" in model["name"]: # noqa E501
+                elif "gpt" in model["name"] or "o1" in model["name"] or "o3" in model["name"]:  # noqa: E501
                     provider = "OpenAI"
 
                 ALL_MODELS.append({
@@ -341,7 +344,7 @@ class ModelCommand(Command):
                     f"${model['output_cost']:.2f}"
                     if model['output_cost'] is not None else "Unknown"
                 )
-                
+
                 # Determine API Key Env Var
                 api_key_var = "N/A"
                 provider_lower = model["provider"].lower()
@@ -609,7 +612,7 @@ class ModelShowCommand(Command):
                     provider = "OpenAI"
                 elif provider == "anthropic":
                     provider = "Anthropic"
-                elif provider == "bedrock": # Bedrock often proxies Anthropic/others
+                elif provider == "bedrock":  # Bedrock often proxies Anthropic/others # noqa: E501
                     # Try to guess based on name for Bedrock
                     if "claude" in model_name.lower():
                         provider = "Anthropic (Bedrock)"
@@ -617,15 +620,15 @@ class ModelShowCommand(Command):
                     else:
                         provider = "AWS Bedrock"
                 elif "gemini" in model_name.lower():
-                     provider = "Google"
+                    provider = "Google"
                 elif "deepseek" in model_name.lower():
-                     provider = "DeepSeek"
+                    provider = "DeepSeek"
                 elif "groq" in model_name.lower():
-                     provider = "Groq"
+                    provider = "Groq"
                 elif "azure" in model_name.lower():
-                     provider = "Azure OpenAI"
+                    provider = "Azure OpenAI"
                 elif "perplexity" in model_name.lower():
-                     provider = "Perplexity"
+                    provider = "Perplexity"
                 elif "cohere" in model_name.lower():
                     provider = "Cohere"
                 elif "together_ai" in model_name.lower():
@@ -664,7 +667,7 @@ class ModelShowCommand(Command):
                     provider = "OpenRouter"
                 elif "cloudflare" in model_name.lower():
                     provider = "Cloudflare"
-                elif "palm" in model_name.lower(): # Older Google
+                elif "palm" in model_name.lower():  # Older Google
                     provider = "Google PaLM"
                 elif "ollama" in model_name.lower():
                     provider = "Ollama"
@@ -677,17 +680,18 @@ class ModelShowCommand(Command):
                 elif "fireworks_ai" in model_name.lower():
                     provider = "Fireworks AI"
                 elif provider == "Unknown" and "/" in model_name:
-                    # Fallback: Extract provider from model name if structure is provider/model
+                    # Fallback: Extract provider from model name if structure
+                    # is provider/model
                     provider_guess = model_name.split("/")[0].capitalize()
                     if provider_guess:
                         provider = provider_guess
-                    
+
                 # Determine API Key Var
                 api_key_var = "N/A"
                 provider_lower = provider.lower()
-                if "google" in provider_lower or "vertex" in provider_lower or "palm" in provider_lower:
+                if "google" in provider_lower or "vertex" in provider_lower or "palm" in provider_lower:  # noqa: E501
                     api_key_var = "GOOGLE_API_KEY"
-                elif "anthropic" in provider_lower or ("bedrock" in provider_lower and "claude" in model_name.lower()):
+                elif "anthropic" in provider_lower or ("bedrock" in provider_lower and "claude" in model_name.lower()):  # noqa: E501
                     api_key_var = "ANTHROPIC_API_KEY"
                 elif "openai" in provider_lower or "azure" in provider_lower:
                     api_key_var = "OPENAI_API_KEY"
@@ -711,15 +715,17 @@ class ModelShowCommand(Command):
                     api_key_var = "REPLICATE_API_KEY"
                 elif "voyage" in provider_lower:
                     api_key_var = "VOYAGE_API_KEY"
-                elif "bedrock" in provider_lower: # Catch-all for other Bedrock
+                elif "bedrock" in provider_lower:  # Catch-all for other Bedrock # noqa: E501
                     api_key_var = "AWS Keys (Configured)"
                 elif "ollama" in provider_lower:
                     api_key_var = "OLLAMA_API_BASE"
-                elif provider != "Unknown" and provider != "Ollama": # Many other providers exist
-                    api_key_var = f"{provider.upper().replace(' ', '_')}_API_KEY"
-                    
+                elif provider != "Unknown" and provider != "Ollama":  # Many other providers exist # noqa: E501
+                    api_key_var = f"{
+                        provider.upper().replace(
+                            ' ', '_')}_API_KEY"
+
                 # Get max tokens
-                max_tokens = model_info.get("max_tokens", "N/A")
+                max_tokens = model_info.get("max_input_tokens", "N/A")
 
                 # Get pricing info
                 input_cost = model_info.get("input_cost_per_token", 0)
@@ -804,10 +810,11 @@ class ModelShowCommand(Command):
                                 search_term not in model_name.lower()):
                             continue
 
-                        # Skip if showing only supported models (Ollama doesn't report this)
+                        # Skip if showing only supported models (Ollama doesn't
+                        # report this)
                         if show_only_supported:
-                             continue
-                             
+                            continue
+
                         total_models += 1
                         displayed_models += 1
 
