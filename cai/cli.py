@@ -72,7 +72,7 @@ Usage Examples:
         CAI_AGENT_TYPE="one_tool_agent" CAI_MODEL="qwen2.5:14b" \
         CAI_TRACING="false" python3 cai/cli.py
 
-    # Run a harder CTF
+    # Run a harder CTF
     CTF_NAME="hackableii" CAI_AGENT_TYPE="redteam_agent" \
         CTF_INSIDE="False" CAI_MODEL="deepseek/deepseek-chat" \
         CAI_TRACING="false" python3 cai/cli.py
@@ -109,6 +109,7 @@ Usage Examples:
 # Standard library imports
 import os
 import traceback
+import uuid
 
 # Third-party imports
 from wasabi import color  # pylint: disable=import-error
@@ -127,6 +128,9 @@ if is_pentestperf_available():
 
 # Import and register platforms at startup
 
+# Set random OPENAI_API_KEY if not exists
+if not os.getenv('OPENAI_API_KEY'):
+    os.environ['OPENAI_API_KEY'] = f"sk-{uuid.uuid4()}"
 
 def initialize_platforms():
     """Initialize and register available platforms."""
