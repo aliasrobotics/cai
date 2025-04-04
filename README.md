@@ -40,6 +40,7 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
   - [:nut\_and\_bolt: Install](#nut_and_bolt-install)
     - [OS X](#os-x)
     - [Ubuntu 24.04](#ubuntu-2404)
+    - [:nut\_and\_bolt: Setup `.env` file](#nut_and_bolt-setup-env-file)
   - [:triangular\_ruler: Architecture:](#triangular_ruler-architecture)
     - [🔹 Agent](#-agent)
     - [🔹 Tools](#-tools)
@@ -138,32 +139,19 @@ cai
 
 Refer to the [Development](#development) section for dev. install instructions.
 
-## :nut_and_bolt: Setup .env
+### :nut_and_bolt: Setup `.env` file
 
-The .env.example file provides a template for configuring your personal LLM API keys to work with Anthropic, OpenAI, and other providers.
-
-Structure of .env.example:
-
-`
-OPENAI_API_KEY="sk-123"
-ANTHROPIC_API_KEY=""
-OLLAMA=""
-PROMPT_TOOLKIT_NO_CPR=1
-`
-
-When cai runs, it loads the .env file to retrieve API keys for connecting to different models.
+CAI leverages the `.env` file to load configuration at launch. To facilitate the setup, the repo provides an exemplary [`.env.example`](.env.example) file provides a template for configuring CAI's setup and your LLM API keys to work with desired LLM models.
 
 :warning: Important:
 
-The OPENAI_API_KEY must not be left blank. It should contain either "sk-123" (as a placeholder) or your actual API key.
+CAI does NOT provide API keys for any model by default. Don't ask us to provide keys, use your own or host your own models.
 
-cai supports multiple models, each requiring different API keys. Attempting to use a model without a valid key will result in an error.
 
-## :nut_and_bolt: Defaults
+:warning: Note:
 
-If no agent or model is specified when running cai, Ollama will be used by default.
+The OPENAI_API_KEY must not be left blank. It should contain either "sk-123" (as a placeholder) or your actual API key. See https://github.com/aliasrobotics/cai/issues/27.
 
-Ollama is an open-source model that can be installed locally by any user.
 
 ## :triangular_ruler: Architecture:
 
