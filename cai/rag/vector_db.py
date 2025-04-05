@@ -33,6 +33,7 @@ Key Features:
 """
 
 import os
+import uuid
 from typing import Dict, List, Optional
 import openai  # pylint: disable=import-error
 from qdrant_client import QdrantClient, models  # pylint: disable=import-error
@@ -85,8 +86,12 @@ class QdrantConnector:
 
         if model_name.startswith("text"):
             # OpenAI model
+            api_key = os.getenv("OPENAI_API_KEY")
+            if not api_key:
+                # Generate a random API key if none is provided
+                api_key = str(uuid.uuid4())
             self.openai_client = openai.Client(
-                api_key=os.getenv("OPENAI_API_KEY"),
+                api_key=api_key,
                 base_url="https://api.openai.com/v1"
             )
             self.vector_size = 3072
