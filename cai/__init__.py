@@ -8,6 +8,8 @@ A library to build Bug Bounty-level grade Cybersecurity AIs (CAIs).
 # Extensions utilities
 ########################################################
 # Import agents
+import os 
+import uuid
 from cai.agents import (  # pylint: disable=unused-import # noqa: F401
     cai_initial_agent, 
     transfer_to_state_agent,  
@@ -15,7 +17,6 @@ from cai.agents import (  # pylint: disable=unused-import # noqa: F401
     flag_discriminator,  
     transfer_to_flag_discriminator,  
 )  
-
 
 def is_pentestperf_available():
     """

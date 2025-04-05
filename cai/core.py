@@ -169,6 +169,9 @@ class CAI:  # pylint: disable=too-many-instance-attributes
         self.total_cost = 0
         # load env variables
         load_dotenv()
+        openai_api_key = os.getenv("OPENAI_API_KEY")
+        if not openai_api_key:
+            os.environ["OPENAI_API_KEY"] = "sk-proj-1234567890"
 
     def get_chat_completion(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,line-too-long,too-many-statements # noqa: E501
         self,
@@ -312,215 +315,255 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             create_params.pop("parallel_tool_calls", None)
         if any(x in agent.model for x in ["deepseek/deepseek-chat"]):
             create_params.pop("parallel_tool_calls", None)
-            litellm.drop_params = True
-
+            litellm.drop_params = True 
         # --------------------------------
         # Inference
         # --------------------------------
         # We keep trying when we reach the rate limit
-        while True:
-            litellm_completion = None
-            try:
-                # print(create_params) debug
-                if os.getenv("OLLAMA", "").lower() == "true":
-                    litellm_completion = litellm.completion(
-                        **create_params,
-                        api_base=get_ollama_api_base(),
-                        custom_llm_provider="openai"
-                    )
-                else:
-                    litellm_completion = litellm.completion(**create_params)
-            except litellm.exceptions.BadRequestError as e:
-                # Check if it's an authentication error (missing API key)
-                if ("auth" in str(e).lower() or 
-                    "api key" in str(e).lower() or 
-                    "apikey" in str(e).lower()):
-                    # Safe error message that doesn't include the actual API key
-                    model_name = create_params.get("model", "Unknown model")
-                    api_provider = (model_name.split("/")[0] 
-                                   if "/" in model_name 
-                                   else model_name.split("-")[0])
-                    print(f"\033[31mAuthentication Error: Missing or invalid API key "
-                          f"for {api_provider}.\033[0m")
-                    print(f"\033[31mPlease set the appropriate environment variable "
-                          f"for {api_provider} API key.\033[0m")
-                    return None
-                # Continue with existing error handling for context window issues
-                elif ("context window" in str(e).lower() or 
-                    "prompt is too long" in str(e).lower() or 
-                    "window exceeded" in str(e).lower()):
-                    print(f"\033[33mContext window exceeded: {str(e)}\033[0m")
-                    print("\033[33mTrimming conversation history to fit context window...\033[0m")
-                    
-                    # Keep system prompt, first user message, and the most recent messages
-                    if len(messages) > 12:
-                        preserved_messages = [messages[0], messages[1]]  # System prompt and first message
-                        preserved_messages.extend(messages[-10:])  # Last 10 messages
-                        create_params["messages"] = preserved_messages
-                        print(f"\033[33mReduced history from {len(messages)} to {len(preserved_messages)} messages\033[0m")
-                        # Retry with smaller context
-                        continue
+        first_attempt = True  # Track if this is the first API call attempt
+        try:
+            while True:
+                litellm_completion = None
+                try:
+                    if first_attempt:
+                        create_params["timeout"] = int(
+                            os.getenv("CAI_TIMEOUT", "20")
+                        )
+                        first_attempt = False
+                    elif "timeout" in create_params:
+                        del create_params["timeout"]
+                        
+                    if os.getenv("OLLAMA", "").lower() == "true":
+                        litellm_completion = litellm.completion(
+                            **create_params,
+                            api_base=get_ollama_api_base(),
+                            custom_llm_provider="openai"
+                        )
                     else:
-                        # If we can't trim further, raise the exception
+                        litellm_completion = litellm.completion(**create_params)
+                except litellm.AuthenticationError as e:
+                    # Extract provider information from the model string
+                    model_name = create_params.get("model", "Unknown model")
+                    
+                    # Determine provider and API key environment variable name
+                    provider_info = {
+                        "gpt": {"name": "OpenAI", "env_var": "OPENAI_API_KEY", "url": "https://platform.openai.com/api-keys"},
+                        "claude": {"name": "Anthropic", "env_var": "ANTHROPIC_API_KEY", "url": "https://console.anthropic.com/settings/keys"},
+                        "gemini": {"name": "Google", "env_var": "GEMINI_API_KEY", "url": "https://aistudio.google.com/app/apikey"},
+                        "deepseek": {"name": "DeepSeek", "env_var": "DEEPSEEK_API_KEY", "url": "https://platform.deepseek.com/api-keys"}
+                    }
+                    
+                    # Determine which provider is being used
+                    provider_key = next((k for k in provider_info.keys() if k in model_name.lower()), None)
+                    
+                    if provider_key:
+                        provider = provider_info[provider_key]
+                        print(f"\033[31mAuthentication Error: Missing or invalid API key for {provider['name']}.\033[0m")
+                        print(f"\033[31mPlease set the {provider['env_var']} environment variable.\033[0m")
+                        print(f"\033[31mYou can obtain an API key from: {provider['url']}\033[0m")
+                        print(f"\033[31mAdd it to your environment with: export {provider['env_var']}=your_api_key\033[0m")
+                    else:
+                        # Generic message if provider cannot be determined
+                        print(f"\033[31mAuthentication Error: Missing or invalid API key for model {model_name}.\033[0m")
+                        print(f"\033[31mPlease ensure you have set the appropriate API key environment variable.\033[0m")
+                    
+                    return None
+                
+                except litellm.exceptions.BadRequestError as e:
+                    # Check if it's a context window exceeded error
+                    if ("context window" in str(e).lower() or 
+                        "prompt is too long" in str(e).lower() or 
+                        "window exceeded" in str(e).lower()):
+                        print(f"\033[33mContext window exceeded: {str(e)}\033[0m")
+                        print("\033[33mTrimming conversation history to fit context window...\033[0m")
+                        
+                        # Keep system prompt, first user message, and the most recent messages
+                        if len(messages) > 12:
+                            preserved_messages = [messages[0], messages[1]]  # System prompt and first message
+                            preserved_messages.extend(messages[-10:])  # Last 10 messages
+                            create_params["messages"] = preserved_messages
+                            print(f"\033[33mReduced history from {len(messages)} to {len(preserved_messages)} messages\033[0m")
+                            # Retry with smaller context
+                            continue
+                        else:
+                            # If we can't trim further, raise the exception
+                            raise e
+                    elif "LLM Provider NOT provided" in str(e):
+                        # Create a copy of params to avoid overwriting the original
+                        # ones
+                        ollama_params = create_params.copy()
+                        ollama_params["api_base"] = get_ollama_api_base()
+                        ollama_params["custom_llm_provider"] = "openai"
+                        try:
+                            litellm_completion = litellm.completion(**ollama_params)
+                        except litellm.exceptions.BadRequestError as e:  # pylint: disable=W0621,C0301 # noqa: E501
+                            #
+                            # CTRL C handler for ollama models
+                            #
+                            if "invalid message content type" in str(e):
+                                create_params["messages"] = fix_message_list(
+                                    create_params["messages"])
+                                litellm_completion = litellm.completion(
+                                    **create_params)
+                            else:
+                                raise e
+                    elif ("An assistant message with 'tool_calls'" in str(e) or
+                        "`tool_use` blocks must be followed by a user message with `tool_result`" in str(e)):  # noqa: E501 # pylint: disable=C0301
+                        print(f"Error: {str(e)}")
+                        # EDGE CASE: Report Agent CTRL C error
+                        # This fix CTRL C error when message list is incomplete
+                        # When a tool is not finished but the LLM generates a tool call
+                        create_params["messages"] = fix_message_list(
+                            create_params["messages"])
+                        litellm_completion = litellm.completion(**create_params)
+                    # this captures an error related to the fact
+                    # that the messages list contains an empty
+                    # content position
+                    elif "expected a string, got null" in str(e):
+                        print(f"Error: {str(e)}")
+                        # Fix for null content in messages
+                        create_params["messages"] = [
+                            msg if msg.get("content") is not None else
+                            {**msg, "content": ""} for msg in create_params["messages"]
+                        ]
+                        litellm_completion = litellm.completion(**create_params)
+
+                    # Handle Anthropic error for empty text content blocks
+                    elif ("text content blocks must be non-empty" in str(e) or
+                        "cache_control cannot be set for empty text blocks" in str(e)):  # noqa
+                        # Only print the error message the first time it happens
+                        if not self.empty_content_error_shown:
+                            print(f"Error: {str(e)}")
+                            self.empty_content_error_shown = True
+                        
+                        # Fix for empty content in messages for Anthropic models
+                        create_params["messages"] = [
+                            msg if msg.get("content") not in [None, ""] else
+                            {
+                                **msg,
+                                "content": "Empty content block"
+                            } for msg in create_params["messages"]
+                        ]
+                        litellm_completion = litellm.completion(**create_params)
+                    else:
                         raise e
-                elif "LLM Provider NOT provided" in str(e):
-                    # Create a copy of params to avoid overwriting the original
-                    # ones
+                except litellm.exceptions.RateLimitError as e:
+                    print("Rate Limit Error:" + str(e))
+                    # Try to extract retry delay from error response or use default
+                    retry_delay = 60  # Default delay in seconds
+                    try:
+                        # Extract the JSON part from the error message
+                        json_str = str(e.message).split('VertexAIException - ')[-1]
+                        error_details = json.loads(json_str)
+                        
+                        retry_info = next(
+                            (detail for detail in error_details.get('error', {}).get('details', [])
+                             if detail.get('@type') == 'type.googleapis.com/google.rpc.RetryInfo'),
+                            None
+                        )
+                        if retry_info and 'retryDelay' in retry_info:
+                            retry_delay = int(retry_info['retryDelay'].rstrip('s'))
+                    except Exception as parse_error:
+                        print(f"Could not parse retry delay, using default: {parse_error}")
+                    
+                    print(f"Waiting {retry_delay} seconds before retrying...")
+                    time.sleep(retry_delay)
+
+                except Exception:  # pylint: disable=W0718
+                    print("If you are using private models, there is a error. "
+                          "callback to ollama")
                     ollama_params = create_params.copy()
                     ollama_params["api_base"] = get_ollama_api_base()
                     ollama_params["custom_llm_provider"] = "openai"
+                    create_params["timeout"] = 60
                     try:
                         litellm_completion = litellm.completion(**ollama_params)
-                    except litellm.exceptions.BadRequestError as e:  # pylint: disable=W0621,C0301 # noqa: E501
-                        #
-                        # CTRL C handler for ollama models
-                        #
-                        if "invalid message content type" in str(e):
-                            create_params["messages"] = fix_message_list(
-                                create_params["messages"])
-                            litellm_completion = litellm.completion(
-                                **create_params)
-                        else:
-                            raise e
-                elif ("An assistant message with 'tool_calls'" in str(e) or
-                    "`tool_use` blocks must be followed by a user message with `tool_result`" in str(e)):  # noqa: E501 # pylint: disable=C0301
-                    print(f"Error: {str(e)}")
-                    # EDGE CASE: Report Agent CTRL C error
-                    # This fix CTRL C error when message list is incomplete
-                    # When a tool is not finished but the LLM generates a tool call
-                    create_params["messages"] = fix_message_list(
-                        create_params["messages"])
-                    litellm_completion = litellm.completion(**create_params)
-                # this captures an error related to the fact
-                # that the messages list contains an empty
-                # content position
-                elif "expected a string, got null" in str(e):
-                    print(f"Error: {str(e)}")
-                    # Fix for null content in messages
-                    create_params["messages"] = [
-                        msg if msg.get("content") is not None else
-                        {**msg, "content": ""} for msg in create_params["messages"]
-                    ]
-                    litellm_completion = litellm.completion(**create_params)
+                    except Exception as e:  # pylint: disable=W0718  # noqa
+                        try:
+                            litellm_completion = litellm.completion(**create_params)
+                        except Exception as execp:  # pylint: disable=W0718
+                            print("Error: " + str(execp))
+                            return None
+                # Gemini 2.5 Pro is special and sometimes returns empty completions <3
+                # Maybe something Google fixes in the future
+                if create_params["model"] == "gemini/gemini-2.5-pro-exp-03-25":
+                    if litellm_completion and len(litellm_completion.choices) == 0:
+                        # We just need to retry
+                        continue
+                # If we get a valid completion, we exit the loop
+                if litellm_completion:
+                    break
 
-                # Handle Anthropic error for empty text content blocks
-                elif ("text content blocks must be non-empty" in str(e) or
-                    "cache_control cannot be set for empty text blocks" in str(e)):  # noqa
-                    # Only print the error message the first time it happens
-                    if not self.empty_content_error_shown:
-                        print(f"Error: {str(e)}")
-                        self.empty_content_error_shown = True
-                    
-                    # Fix for empty content in messages for Anthropic models
-                    create_params["messages"] = [
-                        msg if msg.get("content") not in [None, ""] else
-                        {
-                            **msg,
-                            "content": "Empty content block"
-                        } for msg in create_params["messages"]
-                    ]
-                    litellm_completion = litellm.completion(**create_params)
+            # --------------------------------
+            # Training data
+            # --------------------------------
+            if self.rec_training_data:
+                self.rec_training_data.rec_training_data(
+                    create_params, litellm_completion, self.total_cost)
+
+            # --------------------------------
+            # Token counts
+            # --------------------------------
+            if litellm_completion.usage:
+                self.interaction_input_tokens = (
+                    litellm_completion.usage.prompt_tokens
+                )
+                self.interaction_output_tokens = (
+                    litellm_completion.usage.completion_tokens
+                )
+                if (hasattr(litellm_completion.usage, 'completion_tokens_details') and  # noqa: E501  # pylint: disable=C0103
+                        litellm_completion.usage.completion_tokens_details and
+                        hasattr(litellm_completion.usage.completion_tokens_details,
+                                'reasoning_tokens') and
+                        litellm_completion.usage.completion_tokens_details.reasoning_tokens):  # noqa: E501  # pylint: disable=C0103
+                    self.interaction_reasoning_tokens = (
+                        litellm_completion.usage.completion_tokens_details.reasoning_tokens)  # noqa: E501  # pylint: disable=C0103
+                    self.total_reasoning_tokens += self.interaction_reasoning_tokens  # noqa: E501  # pylint: disable=C0103
                 else:
-                    raise e
-            except litellm.exceptions.RateLimitError as e:
-                print("Rate Limit Error:" + str(e))
-                # Try to extract retry delay from error response or use default
-                retry_delay = 60  # Default delay in seconds
-                try:
-                    # Extract the JSON part from the error message
-                    json_str = str(e.message).split('VertexAIException - ')[-1]
-                    error_details = json.loads(json_str)
-                    
-                    retry_info = next(
-                        (detail for detail in error_details.get('error', {}).get('details', [])
-                         if detail.get('@type') == 'type.googleapis.com/google.rpc.RetryInfo'),
-                        None
-                    )
-                    if retry_info and 'retryDelay' in retry_info:
-                        retry_delay = int(retry_info['retryDelay'].rstrip('s'))
-                except Exception as parse_error:
-                    print(f"Could not parse retry delay, using default: {parse_error}")
-                
-                print(f"Waiting {retry_delay} seconds before retrying...")
-                time.sleep(retry_delay)
+                    self.interaction_reasoning_tokens = 0
 
-            except Exception:  # pylint: disable=W0718
-                ollama_params = create_params.copy()
-                ollama_params["api_base"] = get_ollama_api_base()
-                ollama_params["custom_llm_provider"] = "openai"
-                try:
-                    litellm_completion = litellm.completion(**ollama_params)
-                except Exception as e:  # pylint: disable=W0718  # noqa
-                    try:
-                        litellm_completion = litellm.completion(**create_params)
-                    except Exception as execp:  # pylint: disable=W0718
-                        print("Error: " + str(execp))
-                        return None
-            # Gemini 2.5 Pro is special and sometimes returns empty completions <3
-            # Maybe something Google fixes in the future
-            if create_params["model"] == "gemini/gemini-2.5-pro-exp-03-25":
-                if litellm_completion and len(litellm_completion.choices) == 0:
-                    # We just need to retry
-                    continue
-            # If we get a valid completion, we exit the loop
-            if litellm_completion:
-                break
+                self.total_input_tokens += (
+                    self.interaction_input_tokens
+                )
+                self.total_output_tokens += (
+                    self.interaction_output_tokens
+                )
 
-        # --------------------------------
-        # Training data
-        # --------------------------------
-        if self.rec_training_data:
-            self.rec_training_data.rec_training_data(
-                create_params, litellm_completion, self.total_cost)
+            try:
+                interaction_cost = litellm.completion_cost(
+                    completion_response=litellm_completion,
+                    model=create_params["model"]
+                )
+                self.total_cost += float(interaction_cost)
+                # Store the interaction cost for display in CLI functions
+                self.interaction_cost = interaction_cost
+                # Add cost to litellm_completion for DataRecorder
+                litellm_completion.cost = interaction_cost
+            except Exception as e:  # pylint: disable=W0718
+                self.interaction_cost = 0.0
+                # If the error is about unmapped model, set cost to 0
+                if "model isn't mapped yet" in str(e):
+                    self.total_cost += 0.0
+                    litellm_completion.cost = 0.0
+                else:
+                    print(e)
 
-        # --------------------------------
-        # Token counts
-        # --------------------------------
-        if litellm_completion.usage:
-            self.interaction_input_tokens = (
-                litellm_completion.usage.prompt_tokens
-            )
-            self.interaction_output_tokens = (
-                litellm_completion.usage.completion_tokens
-            )
-            if (hasattr(litellm_completion.usage, 'completion_tokens_details') and  # noqa: E501  # pylint: disable=C0103
-                    litellm_completion.usage.completion_tokens_details and
-                    hasattr(litellm_completion.usage.completion_tokens_details,
-                            'reasoning_tokens') and
-                    litellm_completion.usage.completion_tokens_details.reasoning_tokens):  # noqa: E501  # pylint: disable=C0103
-                self.interaction_reasoning_tokens = (
-                    litellm_completion.usage.completion_tokens_details.reasoning_tokens)  # noqa: E501  # pylint: disable=C0103
-                self.total_reasoning_tokens += self.interaction_reasoning_tokens  # noqa: E501  # pylint: disable=C0103
-            else:
-                self.interaction_reasoning_tokens = 0
+            return litellm_completion
+        except litellm.Timeout as e:
+            print(f"\033[31mRequest timed out: {str(e)}\033[0m")
+            print("\033[31mThis is likely due to network connectivity issues or the host cannot be reached.\033[0m")
+            print("\033[31mPlease check your internet connection and try again.\033[0m")
+            print("\033[31mThis may be because you don't have any API keys configured\033[0m")
+            print("\033[31mor don't have an OpenAI-compatible endpoint with local models available.\033[0m")
+            print("\033[31m1. Put your api keys on .env\033[0m")
+            print("\033[31m2. Reset CAI\033[0m")
+            print("\033[31m3. Select a model -> /model\033[0m")
+            print("\033[31mIMPORTANT: If you already have valid keys on .env, you just need to select a model with /\033[0m")
+            return None
+        except Exception as e:
+            print(f"\033[31mUnexpected error in completion process: {str(e)}\033[0m")
 
-            self.total_input_tokens += (
-                self.interaction_input_tokens
-            )
-            self.total_output_tokens += (
-                self.interaction_output_tokens
-            )
-
-        try:
-            interaction_cost = litellm.completion_cost(
-                completion_response=litellm_completion,
-                model=create_params["model"]
-            )
-            self.total_cost += float(interaction_cost)
-            # Store the interaction cost for display in CLI functions
-            self.interaction_cost = interaction_cost
-            # Add cost to litellm_completion for DataRecorder
-            litellm_completion.cost = interaction_cost
-        except Exception as e:  # pylint: disable=W0718
-            self.interaction_cost = 0.0
-            # If the error is about unmapped model, set cost to 0
-            if "model isn't mapped yet" in str(e):
-                self.total_cost += 0.0
-                litellm_completion.cost = 0.0
-            else:
-                print(e)
-
-        return litellm_completion
+            return None
 
     def handle_function_result(self, result, debug) -> Result:
         """

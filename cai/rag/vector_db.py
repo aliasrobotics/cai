@@ -82,11 +82,15 @@ class QdrantConnector:
         """
         self.client = QdrantClient(host=host, port=port)
         self.model_name = model_name
-
         if model_name.startswith("text"):
             # OpenAI model
+            api_key = os.getenv("OPENAI_API_KEY")
+            if not api_key:
+                # Generate a random API key if not provided
+                api_key = f"sk-{os.urandom(16).hex()}"
+            
             self.openai_client = openai.Client(
-                api_key=os.getenv("OPENAI_API_KEY"),
+                api_key=api_key,
                 base_url="https://api.openai.com/v1"
             )
             self.vector_size = 3072

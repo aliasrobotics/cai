@@ -126,8 +126,6 @@ if is_pentestperf_available():
     import pentestperf as ptt  # pylint: disable=import-error
 
 # Import and register platforms at startup
-
-
 def initialize_platforms():
     """Initialize and register available platforms."""
     if not is_caiextensions_platform_available():
