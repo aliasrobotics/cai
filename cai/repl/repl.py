@@ -368,13 +368,16 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
         padding=(1, 2),
         title_align="center"
     )
-    
     context_tip = Panel(
         "As security exercises progress, LLM quality may\n"
         "degrade, especially if progress stalls.\n\n"
         "It's often better to clear the context window\n"
         "or restart CAI rather than waiting until\n"
-        "context usage reaches 100%.",
+        "context usage reaches 100%.\n\n"
+        "When context exceeds 80%, follow these steps:\n"
+        "1. CAI> resumme your findings with each important ctf info in findings.txt\n"
+        "2. CAI> /flush\n"
+        "3. CAI> Analyze findings, and continue exercise with target: ...",
         title="[bold yellow]Performance Tip[/bold yellow]",
         border_style="yellow",
         padding=(1, 2),
