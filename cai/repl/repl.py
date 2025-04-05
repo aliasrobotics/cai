@@ -306,7 +306,9 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
     agent = starting_agent  # Initialize the agent variable as well
 
     # Display CAI banner and welcome message
+    console.print("\n")  # Add spacing before banner
     display_banner(console)
+    console.print("\n")  # Add spacing after banner
     
     # Display help panel instead
     from rich.panel import Panel
@@ -375,9 +377,9 @@ def run_cai_cli(  # pylint: disable=too-many-arguments,too-many-locals,too-many-
         "or restart CAI rather than waiting until\n"
         "context usage reaches 100%.\n\n"
         "When context exceeds 80%, follow these steps:\n"
-        "1. CAI> resumme your findings with each important ctf info in findings.txt\n"
+        "1. CAI> Dump your memory and findings in current scenario in findings.txt\n"
         "2. CAI> /flush\n"
-        "3. CAI> Analyze findings, and continue exercise with target: ...",
+        "3. CAI> Analyze findings.txt, and continue exercise with target: ...",
         title="[bold yellow]Performance Tip[/bold yellow]",
         border_style="yellow",
         padding=(1, 2),

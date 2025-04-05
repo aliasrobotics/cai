@@ -331,8 +331,22 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 else:
                     litellm_completion = litellm.completion(**create_params)
             except litellm.exceptions.BadRequestError as e:
-                # Check if it's a context window exceeded error
-                if ("context window" in str(e).lower() or 
+                # Check if it's an authentication error (missing API key)
+                if ("auth" in str(e).lower() or 
+                    "api key" in str(e).lower() or 
+                    "apikey" in str(e).lower()):
+                    # Safe error message that doesn't include the actual API key
+                    model_name = create_params.get("model", "Unknown model")
+                    api_provider = (model_name.split("/")[0] 
+                                   if "/" in model_name 
+                                   else model_name.split("-")[0])
+                    print(f"\033[31mAuthentication Error: Missing or invalid API key "
+                          f"for {api_provider}.\033[0m")
+                    print(f"\033[31mPlease set the appropriate environment variable "
+                          f"for {api_provider} API key.\033[0m")
+                    return None
+                # Continue with existing error handling for context window issues
+                elif ("context window" in str(e).lower() or 
                     "prompt is too long" in str(e).lower() or 
                     "window exceeded" in str(e).lower()):
                     print(f"\033[33mContext window exceeded: {str(e)}\033[0m")
