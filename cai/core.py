@@ -326,8 +326,15 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 litellm_completion = None
                 try:
                     if first_attempt:
+                        
+                        # NOTE: This is a workaround for those cases wherein there's neither a 
+                        # remote model enabled (via its corresponding API keys) nor a local model
+                        # available (via ollama). In this case, the model will not be able to
+                        # respond to the user's message, and the conversation will hang.
+                        #
+                        # To avoid this, we set a default timeout of 60 seconds.
                         create_params["timeout"] = int(
-                            os.getenv("CAI_TIMEOUT", "20")
+                            os.getenv("CAI_TIMEOUT", "60")
                         )
                         first_attempt = False
                     elif "timeout" in create_params:
@@ -551,19 +558,23 @@ class CAI:  # pylint: disable=too-many-instance-attributes
             return litellm_completion
         except litellm.Timeout as e:
             print(f"\033[31mRequest timed out: {str(e)}\033[0m")
-            print("\033[31mThis is likely due to network connectivity issues or the host cannot be reached.\033[0m")
-            print("\033[31mPlease check your internet connection and try again.\033[0m")
-            print("\033[31mThis may be because you don't have any API keys configured\033[0m")
-            print("\033[31mor don't have an OpenAI-compatible endpoint with local models available.\033[0m")
-            print("\033[31m1. Put your api keys on .env\033[0m")
-            print("\033[31m2. Reset CAI\033[0m")
-            print("\033[31m3. Select a model -> /model\033[0m")
-            print("\033[31mIMPORTANT: If you already have valid keys on .env, you just need to select a model with /\033[0m")
+            self.print_timeout_error_message()
             return None
         except Exception as e:
             print(f"\033[31mUnexpected error in completion process: {str(e)}\033[0m")
-
+            self.print_timeout_error_message()
             return None
+
+    def print_timeout_error_message(self):
+        print("\033[31mThis is likely due to network connectivity issues or the host cannot be reached.\033[0m")
+        print("\033[31mPlease check your internet connection and try again.\033[0m")
+        print("\033[31mThis may be because you don't have any API keys configured\033[0m")
+        print("\033[31mor don't have an OpenAI-compatible endpoint with local models available.\033[0m")
+        print("\033[31m1. Put your api keys on .env\033[0m")
+        print("\033[31m2. Reset CAI\033[0m")
+        print("\033[31m3. Select a model -> /model\033[0m")
+        print("\033[31mIMPORTANT: If you already have valid keys on .env, you just need to select a model with /model\033[0m")
+
 
     def handle_function_result(self, result, debug) -> Result:
         """
