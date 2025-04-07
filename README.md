@@ -62,7 +62,6 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
     - [Environment Variables](#environment-variables)
   - [Development](#development)
     - [Contributions](#contributions)
-    - [Optional Requirements: caiextensions](#optional-requirements-caiextensions)
     - [:information\_source: Usage Data Collection](#information_source-usage-data-collection)
     - [Reproduce CI-Setup locally](#reproduce-ci-setup-locally)
   - [FAQ](#faq)
@@ -533,29 +532,6 @@ pip install pre-commit
 pre-commit # files staged
 pre-commit run --all-files # all files
 ```
-
-### Optional Requirements: [caiextensions](https://gitlab.com/aliasrobotics/alias_research/caiextensions)
-
-| Extension | Install command | Description | Usage |
-|-----------|---------|-------------|-----------|
-| [Report](https://gitlab.com/aliasrobotics/alias_research/caiextensions/caiextensions-report) | `pip install -e .[report]` | Generates a Report after running CAI against any target. Use the environment variable `CAI_REPORT` to specify the type of report: **generic pentesting report** `CAI_REPORT=pentesting` or **NIS2 report** `CAI_REPORT=nis2` | ```CAI_REPORT=pentesting CAI_MODEL="qwen2.5:72b" python3 cai/cli.py``` |
-| [Benchmarking](https://gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf) | `pip install -e .[pentestperf]` | Allows running CAI against dockerized Capture The Flag (CTF) challenges. Use environment variables (`CTF_NAME` and `CTF_INSIDE`) to run any CTF from [this list](https://gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf/-/blob/main/pentestperf/ctf-jsons/ctf_configs.jsonl)  | ```CTF_NAME="picoctf_static_flag" CTF_INSIDE="true" python3 cai/cli.py``` |
-| [Memory](https://gitlab.com/aliasrobotics/alias_research/caiextensions/caiextensions-memory) | `pip install -e .[memory]` | Allows using previous CAI runs and generated artifacts (e.g. scripts) for future runs |  N/A: If the same CTF or problem is already solved in a previous run, and there are any artifacts in the repository, CAI will automatically use them for future runs |
-| [Platform](https://gitlab.com/aliasrobotics/alias_research/caiextensions/caiextensions-platform) | `pip install -e .[platform]` | Allows running CAI against CTF platforms (currently only working for Hack The Box) | Run the command on the right, and dive into the UI Platform: <ul><li>```/p htb list``` to list machines</li><li>```/p htb connect``` to connect to the VPN</li><li>```/p htb spawn <machine_name>``` to start cracking your first machine</li></ul> |
-
-<details>
-<summary><b>How to install caiextensions?</b></summary>
-
-```bash
-git clone https://gitlab.com/aliasrobotics/alias_research/caiextensions/caiextensions-report.git
-```
-```bash
-cd cai
-```
-```bash
-pip3 install -e .[report]
-```
-
 </details>
 
 
@@ -593,46 +569,6 @@ docker run --rm -it \
 
 
 ## FAQ
-<details><summary>Where are all the caiextensions?</summary>
-
-See [all caiextensions](https://gitlab.com/aliasrobotics/alias_research/caiextensions)
-
-</details>
-
-<details><summary>How do I install the report caiextension?</summary>
-
-[See here](#optional-requirements-caiextensions)
-</details>
-
-<details><summary>How do I set up SSH access for Gitlab?</summary>
-
-Generate a new SSH key
-```bash
-ssh-keygen -t ed25519
-```
-
-Add the key to the SSH agent
-```bash
-ssh-add ~/.ssh/id_ed25519
-```
-
-Add the public key to Gitlab
-Copy the key and add it to Gitlab under https://gitlab.com/-/user_settings/ssh_keys
-```bash
-cat ~/.ssh/id_ed25519.pub
-```
-
-To verify it:
-```bash
-ssh -T git@gitlab.com
-Welcome to GitLab, @vmayoral!
-```
-
-
-</details>
-
-
-
 <details><summary>How do I clear Python cache?</summary>
 
 ```bash
