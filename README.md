@@ -29,10 +29,11 @@
 
 A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity AIs (CAIs).
 
-POC Hackable II
+## 🚀 Proof of Concept Demos
 
-https://github.com/user-attachments/assets/a951b1c7-c64f-48cb-b148-722739277962
-
+| [Hackableii](https://www.vulnhub.com/entry/hackable-ii,711/) | POC2 | POC3 | POC4 |
+|---------|-------------|---------|--------|
+| [Demo](https://github.com/user-attachments/assets/a951b1c7-c64f-48cb-b148-722739277962)  | video | video | video |
 
 > [!WARNING]
 > :warning: CAI is in active development, so don't expect it to work flawlessly. Instead, contribute by raising an issue or sending an MR.
