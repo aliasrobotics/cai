@@ -33,7 +33,7 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
 
 | [Hackableii](https://www.vulnhub.com/entry/hackable-ii,711/) | POC2 | POC3 | POC4 |
 |---------|-------------|---------|--------|
-| <img src="https://github.com/user-attachments/assets/a951b1c7-c64f-48cb-b148-722739277962" width="200"> [Source](https://github.com/user-attachments/assets/a951b1c7-c64f-48cb-b148-722739277962)  | video | video | video |
+| <img src="https://github.com/user-attachments/assets/a951b1c7-c64f-48cb-b148-722739277962" width="200"> | video | video | video |
 
 > [!WARNING]
 > :warning: CAI is in active development, so don't expect it to work flawlessly. Instead, contribute by raising an issue or sending an MR.
