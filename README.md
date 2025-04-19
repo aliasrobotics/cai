@@ -9,6 +9,16 @@
       >
     </a>
   </p>
+  <p align="center">
+    <code>pip3 install cai-framework</code>
+  </p>
+  
+  <p align="center">
+    <a href="https://github.com/user-attachments/assets/f7c550b2-609e-420b-8654-da55da0d9e8c">
+      <img src="https://github.com/user-attachments/assets/f7c550b2-609e-420b-8654-da55da0d9e8c" width="80%">
+    </a>
+  </p>
+
 
 ## 🎯 Milestones
 [![](https://img.shields.io/badge/HTB_ranking-top_90_Spain_(5_days)-red.svg)](https://app.hackthebox.com/users/2268644)
