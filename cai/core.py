@@ -283,7 +283,7 @@ class CAI:  # pylint: disable=too-many-instance-attributes
                 create_params.pop("parallel_tool_calls", None)
             elif "deepseek" in create_params["model"]:
                 create_params.pop("parallel_tool_calls", None)
-            else:
+            if create_params["stream"] is True:
                 create_params["stream_options"] = {"include_usage": True}
             if not isinstance(agent, CodeAgent):  # Don't set temperature for CodeAgent  # noqa: E501
                 create_params["temperature"] = 0.7
