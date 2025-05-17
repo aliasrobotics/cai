@@ -42,6 +42,7 @@ from cai.tools.network.capture_traffic import (
 )
 
 from cai.agents.dfir import transfer_to_dfir_agent
+from cai.agents.replay_attack_agent import transfer_to_replay_attack_agent
 
 
 # Prompts
@@ -58,8 +59,9 @@ functions = [
 if os.getenv('PERPLEXITY_API_KEY'):
     functions.append(make_web_search_with_explanation)
 
-# Handoff to DFIR agent for further analysis
+# Handoff to agents for further analysis
 functions.append(transfer_to_dfir_agent)
+functions.append(transfer_to_replay_attack_agent)
 
 network_security_analyzer_agent = Agent(
     name="Network Security Analyzer",
