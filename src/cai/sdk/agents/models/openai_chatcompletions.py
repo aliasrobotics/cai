@@ -1041,15 +1041,14 @@ class OpenAIChatCompletionsModel(Model):
                             if streaming_context and not thinking_context:
                                 # Check if this is a local model and should have zero cost
                                 model_str = str(self.model).lower()
-                                is_local_model = (
-                                    "alias" not in model_str and
+                                is_local_model = (                                    
                                     "ollama" in model_str or
                                     "qwen" in model_str or
                                     "llama" in model_str or
                                     "mistral" in model_str or
                                     ":" in model_str or
                                     self.is_ollama
-                                )
+                                ) and "alias" not in model_str
                                 
                                 # Calculate cost for current interaction (will be 0 for local models)
                                 current_cost = calculate_model_cost(str(self.model), estimated_input_tokens, estimated_output_tokens)
@@ -1078,7 +1077,7 @@ class OpenAIChatCompletionsModel(Model):
                                 display_total_cost = estimated_session_total
                                 if not is_local_model:
                                     display_total_cost += current_cost
-                                
+
                                 # Create token stats with both current interaction cost and updated total cost
                                 token_stats = {
                                     'input_tokens': estimated_input_tokens,
@@ -1086,28 +1085,27 @@ class OpenAIChatCompletionsModel(Model):
                                     'cost': current_cost,
                                     'total_cost': display_total_cost
                                 }
-                                    
+
                                 update_agent_streaming_content(streaming_context, content, token_stats)
-                            
+
                             # More accurate token counting for text content
                             output_text += content
                             token_count, _ = count_tokens_with_tiktoken(output_text)
                             estimated_output_tokens = token_count
-                            
+
                             # Periodically check price limit during streaming 
                             # This allows early termination if price limit is reached mid-stream
                             if estimated_output_tokens > 0 and estimated_output_tokens % 50 == 0:  # Check every ~50 tokens
                                 # Check if this is a local model (Ollama, Qwen, etc.) that should have zero cost
                                 model_str = str(self.model).lower()
-                                is_local_model = (
-                                    "alias" not in model_str and
+                                is_local_model = (                                    
                                     "ollama" in model_str or
                                     "qwen" in model_str or
                                     "llama" in model_str or
                                     "mistral" in model_str or
                                     ":" in model_str or
                                     self.is_ollama
-                                )
+                                ) and "alias" not in model_str
                                 
                                 # For local models, cost should always be zero
                                 if is_local_model:
@@ -1654,14 +1652,13 @@ class OpenAIChatCompletionsModel(Model):
                 # Check if this is a local model and should have zero cost
                 model_str = str(self.model).lower()
                 is_local_model = (
-                    "alias" not in model_str and
                     "ollama" in model_str or
                     "qwen" in model_str or
                     "llama" in model_str or
                     "mistral" in model_str or
                     ":" in model_str or
                     self.is_ollama
-                )
+                ) and "alias" not in model_str
                 
                 # Calculate costs - use zero for local models
                 model_name = str(self.model)

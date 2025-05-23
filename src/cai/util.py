@@ -288,14 +288,13 @@ class CostTracker:
         # Check if this is a local/free model
         model_str = model_name.lower()
         is_local_model = (
-            "alias" not in model_str and
             "ollama" in model_str or
             "qwen" in model_str or
             "llama" in model_str or
             "mistral" in model_str or
             ":" in model_str or
             (os.getenv('OLLAMA') is not None and os.getenv('OLLAMA').lower() != 'false')
-        )
+        ) and "alias" not in model_str
         
         if is_local_model:
             # Reset the current interaction costs but keep total session costs
@@ -321,14 +320,13 @@ class CostTracker:
         # Check if using Ollama or local model
         model_str = model_name.lower()
         is_local_model = (
-            "alias" not in model_str and
             "ollama" in model_str or
             "qwen" in model_str or
             "llama" in model_str or
             "mistral" in model_str or
             ":" in model_str or  # Ollama uses formats like qwen2.5:7b
             (os.getenv('OLLAMA') is not None and os.getenv('OLLAMA').lower() != 'false')
-        )
+        ) and "alias" not in model_str
         
         # For local models, always return zero cost
         if is_local_model:
@@ -394,14 +392,13 @@ class CostTracker:
         # Check if this is a local model (always free) first
         model_str = model_name.lower()
         is_local_model = (
-           "alias" not in model_str and
             "ollama" in model_str or
             "qwen" in model_str or
             "llama" in model_str or
             "mistral" in model_str or
             ":" in model_str or
             (os.getenv('OLLAMA') is not None and os.getenv('OLLAMA').lower() != 'false')
-        )
+        ) and "alias" not in model_str
         
         # For local models, always return zero cost
         if is_local_model:
