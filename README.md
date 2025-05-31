@@ -155,7 +155,7 @@ python3.12 -m venv cai_env
 source cai_env/bin/activate && pip install cai-framework
 
 # Generate a .env file and set up with defaults
-echo -e 'OPENAI_API_KEY="sk-1234"\nANTHROPIC_API_KEY=""\nOLLAMA=""\nPROMPT_TOOLKIT_NO_CPR=1' > .env
+echo -e 'OPENAI_API_KEY="sk-1234"\nANTHROPIC_API_KEY=""\nOLLAMA=""\nPROMPT_TOOLKIT_NO_CPR=1\nCAI_STREAM=false' > .env
 
 # Launch CAI
 cai  # first launch it can take up to 30 seconds
