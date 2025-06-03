@@ -69,7 +69,7 @@ Some annotation rules:
 If you have any questions about the annotation, please write to us.
 
 
-### 📐Metrics
+###  📐 Metrics
 
 To evaluate the performance of our anonymization system, we use standard information retrieval metrics focused on correctly detecting and anonymizing sensitive entities:
 - **True Positives (TP):** Correctly anonymized entities  
