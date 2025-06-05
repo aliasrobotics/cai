@@ -146,6 +146,8 @@ Cybersecurity AI is a critical field, yet many groups are misguidedly pursuing i
 pip install cai-framework
 ```
 
+Always create a new virtual environment to ensure proper dependency installation when updating CAI.
+
 The following subsections provide a more detailed walkthrough on selected popular Operating Systems. Refer to the [Development](#development) section for developer-related install instructions.
 
 ### OS X
@@ -286,6 +288,16 @@ CAI does NOT provide API keys for any model by default. Don't ask us to provide 
 
 The OPENAI_API_KEY must not be left blank. It should contain either "sk-123" (as a placeholder) or your actual API key. See https://github.com/aliasrobotics/cai/issues/27.
 
+:warning: Note:
+
+If you are using alias0 model, make sure that CAI is >0.4.0 version and here you have an .env example to be able to use it.
+
+```bash
+OPENAI_API_KEY="sk-1234"
+OLLAMA=""
+ALIAS_API_KEY="<sk-your-key>"  # note, add yours
+CAI_STEAM=False
+```
 
 ### 🔹 Custom OpenAI Base URL Support
 
@@ -300,6 +312,7 @@ Or directly from the command line:
 ```bash
 OLLAMA_API_BASE="https://custom-openai-proxy.com/v1" cai
 ```
+
 
 ## :triangular_ruler: Architecture:
 
