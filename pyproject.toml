@@ -31,7 +31,8 @@ dependencies = [
     "mkdocs-material>=9.6.0",
     "paramiko>=3.5.1",
     "dnspython",
-    "flask"
+    "flask",
+    "PyPDF2,
 ]
 classifiers = [
     "Typing :: Typed",
