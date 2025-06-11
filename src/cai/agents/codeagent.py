@@ -648,8 +648,7 @@ I'll execute your code and show you the results.
                             self.python_executor.state.get(
                                 "_print_outputs", ""))
 
-                    timeout_message = f"Code execution timed out after {
-                        self.execution_timeout} seconds."
+                    timeout_message = f"Code execution timed out after \n{self.execution_timeout} seconds."
                     if debug:
                         print(
                             color(
@@ -666,12 +665,10 @@ I'll execute your code and show you the results.
                                     bold=True))
                             print(color(f"{execution_logs}", fg="yellow"))
 
-                    result_message = f"Code execution timed out after {
-                        self.execution_timeout} seconds.\n\n"
+                    result_message = f"Code execution timed out after \n{self.execution_timeout} seconds.\n\n"
                     if execution_logs:
                         result_message += (
-                            f"Execution logs before timeout:\n```\n{
-                                execution_logs}\n```\n\n")
+                            f"Execution logs before timeout:\n```\n{execution_logs}\n```\n\n")
                     result_message += ("Please optimize your code to run "
                                        "more efficiently or break it into "
                                        "smaller steps.")
