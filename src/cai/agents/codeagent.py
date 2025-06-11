@@ -573,8 +573,7 @@ I'll execute your code and show you the results.
             if debug:
                 print(
                     color(
-                        f"❌ Code generation failed: {
-                            str(e)}",
+                        f"❌ Code generation failed: \n{str(e)}",
                         fg="red",
                         bold=True))
             raise CodeGenerationError(f"Failed to generate code: {str(e)}")  # pylint: disable=raise-missing-from # noqa: E702,E501
