@@ -36,6 +36,21 @@ DEFAULT_IMAGES = {
     },
 }
 
+# --- Helper function for image name normalization ---
+def normalize_image_name(image_name: str) -> str:
+    """
+    Ensure the image name always includes a tag (default to ':latest' if missing).
+    Args:
+        image_name: The Docker image name, possibly without a tag.
+    Returns:
+        The image name with a tag (':latest' if not specified).
+    """
+    if not image_name:
+        return image_name
+    if ":" not in image_name:
+        return f"{image_name}:latest"
+    return image_name
+
 
 class DockerManager:
     """Manager for Docker operations."""
@@ -189,6 +204,8 @@ class DockerManager:
             Tuple[bool, str]: Success status and output message
         """
         try:
+            # Normalize image name for all comparisons
+            normalized_image_name = normalize_image_name(image_name)
             # Get the workspace directory for mounting
             workspace_dir = os.getenv("CAI_WORKSPACE_DIR", os.getcwd())
             if not os.path.exists(workspace_dir):
@@ -370,6 +387,56 @@ class DockerManager:
                     else:
                         error_msg = retry_process.stderr
                 
+                # --- Robust handling for 'already exists' error ---
+                if "already exists" in error_msg and container_name:
+                    # Find the container by name
+                    for container in DockerManager.get_container_list():
+                        # Docker prepends '/' to container names in 'Names' field
+                        if container.get("Names", "") == f"/{container_name}":
+                            # Normalize both image names for comparison
+                            container_image = normalize_image_name(container.get("Image", ""))
+                            if container_image == normalized_image_name:
+                                container_id = container.get("ID", "")
+                                container_status = container.get("Status", "").lower()
+                                # If running, just reuse it
+                                if "up" in container_status:
+                                    return True, (
+                                        f"Successfully started existing container: {container_id}"
+                                    )
+                                # If stopped, start it
+                                elif "exited" in container_status or "created" in container_status:
+                                    start_cmd = ["docker", "start", container_id]
+                                    start_process = subprocess.run(
+                                        start_cmd,
+                                        capture_output=True,
+                                        text=True,
+                                        check=False
+                                    )
+                                    if start_process.returncode == 0:
+                                        return True, (
+                                            f"Successfully started existing container: {container_id}"
+                                        )
+                                    else:
+                                        # If start fails, try to remove and recreate
+                                        subprocess.run(
+                                            ["docker", "rm", "-f", container_id],
+                                            capture_output=True,
+                                            text=True,
+                                            check=False
+                                        )
+                                        # Try again with a new name
+                                        new_name = f"{container_name}-new"
+                                        return DockerManager.run_container(image_name, new_name)
+                            else:
+                                # If the image does not match, remove and recreate
+                                subprocess.run(
+                                    ["docker", "rm", "-f", container.get("ID", "")],
+                                    capture_output=True,
+                                    text=True,
+                                    check=False
+                                )
+                                # Try again with the same name
+                                return DockerManager.run_container(image_name, container_name)
                 # If still fails, check for common issues
                 if "already exists" in error_msg and container_name:
                     # Container with this name already exists
@@ -1302,6 +1369,8 @@ class VirtualizationCommand(Command):
         Returns:
             True if the image was activated successfully, False otherwise
         """
+        # Normalize image name for all comparisons
+        normalized_image_identifier = normalize_image_name(image_identifier)
         # Special case for returning to host system
         if image_identifier.lower() in ["host", "system", "none"]:
             if "CAI_ACTIVE_CONTAINER" in os.environ:
@@ -1418,7 +1487,9 @@ class VirtualizationCommand(Command):
         
         # First, check if there's an existing container using the requested image
         for container in self.cached_containers:
-            if container.get("Image", "") == image_name:
+            # Normalize both image names for comparison
+            container_image = normalize_image_name(container.get("Image", ""))
+            if container_image == normalize_image_name(image_name):
                 container_id = container.get("ID", "")
                 container_status = container.get("Status", "").lower()
                 
@@ -1491,7 +1562,8 @@ class VirtualizationCommand(Command):
         # No existing container or container couldn't be started - check if image is available locally
         image_available = False
         for image in self.cached_images:
-            if image.get("Repository", "") == image_name:
+            # Normalize both image names for comparison
+            if normalize_image_name(image.get("Repository", "")) == normalize_image_name(image_name):
                 image_available = True
                 break
                 
@@ -1523,21 +1595,22 @@ class VirtualizationCommand(Command):
             
             # For problematic images, we might still want to set them as active
             # so commands can fall back to host
-            if is_problematic:
-                console.print(
-                    f"[yellow]Unable to start {image_name} container. "
-                    f"Setting it as active anyway to enable fallback to host execution.[/yellow]"
-                )
+            # is_problematic = image_name in problematic_images # This variable is not defined in the original code
+            # if is_problematic:
+            #     console.print(
+            #         f"[yellow]Unable to start {image_name} container. "
+            #         f"Setting it as active anyway to enable fallback to host execution.[/yellow]"
+            #     )
                 
                 # Create a dummy ID that will be treated as the active container
-                dummy_id = f"dummy-{image_name.replace('/', '-')}"
-                os.environ["CAI_ACTIVE_CONTAINER"] = dummy_id
+                # dummy_id = f"dummy-{image_name.replace('/', '-')}"
+                # os.environ["CAI_ACTIVE_CONTAINER"] = dummy_id
                 
-                console.print(
-                    f"[yellow]Set '{dummy_id}' as active environment.[/yellow]\n"
-                    f"[dim]Commands will execute on host, but environment name will show as {image_name}.[/dim]"
-                )
-                return True
+                # console.print(
+                #     f"[yellow]Set '{dummy_id}' as active environment.[/yellow]\n"
+                #     f"[dim]Commands will execute on host, but environment name will show as {image_name}.[/dim]"
+                # )
+                # return True
                 
             return False
             
