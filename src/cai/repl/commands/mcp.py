@@ -108,19 +108,19 @@ class GlobalMCPUtil(MCPUtil):
 
         # For SSE servers, capture the URL
         if isinstance(server, MCPServerSse):
-            server_config["url"] = server.params.get("url")
-            server_config["headers"] = server.params.get("headers")
-            server_config["timeout"] = server.params.get("timeout", 5)
-            server_config["sse_read_timeout"] = server.params.get("sse_read_timeout", 60 * 5)
+            server_config["url"] = getattr(server.params, "url")
+            server_config["headers"] = getattr(server.params, "headers")
+            server_config["timeout"] = getattr(server.params, "timeout", 5)
+            server_config["sse_read_timeout"] = getattr(server.params, "sse_read_timeout", 60 * 5)
         # For STDIO servers, capture the command
         elif isinstance(server, MCPServerStdio):
             server_config["command"] = server.params.command
             server_config["args"] = server.params.args
-            server_config["env"] = server.params.get("env")
-            server_config["cwd"] = server.params.get("cwd")
-            server_config["encoding"] = server.params.get("encoding", "utf-8")
-            server_config["encoding_error_handler"] = server.params.get(
-                "encoding_error_handler", "strict"
+            server_config["env"] = getattr(server.params, "env")
+            server_config["cwd"] = getattr(server.params, "cwd")
+            server_config["encoding"] = getattr(server.params, "encoding", "utf-8")
+            server_config["encoding_error_handler"] = getattr(
+                server.params, "encoding_error_handler", "strict"
             )
 
         # Create a custom invoke function that creates a new connection each time
@@ -810,7 +810,7 @@ Example: `/mcp add burp 13`
 
         # Get the agent
         try:
-            agent = get_agent_by_name(agent_identifier)
+            agent = get_available_agents()[agent_identifier]
             agent_display_name = getattr(agent, "name", agent_identifier)
         except ValueError:
             # Try by index
