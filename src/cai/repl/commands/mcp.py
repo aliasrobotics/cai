@@ -812,7 +812,7 @@ Example: `/mcp add burp 13`
         try:
             agent = get_available_agents()[agent_identifier]
             agent_display_name = getattr(agent, "name", agent_identifier)
-        except ValueError:
+        except KeyError:
             # Try by index
             try:
                 agents = get_available_agents()
