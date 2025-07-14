@@ -724,7 +724,7 @@ CAI>/mcp load http://localhost:9876/sse burp
 
 2. **STDIO (Standard Input/Output)** - For local inter-process communication:
 ```bash
-CAI>/mcp stdio myserver python mcp_server.py
+CAI>/mcp load stdio myserver python mcp_server.py
 ```
 
 Once connected, you can add the MCP tools to any agent:
