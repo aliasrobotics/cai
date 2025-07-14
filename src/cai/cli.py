@@ -1290,7 +1290,7 @@ def run_cai_cli(
 
                 # If command wasn't recognized, show error (skip for /shell or /s)
                 if command not in ("/shell", "/s"):
-                    console.print(f"[red]Unknown command: {command}[/red]")
+                    console.print(f"[red]Command failed or unknown: {command}[/red]")
                 continue
             from rich.text import Text
 
