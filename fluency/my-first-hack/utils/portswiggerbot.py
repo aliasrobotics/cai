@@ -100,6 +100,8 @@ class Bot():
         #Go to sections urls
         self.driver.get(f'{self.LABS_URL}{topic_name}')
         
+        self.__wait_random_time(min_seconds=5, max_seconds=7)
+        
         #Find all <a> elements that have the topic prefix in the href
         links = self.driver.find_elements(By.CLASS_NAME, 'flex-columns')
         
