@@ -31,6 +31,7 @@
 [![Android](https://img.shields.io/badge/Android-Supported-brightgreen?logo=android&logoColor=white)](https://github.com/aliasrobotics/cai)
 [![Discord](https://img.shields.io/badge/Discord-7289DA?logo=discord&logoColor=white)](https://discord.gg/fnUFcTaQAC)
 [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-b31b1b.svg)](https://arxiv.org/pdf/2504.06017)
+[![arXiv](https://img.shields.io/badge/arXiv-2506.23592-b31b1b.svg)](https://arxiv.org/abs/2506.23592)
 
 
 
@@ -135,7 +136,9 @@ Cybersecurity AI is a critical field, yet many groups are misguidedly pursuing i
 
 - [Autonomous Cyber](https://www.acyber.co/)
 - [CrackenAGI](https://cracken.ai/)
+- [ETHIACK](https://ethiack.com/)
 - [Horizon3](https://horizon3.ai/)
+- [Lakera](https://lakera.ai)
 - [Mindfort](www.mindfort.ai)
 - [Mindgard](https://mindgard.ai/)
 - [NDAY Security](https://ndaysecurity.com/)
@@ -785,7 +788,7 @@ pre-commit run --all-files # all files
 
 ### Optional Requirements: caiextensions
 
-Currently, the extensions are not available as they have been (largely) integrated or are in the process of being integrated into the core architecture. We aim to have everything converge in version 0.4.x. Coming soon!
+Currently, the extensions are not publicly available as the engineering endeavour to maintain them is significant. Instead, we're making selected custom caiextensions available for partner companies across collaborations.
 
 ### :information_source: Usage Data Collection
 
