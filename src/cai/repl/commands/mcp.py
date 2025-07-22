@@ -602,8 +602,9 @@ Example: `/mcp add burp 13`
             True if successful
         """
         if name in _GLOBAL_MCP_SERVERS:
-            console.print(f"[yellow]Server '{name}' already exists. Remove it first.[/yellow]")
-            return False
+            console.print(f"[yellow]Server '{name}' is already loaded and active.[/yellow]")
+            console.print(f"[dim]Use '/mcp remove {name}' first if you want to reload it.[/dim]")
+            return True
 
         console.print(f"Connecting to SSE server at {url}...")
 
@@ -690,8 +691,9 @@ Example: `/mcp add burp 13`
             True if successful
         """
         if name in _GLOBAL_MCP_SERVERS:
-            console.print(f"[yellow]Server '{name}' already exists. Remove it first.[/yellow]")
-            return False
+            console.print(f"[yellow]Server '{name}' is already loaded and active.[/yellow]")
+            console.print(f"[dim]Use '/mcp remove {name}' first if you want to reload it.[/dim]")
+            return True
 
         console.print(
             f"Starting stdio server '{name}' with command: {command} {' '.join(cmd_args)}"
