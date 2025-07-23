@@ -5,7 +5,7 @@ This module provides commands for viewing and changing the current LLM model.
 import os
 import datetime
 # Standard library imports
-from typing import List, Optional  # Dict and Any removed as unused
+from typing import List, Optional, Dict, Any 
 
 # Third-party imports
 import requests  # pylint: disable=import-error
@@ -21,6 +21,138 @@ LITELLM_URL = (
     "https://raw.githubusercontent.com/BerriAI/litellm/main/"
     "model_prices_and_context_window.json"
 )
+
+
+def get_predefined_model_categories() -> Dict[str, List[Dict[str, str]]]:
+    """Get the predefined model categories as the single source of truth.
+    
+    This function serves as the authoritative source for all available models
+    across the CAI system. Other modules should import and use this function
+    to ensure consistency.
+    
+    Returns:
+        Dictionary mapping category names to lists of model dictionaries
+    """
+    return {
+        "Alias": [
+            {
+                "name": "alias0",
+                "description": (
+                    "Best model for Cybersecurity AI tasks"
+                )
+            },
+            {
+                "name": "alias0-fast",
+                "description": (
+                    "Fast version of alias0 for quick tasks"
+                )
+            }
+        ],
+        "Anthropic Claude": [
+            {
+                "name": "claude-sonnet-4-20250514",
+                "description": (
+                    "Excellent balance of performance and efficiency"
+                )
+            },
+            {
+                "name": "claude-3-7-sonnet-20250219",
+                "description": (
+                    "Excellent model for complex reasoning and creative tasks"
+                )
+            },
+            {
+                "name": "claude-3-5-sonnet-20240620",
+                "description": (
+                    "Excellent balance of performance and efficiency"
+                )
+            },
+            {
+                "name": "claude-3-5-haiku-20240307",
+                "description": (
+                    "Fast and efficient model"
+                )
+            },
+        ],
+        "OpenAI": [
+            {
+                "name": "o3-mini",
+                "description": "Latest mini model in the O-series"
+            },
+            {
+                "name": "gpt-4o",
+                "description": (
+                    "Latest GPT-4 model with improved capabilities"
+                )
+            },
+        ],
+        "DeepSeek": [
+            {
+                "name": "deepseek-v3",
+                "description": "DeepSeek's latest general-purpose model"
+            },
+            {
+                "name": "deepseek-r1",
+                "description": "DeepSeek's specialized reasoning model"
+            }
+        ]
+    }
+
+
+def get_all_predefined_models() -> List[Dict[str, Any]]:
+    """Get all predefined models as a flat list with enriched data.
+    
+    Returns:
+        List of model dictionaries with name, provider, category, description, and pricing
+    """
+    model_categories = get_predefined_model_categories()
+    all_models = []
+    
+    # Simple mapping from category to provider name
+    category_to_provider = {
+        "Alias": "OpenAI",  # Alias models use OpenAI as base
+        "Anthropic Claude": "Anthropic",
+        "OpenAI": "OpenAI", 
+        "DeepSeek": "DeepSeek"
+    }
+    
+    for category, models in model_categories.items():
+        provider = category_to_provider.get(category, "Unknown")
+        
+        for model in models:
+            # Get pricing info using COST_TRACKER
+            input_cost_per_token, output_cost_per_token = COST_TRACKER.get_model_pricing(model["name"])
+
+            # Convert to dollars per million tokens
+            input_cost_per_million = None
+            output_cost_per_million = None
+
+            if input_cost_per_token is not None and input_cost_per_token > 0:
+                input_cost_per_million = input_cost_per_token * 1000000
+            if output_cost_per_token is not None and output_cost_per_token > 0:
+                output_cost_per_million = output_cost_per_token * 1000000
+
+            all_models.append({
+                "name": model["name"],
+                "provider": provider,
+                "category": category,
+                "description": model["description"],
+                "input_cost": input_cost_per_million,
+                "output_cost": output_cost_per_million
+            })
+    
+    return all_models
+
+
+def get_predefined_model_names() -> List[str]:
+    """Get a simple list of all predefined model names.
+    
+    This is useful for autocompletion and simple model name lists.
+    
+    Returns:
+        List of model name strings
+    """
+    return [model["name"] for model in get_all_predefined_models()]
 
 
 class ModelCommand(Command):
@@ -64,104 +196,34 @@ class ModelCommand(Command):
         Returns:
             bool: True if the model was changed successfully
         """
-        # Define model categories and their models for easy reference
+        # Get all predefined models from the shared source of truth
         # pylint: disable=invalid-name
-        MODEL_CATEGORIES = {
-            "Alias": [
-                {
-                    "name": "alias0",
-                    "description": (
-                        "Best model for Cybersecurity AI tasks"
-                    )
-                },
-                {
-                    "name": "alias0-fast",
-                    "description": (
-                        "Fast version of alias0 for quick tasks"
-                    )
-                }
-            ],
-            "Anthropic Claude": [
-                {
-                    "name": "claude-sonnet-4-20250514",
-                    "description": (
-                        "Excellent balance of performance and efficiency"
-                    )
-                },
-                {
-                    "name": "claude-3-7-sonnet-20250219",
-                    "description": (
-                        "Excellent model for complex reasoning and creative tasks"
-                    )
-                },
-                {
-                    "name": "claude-3-5-sonnet-20240620",
-                    "description": (
-                        "Excellent balance of performance and efficiency"
-                    )
-                },
-                {
-                    "name": "claude-3-5-haiku-20240307",
-                    "description": (
-                        "Fast and efficient model"
-                    )
-                },
-            ],
-            "OpenAI": [
-                {
-                    "name": "o3-mini",
-                    "description": "Latest mini model in the O-series"
-                },
-                {
-                    "name": "gpt-4o",
-                    "description": (
-                        "Latest GPT-4 model with improved capabilities"
-                    )
-                },
-            ],
-            "DeepSeek": [
-                {
-                    "name": "deepseek-v3",
-                    "description": "DeepSeek's latest general-purpose model"
-                },
-                {
-                    "name": "deepseek-r1",
-                    "description": "DeepSeek's specialized reasoning model"
-                }
-            ]
-        }
+        ALL_MODELS = get_all_predefined_models()
 
-        # Create a flat list of all models for numeric selection
-        # pylint: disable=invalid-name
-        ALL_MODELS = []
-        for category, models in MODEL_CATEGORIES.items():
-            for model in models:
-                # Get pricing info using COST_TRACKER
-                input_cost_per_token, output_cost_per_token = COST_TRACKER.get_model_pricing(model["name"])
+        # Also fetch LiteLLM models to make numbering consistent with /model-show
+        litellm_models = []
+        try:
+            response = requests.get(LITELLM_URL, timeout=5)
+            if response.status_code == 200:
+                litellm_data = response.json()
+                # Add LiteLLM models (sorted for consistency)
+                for model_name in sorted(litellm_data.keys()):
+                    litellm_models.append({
+                        "name": model_name,
+                        "provider": "LiteLLM",
+                        "category": "External",
+                        "description": "External model via LiteLLM",
+                        "input_cost": None,
+                        "output_cost": None
+                    })
+        except Exception:  # pylint: disable=broad-except
+            # Silently fail if LiteLLM is not available
+            pass
 
-                # Convert to dollars per million tokens
-                input_cost_per_million = None
-                output_cost_per_million = None
+        # Combine predefined models with LiteLLM models for consistent numbering
+        ALL_MODELS.extend(litellm_models)
 
-                if input_cost_per_token is not None and input_cost_per_token > 0:
-                    input_cost_per_million = input_cost_per_token * 1000000
-                if output_cost_per_token is not None and output_cost_per_token > 0:
-                    output_cost_per_million = output_cost_per_token * 1000000
-
-                ALL_MODELS.append({
-                    "name": model["name"],
-                    "provider": (
-                        "Anthropic" if "claude" in model["name"]
-                        else "DeepSeek" if "deepseek" in model["name"]
-                        else "OpenAI"
-                    ),
-                    "category": category,
-                    "description": model["description"],
-                    "input_cost": input_cost_per_million,
-                    "output_cost": output_cost_per_million
-                })
-
-        # Update cached models
+        # Update cached models to include all models for number selection
         self.cached_models = [model["name"] for model in ALL_MODELS]
         self.cached_model_numbers = {
             str(i): model["name"]

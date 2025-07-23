@@ -7,9 +7,17 @@ from typing import List, Optional
 import os
 import datetime
 from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
 
 from cai.repl.commands.base import Command, register_command
 from cai.sdk.agents.models.openai_chatcompletions import get_current_active_model
+from cai.util import COST_TRACKER
+from cai.repl.commands.model import (
+    ModelCommand, 
+    get_predefined_model_categories,
+    get_all_predefined_models
+)
 
 console = Console()
 
@@ -82,11 +90,6 @@ class CompactCommand(Command):
     
     def handle_model(self, args: Optional[List[str]] = None) -> bool:
         """Set model for compaction."""
-        from cai.repl.commands.model import ModelCommand
-        from rich.table import Table
-        from rich.panel import Panel
-        from cai.util import COST_TRACKER
-        
         if not args:
             # Display current model
             console.print(
@@ -97,85 +100,8 @@ class CompactCommand(Command):
                 )
             )
             
-            # Create model command instance to reuse its model data
-            model_cmd = ModelCommand()
-            
-            # Define model categories (same as in model.py)
-            MODEL_CATEGORIES = {
-                "Alias": [
-                    {
-                        "name": "alias0",
-                        "description": "Best model for Cybersecurity AI tasks"
-                    }
-                ],
-                "Anthropic Claude": [
-                    {
-                        "name": "claude-sonnet-4-20250514",
-                        "description": "Excellent balance of performance and efficiency"
-                    },
-                    {
-                        "name": "claude-3-7-sonnet-20250219",
-                        "description": "Excellent model for complex reasoning and creative tasks"
-                    },
-                    {
-                        "name": "claude-3-5-sonnet-20240620",
-                        "description": "Excellent balance of performance and efficiency"
-                    },
-                    {
-                        "name": "claude-3-5-haiku-20240307",
-                        "description": "Fast and efficient model"
-                    },
-                ],
-                "OpenAI": [
-                    {
-                        "name": "o3-mini",
-                        "description": "Latest mini model in the O-series"
-                    },
-                    {
-                        "name": "gpt-4o",
-                        "description": "Latest GPT-4 model with improved capabilities"
-                    },
-                ],
-                "DeepSeek": [
-                    {
-                        "name": "deepseek-v3",
-                        "description": "DeepSeek's latest general-purpose model"
-                    },
-                    {
-                        "name": "deepseek-r1",
-                        "description": "DeepSeek's specialized reasoning model"
-                    }
-                ]
-            }
-            
-            # Create a flat list of all models
-            ALL_MODELS = []
-            for category, models in MODEL_CATEGORIES.items():
-                for model in models:
-                    # Get pricing info
-                    input_cost_per_token, output_cost_per_token = COST_TRACKER.get_model_pricing(model["name"])
-                    
-                    # Convert to dollars per million tokens
-                    input_cost_per_million = None
-                    output_cost_per_million = None
-                    
-                    if input_cost_per_token is not None and input_cost_per_token > 0:
-                        input_cost_per_million = input_cost_per_token * 1000000
-                    if output_cost_per_token is not None and output_cost_per_token > 0:
-                        output_cost_per_million = output_cost_per_token * 1000000
-                    
-                    ALL_MODELS.append({
-                        "name": model["name"],
-                        "provider": (
-                            "Anthropic" if "claude" in model["name"]
-                            else "DeepSeek" if "deepseek" in model["name"]
-                            else "OpenAI"
-                        ),
-                        "category": category,
-                        "description": model["description"],
-                        "input_cost": input_cost_per_million,
-                        "output_cost": output_cost_per_million
-                    })
+            # Get all predefined models using the shared function
+            ALL_MODELS = get_all_predefined_models()
             
             # Show available models in a table
             model_table = Table(

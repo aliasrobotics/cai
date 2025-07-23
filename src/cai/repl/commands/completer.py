@@ -30,6 +30,7 @@ from cai.repl.commands.base import (
     COMMANDS,
     COMMAND_ALIASES
 )
+from cai.repl.commands.model import get_predefined_model_names
 
 console = Console()
 
@@ -82,12 +83,12 @@ class FuzzyCommandCompleter(Completer):
     def _background_fetch_models(self):
         """Fetch models in background to avoid blocking the UI."""
         try:
-            self.fetch_ollama_models()
+            self.fetch_all_models()
         except Exception:  # pylint: disable=broad-except
             pass
 
-    def fetch_ollama_models(self):  # pylint: disable=too-many-branches,too-many-statements,inconsistent-return-statements,line-too-long # noqa: E501
-        """Fetch available models from Ollama if it's running."""
+    def fetch_all_models(self):  # pylint: disable=too-many-branches,too-many-statements,inconsistent-return-statements,line-too-long # noqa: E501
+        """Fetch all available models (predefined + LiteLLM + Ollama) to match /model command."""
         # Only fetch every 60 seconds to avoid excessive API calls
         now = datetime.datetime.now()
         
@@ -97,8 +98,28 @@ class FuzzyCommandCompleter(Completer):
                 return
             
             self._last_model_fetch = now
-            ollama_models = []
+            
+            # Start with predefined models from the shared source of truth
+            all_models = get_predefined_model_names()
 
+            # Fetch LiteLLM models (matches the /model command behavior)
+            try:
+                litellm_url = (
+                    "https://raw.githubusercontent.com/BerriAI/litellm/main/"
+                    "model_prices_and_context_window.json"
+                )
+                response = requests.get(litellm_url, timeout=2)
+                
+                if response.status_code == 200:
+                    litellm_data = response.json()
+                    # Add LiteLLM models (sorted for consistency)
+                    litellm_models = sorted(litellm_data.keys())
+                    all_models.extend(litellm_models)
+            except Exception:  # pylint: disable=broad-except
+                # Silently fail if LiteLLM is not available
+                pass
+
+            # Fetch Ollama models
             try:
                 # Get Ollama models with a short timeout to prevent hanging
                 api_base = get_ollama_api_base()
@@ -113,47 +134,17 @@ class FuzzyCommandCompleter(Completer):
                         # Fallback for older Ollama versions
                         models = data.get('items', [])
 
-                    ollama_models = [(model.get('name', ''), []) for model in models]
+                    ollama_models = [model.get('name', '') for model in models]
+                    all_models.extend(ollama_models)
             except Exception:  # pylint: disable=broad-except
                 # Silently fail if Ollama is not available
                 pass
 
-            # Standard models always available
-            standard_models = [
-                # Alias models
-                "alias0",
-
-                # Claude 3.7 models
-                "claude-3-7-sonnet-20250219",
-
-                # Claude 3.5 models
-                "claude-3-5-sonnet-20240620",
-                "claude-3-5-20241122",
-
-                # Claude 3 models
-                "claude-3-opus-20240229",
-                "claude-3-sonnet-20240229",
-                "claude-3-haiku-20240307",
-
-                # OpenAI O-series models
-                "o1",
-                "o1-mini",
-                "o3-mini",
-
-                # OpenAI GPT models
-                "gpt-4o",
-                "gpt-4-turbo",
-                "gpt-3.5-turbo",
-
-                # DeepSeek models
-                "deepseek-v3",
-                "deepseek-r1"
-            ]
-
-            # Combine standard models with Ollama models
-            self._cached_models = standard_models + ollama_models
+            # Cache all models that the /model command can handle
+            self._cached_models = all_models
 
             # Create number mappings for models (1-based indexing)
+            # This matches the /model command numbering exactly
             self._cached_model_numbers = {}
             for i, model in enumerate(self._cached_models, 1):
                 self._cached_model_numbers[str(i)] = model
@@ -484,7 +475,7 @@ class FuzzyCommandCompleter(Completer):
         words = text.split()
 
         # Refresh Ollama models periodically
-        self.fetch_ollama_models()
+        self.fetch_all_models()
 
         if not text:
             # Show all main commands with descriptions
