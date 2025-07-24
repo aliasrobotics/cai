@@ -200,34 +200,24 @@ class ModelCommand(Command):
         # pylint: disable=invalid-name
         ALL_MODELS = get_all_predefined_models()
 
-        # Also fetch LiteLLM models to make numbering consistent with /model-show
-        litellm_models = []
+        # Also fetch LiteLLM model names to make numbering consistent with /model-show
+        litellm_model_names = []
         try:
             response = requests.get(LITELLM_URL, timeout=5)
             if response.status_code == 200:
                 litellm_data = response.json()
-                # Add LiteLLM models (sorted for consistency)
-                for model_name in sorted(litellm_data.keys()):
-                    litellm_models.append({
-                        "name": model_name,
-                        "provider": "LiteLLM",
-                        "category": "External",
-                        "description": "External model via LiteLLM",
-                        "input_cost": None,
-                        "output_cost": None
-                    })
+                # Add LiteLLM model names (sorted for consistency with /model-show)
+                litellm_model_names = sorted(litellm_data.keys())
         except Exception:  # pylint: disable=broad-except
             # Silently fail if LiteLLM is not available
             pass
 
-        # Combine predefined models with LiteLLM models for consistent numbering
-        ALL_MODELS.extend(litellm_models)
-
-        # Update cached models to include all models for number selection
-        self.cached_models = [model["name"] for model in ALL_MODELS]
+        # Update cached models to include all models for number selection (consistent with /model-show)
+        predefined_model_names = [model["name"] for model in ALL_MODELS]
+        self.cached_models = predefined_model_names + litellm_model_names
         self.cached_model_numbers = {
-            str(i): model["name"]
-            for i, model in enumerate(ALL_MODELS, 1)
+            str(i): model_name
+            for i, model_name in enumerate(self.cached_models, 1)
         }
 
         if not args:  # pylint: disable=too-many-nested-blocks
@@ -260,7 +250,7 @@ class ModelCommand(Command):
                 justify="right")
             model_table.add_column("Description", style="white")
 
-            # Add all predefined models with numbers
+            # Add predefined models with numbers
             for i, model in enumerate(ALL_MODELS, 1):
                 # Format pricing info as dollars per million tokens
                 input_cost_str = (
@@ -304,7 +294,8 @@ class ModelCommand(Command):
                         ollama_models = data.get('items', [])
 
                     # Add Ollama models to the table with continuing numbers
-                    start_index = len(ALL_MODELS) + 1
+                    # (after predefined models + LiteLLM models in numbering)
+                    start_index = len(predefined_model_names) + len(litellm_model_names) + 1
                     for i, model in enumerate(ollama_models, start_index):
                         model_name = model.get('name', '')
                         model_size = model.get('size', 0)
@@ -337,7 +328,7 @@ class ModelCommand(Command):
                         self.cached_model_numbers[str(i)] = model_name
             except Exception:  # pylint: disable=broad-except
                 # Add a note about Ollama if we couldn't fetch models
-                start_index = len(ALL_MODELS) + 1
+                start_index = len(predefined_model_names) + len(litellm_model_names) + 1
                 model_table.add_row(
                     str(start_index),
                     "llama3",
