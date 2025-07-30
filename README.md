@@ -378,28 +378,15 @@ CAI focuses on making cybersecurity agent **coordination** and **execution** lig
 
 If you want to dive deeper into the code, check the following files as a start point for using CAI:
 
-```
-cai
-├── __init__.py
-│
-├── cli.py                        # entrypoint for CLI
-├── core.py                     # core implementation and agentic flow
-├── types.py                   # main abstractions and classes
-├── util.py                      # utility functions
-│
-├── repl                          # CLI aesthetics and commands
-│   ├── commands
-│   └── ui
-├── agents                      # agent implementations
-│   ├── one_tool.py      # agent, one agent per file
-│   └── patterns            # agentic patterns, one per file
-│
-├── tools                        # agent tools
-│   ├── common.py
-
-caiextensions                      # out of tree Python extensions
-```
-
+* [__init__.py](https://github.com/aliasrobotics/cai/blob/main/src/cai/__init__.py)
+* [cli.py](https://github.com/aliasrobotics/cai/blob/main/src/cai/cli.py) - entrypoint for command line interface
+* [util.py](https://github.com/aliasrobotics/cai/blob/main/src/cai/util.py) - utility functions
+* [agents](https://github.com/aliasrobotics/cai/blob/main/src/cai/agents) - Agent implementations
+* [internal](https://github.com/aliasrobotics/cai/blob/main/src/cai/internal) - CAI internal functions (endpoints, metrics, logging, etc.)
+* [prompts](https://github.com/aliasrobotics/cai/blob/main/src/cai/prompts) - Agent Prompt Database
+* [repl](https://github.com/aliasrobotics/cai/blob/main/src/cai/repl) - CLI aesthetics and commands
+* [sdk](https://github.com/aliasrobotics/cai/blob/main/src/cai/sdk) - CAI command sdk
+* [tools](https://github.com/aliasrobotics/cai/tree/main/src/cai/tools) - agent tools
 
 ### 🔹 Agent
 
