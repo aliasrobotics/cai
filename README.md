@@ -158,6 +158,16 @@ Cybersecurity AI is a critical field, yet many groups are misguidedly pursuing i
 
 ## Learn - `CAI` Fluency
 
+<div align="center">
+  <p>
+    <a align="center" href="" target="https://github.com/aliasrobotics/CAI">
+      <img
+        width="100%"
+        src="https://github.com/aliasrobotics/cai/raw/main/media/caiedu.PNG"
+      >
+    </a>
+  </p>
+
 
 |       |   Description  | English | Spanish |
 |-------|----------------|---------|---------|
