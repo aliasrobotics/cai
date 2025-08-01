@@ -401,65 +401,58 @@ If you want to dive deeper into the code, check the following files as a start p
 
 ### 🔹 Agent
 
-At its core, CAI abstracts its cybersecurity behavior via `Agents` and agentic `Patterns`. An Agent in *an intelligent system that interacts with some environment*. More technically, within CAI we embrace a robotics-centric definition wherein an agent is anything that can be viewed as a system perceiving its environment through sensors, reasoning about its goals and and acting accordingly upon that environment through actuators (*adapted* from Russel & Norvig, AI: A Modern Approach). In cybersecurity, an `Agent` interacts with systems and networks, using peripherals and network interfaces as sensors, reasons accordingly and then executes network actions as if actuators. Correspondingly, in CAI, `Agent`s implement the `ReACT` (Reasoning and Action) agent model[^3].
-
+At its core, CAI abstracts its cybersecurity behavior via `Agents` and agentic `Patterns`. An Agent in *an intelligent system that interacts with some environment*. More technically, within CAI we embrace a robotics-centric definition wherein an agent is anything that can be viewed as a system perceiving its environment through sensors, reasoning about its goals and and acting accordingly upon that environment through actuators (*adapted* from Russel & Norvig, AI: A Modern Approach). In cybersecurity, an `Agent` interacts with systems and networks, using peripherals and network interfaces as sensors, reasons accordingly and then executes network actions as if actuators. Correspondingly, in CAI, `Agent`s implement the `ReACT` (Reasoning and Action) agent model[^3]. For more information, see the [example here](https://github.com/aliasrobotics/cai/blob/main/examples/basic/hello_world.py) for the full execution code, and refer to this [jupyter notebook](https://github.com/aliasrobotics/cai/blob/main/fluency/my-first-hack/my_first_hack.ipynb) for a tutorial on how to use it.
 
 ```python
-from cai.sdk.agents import Agent
-from cai.core import CAI
-ctf_agent = Agent(
-    name="CTF Agent",
-    instructions="""You are a Cybersecurity expert Leader""",
-    model= "gpt-4o",
-)
+from cai.sdk.agents import Agent, Runner, OpenAIChatCompletionsModel
 
-messages = [{
-    "role": "user",
-    "content": "CTF challenge: TryMyNetwork. Target IP: 192.168.1.1"
-   }]
+import os
+from openai import AsyncOpenAI
+from dotenv import load_dotenv
+load_dotenv()
 
-client = CAI()
-response = client.run(agent=ctf_agent,
-                      messages=messages)
+agent = Agent(
+      name="Custom Agent",
+      instructions="""You are a Cybersecurity expert Leader""",
+      model=OpenAIChatCompletionsModel(
+          model=os.getenv('CAI_MODEL', "openai/gpt-4o"),
+          openai_client=AsyncOpenAI(),
+          )
+      )
+
+message = "Tell me about recursion in programming."
+result = await Runner.run(agent, message)
 ```
 
 ### 🔹 Tools
 
-`Tools` let cybersecurity agents take actions by providing interfaces to execute system commands, run security scans, analyze vulnerabilities, and interact with target systems and APIs - they are the core capabilities that enable CAI agents to perform security tasks effectively; in CAI, tools include built-in cybersecurity utilities (like LinuxCmd for command execution, WebSearch for OSINT gathering, Code for dynamic script execution, and SSHTunnel for secure remote access), function calling mechanisms that allow integration of any Python function as a security tool, and agent-as-tool functionality that enables specialized security agents (such as reconnaissance or exploit agents) to be used by other agents, creating powerful collaborative security workflows without requiring formal handoffs between agents.
+`Tools` let cybersecurity agents take actions by providing interfaces to execute system commands, run security scans, analyze vulnerabilities, and interact with target systems and APIs - they are the core capabilities that enable CAI agents to perform security tasks effectively; in CAI, tools include built-in cybersecurity utilities (like LinuxCmd for command execution, WebSearch for OSINT gathering, Code for dynamic script execution, and SSHTunnel for secure remote access), function calling mechanisms that allow integration of any Python function as a security tool, and agent-as-tool functionality that enables specialized security agents (such as reconnaissance or exploit agents) to be used by other agents, creating powerful collaborative security workflows without requiring formal handoffs between agents. For more information, please refer to the [example here](https://github.com/aliasrobotics/cai/blob/main/examples/basic/tools.py) for the complete configuration of custom functions.
 
 ```python
-from cai.sdk.agents import Agent
-from cai.tools.common import run_command
-from cai.core import CAI
+from cai.sdk.agents import Agent, Runner, OpenAIChatCompletionsModel
+from cai.tools.reconnaissance.exec_code import execute_code
+from cai.tools.reconnaissance.generic_linux_command import generic_linux_command
 
-def listing_tool():
-   """
-   This is a tool used list the files in the current directory
-   """
-    command = "ls -la"
-    return run_command(command, ctf=ctf)
+import os
+from openai import AsyncOpenAI
+from dotenv import load_dotenv
+load_dotenv()
 
-def generic_linux_command(command: str = "", args: str = "", ctf=None) -> str:
-    """
-    Tool to send a linux command.
-    """
-    command = f'{command} {args}'
-    return run_command(command, ctf=ctf)
+agent = Agent(
+      name="Custom Agent",
+      instructions="""You are a Cybersecurity expert Leader""",
+      tools= [
+        generic_linux_command,
+        execute_code
+      ],
+      model=OpenAIChatCompletionsModel(
+          model=os.getenv('CAI_MODEL', "openai/gpt-4o"),
+          openai_client=AsyncOpenAI(),
+          )
+      )
 
-ctf_agent = Agent(
-    name="CTF Agent",
-    instructions="""You are a Cybersecurity expert Leader""",
-    model= "claude-3-7-sonnet-20250219",
-    functions=[listing_tool, generic_linux_command])
-
-client = CAI()
-messages = [{
-    "role": "user",
-    "content": "CTF challenge: TryMyNetwork. Target IP: 192.168.1.1"
-   }]
-
-response = client.run(agent=ctf_agent,
-                      messages=messages)
+message = "Tell me about recursion in programming."
+result = await Runner.run(agent, message)
 ```
 
 
@@ -475,43 +468,47 @@ You may find different [tools](cai/tools). They are grouped in 6 major categorie
 
 ### 🔹 Handoffs
 
-`Handoffs` allow an `Agent` to delegate tasks to another agent, which is crucial in cybersecurity operations where specialized expertise is needed for different phases of an engagement. In our framework, `Handoffs` are implemented as tools for the LLM, where a **handoff/transfer function** like `transfer_to_flag_discriminator` enables the `ctf_agent` to pass control to the `flag_discriminator_agent` once it believes it has found the flag. This creates a security validation chain where the first agent handles exploitation and flag discovery, while the second agent specializes in flag verification, ensuring proper segregation of duties and leveraging specialized capabilities of different models for distinct security tasks.
+`Handoffs` allow an `Agent` to delegate tasks to another agent, which is crucial in cybersecurity operations where specialized expertise is needed for different phases of an engagement. In our framework, `Handoffs` are implemented as tools for the LLM, where a **handoff/transfer function** like `transfer_to_flag_discriminator` enables the `ctf_agent` to pass control to the `flag_discriminator_agent` once it believes it has found the flag. This creates a security validation chain where the first agent handles exploitation and flag discovery, while the second agent specializes in flag verification, ensuring proper segregation of duties and leveraging specialized capabilities of different models for distinct security tasks. For more information, please refer to the [example here](https://github.com/aliasrobotics/cai/blob/main/examples/cai/agent_patterns/handoffs.py) for the full execution code.
 
 
 ```python
-from cai.sdk.agents import Agent
-from cai.core import CAI
+from cai.sdk.agents import function_tool
+from cai.tools.common import run_command
+from cai.sdk.agents import Agent, OpenAIChatCompletionsModel, HandoffInputData, Runner, function_tool, handoff, trace
+from cai.sdk.agents.extensions import handoff_filters
+
+import os
+from openai import AsyncOpenAI
+from dotenv import load_dotenv
+load_dotenv()
+
+@function_tool
+def execute_cli_command(command: str) -> str:
+    return run_command(command)
+
+flag_discriminator = Agent(
+    name="Flag discriminator",
+    description="Agent focused on extracting the flag from the output",
+    instructions="You are an agent tailored to extract the flag from a given output.",
+    model=OpenAIChatCompletionsModel(
+        model=os.getenv('CAI_MODEL', "qwen2.5:14b"),
+        openai_client=AsyncOpenAI(),
+    ) 
+)
 
 ctf_agent = Agent(
-    name="CTF Agent",
-    instructions="""You are a Cybersecurity expert Leader""",
-    model= "deepseek/deepseek-chat",
-    functions=[],
+    name="CTF agent",
+    description="Agent focused on conquering security challenges",
+    instructions="You are a Cybersecurity expert Leader facing a CTF",
+    tools=[
+        execute_cli_command,
+    ],
+    model=OpenAIChatCompletionsModel(
+        model= os.getenv('CAI_MODEL', "qwen2.5:14b"),
+        openai_client=AsyncOpenAI(),
+    ), 
+    handoffs = [flag_discriminator]
 )
-
-flag_discriminator_agent = Agent(
-    name="Flag Discriminator Agent",
-    instructions="You are a Cybersecurity expert facing a CTF challenge. You are in charge of checking if the flag is correct.",
-    model= "qwen2.5:14b",
-    functions=[],
-)
-
-def transfer_to_flag_discriminator():
-    """
-    Transfer the flag to the flag_discriminator_agent to check if it is the correct flag
-    """
-    return flag_discriminator_agent
-
-ctf_agent.functions.append(transfer_to_flag_discriminator)
-
-client = CAI()
-messages = [{
-    "role": "user",
-    "content": "CTF challenge: TryMyNetwork. Target IP: 192.168.1.1"
-   }]
-
-response = client.run(agent=ctf_agent,
-                      messages=messages)
 ```
 
 ### 🔹 Patterns
@@ -543,44 +540,9 @@ When building `Patterns`, we generall y classify them among one of the following
 | `Auction-Based` (Competitive Allocation) | Agents "bid" on tasks based on priority, capability, or cost. A decision agent evaluates bids and hands off tasks to the best-fit agent. |
 | `Recursive` | A single agent continuously refines its own output, treating itself as both executor and evaluator, with handoffs (internal or external) to itself. *An example of a recursive agentic pattern is the `CodeAgent` (when used as a recursive agent), which continuously refines its own output by executing code and updating its own instructions.* |
 
-Building a `Pattern` is rather straightforward and only requires to link together `Agents`, `Tools` and `Handoffs`. For example, the following builds an offensive `Pattern` that adopts the `Swarm` category:
-
-```python
-# A Swarm Pattern for Red Team Operations
-from cai.agents.red_teamer import redteam_agent
-from cai.agents.thought import thought_agent
-from cai.agents.mail import dns_smtp_agent
+For more information and examples of common agentic patterns, see the [examples folder](https://github.com/aliasrobotics/cai/blob/main/examples/agent_patterns/README.md).
 
 
-def transfer_to_dns_agent():
-    """
-    Use THIS always for DNS scans and domain reconnaissance about dmarc and dkim registers
-    """
-    return dns_smtp_agent
-
-
-def redteam_agent_handoff(ctf=None):
-    """
-    Red Team Agent, call this function empty to transfer to redteam_agent
-    """
-    return redteam_agent
-
-
-def thought_agent_handoff(ctf=None):
-    """
-    Thought Agent, call this function empty to transfer to thought_agent
-    """
-    return thought_agent
-
-# Register handoff functions to enable inter-agent communication pathways
-redteam_agent.functions.append(transfer_to_dns_agent)
-dns_smtp_agent.functions.append(redteam_agent_handoff)
-thought_agent.functions.append(redteam_agent_handoff)
-
-# Initialize the swarm pattern with the thought agent as the entry point
-redteam_swarm_pattern = thought_agent
-redteam_swarm_pattern.pattern = "swarm"
-```
 
 ### 🔹 Turns and Interactions
 During the agentic flow (conversation), we distinguish between **interactions** and **turns**.
