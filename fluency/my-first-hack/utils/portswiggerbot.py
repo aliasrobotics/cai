@@ -3,7 +3,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support import expected_conditions as EC
 import time
 import random
 import json
@@ -14,7 +16,7 @@ from pathlib import Path
 class Bot():
 
 
-    def __init__(self):
+    def __init__(self,headless=True):
         """
         Initializes the MyBrowser instance.
         Sets up Chrome WebDriver with headless mode and necessary arguments
@@ -24,8 +26,13 @@ class Bot():
         self.LABS_URL = 'https://portswigger.net/web-security/all-labs#'
         self.prefixes_filename = 'topics_prefixes.json'
         self.options = Options()
-
-        for arg in ['--headless','--disable-gpu', '--no-sandbox']: 
+        
+        if headless:
+            args = ['--headless','--disable-gpu', '--no-sandbox']
+        else:
+            args = ['--disable-gpu', '--no-sandbox']
+            
+        for arg in args:
             self.options.add_argument(arg)
         
         self.driver = webdriver.Chrome(options=self.options)
@@ -76,7 +83,7 @@ class Bot():
 
 
 
-    def choose_topic(self,topic_name='sql-injection',level=None):
+    def choose_topic(self,topic_name='cross-site-scripting',level=None):
         """
         Extract urls of each of the labs in the selected section.
 
@@ -99,9 +106,18 @@ class Bot():
         
         #Go to sections urls
         self.driver.get(f'{self.LABS_URL}{topic_name}')
+        self.__wait_random_time(min_seconds=5, max_seconds=7)
+        
+        links = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, 'widgetcontainer-lab-link'))
+        )
+        
+
+    
         
         #Find all <a> elements that have the topic prefix in the href
-        links = self.driver.find_elements(By.CLASS_NAME, 'flex-columns')
+        links = self.driver.find_elements(By.CLASS_NAME, 'widgetcontainer-lab-link')
+   
         
         #Extract the href attributes
         if level:
@@ -110,7 +126,7 @@ class Bot():
             extracted_links = [link.find_element(By.TAG_NAME, 'a').get_attribute('href') for link in links]
         
         #Filter links that contain the topic prefix
-        return [link for link in extracted_links if topic_name == link.split('/')[4]]
+        return [link for link in extracted_links if topic_prefix == link.split('/')[4]]
 
     def obtain_lab_information(self,lab_url):
         """
