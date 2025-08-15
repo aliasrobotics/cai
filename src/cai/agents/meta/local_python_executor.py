@@ -279,8 +279,7 @@ def evaluate_unaryop(
         return ~operand
     else:
         raise InterpreterError(
-            f"Unary operation {
-                expression.op.__class__.__name__} is not supported.")
+            f"Unary operation {expression.op.__class__.__name__} is not supported.")
 
 
 def evaluate_lambda(
@@ -462,8 +461,7 @@ def evaluate_class_def(
                     )
         else:
             raise InterpreterError(
-                f"Unsupported statement in class body: {
-                    stmt.__class__.__name__}")
+                f"Unsupported statement in class body: {stmt.__class__.__name__}")
 
     new_class = type(class_name, tuple(bases), class_dict)
     state[class_name] = new_class
@@ -550,9 +548,7 @@ def evaluate_augassign(
         current_value >>= value_to_add
     else:
         raise InterpreterError(
-            f"Operation {
-                type(
-                    expression.op).__name__} is not supported.")
+            f"Operation {type(expression.op).__name__} is not supported.")
 
     # Update the state: current_value has been updated in-place
     set_value(
@@ -637,9 +633,7 @@ def evaluate_binop(
         return left_val >> right_val
     else:
         raise NotImplementedError(
-            f"Binary operation {
-                type(
-                    binop.op).__name__} is not implemented.")
+            f"Binary operation {type(binop.op).__name__} is not implemented.")
 
 
 def evaluate_assign(
@@ -666,8 +660,7 @@ def evaluate_assign(
             authorized_imports)
     else:
         if len(assign.targets) != len(result):
-            raise InterpreterError(f"Assign failed: expected {len(
-                result)} values but got {len(assign.targets)}.")
+            raise InterpreterError(f"Assign failed: expected {len(result)} values but got {len(assign.targets)}.")
         expanded_values = []
         for tgt in assign.targets:
             if isinstance(tgt, ast.Starred):
@@ -696,8 +689,7 @@ def set_value(
     if isinstance(target, ast.Name):
         if target.id in static_tools:
             raise InterpreterError(
-                f"Cannot assign to name '{
-                    target.id}': doing this would erase the existing tool!")
+                f"Cannot assign to name '{target.id}': doing this would erase the existing tool!")
         state[target.id] = value
     elif isinstance(target, ast.Tuple):
         if not isinstance(value, tuple):
@@ -757,8 +749,7 @@ def evaluate_call(
             ast.Subscript)
     ):
         raise InterpreterError(
-            f"This is not a correct function: {
-                call.func}).")
+            f"This is not a correct function: {call.func}).")
     if isinstance(call.func, ast.Attribute):
         obj = evaluate_ast(
             call.func.value,
@@ -787,8 +778,7 @@ def evaluate_call(
                 f"It is not permitted to evaluate other functions "
                 f"than the provided tools or functions "
                 f"defined/imported in previous code "
-                f"(tried to execute {
-                    call.func.id})."
+                f"(tried to execute {call.func.id})."
             )
 
     elif isinstance(call.func, ast.Subscript):
@@ -808,13 +798,11 @@ def evaluate_call(
             func = value[index]
         else:
             raise InterpreterError(
-                f"Cannot subscript object of type {
-                    type(value).__name__}")
+                f"Cannot subscript object of type {type(value).__name__}")
 
         if not callable(func):
             raise InterpreterError(
-                f"This is not a correct function: {
-                    call.func}).")
+                f"This is not a correct function: {call.func}).")
         func_name = None
     args = []
     for arg in call.args:
@@ -873,8 +861,7 @@ def evaluate_call(
             ):
                 raise InterpreterError(
                     f"Invoking a builtin function that has "
-                    f"not been explicitly added as a tool is not allowed ({
-                        func_name})."
+                    f"not been explicitly added as a tool is not allowed ({func_name})."
                 )
             return func(*args, **kwargs)
 
@@ -918,14 +905,12 @@ def evaluate_subscript(
     elif isinstance(value, (list, tuple)):
         if not (-len(value) <= index < len(value)):
             raise InterpreterError(
-                f"Index {index} out of bounds for list of length {
-                    len(value)}")
+                f"Index {index} out of bounds for list of length {len(value)}")
         return value[int(index)]
     elif isinstance(value, str):
         if not (-len(value) <= index < len(value)):
             raise InterpreterError(
-                f"Index {index} out of bounds for string of length {
-                    len(value)}")
+                f"Index {index} out of bounds for string of length {len(value)}")
         return value[index]
     elif index in value:
         return value[index]
@@ -935,8 +920,7 @@ def evaluate_subscript(
             close_matches = difflib.get_close_matches(
                 index, list(value.keys()))
             if len(close_matches) > 0:
-                error_message += f" Maybe you meant one of these indexes instead: {
-                    str(close_matches)}"
+                error_message += f" Maybe you meant one of these indexes instead: {str(close_matches)}"
         raise InterpreterError(error_message)
 
 
@@ -1330,8 +1314,7 @@ def get_safe_module(raw_module, authorized_imports, visited=None):
             for pattern in DANGEROUS_PATTERNS
         ):
             logger.info(
-                f"Skipping dangerous attribute {
-                    raw_module.__name__}.{attr_name}")
+                f"Skipping dangerous attribute {raw_module.__name__}.{attr_name}")
             continue
 
         try:
@@ -1339,9 +1322,7 @@ def get_safe_module(raw_module, authorized_imports, visited=None):
         except ImportError as e:
             # lazy / dynamic loading module -> INFO log and skip
             logger.info(
-                f"Skipping import error while copying {
-                    raw_module.__name__}.{attr_name}: {
-                    type(e).__name__} - {e}"
+                f"Skipping import error while copying {raw_module.__name__}.{attr_name}: {type(e).__name__} - {e}"
             )
             continue
         # Recursively process nested modules, passing visited set
@@ -1376,9 +1357,7 @@ def import_modules(expression, state, authorized_imports):
                     raw_module, authorized_imports)
             else:
                 raise InterpreterError(
-                    f"Import of {
-                        alias.name} is not allowed. Authorized imports are: {
-                        str(authorized_imports)}"
+                    f"Import of {alias.name} is not allowed. Authorized imports are: {str(authorized_imports)}"
                 )
         return None
     elif isinstance(expression, ast.ImportFrom):
@@ -1405,14 +1384,10 @@ def import_modules(expression, state, authorized_imports):
                             module, alias.name)
                     else:
                         raise InterpreterError(
-                            f"Module {
-                                expression.module} has no attribute {
-                                alias.name}")
+                            f"Module {expression.module} has no attribute {alias.name}")
         else:
             raise InterpreterError(
-                f"Import from {
-                    expression.module} is not allowed. Authorized imports are: {
-                    str(authorized_imports)}"
+                f"Import from {expression.module} is not allowed. Authorized imports are: {str(authorized_imports)}"
             )
         return None
 
@@ -1493,8 +1468,7 @@ def evaluate_delete(
                 del state[target.id]
             else:
                 raise InterpreterError(
-                    f"Cannot delete name '{
-                        target.id}': name is not defined")
+                    f"Cannot delete name '{target.id}': name is not defined")
         elif isinstance(target, ast.Subscript):
             # Handle index/key deletion (del x[y])
             obj = evaluate_ast(
@@ -1515,8 +1489,7 @@ def evaluate_delete(
                 raise InterpreterError(f"Cannot delete index/key: {str(e)}")
         else:
             raise InterpreterError(
-                f"Deletion of {
-                    type(target).__name__} targets is not supported")
+                f"Deletion of {type(target).__name__} targets is not supported")
 
 
 def evaluate_ast(
@@ -1548,8 +1521,7 @@ def evaluate_ast(
     """
     if state.setdefault("_operations_count", 0) >= MAX_OPERATIONS:
         raise InterpreterError(
-            f"Reached the max number of operations of {
-                MAX_OPERATIONS}. Maybe there is an infinite loop somewhere in the code, or you're just asking too many calculations."
+            f"Reached the max number of operations of {MAX_OPERATIONS}. Maybe there is an infinite loop somewhere in the code, or you're just asking too many calculations."
         )
     state["_operations_count"] += 1
     common_params = (state, static_tools, custom_tools, authorized_imports)
@@ -1722,9 +1694,7 @@ def evaluate_python_code(
         expression = ast.parse(code)
     except SyntaxError as e:
         raise InterpreterError(
-            f"Code parsing failed on line {
-                e.lineno} due to: {
-                type(e).__name__}\n"
+            f"Code parsing failed on line {e.lineno} due to: {type(e).__name__}\n"
             f"{e.text}"
             f"{' ' * (e.offset or 0)}^\n"
             f"Error: {str(e)}"
@@ -1766,10 +1736,7 @@ def evaluate_python_code(
             str(state["_print_outputs"]), max_length=max_print_outputs_length
         )
         raise InterpreterError(
-            f"Code execution failed at line '{
-                ast.get_source_segment(
-                    code, node)}' due to: {
-                type(e).__name__}: {e}"
+            f"Code execution failed at line '{ast.get_source_segment(code, node)}' due to: {type(e).__name__}: {e}"
         )
 
 
