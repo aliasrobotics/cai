@@ -55,9 +55,9 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
 > [!WARNING]
 > :warning: CAI is in active development, so please don't expect it to work flawlessly. Instead, contribute to development by raising an issue or [sending a PR](https://github.com/aliasrobotics/cai/pulls).
 >
-> Access to this library and the use of its information, materials (or portions thereof), is **<u>not intended</u>, and is in fact <u>prohibited</u>, where access or usage violates applicable laws or regulations.** Please check your local laws first. By <b>no means</b> do the authors of CAI encourage, promote or condone the unauthorized tampering of systems and infrastructure that you do not own and operate. This can cause serious harm to human lives and cause material damages.
+> Access to this library and the use of its information, materials (or portions thereof), is **<u>not intended</u>, and is in fact <ins>prohibited</ins>, where access or usage violates applicable laws or regulations.** Please check your local laws first. By <b>no means</b> do the authors of CAI encourage, promote or condone the unauthorized tampering of systems and infrastructure that you do not own and operate. This can cause serious harm to human lives and cause material damages.
 >
-> *By no means do the authors of CAI encourage, promote or condone the unauthorized tampering with computing systems and infrastructure. Please don't use the source code for cybercrime. <u>Pentest for good instead. Help, don't harm</u>*. By downloading, using, modifying or sharing this source code, you have agreed to the terms of the [`LICENSE`](LICENSE) and the limitations outlined in the [`DISCLAIMER`](DISCLAIMER) file.
+> *By no means do the authors of CAI encourage, promote or condone the unauthorized tampering with computing systems and infrastructure. Please don't use the source code for cybercrime. <ins>Pentest for good instead. **Help, don't harm**</ins>*. By downloading, using, modifying or sharing this source code, you have agreed to the terms of the [`LICENSE`](LICENSE) and the limitations outlined within the [`DISCLAIMER`](DISCLAIMER) file.
 
 ## :bookmark: Table of Contents
 
