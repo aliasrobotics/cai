@@ -53,11 +53,11 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
 > We encourage you to read CAI's the technical report at https://arxiv.org/pdf/2504.06017.
 
 > [!WARNING]
-> :warning: CAI is in active development, so don't expect it to work flawlessly. Instead, contribute by raising an issue or [sending a PR](https://github.com/aliasrobotics/cai/pulls).
+> :warning: CAI is in active development, so please don't expect it to work flawlessly. Instead, contribute to development by raising an issue or [sending a PR](https://github.com/aliasrobotics/cai/pulls).
 >
-> Access to this library and the use of information, materials (or portions thereof), is **<u>not intended</u>, and is <u>prohibited</u>, where such access or use violates applicable laws or regulations**. By no means the authors encourage or promote the unauthorized tampering with running systems. This can cause serious human harm and material damages.
+> Access to this library and the use of its information, materials (or portions thereof), is **<u>not intended</u>, and is in fact <u>prohibited</u>, where access or usage violates applicable laws or regulations.** Please check your local laws first. By <b>no means</b> do the authors of CAI encourage, promote or condone the unauthorized tampering of systems and infrastructure that you do not own and operate. This can cause serious harm to human lives and cause material damages.
 >
-> *By no means the authors of CAI encourage or promote the unauthorized tampering with compute systems. Please don't use the source code in here for cybercrime. <u>Pentest for good instead</u>*. By downloading, using, or modifying this source code, you agree to the terms of the [`LICENSE`](LICENSE) and the limitations outlined in the [`DISCLAIMER`](DISCLAIMER) file.
+> *By no means do the authors of CAI encourage, promote or condone the unauthorized tampering with computing systems and infrastructure. Please don't use the source code for cybercrime. <u>Pentest for good instead. Help, don't harm</u>*. By downloading, using, modifying or sharing this source code, you have agreed to the terms of the [`LICENSE`](LICENSE) and the limitations outlined in the [`DISCLAIMER`](DISCLAIMER) file.
 
 ## :bookmark: Table of Contents
 
