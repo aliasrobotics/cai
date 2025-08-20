@@ -21,6 +21,9 @@
 	// "shutdownAction": "none",  // don't shut down container when vscode is closed
 	"workspaceFolder": "/workspace",
 
+	// Ensures all services defined in docker-compose.yml start
+	"runServices": [ "prompt-injection-poc" ],
+
 	// Configure tool-specific properties.
 	"customizations": {
 		// Configure properties specific to VS Code.
