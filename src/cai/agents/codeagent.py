@@ -573,8 +573,7 @@ I'll execute your code and show you the results.
             if debug:
                 print(
                     color(
-                        f"❌ Code generation failed: {
-                            str(e)}",
+                        f"❌ Code generation failed: {str(e)}",
                         fg="red",
                         bold=True))
             raise CodeGenerationError(f"Failed to generate code: {str(e)}")  # pylint: disable=raise-missing-from # noqa: E702,E501
@@ -649,8 +648,7 @@ I'll execute your code and show you the results.
                             self.python_executor.state.get(
                                 "_print_outputs", ""))
 
-                    timeout_message = f"Code execution timed out after {
-                        self.execution_timeout} seconds."
+                    timeout_message = f"Code execution timed out after {self.execution_timeout} seconds."
                     if debug:
                         print(
                             color(
@@ -667,12 +665,10 @@ I'll execute your code and show you the results.
                                     bold=True))
                             print(color(f"{execution_logs}", fg="yellow"))
 
-                    result_message = f"Code execution timed out after {
-                        self.execution_timeout} seconds.\n\n"
+                    result_message = f"Code execution timed out after {self.execution_timeout} seconds.\n\n"
                     if execution_logs:
                         result_message += (
-                            f"Execution logs before timeout:\n```\n{
-                                execution_logs}\n```\n\n")
+                            f"Execution logs before timeout:\n```\n{execution_logs}\n```\n\n")
                     result_message += ("Please optimize your code to run "
                                        "more efficiently or break it into "
                                        "smaller steps.")
@@ -733,8 +729,7 @@ I'll execute your code and show you the results.
                             self.python_executor.state.get(
                                 "_print_outputs", ""))
 
-                    timeout_message = f"Code execution timed out after {
-                        self.execution_timeout} seconds."
+                    timeout_message = f"Code execution timed out after {self.execution_timeout} seconds."
                     if debug:
                         print(
                             color(
@@ -752,12 +747,10 @@ I'll execute your code and show you the results.
                             print(color(f"{execution_logs}", fg="yellow"))
 
                     result_message = (
-                        f"Code execution timed out after {
-                            self.execution_timeout} seconds.\n\n")
+                        f"Code execution timed out after {self.execution_timeout} seconds.\n\n")
                     if execution_logs:
                         result_message += (
-                            f"Execution logs before timeout:\n```\n{
-                                execution_logs}\n```\n\n")
+                            f"Execution logs before timeout:\n```\n{execution_logs}\n```\n\n")
                     result_message += ("Please optimize your code to run "
                                        "more efficiently or break it into "
                                        "smaller steps.")
@@ -778,8 +771,7 @@ I'll execute your code and show you the results.
                                 "_print_outputs", ""))
 
                     error_message = (
-                        f"Code execution failed: {type(e).__name__}: {
-                            str(e)}")
+                        f"Code execution failed: {type(e).__name__}: {str(e)}")
                     if debug:
                         print(
                             color(
@@ -797,8 +789,7 @@ I'll execute your code and show you the results.
                             print(color(f"{execution_logs}", fg="yellow"))
 
                     error_message += (
-                        f"\n\nExecution logs before error:\n```\n{
-                            execution_logs}\n```")
+                        f"\n\nExecution logs before error:\n```\n{execution_logs}\n```")
 
                     raise CodeExecutionError(error_message)  # pylint: disable=raise-missing-from # noqa
 
@@ -808,8 +799,7 @@ I'll execute your code and show you the results.
 
             if execution_logs:
                 result_message += (
-                    f"Execution logs:\n```\n{
-                        execution_logs}\n```\n\n")
+                    f"Execution logs:\n```\n{execution_logs}\n```\n\n")
 
             result_message += (
                 f"Output: {truncate_content(str(output))}")
@@ -853,8 +843,7 @@ I'll execute your code and show you the results.
                     self.python_executor.state.get(
                         "_print_outputs", ""))
 
-            error_message = f"Code execution failed: {type(e).__name__}: {
-                str(e)}"
+            error_message = f"Code execution failed: {type(e).__name__}: {str(e)}"
             if debug:
                 print(color("❌ Code execution failed:", fg="red", bold=True))
                 print(color(f"{error_message}", fg="red"))
@@ -867,8 +856,7 @@ I'll execute your code and show you the results.
                             bold=True))
                     print(color(f"{execution_logs}", fg="yellow"))
 
-            error_message += f"\n\nExecution logs before error:\n```\n{
-                execution_logs}\n```"
+            error_message += f"\n\nExecution logs before error:\n```\n{execution_logs}\n```"
 
             raise CodeExecutionError(error_message)  # pylint: disable=raise-missing-from # noqa: E702,E501
         finally:
@@ -914,8 +902,7 @@ I'll execute your code and show you the results.
             return result
         except Exception as e:  # pylint: disable=broad-exception-caught # noqa
             # Handle any exceptions that might occur during execution
-            error_message = f"Agent execution failed: {type(e).__name__}: {
-                str(e)}"
+            error_message = f"Agent execution failed: {type(e).__name__}: {str(e)}"
             if debug:
                 print(color("❌ Agent execution failed:", fg="red", bold=True))
                 print(color(f"{error_message}", fg="red"))

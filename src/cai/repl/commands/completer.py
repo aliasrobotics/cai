@@ -569,6 +569,109 @@ class FuzzyCommandCompleter(Completer):
 
         return suggestions
 
+    def get_mcp_server_suggestions(self, current_word: str) -> List[Completion]:
+        """Get MCP server name suggestions.
+        
+        Args:
+            current_word: The current word being typed
+            
+        Returns:
+            A list of completions for MCP servers
+        """
+        suggestions = []
+        
+        try:
+            # Import the global MCP servers registry
+            from cai.repl.commands.mcp import _GLOBAL_MCP_SERVERS
+            
+            # Get all active MCP server names
+            for server_name in _GLOBAL_MCP_SERVERS.keys():
+                # Get server type for display
+                server = _GLOBAL_MCP_SERVERS[server_name]
+                server_type = type(server).__name__.replace("MCPServer", "")
+                
+                # Exact prefix match
+                if server_name.startswith(current_word):
+                    suggestions.append(Completion(
+                        server_name,
+                        start_position=-len(current_word),
+                        display=HTML(
+                            f"<ansicyan><b>{server_name}</b></ansicyan> "
+                            f"<ansiwhite>({server_type})</ansiwhite>"),
+                        style="fg:ansicyan bold"
+                    ))
+                # Fuzzy match
+                elif (current_word.lower() in server_name.lower() and
+                      not server_name.startswith(current_word)):
+                    suggestions.append(Completion(
+                        server_name,
+                        start_position=-len(current_word),
+                        display=HTML(
+                            f"<ansicyan>{server_name}</ansicyan> "
+                            f"<ansiwhite>({server_type})</ansiwhite>"),
+                        style="fg:ansicyan"
+                    ))
+        except (ImportError, AttributeError):
+            pass  # No MCP servers available
+            
+        return suggestions
+
+    def get_mcp_suggestions(self, words: List[str], current_word: str) -> List[Completion]:
+        """Get context-aware MCP command completions.
+        
+        Args:
+            words: List of words including empty string if trailing space
+            current_word: The current word being typed (empty if trailing space)
+        
+        Returns:
+            List of completion suggestions
+        """
+        suggestions = []
+        
+        # Get the actual typed words (excluding empty strings from trailing spaces)
+        actual_words = [w for w in words if w]
+        
+        # Position 2: Completing subcommand (e.g., "/mcp <tab>")
+        # Use the default subcommand handler - no need to duplicate!
+        if len(words) == 2:
+            return self.get_subcommand_suggestions(words[0], current_word)
+        
+        # Position 3: After subcommand (e.g., "/mcp load <tab>")
+        elif len(words) == 3 and len(actual_words) > 1:
+            subcommand = actual_words[1]
+            
+            if subcommand == "load":
+                # Suggest transport types for load command
+                if not current_word.startswith("http"):  # Don't suggest if typing URL
+                    transports = [
+                        ("stdio", "Local process communication"),
+                        ("sse", "Server-Sent Events (HTTP)"),
+                    ]
+                    for transport, desc in transports:
+                        if transport.startswith(current_word):
+                            suggestions.append(Completion(
+                                transport,
+                                start_position=-len(current_word),
+                                display=HTML(
+                                    f"<ansiyellow><b>{transport}</b></ansiyellow> "
+                                    f"<ansiwhite>- {desc}</ansiwhite>"),
+                                style="fg:ansiyellow bold"
+                            ))
+                            
+            elif subcommand in ["add", "remove", "tools"]:
+                # These commands need an MCP server name
+                suggestions.extend(self.get_mcp_server_suggestions(current_word))
+        
+        # Position 4: After server name in add command (e.g., "/mcp add server <tab>")
+        elif len(words) == 4 and len(actual_words) > 1:
+            subcommand = actual_words[1]
+            
+            if subcommand == "add":
+                # After server name, suggest agent names
+                suggestions.extend(self.get_agent_suggestions(current_word))
+                
+        return suggestions
+
     # pylint: disable=unused-argument
     def get_completions(self, document, complete_event):
         """Get completions for the current document
@@ -581,8 +684,13 @@ class FuzzyCommandCompleter(Completer):
         Returns:
             A generator of completions
         """
-        text = document.text_before_cursor.strip()
+        # Keep original text to detect trailing spaces
+        text_original = document.text_before_cursor
+        text = text_original.strip()
         words = text.split()
+        
+        # Check if there's a trailing space (user finished typing a word)
+        has_trailing_space = text_original and text_original[-1] == ' '
 
         # Refresh Ollama models and agents periodically
         self.fetch_all_models()
@@ -611,15 +719,23 @@ class FuzzyCommandCompleter(Completer):
             return
 
         if text.startswith('/'):
-            current_word = words[-1]
+            # Determine current word and effective word count based on trailing space
+            # Example: "/mcp " has trailing space, so current_word="" and we add empty string to words
+            # Example: "/mcp" has no trailing space, so current_word="/mcp" 
+            if has_trailing_space:
+                current_word = ""
+                effective_words = words + [""]  # Add empty string to represent new word position
+            else:
+                current_word = words[-1] if words else ""
+                effective_words = words
 
             # Main command completion (first word)
-            if len(words) == 1:
+            if len(effective_words) == 1 and not has_trailing_space:
                 # Get command suggestions
                 yield from self.get_command_suggestions(current_word)
 
             # Subcommand completion (second word)
-            elif len(words) == 2:
+            elif len(effective_words) == 2:
                 cmd = words[0]
 
                 # Special handling for model command
@@ -628,15 +744,29 @@ class FuzzyCommandCompleter(Completer):
                 # Add special handling for agent command
                 elif cmd in ["/agent", "/a"]:
                     yield from self.get_agent_suggestions(current_word)
+                # Add special handling for MCP command
+                elif cmd in ["/mcp", "/m"]:
+                    yield from self.get_mcp_suggestions(effective_words, current_word)
                 else:
                     # Get subcommand suggestions
                     yield from self.get_subcommand_suggestions(cmd, current_word)
 
-            # Agent select completion
-            elif len(words) == 3:
+            # Third word completion
+            elif len(effective_words) == 3:
                 cmd = words[0]
-                subcommand = words[1]
+                subcommand = words[1] if len(words) > 1 else ""
                 
                 # Agent select completion
                 if cmd in ["/agent", "/a"] and subcommand in ["select", "info"]:
                     yield from self.get_agent_suggestions(current_word)
+                # MCP command completion for third word
+                elif cmd in ["/mcp", "/m"]:
+                    yield from self.get_mcp_suggestions(effective_words, current_word)
+            
+            # Fourth word completion (for MCP add command)
+            elif len(effective_words) == 4:
+                cmd = words[0]
+                
+                # MCP add command needs agent name as fourth word
+                if cmd in ["/mcp", "/m"]:
+                    yield from self.get_mcp_suggestions(effective_words, current_word)

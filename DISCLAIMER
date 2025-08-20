@@ -1,0 +1,31 @@
+## Legal disclaimer for CAI
+
+### **1. Compliance & Intended Use**
+CAI is an AI-powered cybersecurity evaluation tool intended to assist in security assessments of robotic and other automated systems. It is designed to operate under a "human-on-the-loop" principle, ensuring oversight and mitigating risks associated with autonomous decision-making.
+
+The software is developed in alignment with **ethical AI principles** and is intended to support compliance with the **EU AI Act** and other applicable cybersecurity regulations. However, it is the sole responsibility of the user to ensure adherence to all relevant laws and standards when deploying or modifying this software.
+
+### **2. Open Source Notice & Responsibility**
+This source code is provided under the license terms detailed in the accompanying `LICENSE` file. Portions of CAI are released as **open-source** to encourage transparency and community collaboration.
+
+Please note:
+- The software is provided "**as is**", without warranty of any kind.
+- The authors and contributors assume **no liability** for any damages, data loss, or legal consequences arising from its use.
+- Users must conduct **appropriate testing and validation** before deploying this software in any production or mission-critical environment.
+
+### **3. Security & Ethical Use**
+- **Non-Disruptive Use Only:** CAI is intended for research, education, and evaluation purposes. It must **not** be used to disrupt, manipulate, or interfere with live production systems.
+- **Authorized Access Required:** Cybersecurity assessments or testing using this tool must be conducted **only with explicit permission** from the system owner.
+- **Qualified Use:** This software should be used by **trained professionals** following industry best practices and applicable organizational security policies.
+
+### **4. Limitations**
+- Use of this tool does **not guarantee** full protection against cyber threats or compliance with any regulatory framework.
+- It is **not a substitute** for formal cybersecurity audits, penetration testing services, or legal compliance assessments.
+- Users are fully responsible for the consequences of how they apply or modify the code.
+
+### **5. Contact & Contributions**
+We welcome community contributions to improve CAI. To contribute, report bugs, or request clarification on legal or compliance issues, please use [GitHub Issues/Support Email].
+
+---
+
+By downloading, using, or modifying this source code, you agree to the terms of the `LICENSE` and the limitations outlined in this disclaimer.

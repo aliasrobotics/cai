@@ -69,8 +69,7 @@ def add_to_memory_episodic(texts: str, step: int = 0, **kwargs) -> str:  # pylin
         )
 
         if success:
-            return f"Successfully added document to collection {
-                collection_name}"
+            return f"Successfully added document to collection {collection_name}"
         return "Failed to add documents to vector database"
 
     except Exception as e:  # pylint: disable=broad-exception-caught
@@ -107,8 +106,7 @@ def add_to_memory_semantic(texts: str, step: int = 0, **kwargs) -> str:  # pylin
         )
 
         if success:
-            return f"Successfully added document to collection {
-                collection_name}"
+            return f"Successfully added document to collection {collection_name}"
         return "Failed to add documents to vector database"
 
     except Exception as e:  # pylint: disable=broad-exception-caught
