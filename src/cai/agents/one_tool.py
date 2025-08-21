@@ -6,6 +6,7 @@ from cai.sdk.agents import Agent, OpenAIChatCompletionsModel
 from cai.tools.reconnaissance.generic_linux_command import generic_linux_command  # noqa
 from openai import AsyncOpenAI
 from cai.util import create_system_prompt_renderer
+from cai.agents.guardrails import get_security_guardrails
 
 # Get model from environment or use default
 model_name = os.getenv('CAI_MODEL', "alias0")
@@ -54,6 +55,9 @@ instructions = """You are a Cybersecurity expert Leader facing a CTF
 #Loaded in openaichatcompletion client
 api_key = os.getenv('OPENAI_API_KEY', 'sk-placeholder-key-for-local-models')
 
+# Get security guardrails for this high-risk agent
+input_guardrails, output_guardrails = get_security_guardrails()
+
 one_tool_agent = Agent(
     name="CTF agent",
     description="""Agent focused on conquering security challenges using generic linux commands
@@ -62,6 +66,8 @@ one_tool_agent = Agent(
     tools=[
         generic_linux_command,
     ],
+    input_guardrails=input_guardrails,
+    output_guardrails=output_guardrails,
     model=OpenAIChatCompletionsModel(
         model=model_name,
         openai_client=AsyncOpenAI(api_key=api_key),
