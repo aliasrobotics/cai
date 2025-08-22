@@ -302,6 +302,7 @@ from cai.repl.ui.toolbar import get_toolbar_with_refresh
 # CAI SDK imports
 from cai.sdk.agents import Agent, OpenAIChatCompletionsModel, Runner, set_tracing_disabled
 from cai.sdk.agents.items import ToolCallOutputItem
+from cai.sdk.agents.exceptions import OutputGuardrailTripwireTriggered
 from cai.sdk.agents.models.openai_chatcompletions import (
     get_agent_message_history,
     get_all_agent_histories,
@@ -1553,6 +1554,20 @@ def run_cai_cli(
 
                     try:
                         asyncio.run(process_streamed_response(agent, conversation_input))
+                    except OutputGuardrailTripwireTriggered as e:
+                        # Display a user-friendly warning instead of crashing (streaming mode)
+                        guardrail_name = e.guardrail_result.guardrail.get_name()
+                        reason = e.guardrail_result.output.output_info.get("reason", "Security policy violation")
+                        
+                        # Use red color for the warning message
+                        print(f"\n\033[91m🛡️  SECURITY GUARDRAIL TRIGGERED\033[0m")
+                        print(f"\033[91mGuardrail: {guardrail_name}\033[0m")
+                        print(f"\033[91mReason: {reason}\033[0m")
+                        print(f"\033[93mThe agent's output was blocked for security reasons.\033[0m")
+                        print(f"\033[96mYou can continue the conversation with a different request.\033[0m\n")
+                        
+                        # Continue the conversation loop instead of crashing
+                        continue
                     except KeyboardInterrupt:
                         # This will catch the re-raised KeyboardInterrupt from process_streamed_response
                         # The cleanup will happen in the outer try-except block
@@ -1574,13 +1589,44 @@ def run_cai_cli(
                             asyncio.set_event_loop(new_loop)
                             try:
                                 new_loop.run_until_complete(process_streamed_response(agent, conversation_input))
-                            finally:
+                            except OutputGuardrailTripwireTriggered as e:
+                                # Display a user-friendly warning instead of crashing (new event loop)
+                                guardrail_name = e.guardrail_result.guardrail.get_name()
+                                reason = e.guardrail_result.output.output_info.get("reason", "Security policy violation")
+                                
+                                # Use red color for the warning message
+                                print(f"\n\033[91m🛡️  SECURITY GUARDRAIL TRIGGERED\033[0m")
+                                print(f"\033[91mGuardrail: {guardrail_name}\033[0m")
+                                print(f"\033[91mReason: {reason}\033[0m")
+                                print(f"\033[93mThe agent's output was blocked for security reasons.\033[0m")
+                                print(f"\033[96mYou can continue the conversation with a different request.\033[0m\n")
+                                
+                                # Close the loop and continue the conversation loop
                                 new_loop.close()
+                                continue
+                            finally:
+                                if not new_loop.is_closed():
+                                    new_loop.close()
                         else:
                             raise
                 else:
                     # Use non-streamed response
-                    response = asyncio.run(Runner.run(agent, conversation_input))
+                    try:
+                        response = asyncio.run(Runner.run(agent, conversation_input))
+                    except OutputGuardrailTripwireTriggered as e:
+                        # Display a user-friendly warning instead of crashing
+                        guardrail_name = e.guardrail_result.guardrail.get_name()
+                        reason = e.guardrail_result.output.output_info.get("reason", "Security policy violation")
+                        
+                        # Use red color for the warning message
+                        print(f"\n\033[91m🛡️  SECURITY GUARDRAIL TRIGGERED\033[0m")
+                        print(f"\033[91mGuardrail: {guardrail_name}\033[0m")
+                        print(f"\033[91mReason: {reason}\033[0m")
+                        print(f"\033[93mThe agent's output was blocked for security reasons.\033[0m")
+                        print(f"\033[96mYou can continue the conversation with a different request.\033[0m\n")
+                        
+                        # Continue the conversation loop instead of crashing
+                        continue
 
                     # En modo no-streaming, procesamos SOLO los tool outputs de response.new_items
                     # Los tool calls (assistant messages) ya se añaden correctamente en openai_chatcompletions.py
