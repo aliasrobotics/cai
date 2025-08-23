@@ -62,6 +62,10 @@ Environment Variables
             (default: "1"). When set to values greater than 1,
             executes multiple instances of the same agent in
             parallel and displays all results.
+        CAI_GUARDRAILS: Enable/disable security guardrails for agents
+            (default: "true"). When enabled, applies security guardrails
+            to prevent potentially dangerous outputs and inputs. Set to
+            "false" to disable all guardrail functionality.
 
     Extensions (only applicable if the right extension is installed):
 

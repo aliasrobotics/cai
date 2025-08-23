@@ -316,5 +316,19 @@ async def command_execution_guardrail(
 def get_security_guardrails():
     """
     Returns a tuple of (input_guardrails, output_guardrails) for security-critical agents.
+    
+    Respects the CAI_GUARDRAILS environment variable:
+    - "true" (default): Returns configured guardrails
+    - "false": Returns empty lists, disabling all guardrails
     """
+    import os
+    
+    # Check if guardrails are disabled via environment variable
+    guardrails_enabled = os.getenv("CAI_GUARDRAILS", "true").lower() != "false"
+    
+    if not guardrails_enabled:
+        # Return empty lists to disable all guardrails
+        return [], []
+    
+    # Return the configured guardrails
     return [prompt_injection_guardrail], [command_execution_guardrail]
