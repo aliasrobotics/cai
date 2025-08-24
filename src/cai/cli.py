@@ -306,7 +306,7 @@ from cai.repl.ui.toolbar import get_toolbar_with_refresh
 # CAI SDK imports
 from cai.sdk.agents import Agent, OpenAIChatCompletionsModel, Runner, set_tracing_disabled
 from cai.sdk.agents.items import ToolCallOutputItem
-from cai.sdk.agents.exceptions import OutputGuardrailTripwireTriggered
+from cai.sdk.agents.exceptions import OutputGuardrailTripwireTriggered, InputGuardrailTripwireTriggered
 from cai.sdk.agents.models.openai_chatcompletions import (
     get_agent_message_history,
     get_all_agent_histories,
@@ -419,7 +419,7 @@ def update_agent_models_recursively(agent, new_model, visited=None):
 
 
 def run_cai_cli(
-    starting_agent, context_variables=None, max_turns=float("inf"), force_until_flag=False
+    starting_agent, context_variables=None, max_turns=float("inf"), force_until_flag=False, initial_prompt=None
 ):
     """
     Run a simple interactive CLI loop for CAI.
@@ -428,6 +428,8 @@ def run_cai_cli(
         starting_agent: The initial agent to use for the conversation
         context_variables: Optional dictionary of context variables to initialize the session
         max_turns: Maximum number of interaction turns before terminating (default: infinity)
+        force_until_flag: Whether to force execution until a flag is found
+        initial_prompt: Optional initial prompt to execute immediately before entering interactive mode
 
     Returns:
         None
@@ -441,6 +443,7 @@ def run_cai_cli(
     last_model = os.getenv("CAI_MODEL", "alias0")
     last_agent_type = os.getenv("CAI_AGENT_TYPE", "one_tool_agent")
     parallel_count = int(os.getenv("CAI_PARALLEL", "1"))
+    use_initial_prompt = initial_prompt is not None
     
     # Reset cost tracking at the start
     from cai.util import COST_TRACKER
@@ -680,10 +683,15 @@ def run_cai_cli(
                         console.print(f"[red]Error switching agent: {str(e)}[/red]")
 
             if not force_until_flag and ctf_init != 0:
-                # Get user input with command completion and history
-                user_input = get_user_input(
-                    command_completer, kb, history_file, get_toolbar_with_refresh, current_text
-                )
+                # Use initial prompt on first iteration if provided
+                if use_initial_prompt:
+                    user_input = initial_prompt
+                    use_initial_prompt = False  # Only use it once
+                else:
+                    # Get user input with command completion and history
+                    user_input = get_user_input(
+                        command_completer, kb, history_file, get_toolbar_with_refresh, current_text
+                    )
 
             else:
                 user_input = messages_ctf
@@ -1617,6 +1625,30 @@ def run_cai_cli(
                     # Use non-streamed response
                     try:
                         response = asyncio.run(Runner.run(agent, conversation_input))
+                    except InputGuardrailTripwireTriggered as e:
+                        # Display a user-friendly warning for input guardrails
+                        reason = "Potential security threat detected in input"
+                        if hasattr(e, 'guardrail_result') and e.guardrail_result:
+                            if hasattr(e.guardrail_result, 'output') and e.guardrail_result.output:
+                                reason = e.guardrail_result.output.output_info.get("reason", reason)
+                        
+                        # Use red color for the warning message
+                        print(f"\n\033[91m🛡️  INPUT SECURITY GUARDRAIL TRIGGERED\033[0m")
+                        print(f"\033[91mReason: {reason}\033[0m")
+                        print(f"\033[93mYour input was blocked for security reasons.\033[0m")
+                        
+                        # Check if this is likely due to conversation history
+                        if "base64" in reason.lower() or "pattern" in reason.lower():
+                            print(f"\n\033[96mThis may be due to malicious content in the conversation history.\033[0m")
+                            print(f"\033[96mOptions:\033[0m")
+                            print(f"  1. Type \033[92m/clear\033[0m to clear the conversation history")
+                            print(f"  2. Type \033[92m/config set 26 false\033[0m to temporarily disable guardrails")
+                            print(f"  3. Type \033[92m/exit\033[0m to exit CAI")
+                        else:
+                            print(f"\033[96mPlease rephrase your request or try a different approach.\033[0m\n")
+                        
+                        # Continue the conversation loop instead of crashing
+                        continue
                     except OutputGuardrailTripwireTriggered as e:
                         # Display a user-friendly warning instead of crashing
                         guardrail_name = e.guardrail_result.guardrail.get_name()
@@ -1794,6 +1826,11 @@ def main():
             )
         )
 
+    # Check for command-line arguments to use as initial prompt
+    initial_prompt = None
+    if len(sys.argv) > 1:
+        initial_prompt = sys.argv[1]
+
     # Get agent type from environment variables or use default
     agent_type = os.getenv("CAI_AGENT_TYPE", "one_tool_agent")
 
@@ -1819,8 +1856,8 @@ def main():
     current_model = os.getenv("CAI_MODEL", "alias0")
     update_agent_models_recursively(agent, current_model)
 
-    # Run the CLI with the selected agent
-    run_cai_cli(agent)
+    # Run the CLI with the selected agent and optional initial prompt
+    run_cai_cli(agent, initial_prompt=initial_prompt)
 
 
 if __name__ == "__main__":
