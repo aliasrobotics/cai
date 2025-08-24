@@ -168,6 +168,20 @@ async def generic_linux_command(command: str = "",
     guardrails_enabled = os.getenv("CAI_GUARDRAILS", "true").lower() != "false"
     
     if guardrails_enabled:
+        # Check for file write operations that create Python/shell scripts with dangerous content
+        # Pattern: echo/cat with base64 decode and execute
+        if re.search(r'(echo|cat|printf).*>.*\.(py|sh|bash|pl|rb|php)', command):
+            # Check if the command contains base64 strings and execution patterns
+            if "base64" in command and any(danger in command for danger in ['os.system', 'subprocess', 'exec', 'eval']):
+                return "Error: Blocked attempt to create script with base64 decode and execute pattern"
+            # Check for the specific base64 string from POC
+            if "bmMgMTkyLjE2OC4zLjE0IDQ0NDQgLWUgL2Jpbi9zaAo=" in command:
+                return "Error: Blocked attempt to create script with known malicious base64 payload"
+        
+        # Also check heredoc patterns for creating files
+        if re.search(r'cat.*<<.*>.*\.(py|sh|bash|pl|rb|php)', command):
+            if "base64" in command and any(danger in command for danger in ['os.system', 'subprocess', 'exec', 'eval']):
+                return "Error: Blocked attempt to create script with base64 decode and execute pattern via heredoc"
         dangerous_patterns = [
             r"(?i)rm\s+-rf\s+/",
             r"(?i):(){ :|:& };:",  # Fork bomb
