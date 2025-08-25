@@ -143,6 +143,11 @@ ENV_VARS = {
         "description": "Boolean to enable real-time, chunked responses instead of full messages.",
         "default": "True"
     },
+    26: {
+        "name": "CAI_GUARDRAILS",
+        "description": "Enable/disable security guardrails for prompt injection protection",
+        "default": "true"
+    },
 }
 
 

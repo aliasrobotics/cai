@@ -108,7 +108,9 @@ RUN apt-get update && \
 
 RUN cargo install --git https://github.com/asciinema/agg
 
-# Remove system's python3 libs to avoid conflicts
+# Remove system's python3 libs to avoid conflicts with pip packages
 RUN apt-get remove -y python3-jsonschema && \
     apt-get remove -y python3-numpy && \
+    apt-get remove -y python3-uvicorn && \
+    apt-get remove -y python3-fastapi && \
     apt-get autoremove -y

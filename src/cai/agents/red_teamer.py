@@ -18,6 +18,7 @@ from cai.tools.reconnaissance.exec_code import (  # pylint: disable=import-error
     execute_code
 )
 from cai.util import load_prompt_template, create_system_prompt_renderer
+from cai.agents.guardrails import get_security_guardrails
 
 load_dotenv()
 model_name = os.getenv("CAI_MODEL", "alias0")
@@ -33,7 +34,9 @@ tools = [
 # Add make_web_search_with_explanation function if PERPLEXITY_API_KEY environment variable is set
 if os.getenv('PERPLEXITY_API_KEY'):
     tools.append(make_web_search_with_explanation)
-    
+
+# Get security guardrails
+input_guardrails, output_guardrails = get_security_guardrails()
 
 redteam_agent = Agent(
     name="Red Team Agent",
@@ -41,6 +44,8 @@ redteam_agent = Agent(
                    Expert in cybersecurity, recon, and exploitation.""",
     instructions=create_system_prompt_renderer(redteam_agent_system_prompt),
     tools=tools,
+    input_guardrails=input_guardrails,
+    output_guardrails=output_guardrails,
     model=OpenAIChatCompletionsModel(
         model=model_name,
         openai_client=AsyncOpenAI(),
