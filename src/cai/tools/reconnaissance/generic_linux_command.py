@@ -182,6 +182,18 @@ async def generic_linux_command(command: str = "",
         if re.search(r'cat.*<<.*>.*\.(py|sh|bash|pl|rb|php)', command):
             if "base64" in command and any(danger in command for danger in ['os.system', 'subprocess', 'exec', 'eval']):
                 return "Error: Blocked attempt to create script with base64 decode and execute pattern via heredoc"
+        
+        # CRITICAL MITIGATION: Block creation of scripts containing command substitution in /tmp
+        # This prevents PoC 10 where external input tricks agent into creating executable with $(env)
+        if re.search(r'(cat|echo|printf).*>.*/(tmp|var/tmp|dev/shm)/.*\.(sh|bash|py)', command, re.IGNORECASE):
+            # Check if the content being written contains command substitution
+            if '$(' in command or '`' in command:
+                return "Error: Blocked creation of script in temporary directory with command substitution. This is likely a prompt injection attempt."
+        
+        # Block heredoc creation of scripts with command substitution in temp directories
+        if re.search(r'cat.*<<.*EOF.*>.*/(tmp|var/tmp|dev/shm)/', command, re.IGNORECASE):
+            if '$(' in command or '`' in command:
+                return "Error: Blocked heredoc creation of script with command substitution in temporary directory."
         dangerous_patterns = [
             r"(?i)rm\s+-rf\s+/",
             r"(?i):(){ :|:& };:",  # Fork bomb
