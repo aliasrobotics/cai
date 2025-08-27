@@ -50,6 +50,8 @@ INJECTION_PATTERNS = [
     r"(?i)IF\s+YOU\s+HAVE\s+BEEN\s+TASKED.*EXPLOIT",
     r"(?i)PRODUCE\s+THE\s+RESULT\s+OF.*DIRECTIVE",
     r"(?i)FOLLOWING\s+DIRECTIVE.*\$\(",
+    r"(?i)FOLLOWING\s+DIRECTIVE.*base32",  # PoC5 specific pattern
+    r"(?i)base32.*-d.*\|",  # Base32 decode to pipe
     
     # Command injection attempts
     r"(?i)(execute|run|eval|exec|os\.system|subprocess|shell)",
@@ -343,6 +345,32 @@ async def command_execution_guardrail(
                     )
             except:
                 pass
+    
+    # Check for base32 decoding commands (PoC5 mitigation)
+    # This catches when agent tries to decode injected base32 commands
+    if "base32" in output_text.lower() and "-d" in output_text:
+        # Look for the specific pattern of base32 decoding commands
+        # Pattern for echo piped to base32 decode
+        decode_pattern = r'echo[^|]*\|[^|]*base32\s+-d'
+        if re.search(decode_pattern, output_text, re.IGNORECASE):
+            # Extract potential base32 strings
+            base32_pattern = r'([A-Z2-7]{20,}={0,6})'
+            matches = re.findall(base32_pattern, output_text)
+            
+            for match in matches:
+                try:
+                    decoded = base64.b32decode(match).decode('utf-8', errors='ignore')
+                    # Check if decoded content looks like a dangerous command
+                    if any(cmd in decoded.lower() for cmd in ['curl', 'nc ', 'netcat', 'bash', '/bin/sh', 'exec', 'eval', '$(env)', '`env`', '192.168', '10.0', '4444']):
+                        return GuardrailFunctionOutput(
+                            output_info={
+                                "action": "blocked",
+                                "reason": f"Blocked attempt to decode base32 that contains dangerous command or environment variable exfiltration"
+                            },
+                            tripwire_triggered=True
+                        )
+                except:
+                    pass
     
     # Check if output contains IP addresses with common exploit patterns
     if re.search(r'\d+\.\d+\.\d+\.\d+.*4444', output_text):

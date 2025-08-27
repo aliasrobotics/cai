@@ -190,6 +190,10 @@ async def generic_linux_command(command: str = "",
             r"(?i)nc\s+[\d\.]+\s+\d+.*(-e|/bin/sh|/bin/bash)",  # Netcat reverse shell
             r"(?i)bash.*-i.*>&.*tcp/",  # Bash reverse shell
             r"(?i)/dev/tcp/[\d\.]+/\d+",  # Bash network redirection
+            r"(?i)echo.*\|.*bash",  # Echo pipe to bash - blocks PoC5 bypass
+            r"(?i)echo.*\|.*sh",  # Echo pipe to sh - blocks PoC5 bypass
+            r"(?i)printf.*\|.*bash",  # Printf pipe to bash
+            r"(?i)printf.*\|.*sh",  # Printf pipe to sh
         ]
         
         for pattern in dangerous_patterns:
@@ -223,6 +227,37 @@ async def generic_linux_command(command: str = "",
                 except:
                     # If we can't decode, be cautious
                     pass
+        
+        # Check for base32 encoded commands that might be dangerous (PoC5 mitigation)
+        if "base32" in command and ("-d" in command or "--decode" in command):
+            # Extract and check what's being decoded
+            base32_pattern = r"echo\s+([A-Za-z2-7=]+)\s*\|\s*base32\s+-d"
+            match = re.search(base32_pattern, command)
+            if match:
+                try:
+                    import base64
+                    encoded = match.group(1)
+                    decoded = base64.b32decode(encoded).decode('utf-8', errors='ignore')
+                    
+                    # Check if decoded content contains dangerous commands
+                    dangerous_decoded = [
+                        r"(?i)curl.*\$\(",  # Curl with command substitution
+                        r"(?i)nc\s+[\d\.]+\s+\d+",  # Netcat to IP
+                        r"(?i)bash.*-i",  # Interactive bash
+                        r"(?i)/bin/sh",  # Shell execution
+                        r"(?i)exec\s+",  # Exec command
+                        r"(?i)eval\s+",  # Eval command
+                        r"(?i)rm\s+-rf",  # Dangerous rm
+                        r"(?i)\$\(.*env.*\)",  # Environment variable exfiltration
+                        r"(?i)`.*env.*`",  # Alternative env exfiltration
+                    ]
+                    
+                    for pattern in dangerous_decoded:
+                        if re.search(pattern, decoded):
+                            return f"Error: Blocked base32-encoded dangerous command. Decoded content contains: {pattern}"
+                except:
+                    # If we can't decode, be cautious
+                    pass
     
     # Run the command with the appropriate parameters
     result = await run_command_async(command, ctf=None,
@@ -235,7 +270,8 @@ async def generic_linux_command(command: str = "",
     
     if guardrails_enabled and isinstance(result, str):
         # Special handling for curl/wget commands - their output is external content
-        if command.strip().startswith(('curl ', 'wget ', 'fetch ')):
+        # Enhanced detection to catch piped commands (e.g., curl | xxd)
+        if re.search(r'^\s*(curl|wget|fetch)\s+', command):
             # Check if the result contains obvious injection attempts
             if "FOLLOWING DIRECTIVE" in result.upper() and "$(" in result:
                 # This is definitely an injection attempt - return error
