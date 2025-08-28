@@ -127,7 +127,7 @@ async def generic_linux_command(command: str = "",
         return out if out else "No new output"
 
     if command.startswith("session"):
-        # Accept flexible syntaxis for LLMs: it may send
+        # Accept flexible syntax for LLMs: it may send
         # - command="session output <id>"
         # - command="session" and session_id="output <id>"
         # - command="session" and session_id="#1" or "S1" or "last"
@@ -266,88 +266,10 @@ async def generic_linux_command(command: str = "",
     except Exception:
         pass
 
-    # call_id para streaming
+    # call_id for streaming
     call_id = str(uuid.uuid4())[:8]
 
- 
-    # Sanitize command if it contains suspicious patterns that might be from external input
-    # This is an additional layer of defense beyond the guardrails
-    # Respect CAI_GUARDRAILS environment variable
-    guardrails_enabled = os.getenv("CAI_GUARDRAILS", "true").lower() != "false"
-    
     if guardrails_enabled:
-        # Check for file write operations that create Python/shell scripts with dangerous content
-        # Pattern: echo/cat with base64 decode and execute
-        if re.search(r'(echo|cat|printf).*>.*\.(py|sh|bash|pl|rb|php)', command):
-            # Check if the command contains base64 strings and execution patterns
-            if "base64" in command and any(danger in command for danger in ['os.system', 'subprocess', 'exec', 'eval']):
-                return "Error: Blocked attempt to create script with base64 decode and execute pattern"
-            # Check for the specific base64 string from POC
-            if "bmMgMTkyLjE2OC4zLjE0IDQ0NDQgLWUgL2Jpbi9zaAo=" in command:
-                return "Error: Blocked attempt to create script with known malicious base64 payload"
-        
-        # Also check heredoc patterns for creating files
-        if re.search(r'cat.*<<.*>.*\.(py|sh|bash|pl|rb|php)', command):
-            if "base64" in command and any(danger in command for danger in ['os.system', 'subprocess', 'exec', 'eval']):
-                return "Error: Blocked attempt to create script with base64 decode and execute pattern via heredoc"
-        
-        # CRITICAL MITIGATION: Block creation of scripts containing command substitution in /tmp
-        # This prevents PoC 10 where external input tricks agent into creating executable with $(env)
-        if re.search(r'(cat|echo|printf).*>.*/(tmp|var/tmp|dev/shm)/.*\.(sh|bash|py)', command, re.IGNORECASE):
-            # Check if the content being written contains command substitution
-            if '$(' in command or '`' in command:
-                return "Error: Blocked creation of script in temporary directory with command substitution. This is likely a prompt injection attempt."
-        
-        # Block heredoc creation of scripts with command substitution in temp directories
-        if re.search(r'cat.*<<.*EOF.*>.*/(tmp|var/tmp|dev/shm)/', command, re.IGNORECASE):
-            if '$(' in command or '`' in command:
-                return "Error: Blocked heredoc creation of script with command substitution in temporary directory."
-        dangerous_patterns = [
-            r"(?i)rm\s+-rf\s+/",
-            r"(?i):(){ :|:& };:",  # Fork bomb
-            r"(?i)curl.*\|.*sh",  # Curl pipe to shell
-            r"(?i)wget.*\|.*bash",
-            r"(?i)nc\s+[\d\.]+\s+\d+.*(-e|/bin/sh|/bin/bash)",  # Netcat reverse shell
-            r"(?i)bash.*-i.*>&.*tcp/",  # Bash reverse shell
-            r"(?i)/dev/tcp/[\d\.]+/\d+",  # Bash network redirection
-            r"(?i)echo.*\|.*bash",  # Echo pipe to bash - blocks PoC5 bypass
-            r"(?i)echo.*\|.*sh",  # Echo pipe to sh - blocks PoC5 bypass
-            r"(?i)printf.*\|.*bash",  # Printf pipe to bash
-            r"(?i)printf.*\|.*sh",  # Printf pipe to sh
-        ]
-        
-        for pattern in dangerous_patterns:
-            if re.search(pattern, command):
-                return f"Error: Command blocked due to dangerous pattern: {pattern}"
-        
-        # Check for base64 encoded commands that might be dangerous
-        if "base64" in command and ("-d" in command or "--decode" in command):
-            # Extract and check what's being decoded
-            base64_pattern = r"echo\s+([A-Za-z0-9+/=]+)\s*\|\s*base64\s+-d"
-            match = re.search(base64_pattern, command)
-            if match:
-                try:
-                    import base64
-                    encoded = match.group(1)
-                    decoded = base64.b64decode(encoded).decode('utf-8', errors='ignore')
-                    
-                    # Check if decoded content contains dangerous commands
-                    dangerous_decoded = [
-                        r"(?i)nc\s+[\d\.]+\s+\d+",  # Netcat to IP
-                        r"(?i)bash.*-i",  # Interactive bash
-                        r"(?i)/bin/sh",  # Shell execution
-                        r"(?i)exec\s+",  # Exec command
-                        r"(?i)eval\s+",  # Eval command
-                        r"(?i)rm\s+-rf",  # Dangerous rm
-                    ]
-                    
-                    for pattern in dangerous_decoded:
-                        if re.search(pattern, decoded):
-                            return f"Error: Blocked base64-encoded dangerous command. Decoded content contains: {pattern}"
-                except:
-                    # If we can't decode, be cautious
-                    pass
-        
         # Check for base32 encoded commands that might be dangerous (PoC5 mitigation)
         if "base32" in command and ("-d" in command or "--decode" in command):
             # Extract and check what's being decoded
@@ -374,8 +296,10 @@ async def generic_linux_command(command: str = "",
                     
                     for pattern in dangerous_decoded:
                         if re.search(pattern, decoded):
-                            return f"Error: Blocked base32-encoded dangerous command. Decoded content contains: {pattern}"
-                except:
+                            return (
+                                "Error: Blocked base32-encoded dangerous command. Decoded content contains a dangerous pattern."
+                            )
+                except Exception:
                     # If we can't decode, be cautious
                     pass
     # Execute respecting session/interactive semantics and capture result
@@ -458,17 +382,12 @@ async def generic_linux_command(command: str = "",
                 )
 
     return result
- 
-    # Respeta SIEMPRE la elección del LLM:
-    # - Si hay session_id: interactúa con esa sesión.
-    # - Si interactive=True: crea sesión asíncrona nueva y deja vivo el proceso.
-    # - Si interactive=False: ejecución one-shot sin sesión persistente.
     if session_id:
         return run_command(
             command,
             ctf=None,
             stdout=False,
-            async_mode=True,  # interactuamos con una sesión ya existente
+            async_mode=True,  # interacting with an existing session
             session_id=session_id,
             timeout=timeout,
             stream=stream,
@@ -476,7 +395,7 @@ async def generic_linux_command(command: str = "",
             tool_name="generic_linux_command",
         )
 
-    # Decide session vs one-shot cuando interactive=True
+    # Decide session vs one-shot when interactive=True
     def _looks_interactive(cmd: str) -> bool:
         first = cmd.strip().split(" ", 1)[0].lower()
         interactive_bins = {
@@ -511,7 +430,7 @@ async def generic_linux_command(command: str = "",
                 call_id=call_id,
                 tool_name="generic_linux_command",
             )
-        # Si el comando no parece interactivo, ejecútalo one‑shot
+        # If the command doesn't look interactive, run it one-shot
         return await run_command_async(
             command,
             ctf=None,
@@ -524,7 +443,7 @@ async def generic_linux_command(command: str = "",
             tool_name="generic_linux_command",
         )
 
-    # No interactivo (one-shot)
+    # Non-interactive (one-shot)
     return await run_command_async(
         command,
         ctf=None,
