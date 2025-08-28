@@ -11,6 +11,12 @@ __pycache__/
 # C extensions
 *.so
 
+# Agent Framework Files
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+AGENTS*.md
+
 # Distribution / packaging
 .Python
 build/
