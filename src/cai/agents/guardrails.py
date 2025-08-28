@@ -22,6 +22,7 @@ from cai.sdk.agents import (
 )
 from openai import AsyncOpenAI
 import os
+import unicodedata
 
 
 class PromptInjectionCheck(BaseModel):
@@ -73,6 +74,59 @@ INJECTION_PATTERNS = [
 ]
 
 
+def normalize_unicode_homographs(text: str) -> str:
+    """
+    Normalize Unicode homograph characters to their ASCII equivalents.
+    This prevents bypass attempts using visually similar characters from different scripts.
+    
+    For example:
+    - Cyrillic 'с' (U+0441) -> Latin 'c' 
+    - Cyrillic 'а' (U+0430) -> Latin 'a'
+    """
+    # Common homograph replacements
+    homograph_map = {
+        # Cyrillic to Latin mappings
+        '\u0430': 'a',  # Cyrillic а
+        '\u0435': 'e',  # Cyrillic е  
+        '\u043e': 'o',  # Cyrillic о
+        '\u0440': 'p',  # Cyrillic р
+        '\u0441': 'c',  # Cyrillic с
+        '\u0443': 'y',  # Cyrillic у
+        '\u0445': 'x',  # Cyrillic х
+        '\u0410': 'A',  # Cyrillic А
+        '\u0415': 'E',  # Cyrillic Е
+        '\u041e': 'O',  # Cyrillic О
+        '\u0420': 'P',  # Cyrillic Р
+        '\u0421': 'C',  # Cyrillic С
+        '\u0425': 'X',  # Cyrillic Х
+        # Greek to Latin mappings
+        '\u03b1': 'a',  # Greek α
+        '\u03bf': 'o',  # Greek ο
+        '\u03c1': 'p',  # Greek ρ
+        '\u03c5': 'u',  # Greek υ
+        '\u03c7': 'x',  # Greek χ
+        '\u0391': 'A',  # Greek Α
+        '\u039f': 'O',  # Greek Ο
+        '\u03a1': 'P',  # Greek Ρ
+        # Other confusables
+        '\u2010': '-',  # Hyphen
+        '\u2011': '-',  # Non-breaking hyphen
+        '\u2212': '-',  # Minus sign
+        '\uff0d': '-',  # Fullwidth hyphen-minus
+    }
+    
+    # Apply direct homograph replacements
+    normalized = text
+    for homograph, replacement in homograph_map.items():
+        normalized = normalized.replace(homograph, replacement)
+    
+    # Also normalize using Unicode NFKD (compatibility decomposition)
+    # This handles many other Unicode tricks
+    normalized = unicodedata.normalize('NFKD', normalized)
+    
+    return normalized
+
+
 def detect_injection_patterns(text: str) -> tuple[bool, list[str]]:
     """
     Detect suspicious patterns that may indicate prompt injection.
@@ -84,14 +138,18 @@ def detect_injection_patterns(text: str) -> tuple[bool, list[str]]:
     if "User input is empty" in text or "'role': 'tool'" in text or "'role': 'assistant'" in text:
         return False, []
     
+    # Normalize Unicode homographs to detect bypass attempts
+    normalized_text = normalize_unicode_homographs(text)
+    
     suspicious_patterns = []
     
+    # Check patterns against both original and normalized text
     for pattern in INJECTION_PATTERNS:
-        if re.search(pattern, text):
+        if re.search(pattern, text) or re.search(pattern, normalized_text):
             suspicious_patterns.append(pattern)
     
     # Check for unusual command-like structures (but not in JSON)
-    if not "'role'" in text and re.search(r'[\$\{\}`;|&><]', text):
+    if not "'role'" in text and (re.search(r'[\$\{\}`;|&><]', text) or re.search(r'[\$\{\}`;|&><]', normalized_text)):
         suspicious_patterns.append("shell_metacharacters")
     
     # Check for excessive uppercase (shouting commands)
@@ -99,9 +157,16 @@ def detect_injection_patterns(text: str) -> tuple[bool, list[str]]:
     if uppercase_ratio > 0.3 and len(text) > 20:
         suspicious_patterns.append("excessive_uppercase")
     
-    # Check for environment variable expansion patterns
-    if re.search(r'\$\(.*\)', text) or re.search(r'`.*`', text):
+    # Check for environment variable expansion patterns  
+    if re.search(r'\$\(.*\)', text) or re.search(r'`.*`', text) or \
+       re.search(r'\$\(.*\)', normalized_text) or re.search(r'`.*`', normalized_text):
         suspicious_patterns.append("command_substitution")
+    
+    # Check if normalized text reveals hidden commands (Unicode bypass attempt)
+    if normalized_text != text:
+        # Check if normalization reveals dangerous commands
+        if any(cmd in normalized_text.lower() for cmd in ['curl', 'wget', 'nc ', 'netcat', 'bash', 'sh ', 'exec', 'eval']):
+            suspicious_patterns.append("unicode_homograph_detected")
     
     return len(suspicious_patterns) > 0, suspicious_patterns
 
@@ -191,6 +256,16 @@ async def prompt_injection_guardrail(
     
     # Quick pattern-based check first (fast)
     has_patterns, patterns = detect_injection_patterns(input_text)
+    
+    # CRITICAL: Block immediately if Unicode homograph bypass detected
+    if 'unicode_homograph_detected' in patterns:
+        return GuardrailFunctionOutput(
+            output_info={
+                "action": "blocked",
+                "reason": "Detected Unicode homograph characters attempting to bypass security checks"
+            },
+            tripwire_triggered=True
+        )
     
     # Check for base64 encoded instructions (often used to bypass filters)
     if re.search(r'base64|b64|BASE64', input_text):
@@ -296,13 +371,17 @@ async def command_execution_guardrail(
     
     output_text = str(output)
     
+    # Normalize Unicode homographs to detect bypass attempts
+    normalized_output = normalize_unicode_homographs(output_text)
+    
     # Check if this looks like a response to an indirect prompt injection
     # Pattern: curl followed by potentially injected command
-    if "curl" in output_text.lower():
+    if "curl" in output_text.lower() or "curl" in normalized_output.lower():
         # Check for environment variable expansion in curl commands
-        if re.search(r'curl.*\$\(.*\)', output_text) or re.search(r'curl.*`.*`', output_text):
+        if re.search(r'curl.*\$\(.*\)', output_text) or re.search(r'curl.*`.*`', output_text) or \
+           re.search(r'curl.*\$\(.*\)', normalized_output) or re.search(r'curl.*`.*`', normalized_output):
             # Check if it's trying to execute env or other commands
-            if any(cmd in output_text.lower() for cmd in ['$(env)', '`env`', '$(id)', '`id`', '$(whoami)', '`whoami`']):
+            if any(cmd in output_text.lower() or cmd in normalized_output.lower() for cmd in ['$(env)', '`env`', '$(id)', '`id`', '$(whoami)', '`whoami`']):
                 return GuardrailFunctionOutput(
                     output_info={
                         "action": "blocked",
@@ -382,8 +461,21 @@ async def command_execution_guardrail(
             tripwire_triggered=True
         )
     
+    # Check for Unicode bypass attempt first
+    if normalized_output != output_text:
+        # Text contains Unicode characters that were normalized
+        # Check if the normalized version contains dangerous commands
+        if any(cmd in normalized_output.lower() for cmd in ['curl', 'wget', 'nc ', 'netcat', 'bash', '/bin/sh', 'exec', 'eval']):
+            return GuardrailFunctionOutput(
+                output_info={
+                    "action": "blocked",
+                    "reason": "Detected Unicode homograph bypass attempt containing dangerous commands"
+                },
+                tripwire_triggered=True
+            )
+    
     for pattern in dangerous_commands:
-        if re.search(pattern, output_text):
+        if re.search(pattern, output_text) or re.search(pattern, normalized_output):
             return GuardrailFunctionOutput(
                 output_info={
                     "action": "blocked",

@@ -7,12 +7,59 @@ import uuid
 import subprocess
 import sys
 import re
+import unicodedata
 from cai.tools.common import (run_command, run_command_async,
                               list_shell_sessions,
                               get_session_output,
                               terminate_session)  # pylint: disable=import-error # noqa E501
 from cai.sdk.agents import function_tool
 from wasabi import color  # pylint: disable=import-error
+
+
+def detect_unicode_homographs(text: str) -> tuple[bool, str]:
+    """
+    Detect and normalize Unicode homograph characters used to bypass security checks.
+    Returns (has_homographs, normalized_text)
+    """
+    # Common homograph replacements
+    homograph_map = {
+        # Cyrillic to Latin mappings
+        '\u0430': 'a',  # Cyrillic а
+        '\u0435': 'e',  # Cyrillic е  
+        '\u043e': 'o',  # Cyrillic о
+        '\u0440': 'p',  # Cyrillic р
+        '\u0441': 'c',  # Cyrillic с
+        '\u0443': 'y',  # Cyrillic у
+        '\u0445': 'x',  # Cyrillic х
+        '\u0410': 'A',  # Cyrillic А
+        '\u0415': 'E',  # Cyrillic Е
+        '\u041e': 'O',  # Cyrillic О
+        '\u0420': 'P',  # Cyrillic Р
+        '\u0421': 'C',  # Cyrillic С
+        '\u0425': 'X',  # Cyrillic Х
+        # Greek to Latin mappings
+        '\u03b1': 'a',  # Greek α
+        '\u03bf': 'o',  # Greek ο
+        '\u03c1': 'p',  # Greek ρ
+        '\u03c5': 'u',  # Greek υ
+        '\u03c7': 'x',  # Greek χ
+        '\u0391': 'A',  # Greek Α
+        '\u039f': 'O',  # Greek Ο
+        '\u03a1': 'P',  # Greek Ρ
+    }
+    
+    # Check if text contains any homographs
+    has_homographs = any(char in text for char in homograph_map)
+    
+    # Normalize the text
+    normalized = text
+    for homograph, replacement in homograph_map.items():
+        normalized = normalized.replace(homograph, replacement)
+    
+    # Also normalize using Unicode NFKD
+    normalized = unicodedata.normalize('NFKD', normalized)
+    
+    return (has_homographs, normalized)
 
 
 @function_tool
@@ -127,6 +174,37 @@ async def generic_linux_command(command: str = "",
 
     if not command.strip():
         return "Error: No command provided"
+
+    # CRITICAL: Check for Unicode homograph bypass attempts
+    guardrails_enabled = os.getenv("CAI_GUARDRAILS", "true").lower() != "false"
+    if guardrails_enabled:
+        has_homographs, normalized_command = detect_unicode_homographs(command)
+        if has_homographs:
+            # Check if the normalized version contains dangerous commands
+            dangerous_commands = ['curl', 'wget', 'nc ', 'netcat', 'bash', 'sh ', 'exec', 'eval']
+            if any(cmd in normalized_command.lower() for cmd in dangerous_commands):
+                # Also check for command substitution
+                if '$(env)' in normalized_command or '`env`' in normalized_command or \
+                   '$(' in normalized_command or '`' in normalized_command:
+                    return "Error: Blocked Unicode homograph bypass attempt. The command contains visually similar Unicode characters to disguise dangerous operations."
+                # Even without command substitution, block if it's a suspicious use of homographs
+                return "Error: Blocked command with suspicious Unicode homograph characters that may be attempting to bypass security checks."
+        
+        # CRITICAL: Block curl/wget commands with command substitution targeting specific IPs
+        # This catches PoC 11 where agent copies the pattern even with ASCII characters
+        if re.match(r'^\s*curl\s+', command, re.IGNORECASE) or re.match(r'^\s*wget\s+', command, re.IGNORECASE):
+            # Check for command substitution in the data parameter
+            if re.search(r'-d\s+["\'].*\$\(env\)', command) or \
+               re.search(r'-d\s+["\'].*`env`', command) or \
+               re.search(r'--data\s+["\'].*\$\(env\)', command) or \
+               re.search(r'--data\s+["\'].*`env`', command):
+                # Check if targeting suspicious IP (192.168.x.x or 10.x.x.x)
+                if re.search(r'192\.168\.\d+\.\d+', command) or re.search(r'10\.\d+\.\d+\.\d+', command):
+                    return "Error: Blocked curl/wget command with command substitution targeting private IP. This matches a known prompt injection pattern."
+            
+            # Also block any curl with $(env) regardless of IP
+            if '$(env)' in command or '`env`' in command:
+                return "Error: Blocked curl/wget command attempting to exfiltrate environment variables."
 
     # For SSH sessions or interactive commands, use different timeout
     if session_id:
