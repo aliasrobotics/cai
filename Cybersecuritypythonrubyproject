@@ -1,0 +1,562 @@
+# Project: Docker Cyber Analyzer (AI-ish rules + baseline checks)
+
+A minimal, extensible project that inspects your local Docker environment for risk signals often present in cybercrime/abuse investigations (e.g., privileged containers, root users, broad port exposure, suspicious secrets in env). Results are stored in SQLite and are accessible via a Python FastAPI and a Ruby Sinatra dashboard.
+
+> **Note**: You can enrich the Python analyzer with ML/AI later (e.g., scoring findings, anomaly detection, or rule-learning from labeled cases). The current build uses a deterministic ruleset that is easy to extend.
+
+---
+
+## File tree
+
+```
+/docker-cyber-analyzer
+├─ README.md
+├─ docker-compose.yml
+├─ data/                 # SQLite file lives here (shared volume)
+├─ python_service/
+│  ├─ requirements.txt
+│  ├─ Dockerfile
+│  ├─ database.py
+│  ├─ models.py
+│  ├─ analyzer.py        # Core checks
+│  └─ app.py             # FastAPI server
+└─ ruby_dashboard/
+   ├─ Gemfile
+   ├─ Dockerfile
+   └─ app.rb             # Sinatra mini UI
+```
+
+---
+
+## Quick start (Docker Compose)
+
+```bash
+# In project root
+docker compose up --build
+
+# Trigger a scan
+curl -X POST http://localhost:8000/analyze
+
+# Explore results
+# API docs:   http://localhost:8000/docs
+# Dashboard:  http://localhost:4567
+```
+
+---
+
+## Python service (FastAPI)
+
+### `python_service/requirements.txt`
+
+```txt
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+SQLAlchemy==2.0.35
+docker==7.1.0
+```
+
+### `python_service/Dockerfile`
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+ENV PYTHONUNBUFFERED=1
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+### `python_service/database.py`
+
+```python
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, DeclarativeBase
+
+DB_PATH = os.getenv("DB_PATH", "/app/data/analyzer.db")
+
+class Base(DeclarativeBase):
+    pass
+
+engine = create_engine(f"sqlite:///{DB_PATH}", echo=False, future=True)
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+```
+
+### `python_service/models.py`
+
+```python
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Text, Float
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from datetime import datetime
+from database import Base
+
+class Case(Base):
+    __tablename__ = "cases"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    note: Mapped[str] = mapped_column(String(255), default="auto-scan")
+
+    containers = relationship("ContainerReport", back_populates="case", cascade="all, delete-orphan")
+    images = relationship("ImageReport", back_populates="case", cascade="all, delete-orphan")
+    findings = relationship("Finding", back_populates="case", cascade="all, delete-orphan")
+
+class ContainerReport(Base):
+    __tablename__ = "container_reports"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    case_id: Mapped[int] = mapped_column(Integer, ForeignKey("cases.id"))
+    container_id: Mapped[str] = mapped_column(String(128))
+    name: Mapped[str] = mapped_column(String(256))
+    image: Mapped[str] = mapped_column(String(256))
+    privileged: Mapped[bool] = mapped_column(Boolean, default=False)
+    runs_as_root: Mapped[bool] = mapped_column(Boolean, default=False)
+    host_network: Mapped[bool] = mapped_column(Boolean, default=False)
+    port_0_0_0_0: Mapped[bool] = mapped_column(Boolean, default=False)
+    added_caps: Mapped[str] = mapped_column(Text, default="")
+    mounts: Mapped[str] = mapped_column(Text, default="")
+    suspicious_env: Mapped[str] = mapped_column(Text, default="")
+
+    case = relationship("Case", back_populates="containers")
+
+class ImageReport(Base):
+    __tablename__ = "image_reports"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    case_id: Mapped[int] = mapped_column(Integer, ForeignKey("cases.id"))
+    image_id: Mapped[str] = mapped_column(String(128))
+    repo_tags: Mapped[str] = mapped_column(Text, default="")
+    size_mb: Mapped[float] = mapped_column(Float, default=0.0)
+    latest_tag: Mapped[bool] = mapped_column(Boolean, default=False)
+    age_days: Mapped[float] = mapped_column(Float, default=0.0)
+
+    case = relationship("Case", back_populates="images")
+
+class Finding(Base):
+    __tablename__ = "findings"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    case_id: Mapped[int] = mapped_column(Integer, ForeignKey("cases.id"))
+    subject_type: Mapped[str] = mapped_column(String(32))  # 'container' | 'image' | 'system'
+    subject_id: Mapped[str] = mapped_column(String(128))
+    severity: Mapped[str] = mapped_column(String(16))  # LOW/MEDIUM/HIGH/CRITICAL
+    title: Mapped[str] = mapped_column(String(256))
+    detail: Mapped[str] = mapped_column(Text, default="")
+
+    case = relationship("Case", back_populates="findings")
+```
+
+### `python_service/analyzer.py`
+
+```python
+import os, re, datetime
+from typing import List, Dict, Any
+import docker
+from sqlalchemy.orm import Session
+from database import SessionLocal, engine
+from models import Base, Case, ContainerReport, ImageReport, Finding
+
+SUS_ENV_PATTERNS = [
+    r"AWS_(ACCESS_KEY|SECRET|SESSION)_?ID?", r"API_KEY", r"SECRET", r"TOKEN",
+    r"PASSWORD", r"PRIVATE_KEY", r"GCP_|GOOGLE_APPLICATION_CREDENTIALS", r"AZURE_"
+]
+
+IMAGE_AGE_LIMIT_DAYS = int(os.getenv("ANALYZER_IMAGE_AGE_DAYS", "365"))
+IMAGE_SIZE_LIMIT_MB = int(os.getenv("ANALYZER_IMAGE_SIZE_MB", "800"))
+
+def init_db():
+    Base.metadata.create_all(bind=engine)
+
+def matches_suspicious(key: str) -> bool:
+    for p in SUS_ENV_PATTERNS:
+        if re.search(p, key, flags=re.IGNORECASE):
+            return True
+    return False
+
+def analyze() -> int:
+    init_db()
+    client = docker.from_env()
+    with SessionLocal() as db:
+        case = Case()
+        db.add(case)
+        db.commit()
+        db.refresh(case)
+
+        analyze_containers(client, db, case.id)
+        analyze_images(client, db, case.id)
+        db.commit()
+        return case.id
+
+def analyze_containers(client, db: Session, case_id: int):
+    for c in client.containers.list(all=True):
+        attrs = c.attrs
+        cfg = attrs.get("Config", {}) or {}
+        host_cfg = attrs.get("HostConfig", {}) or {}
+        network_mode = host_cfg.get("NetworkMode")
+        privileged = bool(host_cfg.get("Privileged"))
+        added_caps = host_cfg.get("CapAdd") or []
+        user = cfg.get("User") or ""
+        runs_as_root = (user.strip() == "" or user.strip() == "0")
+        ports = attrs.get("NetworkSettings", {}).get("Ports") or {}
+        port_0_0_0_0 = any(bind for p in ports.values() if p for bind in p if bind.get("HostIp") in ("0.0.0.0", "::"))
+        host_network = (network_mode == "host")
+        mounts = attrs.get("Mounts") or []
+        mounts_str = "; ".join([f"{m.get('Source')} -> {m.get('Destination')}" for m in mounts])
+
+        env_list = cfg.get("Env") or []
+        env_keys = [e.split("=", 1)[0] for e in env_list]
+        sus_keys = [k for k in env_keys if matches_suspicious(k)]
+        suspicious_env = ", ".join(sus_keys)
+
+        report = ContainerReport(
+            case_id=case_id,
+            container_id=c.id[:12],
+            name=(attrs.get("Name") or c.name or "").lstrip("/"),
+            image=cfg.get("Image") or c.image.tags[0] if c.image.tags else c.image.short_id,
+            privileged=privileged,
+            runs_as_root=runs_as_root,
+            host_network=host_network,
+            port_0_0_0_0=port_0_0_0_0,
+            added_caps=",".join(added_caps),
+            mounts=mounts_str,
+            suspicious_env=suspicious_env,
+        )
+        db.add(report)
+        db.flush()
+
+        # Findings
+        if privileged:
+            add_finding(db, case_id, "container", report.container_id, "HIGH", "Privileged container", f"{report.name} runs with --privileged")
+        if runs_as_root:
+            add_finding(db, case_id, "container", report.container_id, "MEDIUM", "Runs as root", f"{report.name} has no non-root user configured")
+        if host_network:
+            add_finding(db, case_id, "container", report.container_id, "MEDIUM", "Host networking", f"{report.name} uses host network")
+        if port_0_0_0_0:
+            add_finding(db, case_id, "container", report.container_id, "MEDIUM", "Public port exposure", f"{report.name} exposes ports on 0.0.0.0")
+        if added_caps:
+            add_finding(db, case_id, "container", report.container_id, "LOW", "Extra capabilities", f"Capabilities added: {report.added_caps}")
+        if mounts_str:
+            add_finding(db, case_id, "container", report.container_id, "LOW", "Mounted host paths", f"Mounts: {mounts_str}")
+        if suspicious_env:
+            add_finding(db, case_id, "container", report.container_id, "HIGH", "Suspicious env keys", f"Keys: {suspicious_env}")
+
+def analyze_images(client, db: Session, case_id: int):
+    now = datetime.datetime.utcnow()
+    for img in client.images.list():
+        tags = img.tags or []
+        repo_tags = ", ".join(tags)
+        latest_tag = any(t.endswith(":latest") for t in tags)
+        size_mb = round((getattr(img, 'attrs', {}).get('Size') or 0) / (1024*1024), 2)
+        created_str = getattr(img, 'attrs', {}).get('Created')
+        age_days = 0.0
+        if created_str:
+            try:
+                created = datetime.datetime.fromisoformat(created_str.replace('Z','+00:00'))
+                age_days = (now - created).total_seconds() / 86400.0
+            except Exception:
+                age_days = 0.0
+
+        report = ImageReport(
+            case_id=case_id,
+            image_id=img.short_id.replace("sha256:", ""),
+            repo_tags=repo_tags,
+            size_mb=size_mb,
+            latest_tag=latest_tag,
+            age_days=round(age_days, 1)
+        )
+        db.add(report)
+        db.flush()
+
+        if latest_tag:
+            add_finding(db, case_id, "image", report.image_id, "LOW", "Floating 'latest' tag", f"{repo_tags}")
+        if size_mb > IMAGE_SIZE_LIMIT_MB:
+            add_finding(db, case_id, "image", report.image_id, "LOW", "Large image size", f"{size_mb} MB > {IMAGE_SIZE_LIMIT_MB} MB threshold")
+        if age_days > IMAGE_AGE_LIMIT_DAYS:
+            add_finding(db, case_id, "image", report.image_id, "LOW", "Old image", f"{age_days:.0f} days old (> {IMAGE_AGE_LIMIT_DAYS})")
+
+def add_finding(db: Session, case_id: int, subject_type: str, subject_id: str, severity: str, title: str, detail: str):
+    f = Finding(case_id=case_id, subject_type=subject_type, subject_id=subject_id, severity=severity, title=title, detail=detail)
+    db.add(f)
+```
+
+### `python_service/app.py`
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import Optional
+from database import SessionLocal
+from models import Case, ContainerReport, ImageReport, Finding
+from analyzer import analyze, init_db
+
+app = FastAPI(title="Docker Cyber Analyzer API", version="0.1.0")
+
+class AnalyzeRequest(BaseModel):
+    note: Optional[str] = None
+
+@app.on_event("startup")
+def on_startup():
+    init_db()
+
+@app.get("/healthz")
+def healthz():
+    return {"ok": True}
+
+@app.post("/analyze")
+def run_analyze(req: AnalyzeRequest | None = None):
+    case_id = analyze()
+    if req and req.note:
+        with SessionLocal() as db:
+            c = db.get(Case, case_id)
+            if c:
+                c.note = req.note
+                db.commit()
+    return {"case_id": case_id}
+
+@app.get("/cases")
+def get_cases():
+    with SessionLocal() as db:
+        rows = db.query(Case).order_by(Case.id.desc()).all()
+        return [
+            {"id": r.id, "created_at": r.created_at.isoformat(), "note": r.note}
+            for r in rows
+        ]
+
+@app.get("/cases/{case_id}")
+def get_case(case_id: int):
+    with SessionLocal() as db:
+        c = db.get(Case, case_id)
+        if not c:
+            return {"error": "not found"}
+        containers = db.query(ContainerReport).filter_by(case_id=case_id).all()
+        images = db.query(ImageReport).filter_by(case_id=case_id).all()
+        findings = db.query(Finding).filter_by(case_id=case_id).all()
+        return {
+            "case": {"id": c.id, "created_at": c.created_at.isoformat(), "note": c.note},
+            "containers": [{
+                "id": r.id, "container_id": r.container_id, "name": r.name, "image": r.image,
+                "privileged": r.privileged, "runs_as_root": r.runs_as_root, "host_network": r.host_network,
+                "port_0_0_0_0": r.port_0_0_0_0, "added_caps": r.added_caps, "mounts": r.mounts,
+                "suspicious_env": r.suspicious_env
+            } for r in containers],
+            "images": [{
+                "id": r.id, "image_id": r.image_id, "repo_tags": r.repo_tags, "size_mb": r.size_mb,
+                "latest_tag": r.latest_tag, "age_days": r.age_days
+            } for r in images],
+            "findings": [{
+                "id": f.id, "subject_type": f.subject_type, "subject_id": f.subject_id,
+                "severity": f.severity, "title": f.title, "detail": f.detail
+            } for f in findings]
+        }
+```
+
+---
+
+## Ruby dashboard (Sinatra)
+
+### `ruby_dashboard/Gemfile`
+
+```ruby
+source 'https://rubygems.org'
+gem 'sinatra'
+gem 'thin'
+gem 'sequel'
+gem 'sqlite3'
+```
+
+### `ruby_dashboard/Dockerfile`
+
+```dockerfile
+FROM ruby:3.2
+
+WORKDIR /app
+COPY Gemfile ./
+RUN bundle install
+
+COPY . .
+
+ENV RACK_ENV=production
+ENV DB_PATH=/app/data/analyzer.db
+CMD ["ruby", "app.rb", "-o", "0.0.0.0", "-p", "4567"]
+```
+
+### `ruby_dashboard/app.rb`
+
+```ruby
+require 'sinatra'
+require 'sequel'
+
+DB_PATH = ENV.fetch('DB_PATH', '/app/data/analyzer.db')
+DB = Sequel.sqlite(DB_PATH)
+
+get '/' do
+  @cases = DB[:cases].order(Sequel.desc(:id)).all
+  erb :index
+end
+
+get '/cases/:id' do
+  id = params[:id].to_i
+  @case = DB[:cases].where(id: id).first
+  halt 404, 'Not found' unless @case
+  @containers = DB[:container_reports].where(case_id: id).all
+  @images = DB[:image_reports].where(case_id: id).all
+  @findings = DB[:findings].where(case_id: id).all
+  erb :case
+end
+
+__END__
+
+@@ layout
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Docker Cyber Analyzer</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; }
+    header { display:flex; align-items:center; justify-content:space-between; }
+    .card { border:1px solid #ddd; border-radius:14px; padding:16px; margin-bottom:16px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+    code { background:#f6f8fa; padding:2px 6px; border-radius:6px; }
+    table { border-collapse:collapse; width:100%; }
+    th, td { border-bottom:1px solid #eee; padding:8px; text-align:left; }
+    .sev-LOW { color:#2c7; } .sev-MEDIUM { color:#fa0; } .sev-HIGH { color:#e55; } .sev-CRITICAL { color:#c00; font-weight:bold; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Docker Cyber Analyzer</h1>
+  <a href="/">Home</a>
+</header>
+<%= yield %>
+</body>
+</html>
+
+@@ index
+<div class="card">
+  <h2>Cases</h2>
+  <ul>
+    <% @cases.each do |c| %>
+      <li>
+        <a href="/cases/<%= c[:id] %>">Case #<%= c[:id] %></a>
+        — <%= c[:created_at] %>
+        <% if c[:note] && !c[:note].empty? %> — <em><%= c[:note] %></em><% end %>
+      </li>
+    <% end %>
+  </ul>
+  <p>Trigger a scan via API: <code>curl -X POST http://localhost:8000/analyze</code></p>
+</div>
+
+@@ case
+<div class="card">
+  <h2>Case #<%= @case[:id] %></h2>
+  <p><strong>Created:</strong> <%= @case[:created_at] %> — <strong>Note:</strong> <%= @case[:note] %></p>
+</div>
+
+<div class="card">
+  <h3>Findings</h3>
+  <table>
+    <thead><tr><th>Severity</th><th>Subject</th><th>Title</th><th>Detail</th></tr></thead>
+    <tbody>
+      <% @findings.each do |f| %>
+        <tr>
+          <td class="sev-<%= f[:severity] %>"><%= f[:severity] %></td>
+          <td><%= f[:subject_type] %> <code><%= f[:subject_id] %></code></td>
+          <td><%= f[:title] %></td>
+          <td><%= f[:detail] %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>Containers</h3>
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Name</th><th>Image</th><th>Privileged</th><th>Root</th><th>HostNet</th><th>PublicPorts</th><th>Caps</th><th>Mounts</th><th>Suspicious Env</th></tr>
+    </thead>
+    <tbody>
+      <% @containers.each do |c| %>
+        <tr>
+          <td><code><%= c[:container_id] %></code></td>
+          <td><%= c[:name] %></td>
+          <td><%= c[:image] %></td>
+          <td><%= c[:privileged] %></td>
+          <td><%= c[:runs_as_root] %></td>
+          <td><%= c[:host_network] %></td>
+          <td><%= c[:port_0_0_0_0] %></td>
+          <td><%= c[:added_caps] %></td>
+          <td><%= c[:mounts] %></td>
+          <td><%= c[:suspicious_env] %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>Images</h3>
+  <table>
+    <thead><tr><th>ID</th><th>Repo Tags</th><th>Size (MB)</th><th>Latest?</th><th>Age (days)</th></tr></thead>
+    <tbody>
+      <% @images.each do |i| %>
+        <tr>
+          <td><code><%= i[:image_id] %></code></td>
+          <td><%= i[:repo_tags] %></td>
+          <td><%= i[:size_mb] %></td>
+          <td><%= i[:latest_tag] %></td>
+          <td><%= i[:age_days] %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+```
+
+---
+
+## Orchestrator
+
+### `docker-compose.yml`
+
+```yaml
+services:
+  python_api:
+    build: ./python_service
+    ports:
+      - "8000:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data:/app/data
+    environment:
+      - DB_PATH=/app/data/analyzer.db
+      - ANALYZER_IMAGE_AGE_DAYS=365
+      - ANALYZER_IMAGE_SIZE_MB=800
+
+  ruby_ui:
+    build: ./ruby_dashboard
+    ports:
+      - "4567:4567"
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - python_api
+```
+
+---
+
+## Extending with AI/ML (ideas)
+
+* Create a `features` table and export normalized features per container/image.
+* Train a classifier (e.g., XGBoost) to label HIGH/MEDIUM/LOW risk using your historical cases.
+* Add an `/score` endpoint that returns a composite risk score and recommended actions.
+* Add YARA/Trivy/Grype adapters for malware/CVE signals and feed their outputs as features.
+
+---
+
+## Safety & Ops notes
+
+* Mounting `/var/run/docker.sock` gives the analyzer broad control—limit to lab/test machines.
+* Prefer read-only host mounts and least-privilege where possible.
+* Consider Postgres for multi-user deployments; swap the SQLAlchemy URL and update the Ruby Sequel URL accordingly.
