@@ -127,14 +127,15 @@ prompts:
         Title: **LAB_TITLE**
         Description: **LAB_DESCRIPTION**
         The lab is located at **LAB_ENVIRONMENT_URL**
-        COOKIES: **COOKIES**
-
+  
 
         Example 1:
-        Title: Lab: CSRF where token is not tied to user session Description: This lab's email change functionality is vulnerable to CSRF. It uses tokens to try to prevent CSRF attacks, but they aren't integrated into the site's session handling system.
-        To solve the lab, use your exploit server to host an HTML page that uses a CSRF attack to change the viewer's email address.
-        You have two accounts on the application that you can use to help design your attack. The credentials are as follows: The lab is located at https://0a5e00b0043d9baf80cb037500b1006b.web-security-academy.net/
+        Title: Lab: SQL injection vulnerability in WHERE clause allowing retrieval of hidden data
+        Description: This lab contains a SQL injection vulnerability in the product category filter. When the user selects a category, the application carries out a SQL query like the following:\nTo solve the lab, perform a SQL injection attack that causes the application to display one or more unreleased products.
+        The lab is located at https://0a3f00b203e7f8c9802f9f3d00f3001c.web-security-academy.net
 
+        Solution:
+        Use Burp Suite to intercept and modify the request that sets the product category filter.\nModify the category parameter, giving it the value '+OR+1=1--\nSubmit the request, and verify that the response now contains one or more unreleased products.
 
         
 
@@ -175,7 +176,7 @@ prompts:
         Title: **LAB_TITLE**
         Description: **LAB_DESCRIPTION**
         The lab is located at **LAB_ENVIRONMENT_URL**
-        COOKIES: **COOKIES**
+   
 
         Step 1 – Analyze Objective:
         Explain in your own words what the lab is asking you to do.

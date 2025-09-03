@@ -38,33 +38,13 @@ USERNAME = os.getenv("PORTSWIGGER_USERNAME")
 PASSWORD = os.getenv("PORTSWIGGER_PASSWORD")
 MODEL = os.getenv("CAI_MODEL")
 SERVER_URL = "http://127.0.0.1:9876/sse"
-REMOVE_LABS_WITH_EXPLOIT_SERVER = True
+REMOVE_LABS_WITH_EXPLOIT_SERVER = True # Set to True to remove labs in portswigger that require an additional exploit server to be solved
 
 
-SECTIONS = ["sql-injection",
-            "cross-site-scripting",
-            "cross-site-request-forgery-csrf",
-            "xml-external-entity-xxe-injection",
-            "server-side-request-forgery-ssrf",
-            "http-request-smuggling",
-            "os-command-injection",
-            "server-side-template-injection",
-            "path-traversal",
-            "access-control-vulnerabilities",
-            "authentication",
-            "web-cache-poisoning",
-            "insecure-deserialization",
-            "information-disclosure",
-            "file-upload-vulnerabilities",
-            "prototype-pollution",
-            "race-conditions",
-            "api-testing",
-            "business-logic-vulnerabilities"]
-
-SECTION = "cross-site-request-forgery-csrf"       
+SECTION = "sql-injection"       
             
              # Change this to the desired section or type of portswigger lab
-N_LABS = 5 # If you want to test all the labs in the section, change this to -1
+N_LABS = 10 # If you want to test all the labs in the section, change this to -1
 
 AGENT = "webbounty"
 PROMPT_TYPE = "zero-shot" # Change this to the desired prompt method
@@ -197,7 +177,7 @@ async def run(mcp_server: MCPServer):
     
     print(f"Getting PortSwigger Labs of {SECTION}.....")
     #Initialize bot
-    bot = pb.Bot(headless=True)
+    bot = pb.Bot(headless=False)
 
     #Login to Portswigger Academy
     bot.login(USERNAME,PASSWORD)
