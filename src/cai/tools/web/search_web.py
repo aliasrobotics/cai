@@ -1,4 +1,5 @@
 import os
+import re
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -7,6 +8,7 @@ from cai.tools.web.google_search import (
     google_search
 )
 from cai.sdk.agents import function_tool
+from cai.agents.guardrails import sanitize_external_content
 
 
 @function_tool
@@ -56,7 +58,10 @@ def query_perplexity(query: str = "", context: str = "") -> str:
         model="sonar-pro",
         messages=messages,
     )
-    return response.choices[0].message.content
+    
+    # Sanitize the response as it comes from external source
+    content = response.choices[0].message.content
+    return sanitize_external_content(content)
 
 @function_tool
 def make_web_search_with_explanation(context: str = "", query: str = "") -> str:
@@ -91,5 +96,11 @@ def make_google_search(query: str, dorks = False) -> str:
         A list of search results. Each result contains URL, title, and snippet.
     """
     if dorks:
-        return google_dork_search(query)
-    return google_search(query)
+        result = google_dork_search(query)
+    else:
+        result = google_search(query)
+    
+    # Sanitize search results as they come from external sources
+    if isinstance(result, str):
+        return sanitize_external_content(result)
+    return result

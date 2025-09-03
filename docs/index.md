@@ -13,6 +13,15 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
   </p>
 </div>
 
+## Key Features
+
+- 🤖 **300+ AI Models**: Support for OpenAI, Anthropic, DeepSeek, Ollama, and more
+- 🔧 **Built-in Security Tools**: Ready-to-use tools for reconnaissance, exploitation, and privilege escalation  
+- 🏆 **Battle-tested**: Proven in HackTheBox CTFs, bug bounties, and real-world security case studies
+- 🎯 **Agent-based Architecture**: Modular framework design to build specialized agents for different security tasks
+- 🛡️ **Guardrails Protection**: Built-in defenses against prompt injection and dangerous command execution
+- 📚 **Research-oriented**: Research foundation to democratize cybersecurity AI for the community
+
 | CAI with `alias0` on ROS message injection attacks in MiR-100 robot | CAI with `alias0` on API vulnerability discovery at Mercado Libre |
 |-----------------------------------------------|---------------------------------|
 | [![asciicast](https://asciinema.org/a/dNv705hZel2Rzrw0cju9HBGPh.svg)](https://asciinema.org/a/dNv705hZel2Rzrw0cju9HBGPh) | [![asciicast](https://asciinema.org/a/9Hc9z1uFcdNjqP3bY5y7wO1Ww.svg)](https://asciinema.org/a/9Hc9z1uFcdNjqP3bY5y7wO1Ww) |

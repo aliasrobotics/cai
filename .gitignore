@@ -1,7 +1,11 @@
 # macOS Files
 .DS_Store
 cai_env/
+# Agent Framework Files
+AGENTS.md
 CLAUDE.md
+GEMINI.md
+AGENTS*.md
 # Byte-compiled / optimized / DLL files
 __pycache__/
 **/__pycache__/

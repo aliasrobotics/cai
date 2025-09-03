@@ -1,4 +1,4 @@
-CAI focuses on making cybersecurity agent **coordination** and **execution** lightweight, highly controllable, and useful for humans. To do so it builds upon 7 pillars: `Agent`s, `Tools`, `Handoffs`, `Patterns`, `Turns`, `Tracing` and `HITL`.
+CAI focuses on making cybersecurity agent **coordination** and **execution** lightweight, highly controllable, and useful for humans. To do so it builds upon 8 pillars: `Agent`s, `Tools`, `Handoffs`, `Patterns`, `Turns`, `Tracing`, `Guardrails` and `HITL`.
 
 
 ```
@@ -9,12 +9,12 @@ CAI focuses on making cybersecurity agent **coordination** and **execution** lig
                           ▼
 ┌───────────┐       ┌───────────┐       ┌───────────┐      ┌───────────┐
 │  Patterns │◀─────▶│  Handoffs │◀────▶ │   Agents  │◀────▶│    LLMs   │
-└───────────┘       └─────┬─────┘       └───────────┘      └───────────┘
+└───────────┘       └─────┬─────┘       └─────┬─────┘      └───────────┘
                           │                   │
                           │                   ▼
-┌────────────┐       ┌────┴──────┐       ┌───────────┐
-│ Extensions │◀─────▶│  Tracing  │       │   Tools   │
-└────────────┘       └───────────┘       └───────────┘
+┌────────────┐       ┌────┴──────┐       ┌───────────┐     ┌────────────┐
+│ Extensions │◀─────▶│  Tracing  │       │   Tools   │◀───▶│ Guardrails │
+└────────────┘       └───────────┘       └───────────┘     └────────────┘
                                               │
                           ┌─────────────┬─────┴────┬─────────────┐
                           ▼             ▼          ▼             ▼
@@ -122,6 +122,19 @@ During the agentic flow (conversation), we distinguish between **interactions** 
 
 ### 🔹 Tracing
 > ⚠️ TRACING IS STILL IN PROGRESS
+
+
+### 🔹 Guardrails
+
+`Guardrails` provide a critical security layer for CAI agents, protecting against prompt injection attacks and preventing execution of dangerous commands. These guardrails run in parallel to agents, validating both input and output to ensure safe operation. The framework includes:
+
+- **Input Guardrails**: Detect and block prompt injection attempts before they reach agents, using pattern matching, Unicode homograph detection, and AI-powered analysis
+- **Output Guardrails**: Validate agent outputs before execution, preventing dangerous commands like reverse shells, fork bombs, or data exfiltration  
+- **Multi-layered Defense**: Protection at input, processing, and execution stages with tool-level validation
+- **Base64/Base32 Aware**: Automatically decodes and analyzes encoded payloads to detect hidden malicious commands
+- **Configurable**: Can be enabled/disabled via `CAI_GUARDRAILS` environment variable
+
+For detailed implementation and examples, see [Guardrails documentation](guardrails.md) and [Prompt Injection Mitigation](cai_prompt_injection.md).
 
 
 ### 🔹 Human-In-The-Loop (HITL)

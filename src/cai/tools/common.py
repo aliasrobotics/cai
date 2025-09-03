@@ -105,6 +105,12 @@ def _get_agent_token_info():
 # Global dictionary to store active sessions
 ACTIVE_SESSIONS = {}
 
+# Friendly IDs for sessions to simplify LLM control
+# Maps like S1 -> <real_id> and reverse
+FRIENDLY_SESSION_MAP = {}
+REVERSE_SESSION_MAP = {}
+SESSION_COUNTER = 0
+
 # Global counter for session output commands to ensure they always display
 SESSION_OUTPUT_COUNTER = {}
 
@@ -173,6 +179,8 @@ class ShellSession:  # pylint: disable=too-many-instance-attributes
             self.workspace_dir = workspace_dir or _get_workspace_dir()
         else:
             self.workspace_dir = _get_workspace_dir()
+        self.friendly_id = None  # human-friendly alias like S1
+        self.created_at = time.time()
         self.process = None
         self.master = None
         self.slave = None
@@ -181,19 +189,21 @@ class ShellSession:  # pylint: disable=too-many-instance-attributes
         self.last_activity = time.time()
 
     def start(self):
-        """Start the shell session in the appropriate environment."""
-        start_message_cmd = self.command 
+        """Start the shell session in the appropriate environment.
+        Exactly one environment must be chosen to avoid duplicated processes.
+        """
+        start_message_cmd = self.command
 
         # --- Start in Container ---
         if self.container_id:
             try:
                 self.master, self.slave = pty.openpty()
                 docker_cmd_list = [
-                    "docker", "exec", "-i",
-                    "-w", self.workspace_dir, 
+                    "docker", "exec", "-i", "-t",  # allocate a TTY inside the container
+                    "-w", self.workspace_dir,
                     self.container_id,
-                    "sh", "-c", # Use shell to handle complex commands if needed
-                    self.command # The actual command to run
+                    "sh", "-c",
+                    self.command,
                 ]
                 self.process = subprocess.Popen(
                     docker_cmd_list,
@@ -201,13 +211,15 @@ class ShellSession:  # pylint: disable=too-many-instance-attributes
                     stdout=self.slave,
                     stderr=self.slave,
                     preexec_fn=os.setsid,
-                    universal_newlines=True
+                    universal_newlines=True,
                 )
                 self.is_running = True
                 self.output_buffer.append(
                     f"[Session {self.session_id}] Started in container {self.container_id[:12]}: "
-                    f"{start_message_cmd} in {self.workspace_dir}")
+                    f"{start_message_cmd} in {self.workspace_dir}"
+                )
                 threading.Thread(target=self._read_output, daemon=True).start()
+                return None
             except Exception as e:
                 self.output_buffer.append(f"Error starting container session: {str(e)}")
                 self.is_running = False
@@ -215,33 +227,37 @@ class ShellSession:  # pylint: disable=too-many-instance-attributes
 
         # --- Start in CTF ---
         if self.ctf:
-            self.is_running = True
-            self.output_buffer.append(
-                f"[Session {self.session_id}] Started CTF command: {self.command}")
             try:
+                self.is_running = True
+                self.output_buffer.append(
+                    f"[Session {self.session_id}] Started CTF command: {self.command}"
+                )
                 output = self.ctf.get_shell(self.command)
-                self.output_buffer.append(output)
+                if output:
+                    self.output_buffer.append(output)
+                # CTF "sessions" are request/response; mark as finished
+                self.is_running = False
+                return None
             except Exception as e:  # pylint: disable=broad-except
                 self.output_buffer.append(f"Error executing CTF command: {str(e)}")
-                self.is_running = False 
+                self.is_running = False
                 return str(e)
 
         # --- Start Locally (Host) ---
         try:
             self.master, self.slave = pty.openpty()
-            self.process = subprocess.Popen(  # pylint: disable=subprocess-popen-preexec-fn, consider-using-with # noqa: E501
-                self.command, 
-                shell=True,  # nosec B602 
+            self.process = subprocess.Popen(  # pylint: disable=subprocess-popen-preexec-fn
+                self.command,
+                shell=True,  # nosec B602
                 stdin=self.slave,
                 stdout=self.slave,
                 stderr=self.slave,
-                cwd=self.workspace_dir, 
+                cwd=self.workspace_dir,
                 preexec_fn=os.setsid,
-                universal_newlines=True
+                universal_newlines=True,
             )
             self.is_running = True
-            self.output_buffer.append(
-                f"[Session {self.session_id}] Started: {self.command}")
+            self.output_buffer.append(f"[Session {self.session_id}] Started: {self.command}")
             # Start a thread to read output
             threading.Thread(target=self._read_output, daemon=True).start()
         except Exception as e:  # pylint: disable=broad-except
@@ -251,9 +267,6 @@ class ShellSession:  # pylint: disable=too-many-instance-attributes
     def _read_output(self):
         """Read output from the process"""
         try:
-            # Buffer for incomplete lines
-            partial_line = ""
-            
             while self.is_running and self.master is not None:
                 try:
                     # Check if process has exited before reading
@@ -261,28 +274,12 @@ class ShellSession:  # pylint: disable=too-many-instance-attributes
                         self.is_running = False
                         break
                     
-                    # Read the output - increased buffer size to avoid cutting commands
+                    # Read raw output chunk from PTY (don't require newlines)
                     output = os.read(self.master, 4096).decode('utf-8', errors='replace')
-                    
-                    if output:
-                        # Combine with any partial line from previous read
-                        full_output = partial_line + output
-                        
-                        # Split into lines but keep the last partial line if it doesn't end with newline
-                        lines = full_output.split('\n')
-                        
-                        # If output doesn't end with newline, the last item is a partial line
-                        if not output.endswith('\n'):
-                            partial_line = lines[-1]
-                            lines = lines[:-1]
-                        else:
-                            partial_line = ""
-                        
-                        # Add complete lines to buffer
-                        for line in lines:
-                            if line:  # Don't add empty lines
-                                self.output_buffer.append(line)
-                        
+
+                    if output is not None and output != "":
+                        # Append raw chunk so interactive tools (nc, tail -f) show partial states
+                        self.output_buffer.append(output)
                         self.last_activity = time.time()
                     else:
                         # os.read() returned empty. This does NOT necessarily mean
@@ -294,17 +291,14 @@ class ShellSession:  # pylint: disable=too-many-instance-attributes
                         else:
                             # Process is confirmed dead or no process to check,
                             # and read returned empty. Session is over.
-                            if partial_line:
-                                # Add any remaining partial line
-                                self.output_buffer.append(partial_line)
                             self.is_running = False
                             break
                 except UnicodeDecodeError as e:
                     # Handle unicode decode errors gracefully
-                    self.output_buffer.append(f"[Session {self.session_id}] Unicode decode error in output")
+                    self.output_buffer.append(f"[Session {self.session_id}] Unicode decode error in output\n")
                     continue
                 except Exception as read_err: 
-                    self.output_buffer.append(f"Error reading output buffer: {str(read_err)}")
+                    self.output_buffer.append(f"Error reading output buffer: {str(read_err)}\n")
                     self.is_running = False
                     break
                     
@@ -448,8 +442,15 @@ def create_shell_session(command, ctf=None, container_id=None, **kwargs):
         session = ShellSession(command, ctf=ctf, workspace_dir=workspace_dir)
 
     session.start()
-    if session.is_running or (ctf and not session.is_running): 
+    if session.is_running or (ctf and not session.is_running):
+         # Register session and assign friendly ID
+         global SESSION_COUNTER
+         SESSION_COUNTER += 1
+         friendly = f"S{SESSION_COUNTER}"
+         session.friendly_id = friendly
          ACTIVE_SESSIONS[session.session_id] = session
+         FRIENDLY_SESSION_MAP[friendly] = session.session_id
+         REVERSE_SESSION_MAP[session.session_id] = friendly
          return session.session_id
     else:
          error_msg = session.get_output(clear=True)
@@ -467,6 +468,7 @@ def list_shell_sessions():
             continue
 
         result.append({
+            "friendly_id": getattr(session, 'friendly_id', None),
             "session_id": session_id,
             "command": session.command,
             "running": session.is_running,
@@ -477,21 +479,56 @@ def list_shell_sessions():
     return result
 
 
+def _resolve_session_id(session_identifier):
+    """Resolve a session identifier which may be a real ID, a friendly alias (S1/#1/1), or 'last'."""
+    if not session_identifier:
+        return None
+    sid = str(session_identifier).strip()
+    # Accept patterns: S1, s1, #1, 1
+    key = sid
+    if sid.lower() == 'last':
+        # Return the most recently created active session
+        if not ACTIVE_SESSIONS:
+            return None
+        # Pick by created_at
+        latest = None
+        latest_t = -1
+        for _sid, sess in ACTIVE_SESSIONS.items():
+            if hasattr(sess, 'created_at') and sess.created_at > latest_t and sess.is_running:
+                latest = _sid
+                latest_t = sess.created_at
+        return latest or next(iter(ACTIVE_SESSIONS.keys()))
+    if sid.startswith('#'):
+        key = f"S{sid[1:]}"
+    elif sid.isdigit():
+        key = f"S{sid}"
+    elif sid.upper().startswith('S') and sid[1:].isdigit():
+        key = sid.upper()
+    # Real ID direct
+    if sid in ACTIVE_SESSIONS:
+        return sid
+    # Friendly map
+    if key in FRIENDLY_SESSION_MAP:
+        return FRIENDLY_SESSION_MAP[key]
+    return None
+
 def send_to_session(session_id, input_data):
     """Send input to a specific session"""
-    if session_id not in ACTIVE_SESSIONS:
+    resolved = _resolve_session_id(session_id)
+    if not resolved or resolved not in ACTIVE_SESSIONS:
         return f"Session {session_id} not found"
 
-    session = ACTIVE_SESSIONS[session_id]
+    session = ACTIVE_SESSIONS[resolved]
     return session.send_input(input_data)
 
 
 def get_session_output(session_id, clear=True, stdout=True):
     """Get output from a specific session"""
-    if session_id not in ACTIVE_SESSIONS:
+    resolved = _resolve_session_id(session_id)
+    if not resolved or resolved not in ACTIVE_SESSIONS:
         return f"Session {session_id} not found"
 
-    session = ACTIVE_SESSIONS[session_id]
+    session = ACTIVE_SESSIONS[resolved]
     output = session.get_output(clear)
     
     return output
@@ -499,13 +536,18 @@ def get_session_output(session_id, clear=True, stdout=True):
 
 def terminate_session(session_id):
     """Terminate a specific session"""
-    if session_id not in ACTIVE_SESSIONS:
+    resolved = _resolve_session_id(session_id)
+    if not resolved or resolved not in ACTIVE_SESSIONS:
         return f"Session {session_id} not found or already terminated."
 
-    session = ACTIVE_SESSIONS[session_id]
+    session = ACTIVE_SESSIONS[resolved]
     result = session.terminate()
-    if session_id in ACTIVE_SESSIONS:
-        del ACTIVE_SESSIONS[session_id]
+    if resolved in ACTIVE_SESSIONS:
+        del ACTIVE_SESSIONS[resolved]
+        # Clean friendly maps
+        friendly = REVERSE_SESSION_MAP.pop(resolved, None)
+        if friendly:
+            FRIENDLY_SESSION_MAP.pop(friendly, None)
     return result
 
 
@@ -1501,12 +1543,13 @@ def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arg
     try:
         # If session_id is provided, send command to that session
         if session_id:
-            if session_id not in ACTIVE_SESSIONS:
+            resolved_session_id = _resolve_session_id(session_id)
+            if not resolved_session_id or resolved_session_id not in ACTIVE_SESSIONS:
                 # Switch back to idle mode before returning error
                 stop_active_timer()
                 start_idle_timer()
                 return f"Session {session_id} not found"
-            session = ACTIVE_SESSIONS[session_id]
+            session = ACTIVE_SESSIONS[resolved_session_id]
             result = session.send_input(command) # Send the raw command string
             
             # Wait for the command to execute and capture output
@@ -1541,16 +1584,17 @@ def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arg
             
             # Always show the session output after sending input using the counter mechanism
             # Generate unique counter for this session input command
-            counter_key = f"session_input_{session_id}"
+            counter_key = f"session_input_{resolved_session_id}"
             if counter_key not in SESSION_OUTPUT_COUNTER:
                 SESSION_OUTPUT_COUNTER[counter_key] = 0
             SESSION_OUTPUT_COUNTER[counter_key] += 1
             
             # Create args for display
+            label = getattr(session, 'friendly_id', None) or resolved_session_id
             session_args = {
                 "command": command,
                 "args": "",
-                "session_id": session_id,
+                "session_id": label,
                 "call_counter": SESSION_OUTPUT_COUNTER[counter_key],  # This ensures uniqueness
                 "input_to_session": True,  # Flag to identify this as session input
             }
@@ -1582,7 +1626,7 @@ def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arg
                 "status": "completed",
                 "environment": env_type,
                 "host": session.workspace_dir,
-                "session_id": session_id,
+                "session_id": label,
                 "wait_time": elapsed,
                 "new_output_detected": new_output_detected
             }
@@ -1610,7 +1654,7 @@ def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arg
             if output and output.strip():
                 return output
             else:
-                return f"Command sent to session {session_id}. No output captured."
+                return f"Command sent to session {label}. No output captured."
 
         # 2. Determine Execution Environment (Container > CTF > SSH > Local)
         active_container = os.getenv("CAI_ACTIVE_CONTAINER", "")
@@ -1637,10 +1681,11 @@ def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arg
                 from cai.util import cli_print_tool_output
                 
                 # Create args for display
+                label = getattr(ACTIVE_SESSIONS.get(new_session_id), 'friendly_id', None) or new_session_id
                 session_creation_args = {
                     "command": command,
                     "args": "",
-                    "session_id": new_session_id,
+                    "session_id": label,
                     "async_mode": True
                 }
                 
@@ -1649,7 +1694,7 @@ def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arg
                     "status": "session_created",
                     "environment": f"Container({container_id[:12]})",
                     "host": container_workspace,
-                    "session_id": new_session_id
+                    "session_id": label
                 }
                 
                 # Get initial output if any
@@ -1660,7 +1705,7 @@ def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arg
                     initial_output = session.get_new_output(mark_position=True)
                 
                 # Format the output message
-                output_msg = f"Started async session {new_session_id} in container {container_id[:12]}. Use this ID to interact."
+                output_msg = f"Started async session {label} in container {container_id[:12]}. Use this ID to interact."
                 if initial_output:
                     output_msg += f"\n\n{initial_output}"
                 
@@ -1679,7 +1724,7 @@ def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arg
                 # For async sessions, switch back to idle mode after session creation
                 stop_active_timer()
                 start_idle_timer()
-                return f"Started async session {new_session_id} in container {container_id[:12]}. Use this ID to interact." # noqa E501
+                return f"Started async session {label} in container {container_id[:12]}. Use this ID to interact." # noqa E501
 
             # Handle Streaming Container Execution
             if stream:
@@ -2247,10 +2292,11 @@ def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arg
             actual_workspace = session.workspace_dir if session else "unknown"
             
             # Create args for display
+            label = getattr(session, 'friendly_id', None) or new_session_id
             session_creation_args = {
                 "command": command,
                 "args": "",
-                "session_id": new_session_id,
+                "session_id": label,
                 "async_mode": True
             }
             
@@ -2259,7 +2305,7 @@ def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arg
                 "status": "session_created",
                 "environment": "Local",
                 "host": os.path.basename(actual_workspace),
-                "session_id": new_session_id
+                "session_id": label
             }
             
             # Get initial output if any
@@ -2269,7 +2315,7 @@ def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arg
                 initial_output = session.get_new_output(mark_position=True)
             
             # Format the output message
-            output_msg = f"Started async session {new_session_id} locally. Use this ID to interact."
+            output_msg = f"Started async session {label} locally. Use this ID to interact."
             if initial_output:
                 output_msg += f"\n\n{initial_output}"
             
@@ -2286,7 +2332,7 @@ def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arg
             # For async, switch back to idle mode after session creation
             stop_active_timer()
             start_idle_timer()
-            return f"Started async session {new_session_id} locally. Use this ID to interact."
+            return f"Started async session {label} locally. Use this ID to interact."
 
         # Handle Synchronous Execution Locally
         # Pass stream parameter as provided (not always True)

@@ -51,6 +51,7 @@ From here on, type on `CAI` and start your security exercise. Best way to learn 
     | CAI_AGENT_TYPE | Specify the agents to use (e.g. "boot2root") |
     | CAI_PRICE_LIMIT | Price limit for the conversation in dollars |
     | CAI_WORKSPACE | Defines the name of the workspace |
+    | CAI_GUARDRAILS | Enable/disable guardrails for prompt injection protection (default: true) |
 
 
 ## Setting Environment Variables
