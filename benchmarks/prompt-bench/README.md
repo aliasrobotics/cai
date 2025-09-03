@@ -86,7 +86,7 @@ prompt-bench/                  # Root directory of the project
 
 ## Prompt Learning Methods
 
-One of the objectives of this projec is to compare AI models in the CAI framework using different prompt methods.  
+One of the objectives of this project is to compare AI models in the CAI framework using different prompt methods.  
 For this purpose, a YAML file was created containing different types of system and user prompts explained in the following table. 
 
 For more details of the full text in the prompts, see the file [prompts.yml](prompts.yml).
@@ -111,17 +111,17 @@ response blocks (e.g., 12 blocks = 3 turns).
 - **Total seconds**: Sum of idle seconds and active seconds.
 - **Prompt tokens**: Number of tokens in the input prompt sent to the model.
 - **Completion tokens**: Number of tokens generated in the LLMs response.
-- **Total tokens**: Sum of prompt tokens and completion tokens
+- **Total tokens**: Sum of prompt tokens and completion tokens.
 - **Total assistant messages**: Number of text outputs generated in the LLMs response.
 - **Total assistant tools**: Number of tools (payloads in this case) executed in the
-LLMs response
+LLMs response.
 ### Sum-Based Metrics
 - **Interrupted lab status**: Number of labs where the model failed to respond,
 remaining indefinitely in a thinking state.
 - **Not solved lab status**: Number of labs where the model completed the interaction
 but failed to solve the challenge.
 - **Solved lab status**: Number of labs where the model completed the interaction
-and solved the challenge
+and solved the challenge.
 
 ### Example of performance results. 
 The following  example table summarizes the performance metrics of **DeepSeek-V3** and **GPT-4o** when solving a total of  15 security labs (5 each on SQL Injection, Cross-Site Scripting, and Cross-Site Request Forgery).  
