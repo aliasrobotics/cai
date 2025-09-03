@@ -148,6 +148,9 @@ def create_folder_and_move_logs(lab,section,agent,prompt_type,model,lab_status):
 
 async def run(mcp_server: MCPServer):
     
+    # Create folder log if it doesn't exist
+    os.makedirs("logs", exist_ok=True)
+    
     #configuration to write terminal output to a file
     log_file_path = "terminal_output"
     log_name_prefix = f"{SECTION}.{AGENT}.{PROMPT_TYPE}"
