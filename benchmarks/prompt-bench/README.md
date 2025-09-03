@@ -80,6 +80,8 @@ prompt-bench/                  # Root directory of the project
 ├── server.py                     # Main execution script (it uses Burp Suite MCP server to interact with labs)
 ├── metrics.ipynb                 # Notebook for evaluating metrics
 └── prompts.yml                   # Prompt templates
+└── .env.example                  # env file example
+└── requirements.txt              # requirements file for python libs
 ```
 
 ## Prompt Learning Methods
