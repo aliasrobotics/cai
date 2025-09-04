@@ -64,7 +64,7 @@ The program follows a sequence of steps to evaluate the models.
 
 ## Project Folder Structure
 ```plaintext
-prompt-bench/                  # Root directory of the project
+Prompt2PwnBench/                  # Root directory of the project
 ├── logs/                         # CAI log outputs
 ├── results/                      # Final experiment logs
 ├── terminal-output/              # terminal output sessions
