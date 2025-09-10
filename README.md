@@ -275,6 +275,7 @@ cai  # first launch it can take up to 30 seconds
 ```
 
 ### Ubuntu 24.04
+*Note: If you get a `Unable to locate package python3.12-venv` you might need to install python3.12 from source.*
 ```bash
 sudo apt-get update && \
     sudo apt-get install -y git python3-pip python3.12-venv
