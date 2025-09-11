@@ -968,6 +968,14 @@ class OpenAIChatCompletionsModel(Model):
                 # Store pending tool calls but don't add to history yet
                 if not hasattr(self, "_pending_tool_calls"):
                     self._pending_tool_calls = {}
+                
+                # Fix Google Gemini OpenAI compatibility issues.
+                # When using the OpenAI-compatible API to call tools with Google Gemini
+                # tool_call.id is returned as an empty string.
+                for tool_call in assistant_msg.tool_calls:
+                    if tool_call.id is None or tool_call.id == "":
+                        import uuid
+                        tool_call.id = uuid.uuid4().hex[:16]
 
                 for tool_call in assistant_msg.tool_calls:
                     # Handle empty arguments before storing
