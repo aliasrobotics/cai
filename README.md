@@ -275,7 +275,6 @@ cai  # first launch it can take up to 30 seconds
 ```
 
 ### Ubuntu 24.04
-*Note: If you get a `Unable to locate package python3.12-venv` you might need to install python3.12 from source.*
 ```bash
 sudo apt-get update && \
     sudo apt-get install -y git python3-pip python3.12-venv
@@ -1045,7 +1044,12 @@ CAI itself is not a profit-seeking initiative. Our goal is to build a sustainabl
 
 </details>
 
+<details><summary>I get a `Unable to locate package python3.12-venv` when installing the prerequisites on my debian based system!</summary>
 
+The easiest way to get around this is to simply install [`python3.12`](https://www.python.org/downloads/release/python-3120/) from source.
+
+
+</details>
 
 ## Citation
 If you want to cite our work, please use the following:
