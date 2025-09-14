@@ -516,7 +516,7 @@ result = await Runner.run(agent, message)
 ```
 
 
-You may find different [tools](cai/tools). They are grouped in 6 major categories inspired by the security kill chain [^2]:
+You may find different [tools](tools). They are grouped in 6 major categories inspired by the security kill chain [^2]:
 
 1. Reconnaissance and weaponization - *reconnaissance*  (crypto, listing, etc)
 2. Exploitation - *exploitation*
