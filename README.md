@@ -516,7 +516,7 @@ result = await Runner.run(agent, message)
 ```
 
 
-You may find different [tools](cai/tools). They are grouped in 6 major categories inspired by the security kill chain [^2]:
+You may find different [tools](tools). They are grouped in 6 major categories inspired by the security kill chain [^2]:
 
 1. Reconnaissance and weaponization - *reconnaissance*  (crypto, listing, etc)
 2. Exploitation - *exploitation*
@@ -1044,7 +1044,12 @@ CAI itself is not a profit-seeking initiative. Our goal is to build a sustainabl
 
 </details>
 
+<details><summary>I get a `Unable to locate package python3.12-venv` when installing the prerequisites on my debian based system!</summary>
 
+The easiest way to get around this is to simply install [`python3.12`](https://www.python.org/downloads/release/python-3120/) from source.
+
+
+</details>
 
 ## Citation
 If you want to cite our work, please use the following:
