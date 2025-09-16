@@ -385,6 +385,8 @@ cai
 
 CAI leverages the `.env` file to load configuration at launch. To facilitate the setup, the repo provides an exemplary [`.env.example`](.env.example) file provides a template for configuring CAI's setup and your LLM API keys to work with desired LLM models.
 
+**File Location:** CAI looks for the `.env` file in the current directory where you execute the command, and if it doesn't find it, it searches upward in the directory hierarchy. Since you run CAI from some subdirectory of `/Users/me/Documents/`, it finds the file `/Users/me/Documents/.env`. The virtual environment only contains the installed Python packages, not application configurations like `.env` files.
+
 :warning: Important:
 
 CAI does NOT provide API keys for any model by default. Don't ask us to provide keys, use your own or host your own models.
@@ -704,6 +706,8 @@ From here on, type on `CAI` and start your security exercise. Best way to learn 
 
 ### Environment Variables
 For using private models, you are given a [`.env.example`](.env.example) file. Copy it and rename it as `.env`. Fill in your corresponding API keys, and you are ready to use CAI.
+
+**File Location:** CAI looks for the `.env` file in the current directory where you execute the command. If you run CAI from some subdirectory of `/Users/me/Documents/`, it finds the file `/Users/me/Documents/.env`. The virtual environment only contains the installed Python packages, not application configurations like `.env` files.
  <details>
 <summary>List of Environment Variables</summary>
 
@@ -872,6 +876,14 @@ See the following issues that treat this topic in more detail:
 - https://github.com/aliasrobotics/cai/issues/76
 - https://github.com/aliasrobotics/cai/issues/83
 - https://github.com/aliasrobotics/cai/issues/82
+
+</details>
+
+<details><summary>Where does CAI look for the .env file?</summary>
+
+CAI looks for the .env file in the current directory where you execute the command. If you run CAI from some subdirectory of /Users/me/Documents/, it finds the file /Users/me/Documents/.env
+
+The virtual environment only contains the installed Python packages, not application configurations like .env files.
 
 </details>
 

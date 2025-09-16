@@ -134,6 +134,8 @@ cai
 
 CAI leverages the `.env` file to load configuration at launch. To facilitate the setup, the repo provides an exemplary `.env.example` file provides a template for configuring CAI's setup and your LLM API keys to work with desired LLM models.
 
+**File Location:** CAI looks for the `.env` file in the current directory where you execute the command. If you run CAI from some subdirectory of `/Users/me/Documents/`, it finds the file `/Users/me/Documents/.env`. The virtual environment only contains the installed Python packages, not application configurations like `.env` files.
+
 ```bash
 OPENAI_API_KEY="sk-1234" 
 # OPENAI_API_KEY MUST BE FILLED-IN. 
