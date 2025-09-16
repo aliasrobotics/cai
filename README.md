@@ -749,6 +749,22 @@ OPENROUTER_API_KEY=<sk-your-key>  # note, add yours
 OPENROUTER_API_BASE=https://openrouter.ai/api/v1
 ```
 
+### Azure OpenAI
+
+The Cybersecurity AI (CAI) platform integrates seamlessly with Azure OpenAI, enabling organizations to run CAI against enterprise-hosted models (e.g., gpt-4o). This pathway is ideal for teams that must operate within Azure governance while leveraging advanced model capabilities.
+To enable Azure OpenAI support in CAI, configure your environment by adding the following entries to your .env. This ensures CAI can reach your Azure deployment endpoint and authenticate correctly.
+
+```bash
+CAI_AGENT_TYPE=redteam_agent
+CAI_MODEL=azure/<model-name-deployed>
+# Required: keep non-empty even when using Azure
+OPENAI_API_KEY=dummy
+# Azure credentials and endpoint
+AZURE_API_KEY=<your-azure-openai-key>
+AZURE_API_BASE=https://<resource>.openai.azure.com/openai/deployments/<deployment-name>/chat/completions?api-version=2025-01-01-preview
+```
+
+
 ### MCP
 
 CAI supports the Model Context Protocol (MCP) for integrating external tools and services with AI agents. MCP is supported via two transport mechanisms:
