@@ -1,70 +1,69 @@
-# Benchmarking Agentic AI in Cybersecurity: Comparing Models and Prompting Methods in Lab Challenges with CAI.
+# Benchmarking Agentic AI in Cybersecurity: Comparing Models and CAI Agents in Lab Challenges of PortSwigger Web Academy.
 
 ## Introduction
 
-This project explores and evaluates the integration of **Large Language Models (LLMs)** into web application attack scenarios using the **Cybersecurity AI (CAI)** framework. The goal is to test various prompting methods and different LLMs to assess their effectiveness in identifying vulnerabilities within web applications.
+This project explores and evaluates the integration of **Large Language Models (LLMs)** into web application attack scenarios using the **Cybersecurity AI (CAI)** framework. The goal is to test various predefined agents in CAI and different LLMs to assess their effectiveness in identifying vulnerabilities within web applications.
 
 **Fully Automated (No HITL):**  
-The pipeline is designed to be **fully automated, with no Human-in-the-Loop (HITL)**. When the agent attempts to solve the challenge labs, **no human interaction with the model is required**; all decisions, iterations, and actions are executed autonomously according to the experiment’s configuration and the prompt templates.
+The pipeline is designed to be **fully automated, with no Human-in-the-Loop (HITL)**. When the agent attempts to solve the challenge labs, **no human interaction with the model is required**; all decisions, iterations, and actions are executed autonomously according to the experiment’s configuration.
 
 
 ## Objectives
 
 This project focuses on the following objectives:
 
-- Compare the performance of different LLMs within the [**CAI Framework**](https://aliasrobotics.github.io/cai/).
+- Compare the performance of agents using different LLMs within the [**CAI Framework**](https://aliasrobotics.github.io/cai/).
 - Use [*PortSwigger labs*](https://portswigger.net/web-security) as an environment to test the LLMs.
-- Evaluate the effectiveness of the models in identifying and exploiting common web vulnerabilities.
-- Compare the models using prompting methods such as **zero-shot**, **few-shot**, and **chain-of-thought**.
+- Evaluate the effectiveness of the agents in identifying and exploiting common web vulnerabilities.
 - Assess performance using metrics such as **turns, time, cost, tokens,** and **number of payloads (tools) generated**.
-- Create a reproducible framework to evaluate the LLMs.
+- Create a reproducible framework to evaluate the agents.
 
 ## Methodolody
 The program follows a sequence of steps to evaluate the models.
 
-1. The user configures the variables for the LLM, the prompt method, and the PortSwigger lab environment.
+1. The user configures the variables inside the .env file.
 2. The PortSwigger bot extracts the data from the labs.
-3. The prompt method templates are formatted with the lab information.
-4. The custom AI agent in CAI runs and attempts to solve the lab challenges.
+3. The main user prompt is formatted with the lab information.
+4. The CAI agent runs and attempts to solve the lab challenges.
 5. The PortSwigger bot verifies if each lab is solved.
 6. The logs of the labs and terminal outputs are saved.
 7. After the agent completes all tasks, the lab logs can be evaluated using the metrics.ipynb notebook.
 
 ## Steps for Reproducibility
 
-1. Create a `.env` file in the main folder. For more details, see [**.env.example**](.env.example) file.  
-2. Configure the variables related to the PortSwigger account and the LLM used. You can create a PortSwigger account [here](https://portswigger.net/web-security).
+1. Create a PortSwigger Web Academy account [here](https://portswigger.net/web-security).
+2. Install Burp Suite Community in you local machine [here](https://portswigger.net/burp/communitydownload).
 3. Install the Python dependencies with the command:  
    ```bash
    pip install -r requirements.txt
    ```
-4. Configure the labs and agent parameters in the **main.py** or **server.py** script as follows. To see more available sections, see  [**topic_prefixes.json**](utils/topics_prefixes.json) file.
-   ```python
-    SECTION = "sql-injection"  # Change this to the type of lab
-    N_LABS = 4                 # To test all the labs in the section, change this to -1
-    AGENT = "webbounty"
-    PROMPT_TYPE = "zero-shot"  # Change this to the desired prompt method
+4. Create a `.env` file in the main folder. For more details, see [**.env.example**](.env.example) file.  
+
+5. Configure the environmet variables as follows. 
+   ```python             
+   PORTSWIGGER_USERNAME='email' # Email used to log in on PortSwigger Web Academy
+   PORTSWIGGER_PASSWORD='password' # Password used to log in on PortSwigger Web Academy
+   PORTSWIGGER_SECTION='sql-injection' # Change this to the type of lab
+   NUMBER_OF_LABS=10 # To test all the labs in the section, change this to -1
+   CAI_MODEL='openai/gpt-4o' # LLMs used in CAI
+   CAI_AGENT="bug_bounter_agent" # Name of the CAI agent. Available options are (blueteam_agent, bug_bounter_agent, redteam_agent)
+   BURPSUITE_SERVER_URL="http://127.0.0.1:9876/sse" # Local url of the MCP server for burpsuite
    ```
-   To see more information about the prompt templates by type, see the [**promts.yml**](prompts.yml) file.
-5. Open a terminal in the main folder and run the main script with the command:
+   To see more available labs sections, see  [**topic_prefixes.json**](utils/topics_prefixes.json) file.
+
+   To configure the Burp Suite MCP server to interact with the labs, you need first to install the MCP server extension. More information on this [link](https://portswigger.net/bappstore/9952290f04ed4f628e624d0aa9dccebc).
+
+6. Open Burp Suite Community Edition Desktop application.
+
+7. Open a terminal in the main folder and run the main script with the command:
     ```bash
     python main.py
     ```
-    In case you want to run the script using Burp Suite MCP server to interact with the labs, you need first to install the MCP server. More information on this [link](https://portswigger.net/bappstore/9952290f04ed4f628e624d0aa9dccebc).
-    Then, set up the variable SERVER_URL in the script server.py as follows:
-    ```python
-    SERVER_URL = "http://127.0.0.1:9876/sse"
-    ```
-    Finally run the script with python.
-     ```bash
-    python server.py
-    ```
-6. Once the script stops, create the metrics table and graphs running the notebook
-[**metrics.ipynb**](metrics.ipynb).
+8. Once the script stops, create the metrics table and graphs running the notebook [**metrics.ipynb**](metrics.ipynb).
 
 ## Project Folder Structure
 ```plaintext
-Prompt2PwnBench/                  # Root directory of the project
+Agent2PwnBench/                  # Root directory of the project
 ├── logs/                         # CAI log outputs
 ├── results/                      # Final experiment logs
 ├── terminal-output/              # terminal output sessions
@@ -75,31 +74,30 @@ Prompt2PwnBench/                  # Root directory of the project
 │   ├── helpers.py                # General helper functions
 │   ├── portswiggerbot.py         # Automation for PortSwigger bot
 │   └── topics-prefixes.json      # Topic prefixes for PortSwigger bot
-│   └── portswigger-labs.json     # Metadata of Portswigger Web Academy labs
-├── main.py                       # Main execution script (it uses simple curl tools to interact with labs)
-├── server.py                     # Main execution script (it uses Burp Suite MCP server to interact with labs)
+│   └── labs.json                 # Metadata of Portswigger Web Academy labs
+├── main.py                       # Main execution script 
 ├── metrics.ipynb                 # Notebook for evaluating metrics
 └── prompts.yml                   # Prompt templates
 └── .env.example                  # env file example
 └── requirements.txt              # requirements file for python libs
 ```
 
-## Prompt Learning Methods
+## CAI Agents and prompts
 
-One of the objectives of this project is to compare AI models in the CAI framework using different prompt methods.  
-For this purpose, a YAML file was created containing different types of system and user prompts explained in the following table. 
+One of the objectives of this project is to compare CAI agents and their default prompts to measure their performance when solving the labs.  
+For this purpose, in the following table there is a brief description of the CAI agents available to use in this benchmark. 
 
-For more details of the full text in the prompts, see the file [prompts.yml](prompts.yml).
+| **Name**             | **System Prompt Link** | **User Prompt Link** | 
+|-------------------------|------------|------------|
+| Blue Team Agent         | [click here](https://github.com/aliasrobotics/cai/blob/main/src/cai/prompts/system_blue_team_agent.md)  | [click here](prompts.yml)  |
+| Red Team Agent          | [click here](https://github.com/aliasrobotics/cai/blob/main/src/cai/prompts/system_red_team_agent.md)   | [click here](prompts.yml)  |
+| Bug Bounter Agent       | [click here](https://github.com/aliasrobotics/cai/blob/main/src/cai/prompts/system_bug_bounter.md) |  [click here](prompts.yml) |
 
-| **Method**             | **Prompt** | **Description**                                                                 |
-|-------------------------|------------|---------------------------------------------------------------------------------|
-| Zero-shot               | System     | Gives the model the role of bug bounty agent for vulnerabilities of PortSwigger labs |
-| Zero-shot               | User       | Gives the model the task to attack the target lab without any example           |
-| Few-shot                | User       | Gives the model the task to attack the target lab with a small number of examples within the prompt itself to guide its response |
-| Chain-of-thought (CoT)  | User       | Gives the model the task to attack the target lab with a step-by-step explanation |
+Custom user prompt templates can be modified or created in the [**prompts.yml**](prompts.yml) to improve the performance of the CAI agents.
 
-New custom prompt templates can be created using the same structure explained above.
+For more details of all the CAI agents, check this [link](https://github.com/aliasrobotics/cai/tree/main/src/cai/agents).
 
+For more details of all the CAI agents prompts, check this [link](https://github.com/aliasrobotics/cai/tree/main/src/cai/prompts).
 
 ## Metrics and Results
 The following metrics are used to compare the models performance, and they are calculated in the [**metrics.ipynb**](metrics.ipynb) file.
@@ -124,21 +122,19 @@ but failed to solve the challenge.
 and solved the challenge.
 
 ### Example of performance results. 
-The following  example table summarizes the performance metrics of **DeepSeek-V3** and **GPT-4o** when solving a total of  15 security labs (5 each on SQL Injection, Cross-Site Scripting, and Cross-Site Request Forgery).  
-The results are broken down by different prompting strategies and include interaction times, token usage, and assistant behavior statistics. For more examples  with graphs and tables you can check the [**metrics.ipynb**](metrics.ipynb) file.
+The following  example table summarizes the performance metrics of **GPT-4o** when solving a total of 2 labs on SQL Injection, using 3 different CAI Agents.
 
-| prompt           | model                  | avg_turns | avg_active_seconds | avg_idle_seconds | avg_total_seconds | avg_prompt_tokens | avg_completion_tokens | avg_total_tokens | avg_interaction_costs | avg_total_assistant_messages | avg_total_assistant_tools |
-|------------------|------------------------|-----------|--------------------|------------------|-------------------|-------------------|-----------------------|------------------|-----------------------|-----------------------------|---------------------------|
-| chain-of-thought | deepseek-deepseek-chat | 2.7       | 645.5              | 149.9            | 795.5             | 23578.5           | 1674.0                | 25252.5          | 0.0                   | 2.7                         | 1.7                       |
-| chain-of-thought | openai-gpt-4o          | 1.2       | 70.0               | 150.9            | 220.9             | 8774.1            | 1034.3                | 9808.5           | 0.0                   | 1.1                         | 0.2                       |
-| few-shot         | deepseek-deepseek-chat | 2.1       | 668.7              | 88.6             | 757.3             | 24301.0           | 1779.3                | 26080.3          | 0.0                   | 2.2                         | 1.2                       |
-| few-shot         | openai-gpt-4o          | 1.9       | 167.9              | 222.3            | 390.1             | 24134.3           | 780.7                 | 24914.9          | 0.0                   | 1.3                         | 0.9                       |
-| zero-shot        | deepseek-deepseek-chat | 2.7       | 634.1              | 209.0            | 843.1             | 16071.9           | 1392.5                | 17464.3          | 0.0                   | 2.7                         | 1.7                       |
-| zero-shot        | openai-gpt-4o          | 2.9       | 812.9              | 163.4            | 976.3             | 23446.7           | 872.8                 | 24319.5          | 0.0                   | 1.8                         | 2.1                       |
+The results are broken down by different CAI agents and include interaction times, token usage, and assistant behavior statistics. For more examples  with graphs and tables you can check the [**metrics.ipynb**](metrics.ipynb) file.
+
+| agent             | section       | model         |   avg_turns |   avg_active_seconds |   avg_idle_seconds |   avg_total_seconds |   avg_prompt_tokens |   avg_completion_tokens |   avg_total_tokens |   avg_interaction_costs |   avg_total_assistant_messages |   avg_total_assistant_tools |   total_interrupted |   total_not_solved |   total_solved |
+|:------------------|:--------------|:--------------|------------:|---------------------:|-------------------:|--------------------:|--------------------:|------------------------:|-------------------:|------------------------:|-------------------------------:|----------------------------:|--------------------:|-------------------:|---------------:|
+| blueteam_agent    | sql-injection | openai-gpt-4o |         1   |                 32.5 |                 86 |               118.5 |              2251.5 |                   548.5 |             2800   |                       0 |                            1   |                         0   |                   0 |                  2 |              0 |
+| bug_bounter_agent | sql-injection | openai-gpt-4o |         4.5 |                253.5 |                259 |               512.5 |             41288   |                   631.5 |            41919.5 |                       0 |                            2   |                         3.5 |                   0 |                  1 |              1 |
+| redteam_agent     | sql-injection | openai-gpt-4o |         2   |                 64   |                292 |               356   |              9930.5 |                   691   |            10621.5 |                       0 |                            1.5 |                         1   |                   0 |                  0 |              2 |
 
 
 ## Portswigger Web Academy labs
-This project allows you to perform evaluations with any of the following labs:
+This project allows you to perform evaluations with any of the following labs. For more details, check the [**labs.json**](utils/labs.json).
 
 | Section | Lab Title | URL |
 |---------|-----------|-----|

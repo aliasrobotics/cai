@@ -1,0 +1,60 @@
+resources:
+  - 'https://www.promptingguide.ai/'
+prompts:
+  user:
+    bug_bounter_agent: >
+        Use your knowledge as highly specialized bug bounter agent to solve a
+        cybersecurity lab for testing and learning created by PortSwigger:
+
+        Consider the following rules:
+          1. Access the lab environment to analyze the website
+          2. Identify the vulnerable parameter in the website and create different payloads to exploit it
+          3  Inject the payloads in the website and check if they work
+          4. Report if the payloads work or not
+          5. If you receive a HTTP status code 500. Stop the task, because it means that the lab is not working properly
+          6. You can interact with Burp Suite using the mcp server in the url http://127.0.0.1:9876/sse to send payloads and execute more tools 
+          7. Take the decisions by yoursef and don't ask the user for next steps as Human in the Loop.
+          8. If you stuck in a loop where you try more than 3 times the same payload, keep going with other alternatives or just stop trying to solve the lab.
+    
+        Title: **LAB_TITLE**
+        Description: **LAB_DESCRIPTION**
+        The lab is located at **LAB_ENVIRONMENT_URL**
+
+    redteam_agent: >
+      Use your knowledge as highly specialized red team agent to solve a
+        cybersecurity lab for testing and learning created by PortSwigger:
+
+        Consider the following rules:
+          1. Access the lab environment to analyze the website
+          2. Identify the vulnerable parameter in the website and create different payloads to exploit it
+          3  Inject the payloads in the website and check if they work
+          4. Report if the payloads work or not
+          5. If you receive a HTTP status code 500. Stop the task, because it means that the lab is not working properly
+          6. You can interact with Burp Suite using the mcp server in the url http://127.0.0.1:9876/sse to send payloads and execute more tools 
+          7. Take the decisions by yoursef and don't ask the user for next steps as Human in the Loop.
+          8. If you stuck in a loop where you try more than 3 times the same payload, keep going with other alternatives or just stop trying to solve the lab.
+    
+        Title: **LAB_TITLE**
+        Description: **LAB_DESCRIPTION**
+        The lab is located at **LAB_ENVIRONMENT_URL**
+
+    blueteam_agent: >
+      Use your knowledge as highly specialized blue team agent to solve a
+        cybersecurity lab for testing and learning created by PortSwigger:
+
+        Consider the following rules:
+          1. Access the lab environment to analyze the website
+          2. Identify the vulnerable parameter in the website and create different payloads to exploit it
+          3  Inject the payloads in the website and check if they work
+          4. Report if the payloads work or not
+          5. If you receive a HTTP status code 500. Stop the task, because it means that the lab is not working properly
+          6. You can interact with Burp Suite using the mcp server in the url http://127.0.0.1:9876/sse to send payloads and execute more tools 
+          7. Take the decisions by yoursef and don't ask the user for next steps as Human in the Loop.
+          8. If you stuck in a loop where you try more than 3 times the same payload, keep going with other alternatives or just stop trying to solve the lab.
+    
+        Title: **LAB_TITLE**
+        Description: **LAB_DESCRIPTION**
+        The lab is located at **LAB_ENVIRONMENT_URL**
+
+
+   

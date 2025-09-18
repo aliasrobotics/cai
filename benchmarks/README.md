@@ -13,7 +13,7 @@ Currently, this are the benchmarks included:
 | [CTIBench](https://github.com/xashru/cti-bench) | Benchmark focused on evaluating LLM models' capabilities in understanding and processing Cyber Threat Intelligence (CTI) information. |
 | [PentestPerf](https://gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf) | An internal benchmarking framework that measures penetration testing capabilities of LLM models in a proprietary set of IT, OT and robotics scenarios. Reach out if you wish to cooperate in this direction. |
 | [CyberPII-Bench](https://github.com/aliasrobotics/cai/tree/main/benchmarks/cyberPII-bench/) | Benchmark designed to evaluate the ability of LLM models to maintain privacy and handle **Personally Identifiable Information (PII)** in cybersecurity contexts. Built from real-world data generated during offensive hands-on exercises conducted with **CAI (Cybersecurity AI)**. |
-| [Prompt2PwnBench](https://github.com/aliasrobotics/cai/tree/main/benchmarks/Prompt2PwnBench/) | Benchmark designed to evaluate a fully automated integration of LLMs (Large Language Models) with no HITL (Human-in-the-Loop) into web application attack scenarios using **CAI (Cybersecurity AI)**. Its goal is to test various prompting strategies and different LLMs to assess their effectiveness in identifying vulnerabilities within web applications. |
+| [Agent2PwnBench](https://github.com/aliasrobotics/cai/tree/main/benchmarks/Agent2PwnBench/) | Benchmark designed to evaluate a fully automated integration of LLMs with no HITL (Human-in-the-Loop) into web application attack scenarios using **CAI**. Its goal is to test various CAI agents and different LLMs to assess their effectiveness in identifying vulnerabilities within PortSwigger Web Academy Labs. |
 
 
 
