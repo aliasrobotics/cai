@@ -125,7 +125,7 @@ Cybersecurity AI (CAI) is a lightweight, open-source framework that empowers sec
 
 ### 📊 Research Impact
 - Pioneered LLM-powered AI Security with PentestGPT, establishing the foundation for the `Cybersecurity AI` research domain [![arXiv](https://img.shields.io/badge/arXiv-2308.06782-b31b1b.svg)](https://arxiv.org/pdf/2308.06782)
-- Established the `Cybersecurity AI` research line with **4 peer-reviewed papers and technical reports** and active research collaborations [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-b31b1b.svg)](https://arxiv.org/pdf/2504.06017) [![arXiv](https://img.shields.io/badge/arXiv-2506.23592-b31b1b.svg)](https://arxiv.org/abs/2506.23592) [![arXiv](https://img.shields.io/badge/arXiv-2508.13588-b31b1b.svg)](https://arxiv.org/abs/2508.13588) [![arXiv](https://img.shields.io/badge/arXiv-2508.21669-b31b1b.svg)](https://arxiv.org/abs/2508.21669)
+- Established the `Cybersecurity AI` research line with **4 papers and technical reports** and active research collaborations [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-b31b1b.svg)](https://arxiv.org/pdf/2504.06017) [![arXiv](https://img.shields.io/badge/arXiv-2506.23592-b31b1b.svg)](https://arxiv.org/abs/2506.23592) [![arXiv](https://img.shields.io/badge/arXiv-2508.13588-b31b1b.svg)](https://arxiv.org/abs/2508.13588) [![arXiv](https://img.shields.io/badge/arXiv-2508.21669-b31b1b.svg)](https://arxiv.org/abs/2508.21669)
 - Demonstrated **3,600× performance improvement** over human penetration testers in standardized CTF benchmark evaluations [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-b31b1b.svg)](https://arxiv.org/pdf/2504.06017)
 - Identified **CVSS 4.3-7.5 severity vulnerabilities** in production systems through automated security assessment [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-b31b1b.svg)](https://arxiv.org/pdf/2504.06017)
 - **Democratization of AI-empowered vulnerability research**: CAI enables both non-security domain experts and experienced researchers to conduct more efficient vulnerability discovery, expanding the security research community while empowering small and medium enterprises to conduct autonomous security assessments [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-b31b1b.svg)](https://arxiv.org/pdf/2504.06017)
@@ -199,6 +199,7 @@ Cybersecurity AI is a critical field, yet many groups are misguidedly pursuing i
 - [NDAY Security](https://ndaysecurity.com/)
 - [Runsybil](https://www.runsybil.com)
 - [Selfhack](https://www.selfhack.fi)
+- [Sola Security](https://sola.security/)
 - [SQUR](https://squr.ai/)
 - [Staris](https://staris.tech/)
 - [Sxipher](https://www.sxipher.com/) (seems discontinued)
@@ -515,7 +516,7 @@ result = await Runner.run(agent, message)
 ```
 
 
-You may find different [tools](cai/tools). They are grouped in 6 major categories inspired by the security kill chain [^2]:
+You may find different [tools](tools). They are grouped in 6 major categories inspired by the security kill chain [^2]:
 
 1. Reconnaissance and weaponization - *reconnaissance*  (crypto, listing, etc)
 2. Exploitation - *exploitation*
@@ -747,6 +748,22 @@ CAI_MODEL=openrouter/meta-llama/llama-4-maverick
 OPENROUTER_API_KEY=<sk-your-key>  # note, add yours
 OPENROUTER_API_BASE=https://openrouter.ai/api/v1
 ```
+
+### Azure OpenAI
+
+The Cybersecurity AI (CAI) platform integrates seamlessly with Azure OpenAI, enabling organizations to run CAI against enterprise-hosted models (e.g., gpt-4o). This pathway is ideal for teams that must operate within Azure governance while leveraging advanced model capabilities.
+To enable Azure OpenAI support in CAI, configure your environment by adding the following entries to your .env. This ensures CAI can reach your Azure deployment endpoint and authenticate correctly.
+
+```bash
+CAI_AGENT_TYPE=redteam_agent
+CAI_MODEL=azure/<model-name-deployed>
+# Required: keep non-empty even when using Azure
+OPENAI_API_KEY=dummy
+# Azure credentials and endpoint
+AZURE_API_KEY=<your-azure-openai-key>
+AZURE_API_BASE=https://<resource>.openai.azure.com/openai/deployments/<deployment-name>/chat/completions?api-version=2025-01-01-preview
+```
+
 
 ### MCP
 
@@ -1004,22 +1021,23 @@ When CAI is prompted by the first time, the user is provided with two paths, the
 <details>
 <summary>Can I expand CAI capabilities using previous run logs?</summary>
 
-Absolutely! The **memory extension** allows you to use a previously sucessful runs ( the log object is stored as a **.jsonl file in the [log](cai/logs) folder** ) in a new run against the same target.
-The user is also given the path highlighted in orange as shown below.
+Yes. Today CAI performs best by relying on In‑Context Learning (ICL). Rather than building long‑term stores, the recommended workflow is to load relevant prior logs directly into the current session so the model can reason with them in context.
+
+Use the `/load` command to bring JSONL logs into CAI’s context (this replaces the legacy memory-loading tool):
+
+```bash
+CAI>/load logs/cai_20250408_111856.jsonl         # Load into current agent
+CAI>/load <file> agent <name>                    # Load into a specific agent
+CAI>/load <file> all                             # Distribute across all agents
+CAI>/load <file> parallel                        # Match to configured parallel agents
+# Tip: if you omit <file>, /load uses `logs/last`. Alias: /l
+```
+
+CAI prints the path to the current run’s JSONL log at startup (highlighted in orange), which you can pass to `/load`:
 
 ![cai-009-logs](imgs/readme_imgs/cai-009-logs.png)
 
-How to make use of this functionality?
-
-1. Run CAI against the target. Let's assume the target name is: `target001`.
-2. Get the log file path, something like: ```logs/cai_20250408_111856.jsonl```
-3. Generate the memory using any model of your preference:
-```shell JSONL_FILE_PATH="logs/cai_20250408_111856.jsonl" CTF_INSIDE="false" CAI_MEMORY_COLLECTION="target001" CAI_MEMORY="episodic" CAI_MODEL="claude-3-5-sonnet-20241022" python3 tools/2_jsonl_to_memory.py ```
-
-The script [`tools/2_jsonl_to_memory.py`](cai/tools/2_jsonl_to_memory.py) will generate a memory collection file with the most relevant steps. The quality of the memory collection will depend on the model you use.
-
-4. Use the generated memory collection and execute a new run:
-```shell CAI_MEMORY="episodic" CAI_MODEL="gpt-4o" CAI_MEMORY_COLLECTION="target001" CAI_TRACING=false python3 cai/cli.py```
+Legacy notes: earlier “memory extension” mechanisms (episodic/semantic stores and offline ingestion) are retained for reference only. See [src/cai/agents/memory.py](src/cai/agents/memory.py) for background and legacy details. Our current direction prioritizes ICL over persistent memory.
 
 </details>
 
@@ -1042,7 +1060,12 @@ CAI itself is not a profit-seeking initiative. Our goal is to build a sustainabl
 
 </details>
 
+<details><summary>I get a `Unable to locate package python3.12-venv` when installing the prerequisites on my debian based system!</summary>
 
+The easiest way to get around this is to simply install [`python3.12`](https://www.python.org/downloads/release/python-3120/) from source.
+
+
+</details>
 
 ## Citation
 If you want to cite our work, please use the following:

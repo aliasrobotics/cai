@@ -7,25 +7,4 @@ CAI supports **over 300 models**, thanks to its integration with [LiteLLM](https
 - **DeepSeek**: DeepSeek V3, DeepSeek R1  
 - **Ollama**: Qwen2.5 72B, Qwen2.5 14B, and more  
 
-CAI is also compatibile with other platforms like OpenRouter and Ollama. Below you’ll find some configurations to help you get started.
-
-#### [OpenRouter Integration](https://openrouter.ai/)
-
-To enable OpenRouter support in CAI, you need to configure your environment by adding specific entries to your `.env` file. This setup ensures that CAI can interact with the OpenRouter API, facilitating the use of sophisticated models like Meta-LLaMA. Here’s how you can configure it:
-
-```bash
-CAI_MODEL=openrouter/meta-llama/llama-4-maverick
-OPENROUTER_API_KEY=<sk-your-key>  # note, add yours
-OPENROUTER_API_BASE=https://openrouter.ai/api/v1
-```
-
-
-#### [Ollama Integration](https://ollama.com/)
-For local models using Ollama, add the following to your .env:
-
-```bash
-CAI_MODEL=qwen2.5:72b
-OLLAMA_API_BASE=http://localhost:8000/v1 # note, maybe you have a different endpoint
-```
-
-Make sure that the Ollama server is running and accessible at the specified base URL. You can swap the model with any other supported by your local Ollama instance.
+CAI is also compatibile with other platforms like OpenRouter, Ollama and Azure OpenAI. At providers section you’ll find some configurations to help you get started.
