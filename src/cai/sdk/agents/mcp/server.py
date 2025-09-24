@@ -69,6 +69,8 @@ class _MCPServerWithClientSession(MCPServer, abc.ABC):
         self.session: ClientSession | None = None
         self.exit_stack: AsyncExitStack = AsyncExitStack()
         self._cleanup_lock: asyncio.Lock = asyncio.Lock()
+        self._connect_lock: asyncio.Lock = asyncio.Lock()
+        self._call_lock: asyncio.Lock = asyncio.Lock()
         self.cache_tools_list = cache_tools_list
 
         # The cache is always dirty at startup, so that we fetch tools at least once
@@ -100,25 +102,32 @@ class _MCPServerWithClientSession(MCPServer, abc.ABC):
 
     async def connect(self):
         """Connect to the server."""
-        try:
-            transport = await self.exit_stack.enter_async_context(self.create_streams())
-            read, write = transport
-            session = await self.exit_stack.enter_async_context(ClientSession(read, write))
-            await session.initialize()
-            self.session = session
-        except Exception as e:
-            # Only log connection errors at debug level
-            error_str = str(e).lower()
-            error_type = type(e).__name__
-            if ("connection" in error_str or 
-                "refused" in error_str or 
-                "taskgroup" in error_str or
-                error_type == "ExceptionGroup"):
-                logger.debug(f"Expected connection error during MCP server init: {e}")
-            else:
-                logger.error(f"Error initializing MCP server: {e}")
-            await self.cleanup()
-            raise
+        if self.session is not None:
+            return
+
+        async with self._connect_lock:
+            if self.session is not None:
+                return
+
+            try:
+                transport = await self.exit_stack.enter_async_context(self.create_streams())
+                read, write = transport
+                session = await self.exit_stack.enter_async_context(ClientSession(read, write))
+                await session.initialize()
+                self.session = session
+            except Exception as e:
+                # Only log connection errors at debug level
+                error_str = str(e).lower()
+                error_type = type(e).__name__
+                if ("connection" in error_str or 
+                    "refused" in error_str or 
+                    "taskgroup" in error_str or
+                    error_type == "ExceptionGroup"):
+                    logger.debug(f"Expected connection error during MCP server init: {e}")
+                else:
+                    logger.error(f"Error initializing MCP server: {e}")
+                await self.cleanup()
+                raise
 
     async def list_tools(self) -> list[MCPTool]:
         """List the tools available on the server."""
@@ -141,7 +150,16 @@ class _MCPServerWithClientSession(MCPServer, abc.ABC):
         if not self.session:
             raise UserError("Server not initialized. Make sure you call `connect()` first.")
 
-        return await self.session.call_tool(tool_name, arguments)
+        async with self._call_lock:
+            if self.session is None:
+                await self.connect()
+
+            try:
+                return await self.session.call_tool(tool_name, arguments)
+            except Exception:
+                # Ensure resources are released and mark session stale so callers can reconnect
+                await self.cleanup()
+                raise
 
     async def cleanup(self):
         """Cleanup the server."""
