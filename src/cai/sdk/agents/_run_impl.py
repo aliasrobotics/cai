@@ -375,6 +375,16 @@ class RunImpl:
         elif (
             not output_schema or output_schema.is_plain_text()
         ) and not processed_response.has_tools_to_run():
+            # If there are tool outputs in the step (e.g., a synthetic output for a missing tool),
+            # do not finalize; run the model again so it can react to the tool output guidance.
+            if any(isinstance(item, ToolCallOutputItem) for item in new_step_items):
+                return SingleStepResult(
+                    original_input=original_input,
+                    model_response=new_response,
+                    pre_step_items=pre_step_items,
+                    new_step_items=new_step_items,
+                    next_step=NextStepRunAgain(),
+                )
             return await cls.execute_final_output(
                 agent=agent,
                 original_input=original_input,
@@ -475,13 +485,38 @@ class RunImpl:
             # Regular function tool call
             else:
                 if output.name not in function_map:
+                    # Gracefully handle missing tools by emitting a tool call and
+                    # a synthetic tool output instead of raising. This allows the
+                    # agent loop to continue and the model to react.
                     _error_tracing.attach_error_to_current_span(
                         SpanError(
                             message="Tool not found",
                             data={"tool_name": output.name},
                         )
                     )
-                    raise ModelBehaviorError(f"Tool {output.name} not found in agent {agent.name}")
+                    # Record the attempted tool call so it appears in history/inputs
+                    items.append(ToolCallItem(raw_item=output, agent=agent))
+
+                    # Emit a synthetic tool output containing a prompt for the LLM
+                    # with guidance to pick another available tool.
+                    available_tools = ", ".join(sorted(function_map.keys())) or "(none)"
+                    error_msg = (
+                        "You attempted to call an unavailable tool '"
+                        f"{output.name}' for agent '{agent.name}'.\n"
+                        f"Available tools: {available_tools}.\n"
+                        "Choose the best alternative tool and issue a new function_call with"
+                        " appropriate arguments. If no tool fits, ask one brief clarifying"
+                        " question instead of calling a tool."
+                    )
+                    items.append(
+                        ToolCallOutputItem(
+                            raw_item=ItemHelpers.tool_call_output_item(output, error_msg),
+                            output=error_msg,
+                            agent=agent,
+                        )
+                    )
+                    # Don't schedule execution for a non-existent tool
+                    continue
                 items.append(ToolCallItem(raw_item=output, agent=agent))
                 functions.append(
                     ToolRunFunction(
