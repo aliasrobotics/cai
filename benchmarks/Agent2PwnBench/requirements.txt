@@ -1,0 +1,6 @@
+openpyxl
+cai-framework
+pandas
+selenium
+python-dotenv
+nest-asyncio
