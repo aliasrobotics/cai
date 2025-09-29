@@ -22,7 +22,8 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2506.23592-b31b1b.svg)](https://arxiv.org/abs/2506.23592)
 [![arXiv](https://img.shields.io/badge/arXiv-2508.13588-b31b1b.svg)](https://arxiv.org/abs/2508.13588)
 [![arXiv](https://img.shields.io/badge/arXiv-2508.21669-b31b1b.svg)](https://arxiv.org/abs/2508.21669)
-
+[![arXiv](https://img.shields.io/badge/arXiv-2509.14096-b31b1b.svg)](https://arxiv.org/abs/2509.14096) 
+[![arXiv](https://img.shields.io/badge/arXiv-2509.14139-b31b1b.svg)](https://arxiv.org/abs/2509.14139)
 
 
 </div>
@@ -124,22 +125,29 @@ Cybersecurity AI (CAI) is a lightweight, open-source framework that empowers sec
 [![](https://img.shields.io/badge/Mistral_AI_Robotics_Hackathon-2500_$-yellow.svg)](https://lu.ma/roboticshack?tk=RuryKF)
 
 ### 📊 Research Impact
-- Pioneered LLM-powered AI Security with PentestGPT, establishing the foundation for the `Cybersecurity AI` research domain [![arXiv](https://img.shields.io/badge/arXiv-2308.06782-b31b1b.svg)](https://arxiv.org/pdf/2308.06782)
-- Established the `Cybersecurity AI` research line with **4 papers and technical reports** and active research collaborations [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-b31b1b.svg)](https://arxiv.org/pdf/2504.06017) [![arXiv](https://img.shields.io/badge/arXiv-2506.23592-b31b1b.svg)](https://arxiv.org/abs/2506.23592) [![arXiv](https://img.shields.io/badge/arXiv-2508.13588-b31b1b.svg)](https://arxiv.org/abs/2508.13588) [![arXiv](https://img.shields.io/badge/arXiv-2508.21669-b31b1b.svg)](https://arxiv.org/abs/2508.21669)
-- Demonstrated **3,600× performance improvement** over human penetration testers in standardized CTF benchmark evaluations [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-b31b1b.svg)](https://arxiv.org/pdf/2504.06017)
-- Identified **CVSS 4.3-7.5 severity vulnerabilities** in production systems through automated security assessment [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-b31b1b.svg)](https://arxiv.org/pdf/2504.06017)
-- **Democratization of AI-empowered vulnerability research**: CAI enables both non-security domain experts and experienced researchers to conduct more efficient vulnerability discovery, expanding the security research community while empowering small and medium enterprises to conduct autonomous security assessments [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-b31b1b.svg)](https://arxiv.org/pdf/2504.06017)
-- **Systematic evaluation of large language models** across both proprietary and open-weight architectures, revealing <u>substantial gaps</u> between vendor-reported capabilities and empirical cybersecurity performance metrics [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-b31b1b.svg)](https://arxiv.org/pdf/2504.06017)
-- Established the **autonomy levels in cybersecurity** and argued about autonomy vs automation in the field [![arXiv](https://img.shields.io/badge/arXiv-2506.23592-b31b1b.svg)](https://arxiv.org/abs/2506.23592)
-- **Collaborative research initiatives** with international academic institutions focused on developing cybersecurity education curricula and training methodologies [![arXiv](https://img.shields.io/badge/arXiv-2508.13588-b31b1b.svg)](https://arxiv.org/abs/2508.13588)
-- **Contributed a comprehensive defense framework against prompt injection in AI security agents**: developed and empirically validated a multi-layered defense system that addresses the identified prompt injection issues [![arXiv](https://img.shields.io/badge/arXiv-2508.21669-b31b1b.svg)](https://arxiv.org/abs/2508.21669)
+- Pioneered LLM-powered AI Security with PentestGPT, establishing the foundation for the `Cybersecurity AI` research domain [![arXiv](https://img.shields.io/badge/arXiv-2308.06782-4a9b8e.svg)](https://arxiv.org/pdf/2308.06782)
+- Established the `Cybersecurity AI` research line with **6 papers and technical reports**, with active research collaborations [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-63bfab.svg)](https://arxiv.org/pdf/2504.06017) [![arXiv](https://img.shields.io/badge/arXiv-2506.23592-7dd3c0.svg)](https://arxiv.org/abs/2506.23592) [![arXiv](https://img.shields.io/badge/arXiv-2508.13588-52a896.svg)](https://arxiv.org/abs/2508.13588) [![arXiv](https://img.shields.io/badge/arXiv-2508.21669-85e0d1.svg)](https://arxiv.org/abs/2508.21669) [![arXiv](https://img.shields.io/badge/arXiv-2509.14096-3e8b7a.svg)](https://arxiv.org/abs/2509.14096) [![arXiv](https://img.shields.io/badge/arXiv-2509.14139-6bc7b5.svg)](https://arxiv.org/abs/2509.14139)
+
+- Demonstrated **3,600× performance improvement** over human penetration testers in standardized CTF benchmark evaluations [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-63bfab.svg)](https://arxiv.org/pdf/2504.06017)
+- Identified **CVSS 4.3-7.5 severity vulnerabilities** in production systems through automated security assessment [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-63bfab.svg)](https://arxiv.org/pdf/2504.06017)
+- **Democratization of AI-empowered vulnerability research**: CAI enables both non-security domain experts and experienced researchers to conduct more efficient vulnerability discovery, expanding the security research community while empowering small and medium enterprises to conduct autonomous security assessments [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-63bfab.svg)](https://arxiv.org/pdf/2504.06017)
+- **Systematic evaluation of large language models** across both proprietary and open-weight architectures, revealing <u>substantial gaps</u> between vendor-reported capabilities and empirical cybersecurity performance metrics [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-63bfab.svg)](https://arxiv.org/pdf/2504.06017)
+- Established the **autonomy levels in cybersecurity** and argued about autonomy vs automation in the field [![arXiv](https://img.shields.io/badge/arXiv-2506.23592-7dd3c0.svg)](https://arxiv.org/abs/2506.23592)
+- **Collaborative research initiatives** with international academic institutions focused on developing cybersecurity education curricula and training methodologies [![arXiv](https://img.shields.io/badge/arXiv-2508.13588-52a896.svg)](https://arxiv.org/abs/2508.13588)
+- **Contributed a comprehensive defense framework against prompt injection in AI security agents**: developed and empirically validated a multi-layered defense system that addresses the identified prompt injection issues [![arXiv](https://img.shields.io/badge/arXiv-2508.21669-85e0d1.svg)](https://arxiv.org/abs/2508.21669)
+- Explord the Cybersecurity of Humanoid Robots with CAI and identified new attack vectors showing how it `(a)` operates simultaneously as a covert surveillance node and `(b)` can be purposed as an active cyber operations platform [![arXiv](https://img.shields.io/badge/arXiv-2509.14096-3e8b7a.svg)](https://arxiv.org/abs/2509.14096) [![arXiv](https://img.shields.io/badge/arXiv-2509.14139-6bc7b5.svg)](https://arxiv.org/abs/2509.14139)
 
 
 ### 📚 Research products: `Cybersecurity AI`
 
-|  CAI, An Open, Bug Bounty-Ready Cybersecurity AI |  The Dangerous Gap Between Automation and Autonomy  |  CAI Fluency, A Framework for Cybersecurity AI Fluency  | Hacking the AI Hackers via Prompt Injection |
-|---|---|---|---|
-| [<img src="https://aliasrobotics.com/img/paper-cai.png" width="350">](https://arxiv.org/pdf/2508.13588) | [<img src="https://aliasrobotics.com/img/cai_automation_vs_autonomy.png" width="350">](https://www.arxiv.org/pdf/2506.23592) | [<img src="https://aliasrobotics.com/img/cai_fluency_cover.png" width="350">](https://arxiv.org/pdf/2504.06017) | [<img src="https://aliasrobotics.com/img/aihackers.jpeg" width="500">](https://arxiv.org/pdf/2508.21669) |
+|  CAI, An Open, Bug Bounty-Ready Cybersecurity AI [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-63bfab.svg)](https://arxiv.org/pdf/2504.06017) |  The Dangerous Gap Between Automation and Autonomy [![arXiv](https://img.shields.io/badge/arXiv-2506.23592-7dd3c0.svg)](https://arxiv.org/abs/2506.23592) |  CAI Fluency, A Framework for Cybersecurity AI Fluency [![arXiv](https://img.shields.io/badge/arXiv-2508.13588-52a896.svg)](https://arxiv.org/abs/2508.13588) |
+|---|---|---|
+| [<img src="https://aliasrobotics.com/img/paper-cai.png" width="350">](https://arxiv.org/pdf/2504.06017) | [<img src="https://aliasrobotics.com/img/cai_automation_vs_autonomy.png" width="350">](https://www.arxiv.org/pdf/2506.23592) | [<img src="https://aliasrobotics.com/img/cai_fluency_cover.png" width="350">](https://arxiv.org/pdf/2508.13588) |
+
+
+| Hacking the AI Hackers via Prompt Injection [![arXiv](https://img.shields.io/badge/arXiv-2508.21669-85e0d1.svg)](https://arxiv.org/abs/2508.21669) | Humanoid Robots as Attack Vectors [![arXiv](https://img.shields.io/badge/arXiv-2509.14139-6bc7b5.svg)](https://arxiv.org/abs/2509.14139) | The Cybersecurity of a Humanoid Robot [![arXiv](https://img.shields.io/badge/arXiv-2509.14096-3e8b7a.svg)](https://arxiv.org/abs/2509.14096) |
+|---|---|---|
+| [<img src="https://aliasrobotics.com/img/aihackers.jpeg" width="350">](https://arxiv.org/pdf/2508.21669) | [<img src="https://aliasrobotics.com/img/humanoids-cover.png" width="350">](https://arxiv.org/pdf/2509.14139) | [<img src="https://aliasrobotics.com/img/humanoid.png" width="350">](https://arxiv.org/pdf/2509.14096) |
 
 
 
@@ -192,6 +200,7 @@ Cybersecurity AI is a critical field, yet many groups are misguidedly pursuing i
 - [CrackenAGI](https://cracken.ai/)
 - [ETHIACK](https://ethiack.com/)
 - [Horizon3](https://horizon3.ai/)
+- [Irregular](https://www.irregular.com/)
 - [Kindo](https://www.kindo.ai/)
 - [Lakera](https://lakera.ai)
 - [Mindfort](www.mindfort.ai)
@@ -235,7 +244,7 @@ Cybersecurity AI is a critical field, yet many groups are misguidedly pursuing i
 | **Episode 0**: What is CAI? | Cybersecurity AI (`CAI`) explained  |  [![Watch the video](https://img.youtube.com/vi/nBdTxbKM4oo/0.jpg)](https://www.youtube.com/watch?v=nBdTxbKM4oo) | [![Watch the video](https://img.youtube.com/vi/FaUL9HXrQ5k/0.jpg)](https://www.youtube.com/watch?v=FaUL9HXrQ5k) |
 | **Episode 1**: The `CAI` Framework | Vision & Ethics - Explore the core motivation behind CAI and delve into the crucial ethical principles guiding its development. Understand the motivation behind CAI and how you can actively contribute to the future of cybersecurity and the CAI framework. | [![Watch the video](https://img.youtube.com/vi/QEiGdsMf29M/0.jpg)](https://www.youtube.com/watch?v=QEiGdsMf29M&list=PLLc16OUiZWd4RuFdN5_Wx9xwjCVVbopzr&index=3) |  |
 | **Episode 2**: From Zero to Cyber Hero | Breaking into Cybersecurity with AI - A comprehensive guide for complete beginners to become cybersecurity practitioners using CAI and AI tools. Learn how to leverage artificial intelligence to accelerate your cybersecurity learning journey, from understanding basic security concepts to performing real-world security assessments, all without requiring prior cybersecurity experience. | [![Watch the video](https://img.youtube.com/vi/hSTLHOOcQoY/0.jpg)](https://www.youtube.com/watch?v=hSTLHOOcQoY&list=PLLc16OUiZWd4RuFdN5_Wx9xwjCVVbopzr&index=14) |  |
-| **Episode 3**: Vibe-Hacking Tutorial | "My first Hack" - A Vibe-Hacking guide for newbies. We demonstrate a simple web security hack using a default agent and show how to leverage tools and interpret CIA output with the help of the CAI Python API. You'll also learn to compare different LLM models to find the best fit for your hacking endeavors. | [![Watch the video](https://img.youtube.com/vi/9vZ_Iyex7uI/0.jpg)](https://www.youtube.com/watch?v=9vZ_Iyex7uI&list=PLLc16OUiZWd4RuFdN5_Wx9xwjCVVbopzr&index=1) | [![Watch the video](https://img.youtube.com/vi/iAOMaI1ftiA/0.jpg)](https://www.youtube.com/watch?v=iAOMaI1ftiA&list=PLLc16OUiZWd4RuFdN5_Wx9xwjCVVbopzr&index=2) |
+| **Episode 3**: Vibe-Hacking Tutorial | "My first Hack" - A Vibe-Hacking guide for newbies. We demonstrate a simple web security hack using a default agent and show how to leverage tools and interpret CAI output with the help of the CAI Python API. You'll also learn to compare different LLM models to find the best fit for your hacking endeavors. | [![Watch the video](https://img.youtube.com/vi/9vZ_Iyex7uI/0.jpg)](https://www.youtube.com/watch?v=9vZ_Iyex7uI&list=PLLc16OUiZWd4RuFdN5_Wx9xwjCVVbopzr&index=1) | [![Watch the video](https://img.youtube.com/vi/iAOMaI1ftiA/0.jpg)](https://www.youtube.com/watch?v=iAOMaI1ftiA&list=PLLc16OUiZWd4RuFdN5_Wx9xwjCVVbopzr&index=2) |
 | **Episode 4**: Intro ReAct | The Evolution of LLMs - Learn how LLMs evolved from basic language models to advanced multiagency AI systems. From basic LLMs to Chain-of-Thought and Reasoning LLMs towards ReAct and Multi-Agent Architectures. Get to know the basic terms | [![Watch the video](https://img.youtube.com/vi/tLdFO1flj_o/0.jpg)](https://www.youtube.com/watch?v=tLdFO1flj_o&list=PLLc16OUiZWd4RuFdN5_Wx9xwjCVVbopzr&index=13) | |
 | **Episode 5**: CAI on CTF challenges | Dive into Capture The Flag (CTF) competitions using CAI. Learn how to leverage AI agents to solve various cybersecurity challenges including web exploitation, cryptography, reverse engineering, and forensics. Discover how to configure CAI for competitive hacking scenarios and maximize your CTF performance with intelligent automation. | [![Watch the video](https://img.youtube.com/vi/MrXTQ0e2to4/0.jpg)](https://www.youtube.com/watch?v=MrXTQ0e2to4&list=PLLc16OUiZWd4RuFdN5_Wx9xwjCVVbopzr&index=13) | [![Watch the video](https://img.youtube.com/vi/r9US_JZa9_c/0.jpg)](https://www.youtube.com/watch?v=r9US_JZa9_c&list=PLLc16OUiZWd4RuFdN5_Wx9xwjCVVbopzr&index=12) |
 |  |  |  |  |
