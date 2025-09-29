@@ -2534,21 +2534,22 @@ class OpenAIChatCompletionsModel(Model):
         # start by re-fetching self.is_ollama
         self.is_ollama = os.getenv("OLLAMA") is not None and os.getenv("OLLAMA").lower() == "true"
 
-        # IMPORTANT: Include existing message history for context
+        # IMPORTANT: Build the prompt from history and avoid double-adding the current input.
+        # History already contains the latest user/tool messages for this turn.
         converted_messages = []
-        
-        # First, add all existing messages from history
+
+        # Add existing history first (copy to avoid in-place mutations)
         if self.message_history:
             for msg in self.message_history:
-                msg_copy = msg.copy()  # Use copy to avoid modifying original
-                # Remove any existing cache_control to avoid exceeding the 4-block limit
-                if "cache_control" in msg_copy:
-                    del msg_copy["cache_control"]
+                msg_copy = msg.copy()
+                # Remove any existing cache_control to avoid exceeding provider limits
+                msg_copy.pop("cache_control", None)
                 converted_messages.append(msg_copy)
-        
-        # Then convert and add the new input
-        new_messages = self._converter.items_to_messages(input, model_instance=self)
-        converted_messages.extend(new_messages)
+
+        # Only add converted input if there is no history yet (e.g., very first turn)
+        if not self.message_history:
+            new_messages = self._converter.items_to_messages(input, model_instance=self)
+            converted_messages.extend(new_messages)
 
         if system_instructions:
             # Check if we already have a system message
@@ -3233,7 +3234,7 @@ class OpenAIChatCompletionsModel(Model):
         try:
             if stream:
                 # Standard LiteLLM handling for streaming
-                ret = await litellm.acompletion(**kwargs)
+                # Create a single streaming generator; avoid duplicate calls which leak connections
                 stream_obj = await litellm.acompletion(**kwargs)
 
                 response = Response(
@@ -3287,7 +3288,7 @@ class OpenAIChatCompletionsModel(Model):
                 kwargs["messages"] = messages
                 # Retry once, silently
                 if stream:
-                    ret = await litellm.acompletion(**kwargs)
+                    # Retry with a single streaming generator
                     stream_obj = await litellm.acompletion(**kwargs)
                     response = Response(
                         id=FAKE_RESPONSES_ID,

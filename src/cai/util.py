@@ -1377,7 +1377,53 @@ def fix_message_list(messages):  # pylint: disable=R0914,R0915,R0912
             i += 2
         else:
             i += 1
-    return processed_messages
+
+    # Final de-duplication pass to remove accidental duplicates in chat history
+    # This addresses cases where the latest user message or tool pair was added twice upstream.
+    deduped = []
+    for msg in processed_messages:
+        if not deduped:
+            deduped.append(msg)
+            continue
+
+        prev = deduped[-1]
+
+        # Normalize messages for comparison (ignore ephemeral fields ordering)
+        def _norm_tool_calls(m):
+            tcs = m.get("tool_calls") or []
+            norm = []
+            for tc in tcs:
+                if isinstance(tc, dict):
+                    fn = tc.get("function") or {}
+                    norm.append((tc.get("type"), fn.get("name"), fn.get("arguments")))
+            return tuple(norm)
+
+        same_role = prev.get("role") == msg.get("role")
+        # Compare content for text messages
+        same_content = str(prev.get("content")) == str(msg.get("content"))
+        # Compare tool ids for tool messages
+        same_tool_id = (
+            prev.get("role") == "tool"
+            and msg.get("role") == "tool"
+            and str(prev.get("tool_call_id")) == str(msg.get("tool_call_id"))
+            and str(prev.get("content")) == str(msg.get("content"))
+        )
+        # Compare assistant tool calls by name/args (IDs may differ by truncation)
+        same_assistant_tool_calls = (
+            prev.get("role") == "assistant"
+            and msg.get("role") == "assistant"
+            and prev.get("tool_calls")
+            and msg.get("tool_calls")
+            and _norm_tool_calls(prev) == _norm_tool_calls(msg)
+        )
+
+        if (same_role and same_content) or same_tool_id or same_assistant_tool_calls:
+            # Skip exact duplicate
+            continue
+
+        deduped.append(msg)
+
+    return deduped
 
 
 def cli_print_tool_call(tool_name="", args="", output="", prefix="  "):
