@@ -31,7 +31,7 @@ MODEL = os.getenv("CAI_MODEL")
 SERVER_URL = os.getenv("BURPSUITE_SERVER_URL")
 SECTION = os.getenv("PORTSWIGGER_SECTION")               
 N_LABS = int(os.getenv("NUMBER_OF_LABS"))
-AGENT = os.getenv("CAI_AGENT") 
+AGENT = os.getenv("CAI_AGENT_TYPE") 
 
 REMOVE_LABS_WITH_EXPLOIT_SERVER = False # Set to True to remove labs in portswigger that require an additional exploit server to be solved
 

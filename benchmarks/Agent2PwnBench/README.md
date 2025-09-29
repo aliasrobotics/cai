@@ -46,7 +46,7 @@ The program follows a sequence of steps to evaluate the models.
    PORTSWIGGER_SECTION='sql-injection' # Change this to the type of lab
    NUMBER_OF_LABS=10 # To test all the labs in the section, change this to -1
    CAI_MODEL='openai/gpt-4o' # LLMs used in CAI
-   CAI_AGENT="bug_bounter_agent" # Name of the CAI agent. Available options are (blueteam_agent, bug_bounter_agent, redteam_agent)
+   CAI_AGENT_TYPE="bug_bounter_agent" # Name of the CAI agent. Available options are (blueteam_agent, bug_bounter_agent, redteam_agent)
    BURPSUITE_SERVER_URL="http://127.0.0.1:9876/sse" # Local url of the MCP server for burpsuite
    ```
    To see more available labs sections, see  [**topic_prefixes.json**](utils/topics_prefixes.json) file.
