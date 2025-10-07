@@ -11,6 +11,8 @@
   </p>
 
 
+<a href="https://trendshift.io/repositories/14317" target="_blank"><img src="https://trendshift.io/api/badge/repositories/14317" alt="aliasrobotics%2Fcai | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+
 [![version](https://badge.fury.io/py/cai-framework.svg)](https://badge.fury.io/py/cai-framework)
 [![downloads](https://static.pepy.tech/badge/cai-framework)](https://pepy.tech/projects/cai-framework)
 [![Linux](https://img.shields.io/badge/Linux-Supported-brightgreen?logo=linux&logoColor=white)](https://github.com/aliasrobotics/cai)
@@ -98,6 +100,7 @@ Cybersecurity AI (CAI) is a lightweight, open-source framework that empowers sec
   - [:rocket: Quickstart](#rocket-quickstart)
     - [Environment Variables](#environment-variables)
     - [OpenRouter Integration](#openrouter-integration)
+    - [Azure OpenAI](#azure-openai)
     - [MCP](#mcp)
   - [Development](#development)
     - [Contributions](#contributions)
