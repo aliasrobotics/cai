@@ -324,6 +324,7 @@ async def generic_linux_command(command: str = "",
             r"(?i)echo.*\|.*sh",  # Echo pipe to sh - blocks PoC5 bypass
             r"(?i)printf.*\|.*bash",  # Printf pipe to bash
             r"(?i)printf.*\|.*sh",  # Printf pipe to sh
+            r"(?i)socat\s+TCP:[\d\.]+:\d+.*EXEC",  # Socat reverse shell - blocks PoC15
         ]
         
         for pattern in dangerous_patterns:
