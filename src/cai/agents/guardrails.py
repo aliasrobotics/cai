@@ -44,6 +44,7 @@ INJECTION_PATTERNS = [
     r"(?i)(note|important|attention|warning)\s+to\s+(system|ai|assistant|model|agent|llm)",
     r"(?i)(system|admin|root)\s+(note|message|command|instruction)",
     r"(?i)<(system|admin|instruction|command|hidden)[^>]*>",
+    r"(?i)N[0O]TE\s+TO\s+SYST[E3]M",  # Leetspeak obfuscation - PoC15
     
     # Indirect injection patterns (from external content)
     r"(?i)\[END\s+TOOL\s+OUTPUT\]",
@@ -400,6 +401,7 @@ async def command_execution_guardrail(
         r"(?i)/dev/tcp/",  # Bash network redirection
         r"(?i)echo.*>>\s*/etc/",  # Writing to system files
         r"(?i)bash.*-i.*>&",  # Interactive bash reverse shell
+        r"(?i)socat\s+TCP:\d+\.\d+\.\d+\.\d+:\d+.*EXEC",  # Socat reverse shell - PoC15
     ]
     
     # Check for base64 decoding commands specifically in tool calls
