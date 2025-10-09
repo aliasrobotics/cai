@@ -54,6 +54,8 @@ import atexit
 import functools
 import warnings
 import logging
+import os
+import tempfile
 from typing import Dict, List, Optional
 
 # Third-party imports
@@ -85,6 +87,81 @@ _SERVER_INVOCATION_LOCKS: Dict[str, asyncio.Lock] = {}
 # Global registry for agent-MCP associations
 # Maps agent name to list of MCP server names
 _AGENT_MCP_ASSOCIATIONS: Dict[str, List[str]] = {}
+
+
+# --- Helpers to harden stdio MCP interop ---
+def _prepare_python_stdio_log_sanitizer_env() -> dict:
+    """Create an env overlay that forces Python servers to log to stderr.
+
+    Many community MCP stdio servers (e.g., MCP-Kali-Server) log to stdout,
+    which corrupts the MCP stdio protocol and causes connection hangs.
+    This helper injects a lightweight `sitecustomize` that monkeypatches
+    `logging.StreamHandler` to redirect stdout logs to stderr inside the
+    child Python process only.
+
+    Returns an env dict merged with the current environment that sets
+    `PYTHONPATH` to include a temp directory containing our `sitecustomize.py`.
+    Safe no-op for non-Python servers.
+    """
+    try:
+        base_env = dict(os.environ)
+
+        # Create a stable temp dir so subsequent loads can reuse it
+        site_dir = os.path.join(tempfile.gettempdir(), "cai_mcp_sitecustomize")
+        os.makedirs(site_dir, exist_ok=True)
+        site_file = os.path.join(site_dir, "sitecustomize.py")
+
+        site_code = (
+            "# Auto-injected by CAI to keep MCP stdio clean\n"
+            "import logging, sys, os\n"
+            "# Allow opt-out by setting CAI_MCP_STDERR_LOGGING=0\n"
+            "if os.environ.get('CAI_MCP_STDERR_LOGGING', '1') != '0':\n"
+            "    _OrigSH = logging.StreamHandler\n"
+            "    class _StdErrSH(logging.StreamHandler):\n"
+            "        def __init__(self, stream=None):\n"
+            "            if stream is sys.stdout or stream is None:\n"
+            "                stream = sys.stderr\n"
+            "            super().__init__(stream)\n"
+            "    logging.StreamHandler = _StdErrSH\n"
+            "    # Update existing handlers that accidentally point to stdout\n"
+            "    try:\n"
+            "        for _h in logging.getLogger().handlers:\n"
+            "            if getattr(_h, 'stream', None) is sys.stdout:\n"
+            "                try: _h.setStream(sys.stderr)\n"
+            "                except Exception: pass\n"
+            "    except Exception:\n"
+            "        pass\n"
+        )
+
+        # Write/refresh file only if missing or different to avoid extra I/O
+        need_write = True
+        try:
+            if os.path.exists(site_file):
+                with open(site_file, "r", encoding="utf-8") as f:
+                    if f.read() == site_code:
+                        need_write = False
+        except Exception:
+            # On any read error, attempt to overwrite
+            need_write = True
+
+        if need_write:
+            with open(site_file, "w", encoding="utf-8") as f:
+                f.write(site_code)
+
+        # Prepend our site dir so it’s reliably discovered
+        prev = base_env.get("PYTHONPATH", "")
+        if prev:
+            base_env["PYTHONPATH"] = f"{site_dir}{os.pathsep}{prev}"
+        else:
+            base_env["PYTHONPATH"] = site_dir
+
+        # Explicit knob to control behavior from parent if desired
+        base_env.setdefault("CAI_MCP_STDERR_LOGGING", "1")
+
+        return base_env
+    except Exception:
+        # In the unlikely event of failure, fall back to original env
+        return dict(os.environ)
 
 
 # Custom MCPUtil that uses global registry
@@ -741,7 +818,9 @@ Example: `/mcp add burp 13`
         )
 
         async def connect_and_test():
-            params: MCPServerStdioParams = {"command": command, "args": cmd_args}
+            # Harden stdio interop by ensuring Python servers don't log to stdout
+            env = _prepare_python_stdio_log_sanitizer_env()
+            params: MCPServerStdioParams = {"command": command, "args": cmd_args, "env": env}
             server = MCPServerStdio(params, name=name, cache_tools_list=True)
 
             # Connect to the server
