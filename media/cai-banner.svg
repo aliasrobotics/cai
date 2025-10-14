@@ -184,7 +184,7 @@
       <text x="450" y="305" font-family="Arial, sans-serif" font-size="11" font-style="italic"
             text-anchor="middle" fill="#666666" cursor="pointer">
         CAI PRO w/ <tspan font-family="'Courier New', monospace">alias1</tspan> model outperforms GPT-5 in AI vs AI cybersecurity benchmarks |
-        <tspan fill="#529d86" text-decoration="underline">View Full Benchmarks →</tspan>
+        <tspan fill="#529d86" text-decoration="underline">View in CAI PRO page →</tspan>
       </text>
     </g>
   </a>
