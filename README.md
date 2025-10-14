@@ -33,9 +33,7 @@
 <!-- CAI PRO - Professional Edition Banner -->
 
 <div align="center">
-  <a href="https://aliasrobotics.com/cybersecurityai.php">
-    <img src="media/cai-banner.svg" alt="CAI - Community and Professional Editions" width="100%" style="max-width: 900px;">
-  </a>
+  <img src="media/cai-banner.svg" alt="CAI - Community and Professional Editions" width="100%" style="max-width: 900px;">
 </div>
 
 <!-- Alternative HTML version (kept as comment for reference) -->
