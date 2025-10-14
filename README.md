@@ -30,6 +30,61 @@
 
 </div>
 
+<!-- CAI PRO - Professional Edition Banner -->
+
+<div align="center">
+  <a href="https://aliasrobotics.com/cybersecurityai.php" target="_blank">
+    <img src="media/cai-banner.svg" alt="CAI - Community and Professional Editions" width="100%" style="max-width: 900px;">
+  </a>
+
+  <sub><i>Professional Edition with unlimited <code>alias1</code> tokens</i> | <a href="https://aliasrobotics.com/alias1.php#benchmarking">📊 View Benchmarks</a> | <a href="https://aliasrobotics.com/cybersecurityai.php">🚀 Learn More</a></sub>
+</div>
+
+<!-- Alternative HTML version (kept as comment for reference) -->
+<!--
+<div align="center">
+  <table style="border-collapse: collapse; width: 100%; max-width: 900px; box-shadow: 0 4px 12px rgba(82, 157, 134, 0.15);">
+    <tr>
+      <td align="center" width="50%" style="padding: 20px; border: 3px solid #529d86; border-right: 1.5px solid #529d86; border-radius: 10px 0 0 10px; background: linear-gradient(135deg, #f0f8f6 0%, #ffffff 100%);">
+        <h3 style="color: #3d7b6b;">🔓 Community Edition</h3>
+        <sub style="color: #529d86;"><b>Research & Learning · Perfect for Researchers & Students</b></sub><br><br>
+        <code style="background: linear-gradient(135deg, #e8f5f1 0%, #d4ede5 100%); padding: 8px 16px; border-radius: 6px; font-size: 14px; border: 1px solid #529d86; color: #2d5a4d;">pip install cai-framework</code><br><br>
+        <div align="left" style="margin: 10px auto; max-width: 200px; color: #2d2d2d;">
+          ✅ <b style="color: #529d86;">Free</b> for research<br>
+          🤖 <b style="color: #529d86;">300+</b> AI models<br>
+          🌍 <b style="color: #529d86;">Community</b> driven<br>
+          📚 <b style="color: #529d86;">Open</b> source<br>
+          🔧 <b style="color: #529d86;">Extensible</b> framework<br>
+        </div>
+      </td>
+      <td align="center" width="50%" style="padding: 20px; border: 3px solid #529d86; border-left: 1.5px solid #529d86; border-radius: 0 10px 10px 0; background: linear-gradient(135deg, #529d86 0%, #6bb09a 100%); position: relative; box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.1);">
+        <h3 style="color: #ffffff; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">🚀 <a href="https://aliasrobotics.com/cybersecurityai.php" style="text-decoration: none; color: #ffffff;">Professional Edition</a></h3>
+        <sub style="color: #e8f5f1;"><b>Enterprise & Production · €350/month · Unlimited <code style="background: rgba(255, 255, 255, 0.2); padding: 2px 6px; border-radius: 3px; color: #ffffff;">alias1</code> Tokens</b></sub><br><br>
+        <a href="https://aliasrobotics.com/cybersecurityai.php">
+          <code style="background: linear-gradient(135deg, #ffffff 0%, #f0f8f6 100%); color: #529d86; padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: bold; border: 2px solid #ffffff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);">→ Upgrade to PRO</code>
+        </a><br><br>
+        <div align="left" style="margin: 10px auto; max-width: 280px; color: #ffffff;">
+          ⚡ <b><a href="https://aliasrobotics.com/alias1.php#benchmarking" style="color: #ffffff; text-decoration: underline;">alias1</a></b> model - ∞ unlimited tokens<br>
+          🚫 <b>Zero refusals</b> - Unrestricted AI<br>
+          🏆 <b>Beats GPT-5</b> in CTF benchmarks<br>
+          🛡️ <b>Professional</b> support included<br>
+          🇪🇺 <b>European</b> data sovereignty<br>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" align="center" style="padding: 10px; background: #f6f8fa;">
+        <sub>
+          <a href="https://aliasrobotics.com/cybersecurityai.php"></a><br>
+          <i>CAI PRO w/ <code>alias1</code> model outperforms GPT-5 in AI vs AI cybersecurity benchmarks</i> | <a href="https://aliasrobotics.com/alias1.php#benchmarking">View Full Benchmarks →</a>
+        </sub>
+      </td>
+    </tr>
+  </table>
+</div>
+-->
+
+
 Cybersecurity AI (CAI) is a lightweight, open-source framework that empowers security professionals to build and deploy AI-powered offensive and defensive automation. CAI is the *de facto* framework for AI Security, already used by thousands of individual users and hundreds of organizations. Whether you're a security researcher, ethical hacker, IT professional, or organization looking to enhance your security posture, CAI provides the building blocks to create specialized AI agents that can assist with mitigation, vulnerability discovery, exploitation, and security assessment.
 
 **Key Features:**
@@ -1129,6 +1184,7 @@ If you want to cite our work, please use the following:
       url={https://arxiv.org/abs/2508.21669}, 
 }
 ```
+
 
 ## Acknowledgements
 
