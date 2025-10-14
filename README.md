@@ -33,28 +33,28 @@
 <!-- CAI PRO - Professional Edition Banner -->
 
 <div align="center">
-  <table style="border-collapse: collapse; width: 100%; max-width: 900px;">
+  <table style="border-collapse: collapse; width: 100%; max-width: 900px; box-shadow: 0 4px 12px rgba(82, 157, 134, 0.15);">
     <tr>
-      <td align="center" width="50%" style="padding: 20px; border: 2px solid #e1e4e8; border-radius: 10px 0 0 10px; background: linear-gradient(135deg, #f6f8fa 0%, #ffffff 100%);">
-        <h3>🔓 Community Edition</h3>
-        <sub><b>Research & Learning · Perfect for Researchers & Students</b></sub><br><br>
-        <code style="background: #f6f8fa; padding: 8px 16px; border-radius: 6px; font-size: 14px;">pip install cai-framework</code><br><br>
-        <div align="left" style="margin: 10px auto; max-width: 200px;">
-          ✅ <b>Free</b> for research<br>
-          🤖 <b>300+</b> AI models<br>
-          🌍 <b>Community</b> driven<br>
-          📚 <b>Open</b> source<br>
-          🔧 <b>Extensible</b> framework<br>
+      <td align="center" width="50%" style="padding: 20px; border: 3px solid #529d86; border-right: 1.5px solid #529d86; border-radius: 10px 0 0 10px; background: linear-gradient(135deg, #f0f8f6 0%, #ffffff 100%);">
+        <h3 style="color: #3d7b6b;">🔓 Community Edition</h3>
+        <sub style="color: #529d86;"><b>Research & Learning · Perfect for Researchers & Students</b></sub><br><br>
+        <code style="background: linear-gradient(135deg, #e8f5f1 0%, #d4ede5 100%); padding: 8px 16px; border-radius: 6px; font-size: 14px; border: 1px solid #529d86; color: #2d5a4d;">pip install cai-framework</code><br><br>
+        <div align="left" style="margin: 10px auto; max-width: 200px; color: #2d2d2d;">
+          ✅ <b style="color: #529d86;">Free</b> for research<br>
+          🤖 <b style="color: #529d86;">300+</b> AI models<br>
+          🌍 <b style="color: #529d86;">Community</b> driven<br>
+          📚 <b style="color: #529d86;">Open</b> source<br>
+          🔧 <b style="color: #529d86;">Extensible</b> framework<br>
         </div>
       </td>
-      <td align="center" width="50%" style="padding: 20px; border: 2px solid #529d86; border-radius: 0 10px 10px 0; background: linear-gradient(135deg, #f5faf9 0%, #ffffff 100%); position: relative;">
-        <h3>🚀 <a href="https://aliasrobotics.com/cybersecurityai.php" style="text-decoration: none; color: inherit;">Professional Edition</a></h3>
-        <sub><b>Enterprise & Production · €350/month · Unlimited <code>alias1</code> Tokens</b></sub><br><br>
+      <td align="center" width="50%" style="padding: 20px; border: 3px solid #529d86; border-left: 1.5px solid #529d86; border-radius: 0 10px 10px 0; background: linear-gradient(135deg, #529d86 0%, #6bb09a 100%); position: relative; box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.1);">
+        <h3 style="color: #ffffff; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">🚀 <a href="https://aliasrobotics.com/cybersecurityai.php" style="text-decoration: none; color: #ffffff;">Professional Edition</a></h3>
+        <sub style="color: #e8f5f1;"><b>Enterprise & Production · €350/month · Unlimited <code style="background: rgba(255, 255, 255, 0.2); padding: 2px 6px; border-radius: 3px; color: #ffffff;">alias1</code> Tokens</b></sub><br><br>
         <a href="https://aliasrobotics.com/cybersecurityai.php">
-          <code style="background: linear-gradient(135deg, #529d86 0%, #6bb09a 100%); color: white; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: bold;">→ Upgrade to PRO</code>
+          <code style="background: linear-gradient(135deg, #ffffff 0%, #f0f8f6 100%); color: #529d86; padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: bold; border: 2px solid #ffffff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);">→ Upgrade to PRO</code>
         </a><br><br>
-        <div align="left" style="margin: 10px auto; max-width: 280px;">
-          ⚡ <b><a href="https://aliasrobotics.com/alias1.php#benchmarking">alias1</a></b> model - ∞ unlimited tokens<br>
+        <div align="left" style="margin: 10px auto; max-width: 280px; color: #ffffff;">
+          ⚡ <b><a href="https://aliasrobotics.com/alias1.php#benchmarking" style="color: #ffffff; text-decoration: underline;">alias1</a></b> model - ∞ unlimited tokens<br>
           🚫 <b>Zero refusals</b> - Unrestricted AI<br>
           🏆 <b>Beats GPT-5</b> in CTF benchmarks<br>
           🛡️ <b>Professional</b> support included<br>
