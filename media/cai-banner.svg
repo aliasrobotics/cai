@@ -127,10 +127,10 @@
   </g>
 
   <!-- Professional Edition Content with hyperlink -->
-  <a xlink:href="https://aliasrobotics.com/cybersecurityai.php" target="_blank">
+  <a href="https://aliasrobotics.com/cybersecurityai.php" target="_blank">
     <g>
       <!-- Make PRO section clickable area indicator -->
-      <rect x="453" y="3" width="444" height="277" fill="transparent" opacity="0" cursor="pointer"/>
+      <rect x="453" y="3" width="444" height="277" fill="transparent" opacity="0.01" cursor="pointer"/>
 
       <!-- Title with emoji and shadow -->
       <text x="673" y="40" font-family="Arial, sans-serif" font-size="22" font-weight="bold"
@@ -176,10 +176,10 @@
   </a>
 
   <!-- Bottom banner with hyperlink -->
-  <a xlink:href="https://aliasrobotics.com/alias1.php#benchmarking" target="_blank">
+  <a href="https://aliasrobotics.com/alias1.php#benchmarking" target="_blank">
     <g>
       <!-- Make bottom banner clickable area indicator -->
-      <rect x="3" y="283" width="894" height="34" fill="transparent" opacity="0" cursor="pointer"/>
+      <rect x="3" y="283" width="894" height="34" fill="transparent" opacity="0.01" cursor="pointer"/>
 
       <text x="450" y="305" font-family="Arial, sans-serif" font-size="11" font-style="italic"
             text-anchor="middle" fill="#666666" cursor="pointer">
