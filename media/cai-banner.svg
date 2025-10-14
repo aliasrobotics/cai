@@ -100,28 +100,28 @@
       Research &amp; Learning · Perfect for Researchers &amp; Students
     </text>
 
-    <!-- Code block -->
-    <rect x="80" y="80" width="290" height="35" fill="url(#codeBlockBg)"
-          stroke="#529d86" stroke-width="1" rx="6" ry="6"/>
-    <text x="225" y="102" font-family="'Courier New', monospace" font-size="14"
+    <!-- Code block - centered in left panel (450px wide, center at 225) -->
+    <rect x="125" y="80" width="200" height="35" fill="url(#codeBlockBg)"
+          stroke="#529d86" stroke-width="2" rx="6" ry="6"/>
+    <text x="225" y="102" font-family="'Courier New', monospace" font-size="14" font-weight="bold"
           text-anchor="middle" fill="#2d5a4d">
       pip install cai-framework
     </text>
 
     <!-- Feature list -->
-    <text x="145" y="145" font-family="Arial, sans-serif" font-size="14" fill="#2d2d2d">
+    <text x="135" y="145" font-family="Arial, sans-serif" font-size="14" fill="#2d2d2d">
       ✅ <tspan font-weight="bold" fill="#529d86">Free</tspan> for research
     </text>
-    <text x="145" y="165" font-family="Arial, sans-serif" font-size="14" fill="#2d2d2d">
+    <text x="135" y="165" font-family="Arial, sans-serif" font-size="14" fill="#2d2d2d">
       🤖 <tspan font-weight="bold" fill="#529d86">300+</tspan> AI models
     </text>
-    <text x="145" y="185" font-family="Arial, sans-serif" font-size="14" fill="#2d2d2d">
+    <text x="135" y="185" font-family="Arial, sans-serif" font-size="14" fill="#2d2d2d">
       🌍 <tspan font-weight="bold" fill="#529d86">Community-</tspan>driven
     </text>
-    <text x="145" y="205" font-family="Arial, sans-serif" font-size="14" fill="#2d2d2d">
+    <text x="135" y="205" font-family="Arial, sans-serif" font-size="14" fill="#2d2d2d">
       📚 <tspan font-weight="bold" fill="#529d86">Open</tspan> source
     </text>
-    <text x="145" y="225" font-family="Arial, sans-serif" font-size="14" fill="#2d2d2d">
+    <text x="135" y="225" font-family="Arial, sans-serif" font-size="14" fill="#2d2d2d">
       📅 <tspan font-weight="bold" fill="#529d86">~6 months</tspan> release cycles
     </text>
   </g>
@@ -146,30 +146,30 @@
                style="background:rgba(255,255,255,0.2)">alias1</tspan> Tokens
       </text>
 
-      <!-- Button with gradient and shadow -->
+      <!-- Button with gradient and shadow - centered in right panel (447px wide, center at 673.5) -->
       <g filter="url(#buttonShadow)">
-        <rect x="573" y="80" width="200" height="35" fill="url(#buttonBg)"
-              stroke="#ffffff" stroke-width="2" rx="6" ry="6" cursor="pointer"/>
-        <text x="673" y="102" font-family="'Courier New', monospace" font-size="14" font-weight="bold"
+        <rect x="573.5" y="80" width="200" height="35" fill="url(#buttonBg)"
+              stroke="#529d86" stroke-width="2" rx="6" ry="6" cursor="pointer"/>
+        <text x="673.5" y="102" font-family="'Courier New', monospace" font-size="14" font-weight="bold"
               text-anchor="middle" fill="#529d86">
           → Upgrade to PRO
         </text>
       </g>
 
       <!-- Feature list -->
-      <text x="580" y="145" font-family="Arial, sans-serif" font-size="14" fill="#ffffff">
+      <text x="583" y="145" font-family="Arial, sans-serif" font-size="14" fill="#ffffff">
         ⚡ <tspan font-weight="bold">alias1</tspan> model - ∞ unlimited tokens
       </text>
-      <text x="580" y="165" font-family="Arial, sans-serif" font-size="14" fill="#ffffff">
+      <text x="583" y="165" font-family="Arial, sans-serif" font-size="14" fill="#ffffff">
         💻 <tspan font-weight="bold">Hacking without limits</tspan> - Unrestricted AI
       </text>
-      <text x="580" y="185" font-family="Arial, sans-serif" font-size="14" fill="#ffffff">
+      <text x="583" y="185" font-family="Arial, sans-serif" font-size="14" fill="#ffffff">
         🏆 <tspan font-weight="bold">Beats GPT-5</tspan> in benchmarks
       </text>
-      <text x="580" y="205" font-family="Arial, sans-serif" font-size="14" fill="#ffffff">
+      <text x="583" y="205" font-family="Arial, sans-serif" font-size="14" fill="#ffffff">
         🛡️ <tspan font-weight="bold">Professional</tspan> support included
       </text>
-      <text x="580" y="225" font-family="Arial, sans-serif" font-size="14" fill="#ffffff">
+      <text x="583" y="225" font-family="Arial, sans-serif" font-size="14" fill="#ffffff">
         🇪🇺 <tspan font-weight="bold">European</tspan> data sovereignty
       </text>
     </g>
