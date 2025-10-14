@@ -1,6 +1,6 @@
 # Cybersecurity AI (`CAI`)
 
-<!-- <div align="center">
+<div align="center">
   <p>
     <a align="center" href="" target="https://github.com/aliasrobotics/CAI">
       <img
@@ -8,13 +8,8 @@
         src="https://github.com/aliasrobotics/cai/raw/main/media/cai.png"
       >
     </a>
-  </p> -->
+  </p>
 
-<!-- CAI PRO - Professional Edition Banner -->
-
-<div align="center">
-  <img src="media/cai-banner.svg" alt="CAI - Community and Professional Editions" width="100%" style="max-width: 900px;">
-</div>
 
 <a href="https://trendshift.io/repositories/14317" target="_blank"><img src="https://trendshift.io/api/badge/repositories/14317" alt="aliasrobotics%2Fcai | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
@@ -35,7 +30,13 @@
 
 </div>
 
+<!-- CAI PRO - Professional Edition Banner -->
 
+<div align="center">
+  <a href="https://aliasrobotics.com/cybersecurityai.php" target="_blank">
+    <img src="media/cai-banner.svg" alt="CAI - Community and Professional Editions" width="100%" style="max-width: 900px;">
+  </a>
+</div>
 
 <!-- Alternative HTML version (kept as comment for reference) -->
 <!--
