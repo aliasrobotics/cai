@@ -36,9 +36,8 @@
   <table style="border-collapse: collapse; width: 100%; max-width: 900px;">
     <tr>
       <td align="center" width="50%" style="padding: 20px; border: 2px solid #e1e4e8; border-radius: 10px 0 0 10px; background: linear-gradient(135deg, #f6f8fa 0%, #ffffff 100%);">
-        <img src="https://img.shields.io/badge/OPEN%20SOURCE-CAI-28a745?style=for-the-badge&logo=github&logoColor=white" alt="Open Source CAI" style="margin-bottom: 10px;"><br>
         <h3>🔓 Community Edition</h3>
-        <sub><b>Research & Learning</b></sub><br><br>
+        <sub><b>Research & Learning · Perfect for Researchers & Students</b></sub><br><br>
         <code style="background: #f6f8fa; padding: 8px 16px; border-radius: 6px; font-size: 14px;">pip install cai-framework</code><br><br>
         <div align="left" style="margin: 10px auto; max-width: 200px;">
           ✅ <b>Free</b> for research<br>
@@ -47,20 +46,12 @@
           📚 <b>Open</b> source<br>
           🔧 <b>Extensible</b> framework<br>
         </div>
-        <br>
-        <img src="https://img.shields.io/badge/Perfect%20for-Researchers%20%26%20Students-blue?style=flat-square" alt="Perfect for">
       </td>
-      <td align="center" width="50%" style="padding: 20px; border: 2px solid #ff6b6b; border-radius: 0 10px 10px 0; background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%); position: relative;">
-        <div style="position: absolute; top: 5px; right: 10px;">
-          <img src="https://img.shields.io/badge/NEW-2025-ff6b6b?style=flat&labelColor=333333" alt="New">
-        </div>
-        <a href="https://aliasrobotics.com/cybersecurityai.php">
-          <img src="https://img.shields.io/badge/PROFESSIONAL-CAI%20PRO-ff6b6b?style=for-the-badge&logo=rocket&logoColor=white" alt="CAI PRO">
-        </a><br>
+      <td align="center" width="50%" style="padding: 20px; border: 2px solid #529d86; border-radius: 0 10px 10px 0; background: linear-gradient(135deg, #f5faf9 0%, #ffffff 100%); position: relative;">
         <h3>🚀 <a href="https://aliasrobotics.com/cybersecurityai.php" style="text-decoration: none; color: inherit;">Professional Edition</a></h3>
-        <sub><b>Enterprise & Production</b></sub><br><br>
+        <sub><b>Enterprise & Production · €350/month · Unlimited <code>alias1</code> Tokens</b></sub><br><br>
         <a href="https://aliasrobotics.com/cybersecurityai.php">
-          <code style="background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%); color: white; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: bold;">→ Upgrade to PRO</code>
+          <code style="background: linear-gradient(135deg, #529d86 0%, #6bb09a 100%); color: white; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: bold;">→ Upgrade to PRO</code>
         </a><br><br>
         <div align="left" style="margin: 10px auto; max-width: 280px;">
           ⚡ <b><a href="https://aliasrobotics.com/alias1.php#benchmarking">alias1</a></b> model - ∞ unlimited tokens<br>
@@ -69,8 +60,6 @@
           🛡️ <b>Professional</b> support included<br>
           🇪🇺 <b>European</b> data sovereignty<br>
         </div>
-        <br>
-        <img src="https://img.shields.io/badge/€350%2Fmonth-Unlimited%20Tokens-success?style=flat-square" alt="Pricing">
       </td>
     </tr>
     <tr>
