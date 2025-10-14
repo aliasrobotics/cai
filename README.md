@@ -33,6 +33,14 @@
 <!-- CAI PRO - Professional Edition Banner -->
 
 <div align="center">
+  <a href="https://aliasrobotics.com/cybersecurityai.php">
+    <img src="media/cai-banner.svg" alt="CAI - Community and Professional Editions" width="100%" style="max-width: 900px;">
+  </a>
+</div>
+
+<!-- Alternative HTML version (kept as comment for reference) -->
+<!--
+<div align="center">
   <table style="border-collapse: collapse; width: 100%; max-width: 900px; box-shadow: 0 4px 12px rgba(82, 157, 134, 0.15);">
     <tr>
       <td align="center" width="50%" style="padding: 20px; border: 3px solid #529d86; border-right: 1.5px solid #529d86; border-radius: 10px 0 0 10px; background: linear-gradient(135deg, #f0f8f6 0%, #ffffff 100%);">
@@ -65,15 +73,14 @@
     <tr>
       <td colspan="2" align="center" style="padding: 10px; background: #f6f8fa;">
         <sub>
-          <a href="https://aliasrobotics.com/cybersecurityai.php">
-            <img src="https://aliasrobotics.com/img/ad_alias1_vs_gpt5_v2.png" alt="alias1 vs GPT-5 Benchmark" style="max-width: 600px; width: 100%; border-radius: 8px; margin-top: 10px;">
-          </a><br>
-          <i>CAI PRO's alias1 model outperforms GPT-5 in cybersecurity benchmarks</i> | <a href="https://aliasrobotics.com/alias1.php#benchmarking">View Full Benchmarks →</a>
+          <a href="https://aliasrobotics.com/cybersecurityai.php"></a><br>
+          <i>CAI PRO w/ <code>alias1</code> model outperforms GPT-5 in AI vs AI cybersecurity benchmarks</i> | <a href="https://aliasrobotics.com/alias1.php#benchmarking">View Full Benchmarks →</a>
         </sub>
       </td>
     </tr>
   </table>
 </div>
+-->
 
 
 Cybersecurity AI (CAI) is a lightweight, open-source framework that empowers security professionals to build and deploy AI-powered offensive and defensive automation. CAI is the *de facto* framework for AI Security, already used by thousands of individual users and hundreds of organizations. Whether you're a security researcher, ethical hacker, IT professional, or organization looking to enhance your security posture, CAI provides the building blocks to create specialized AI agents that can assist with mitigation, vulnerability discovery, exploitation, and security assessment.
