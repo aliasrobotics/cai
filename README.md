@@ -478,13 +478,14 @@ The OPENAI_API_KEY must not be left blank. It should contain either "sk-123" (as
 
 :warning: Note:
 
-If you are using alias0 model, make sure that CAI is >0.4.0 version and here you have an .env example to be able to use it.
+If you are using alias1 model, make sure that CAI is >0.4.0 version and here you have an .env example to be able to use it.
 
 ```bash
 OPENAI_API_KEY="sk-1234"
 OLLAMA=""
 ALIAS_API_KEY="<sk-your-key>"  # note, add yours
 CAI_STEAM=False
+CAI_MODEL="alias1"
 ```
 
 ### 🔹 Custom OpenAI Base URL Support
