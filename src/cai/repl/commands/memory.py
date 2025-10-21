@@ -1415,6 +1415,8 @@ This session is being continued from a previous conversation that ran out of con
 
         NOTE: This method is deprecated and kept for backwards compatibility.
         Use _write_history_to_file for better memory efficiency with large histories.
+
+        IMPORTANT: Preserves COMPLETE history without truncation or message limits.
         """
         formatted_parts = []
 
@@ -1426,7 +1428,7 @@ This session is being continued from a previous conversation that ran out of con
             if not content:
                 continue
 
-            # Format based on role
+            # Format based on role - PRESERVE EVERYTHING
             if role == "user":
                 formatted_parts.append(f"USER: {content}")
             elif role == "assistant":
@@ -1435,27 +1437,28 @@ This session is being continued from a previous conversation that ran out of con
                     tool_info = []
                     for tc in msg["tool_calls"]:
                         if hasattr(tc, "function"):
+                            # PRESERVE FULL ARGUMENTS
                             tool_info.append(f"{tc.function.name}({tc.function.arguments})")
                     if tool_info:
                         formatted_parts.append(f"ASSISTANT (tools): {', '.join(tool_info)}")
                 if content:
                     formatted_parts.append(f"ASSISTANT: {content}")
             elif role == "tool":
-                # Include important tool outputs
-                if len(str(content)) < 500:  # Only include short outputs
-                    formatted_parts.append(f"TOOL OUTPUT: {content}")
-                else:
-                    formatted_parts.append(f"TOOL OUTPUT: [Long output truncated]")
+                # PRESERVE FULL TOOL OUTPUT - no truncation
+                formatted_parts.append(f"TOOL OUTPUT: {content}")
 
-        return "\n\n".join(formatted_parts[-50:])  # Limit to last 50 exchanges
+        # Return ALL messages, no limit
+        return "\n\n".join(formatted_parts)
 
-    def _write_history_to_file(self, history: List[Dict[str, Any]], output_file: Path, max_tool_output_size: int = 1000) -> tuple[int, int]:
+    def _write_history_to_file(self, history: List[Dict[str, Any]], output_file: Path) -> tuple[int, int]:
         """Write message history to file using streaming to avoid memory issues.
+
+        IMPORTANT: This writes the COMPLETE history without any truncation or loss of data.
+        All messages, tool outputs, and function arguments are preserved in full.
 
         Args:
             history: Message history to write
             output_file: Path to output file
-            max_tool_output_size: Maximum size for tool outputs (truncate longer ones)
 
         Returns:
             Tuple of (messages_written, total_size_bytes)
@@ -1472,7 +1475,7 @@ This session is being continued from a previous conversation that ran out of con
                 if not content:
                     continue
 
-                # Format based on role
+                # Format based on role - PRESERVE EVERYTHING
                 message_text = None
                 if role == "user":
                     message_text = f"USER: {content}\n\n"
@@ -1482,10 +1485,8 @@ This session is being continued from a previous conversation that ran out of con
                         tool_info = []
                         for tc in msg["tool_calls"]:
                             if hasattr(tc, "function"):
-                                # Truncate large function arguments
+                                # PRESERVE FULL ARGUMENTS - no truncation
                                 args = str(tc.function.arguments)
-                                if len(args) > max_tool_output_size:
-                                    args = args[:max_tool_output_size] + "... [truncated]"
                                 tool_info.append(f"{tc.function.name}({args})")
                         if tool_info:
                             message_text = f"ASSISTANT (tools): {', '.join(tool_info)}\n\n"
@@ -1495,10 +1496,8 @@ This session is being continued from a previous conversation that ran out of con
                         else:
                             message_text = f"ASSISTANT: {content}\n\n"
                 elif role == "tool":
-                    # Truncate large tool outputs
+                    # PRESERVE FULL TOOL OUTPUT - no truncation
                     content_str = str(content)
-                    if len(content_str) > max_tool_output_size:
-                        content_str = content_str[:max_tool_output_size] + "... [truncated for size]"
                     message_text = f"TOOL OUTPUT: {content_str}\n\n"
 
                 if message_text:
