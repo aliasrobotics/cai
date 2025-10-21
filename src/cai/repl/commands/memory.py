@@ -8,11 +8,13 @@ import os
 import asyncio
 import json
 import datetime
+import tempfile
 from pathlib import Path
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.tree import Tree
+from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
 
 from cai.repl.commands.base import Command, register_command
 from cai.sdk.agents.models.openai_chatcompletions import (
@@ -1120,7 +1122,7 @@ Model: {get_compact_model() or os.environ.get("CAI_MODEL", "gpt-4")}
             PERSISTENT_MESSAGE_HISTORIES[agent_name].clear()
     
     async def _ai_summarize_history(self, agent_name: Optional[str] = None) -> Optional[str]:
-        """Use an AI agent to summarize conversation history."""
+        """Use an AI agent to summarize conversation history with optimized memory usage."""
         # Get history to summarize
         if agent_name:
             history = get_agent_message_history(agent_name)
@@ -1132,24 +1134,163 @@ Model: {get_compact_model() or os.environ.get("CAI_MODEL", "gpt-4")}
             for h in all_histories.values():
                 history.extend(h)
             target = "all agents"
-            
+
         if not history:
             console.print(f"[yellow]No history to summarize for {target}[/yellow]")
             return None
-            
-        # Prepare conversation for summarization
-        conversation_text = self._format_history_for_summary(history)
-        
-        # Get compact settings from compact command
+
+        console.print(f"[cyan]Preparing conversation history ({len(history)} messages)...[/cyan]")
+
+        # Write history to temporary file to avoid memory issues
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False, encoding='utf-8') as temp_file:
+            temp_path = Path(temp_file.name)
+            try:
+                # Write history to file with progress indicator
+                with Progress(
+                    SpinnerColumn(),
+                    TextColumn("[progress.description]{task.description}"),
+                    BarColumn(),
+                    TaskProgressColumn(),
+                    console=console,
+                    transient=True
+                ) as progress:
+                    task = progress.add_task("[cyan]Writing history to temporary file...", total=len(history))
+
+                    messages_written, file_size = self._write_history_to_file(history, temp_path)
+
+                    progress.update(task, completed=len(history))
+
+                file_size_mb = file_size / (1024 * 1024)
+                console.print(f"[green]✓ Wrote {messages_written} messages ({file_size_mb:.2f} MB) to temporary file[/green]")
+
+                # Check if file is too large and needs batching
+                MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB threshold for batching
+                if file_size > MAX_FILE_SIZE:
+                    console.print(f"[yellow]Large history detected ({file_size_mb:.2f} MB), using batch processing...[/yellow]")
+                    summary = await self._batch_summarize_from_file(temp_path, target, file_size, messages_written)
+                else:
+                    # Read file and summarize in one go
+                    with open(temp_path, 'r', encoding='utf-8') as f:
+                        conversation_text = f.read()
+
+                    summary = await self._summarize_text(conversation_text, target)
+
+                return summary
+
+            finally:
+                # Clean up temp file
+                if temp_path.exists():
+                    temp_path.unlink()
+
+    async def _batch_summarize_from_file(self, file_path: Path, target: str, total_size: int, total_messages: int) -> Optional[str]:
+        """Summarize large conversation history in batches to avoid memory/API limits.
+
+        Args:
+            file_path: Path to file containing conversation history
+            target: Description of what is being summarized
+            total_size: Total size in bytes
+            total_messages: Total number of messages
+
+        Returns:
+            Final summary combining all batches
+        """
+        BATCH_SIZE = 3 * 1024 * 1024  # 3 MB per batch
+        batch_summaries = []
+
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Split into batches by size
+        num_batches = (len(content) + BATCH_SIZE - 1) // BATCH_SIZE
+
+        console.print(f"[cyan]Processing in {num_batches} batches...[/cyan]")
+
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            console=console
+        ) as progress:
+            task = progress.add_task(f"[cyan]Summarizing batches...", total=num_batches)
+
+            for i in range(num_batches):
+                start = i * BATCH_SIZE
+                end = min((i + 1) * BATCH_SIZE, len(content))
+                batch_content = content[start:end]
+
+                batch_summary = await self._summarize_text(
+                    batch_content,
+                    f"{target} (batch {i+1}/{num_batches})",
+                    batch_mode=True
+                )
+
+                if batch_summary:
+                    batch_summaries.append(batch_summary)
+
+                progress.update(task, advance=1)
+
+        if not batch_summaries:
+            console.print("[red]Failed to generate any batch summaries[/red]")
+            return None
+
+        # Combine batch summaries into final summary
+        if len(batch_summaries) == 1:
+            return batch_summaries[0]
+
+        console.print("[cyan]Combining batch summaries into final summary...[/cyan]")
+        combined_text = "\n\n---\n\n".join(f"## Batch {i+1}\n{summary}" for i, summary in enumerate(batch_summaries))
+
+        final_summary = await self._summarize_text(
+            combined_text,
+            target,
+            batch_mode=False,
+            is_final_pass=True
+        )
+
+        return final_summary
+
+    async def _summarize_text(self, text: str, target: str, batch_mode: bool = False, is_final_pass: bool = False) -> Optional[str]:
+        """Summarize a text using AI model.
+
+        Args:
+            text: Text to summarize
+            target: Description of what is being summarized
+            batch_mode: Whether this is a batch summary (uses simpler prompt)
+            is_final_pass: Whether this is the final pass combining batch summaries
+
+        Returns:
+            Summary text or None on failure
+        """
         from cai.repl.commands.compact import get_compact_model, get_custom_prompt
-        
+
         # Create summary agent
         model_name = get_compact_model() or os.environ.get("CAI_MODEL", "alias0")
-        
+
         # Use custom prompt if set, otherwise use default
         custom_prompt = get_custom_prompt()
+
         if custom_prompt:
             instructions = custom_prompt
+        elif batch_mode and not is_final_pass:
+            # Simpler instructions for batch processing
+            instructions = """You are a conversation summarizer. Summarize this portion of a conversation, focusing on:
+1. Main topics and user requests
+2. Key technical details and file changes
+3. Important errors and solutions
+4. Current progress and outcomes
+
+Keep the summary detailed but organized. This is part of a larger conversation."""
+        elif is_final_pass:
+            # Instructions for combining batch summaries
+            instructions = """You are a conversation summarizer. You will receive multiple summaries of different parts of a conversation.
+Combine these summaries into one comprehensive, well-organized summary that:
+1. Maintains chronological flow
+2. Eliminates redundancy
+3. Preserves all critical technical details
+4. Provides clear next steps
+
+Create a cohesive summary that reads as if it was summarizing the entire conversation from the start."""
         else:
             instructions = """You are an advanced conversation summarizer specializing in creating comprehensive continuity summaries for technical conversations. Your task is to analyze the conversation and create a detailed summary that will serve as context for continuing the work in a new session.
 
@@ -1234,7 +1375,7 @@ After the analysis, provide a structured summary with these sections:
 - When the conversation is resumed, it should feel like a natural continuation
 
 This session is being continued from a previous conversation that ran out of context. The conversation is summarized below:"""
-        
+
         summary_agent = Agent(
             name="Summary Agent",
             instructions=instructions,
@@ -1244,38 +1385,47 @@ This session is being continued from a previous conversation that ran out of con
                 agent_name="Summary Agent"
             )
         )
-        
+
         # Generate summary
-        console.print(f"[yellow]Generating summary for {target} using {model_name}...[/yellow]")
-        
+        mode_desc = "batch " if batch_mode else ""
+        mode_desc = "final combined " if is_final_pass else mode_desc
+        console.print(f"[yellow]Generating {mode_desc}summary for {target} using {model_name}...[/yellow]")
+
         try:
             result = await Runner.run(
                 starting_agent=summary_agent,
-                input=f"Please summarize the following conversation:\n\n{conversation_text}",
+                input=f"Please summarize the following conversation:\n\n{text}",
                 max_turns=1
             )
-            
+
             if result.final_output:
                 return str(result.final_output)
             else:
                 return None
-                
+
         except Exception as e:
             console.print(f"[red]Error generating summary: {e}[/red]")
+            if os.getenv("CAI_DEBUG", "1") == "2":
+                import traceback
+                traceback.print_exc()
             return None
     
     def _format_history_for_summary(self, history: List[Dict[str, Any]]) -> str:
-        """Format message history for summarization."""
+        """Format message history for summarization.
+
+        NOTE: This method is deprecated and kept for backwards compatibility.
+        Use _write_history_to_file for better memory efficiency with large histories.
+        """
         formatted_parts = []
-        
+
         for msg in history:
             role = msg.get("role", "unknown")
             content = msg.get("content", "")
-            
+
             # Skip empty messages
             if not content:
                 continue
-                
+
             # Format based on role
             if role == "user":
                 formatted_parts.append(f"USER: {content}")
@@ -1296,8 +1446,67 @@ This session is being continued from a previous conversation that ran out of con
                     formatted_parts.append(f"TOOL OUTPUT: {content}")
                 else:
                     formatted_parts.append(f"TOOL OUTPUT: [Long output truncated]")
-                    
+
         return "\n\n".join(formatted_parts[-50:])  # Limit to last 50 exchanges
+
+    def _write_history_to_file(self, history: List[Dict[str, Any]], output_file: Path, max_tool_output_size: int = 1000) -> tuple[int, int]:
+        """Write message history to file using streaming to avoid memory issues.
+
+        Args:
+            history: Message history to write
+            output_file: Path to output file
+            max_tool_output_size: Maximum size for tool outputs (truncate longer ones)
+
+        Returns:
+            Tuple of (messages_written, total_size_bytes)
+        """
+        messages_written = 0
+        total_size = 0
+
+        with open(output_file, 'w', encoding='utf-8') as f:
+            for msg in history:
+                role = msg.get("role", "unknown")
+                content = msg.get("content", "")
+
+                # Skip empty messages
+                if not content:
+                    continue
+
+                # Format based on role
+                message_text = None
+                if role == "user":
+                    message_text = f"USER: {content}\n\n"
+                elif role == "assistant":
+                    # Check for tool calls
+                    if "tool_calls" in msg and msg["tool_calls"]:
+                        tool_info = []
+                        for tc in msg["tool_calls"]:
+                            if hasattr(tc, "function"):
+                                # Truncate large function arguments
+                                args = str(tc.function.arguments)
+                                if len(args) > max_tool_output_size:
+                                    args = args[:max_tool_output_size] + "... [truncated]"
+                                tool_info.append(f"{tc.function.name}({args})")
+                        if tool_info:
+                            message_text = f"ASSISTANT (tools): {', '.join(tool_info)}\n\n"
+                    if content:
+                        if message_text:
+                            message_text += f"ASSISTANT: {content}\n\n"
+                        else:
+                            message_text = f"ASSISTANT: {content}\n\n"
+                elif role == "tool":
+                    # Truncate large tool outputs
+                    content_str = str(content)
+                    if len(content_str) > max_tool_output_size:
+                        content_str = content_str[:max_tool_output_size] + "... [truncated for size]"
+                    message_text = f"TOOL OUTPUT: {content_str}\n\n"
+
+                if message_text:
+                    f.write(message_text)
+                    messages_written += 1
+                    total_size += len(message_text.encode('utf-8'))
+
+        return messages_written, total_size
     
     def _get_current_agent_name(self) -> Optional[str]:
         """Get the name of the current active agent."""
