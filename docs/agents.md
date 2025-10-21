@@ -334,8 +334,6 @@ CAI>/load logs/logname.jsonl
 ---
 
 
----
-
 ## Next Steps
 
 - **Running Agents**: See [running_agents documentation](running_agents.md) for execution details
