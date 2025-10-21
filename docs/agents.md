@@ -257,8 +257,11 @@ agent = Agent[UserContext](
 ```
 
 
-# Launch
+### Launch
+
+```bash
 cai
+```
 
 ### Performance Optimization
 
