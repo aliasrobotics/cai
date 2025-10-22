@@ -709,6 +709,8 @@ def run_cai_cli(
             # No agent selection menu - just run all agents
 
         except KeyboardInterrupt:
+            # Print newline to ensure clean prompt display after interrupt
+            print()
 
             def format_time(seconds):
                 mins, secs = divmod(int(seconds), 60)
@@ -1699,6 +1701,9 @@ def run_cai_cli(
             start_idle_timer()
 
         except KeyboardInterrupt:
+            # Print newline to ensure clean prompt display after interrupt
+            print()
+
             # Clean up any active streaming panels
             try:
                 from cai.util import cleanup_all_streaming_resources
