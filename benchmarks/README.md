@@ -138,7 +138,7 @@ Currently, supporting the following benchmarks, refer to [`ctf_configs.jsonl`](.
 
 [^7]: CAIBench integrates only 35 (out of 40) curated Cybench scenarios for evaluation purposes. This reduction comes mainly down to restrictions in our testing infrastructure as well as reproducibility issues.
 
-[^8]: CAI PRO version includes Jeopardy-style CTFs, Attack–Defense CTF, and Cyber Range Exercises. Learn more at https://aliasrobotics.com/cybersecurityai.php
+[^8]: Internal exercises related to Jeopardy-style CTFs, Attack–Defense CTF, and Cyber Range Exercises are available upon request to [CAI PRO](https://aliasrobotics.com/cybersecurityai.php) subscribers on a use case basis. Learn more at https://aliasrobotics.com/cybersecurityai.php
 
 
 ## About `Cybersecurity Knowledge` benchmarks
