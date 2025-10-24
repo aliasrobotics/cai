@@ -47,7 +47,7 @@ Basic workflow:
 3. Choose an agent or use `selection_agent` for recommendations
 4. Type your prompt and press **Enter**
 
-See the [Getting Started Guide](getting-started.md) for detailed instructions.
+See the [Getting Started Guide](getting_started.md) for detailed instructions.
 
 ## System Requirements
 
@@ -120,7 +120,7 @@ Learn more: [Sidebar Features](sidebar-features.md)
 ## Documentation Structure
 
 ### For New Users
-1. [Getting Started](getting-started.md) - First steps and basic usage
+1. [Getting Started](getting_started.md) - First steps and basic usage
 2. [User Interface](user-interface.md) - Understanding the layout
 3. [Keyboard Shortcuts](keyboard-shortcuts.md) - Essential shortcuts
 
@@ -198,7 +198,7 @@ For technical details, see the [Architecture Overview](../cai_architecture.md).
 
 ## What's Next?
 
-- 📖 [Getting Started Guide](getting-started.md) - Learn the basics
+- 📖 [Getting Started Guide](getting_started.md) - Learn the basics
 - ⌨️ [Keyboard Shortcuts](keyboard-shortcuts.md) - Boost your productivity
 - 🎯 [Commands Reference](commands-reference.md) - Master the commands
 - 👥 [Teams and Parallel Execution](teams-and-parallel-execution.md) - Advanced workflows
