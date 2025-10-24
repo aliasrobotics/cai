@@ -244,7 +244,7 @@ This will:
 - **2 Red + 2 Blue**: Offensive + defensive analysis
 - **Red + Blue + Retester + Bug**: Full security assessment lifecycle
 
-Learn more: [Teams and Parallel Execution](teams-and-parallel-execution.md)
+Learn more about Teams and Parallel Execution in the full TUI documentation.
 
 ## Step 8: Saving Your Work
 
@@ -319,20 +319,22 @@ Open the sidebar (`Ctrl+S`) and go to **"Stats"** tab to see:
 
 Congratulations! You've completed the basics of CAI TUI. Here's what to explore next:
 
+> **Note**: Additional TUI documentation is currently being developed. Topics marked with 🚧 will be available soon.
+
 ### Learn More Commands
-- 📖 [Commands Reference](commands-reference.md) - Master all available commands
-- ⌨️ [Keyboard Shortcuts](keyboard-shortcuts.md) - Speed up your workflow
+- 📖 Commands Reference 🚧 - Master all available commands
+- ⌨️ Keyboard Shortcuts 🚧 - Speed up your workflow
 
 ### Explore Advanced Features
-- 👥 [Teams and Parallel Execution](teams-and-parallel-execution.md) - Multi-agent workflows
-- 🔧 [MCP Integration](advanced-features.md#mcp-integration) - Connect external tools
-- 💾 [Session Management](advanced-features.md#session-management) - Advanced save/load
+- 👥 Teams and Parallel Execution 🚧 - Multi-agent workflows
+- 🔧 MCP Integration 🚧 - Connect external tools
+- 💾 Session Management 🚧 - Advanced save/load
 
 ### Customize Your Setup
-- ⚙️ [Configuration](configuration.md) - Environment variables and settings
+- ⚙️ Configuration 🚧 - Environment variables and settings
 
 ### Get Help
-- ❓ [FAQ](faq.md) - Common questions
-- 🔧 [Troubleshooting](troubleshooting.md) - Solve issues
+- ❓ FAQ 🚧 - Common questions
+- 🔧 Troubleshooting 🚧 - Solve issues
 - 💬 [Community Discord](https://discord.gg/aliasrobotics) - Ask questions
 

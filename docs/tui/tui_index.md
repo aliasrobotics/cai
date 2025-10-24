@@ -82,7 +82,7 @@ Each terminal maintains its own:
 - Isolated conversation history
 - Separate execution context
 
-Learn more: [Terminals Management](terminals-management.md)
+Learn more about terminal management in the full TUI documentation.
 
 ### 👥 Preconfigured Teams
 
@@ -92,7 +92,7 @@ Access specialized agent teams from the sidebar:
 - **Team: 2 Red + 2 Blue**: Dual-perspective security analysis
 - **Team: Red + Blue + Retester + Bug**: Comprehensive assessment workflow
 
-Learn more: [Teams and Parallel Execution](teams-and-parallel-execution.md)
+Learn more about Teams and Parallel Execution in the full TUI documentation.
 
 ### 🎯 Smart Agent Selection
 
@@ -104,7 +104,7 @@ Use the `selection_agent` to get intelligent agent recommendations based on your
 
 Or simply select it from the agent dropdown.
 
-Learn more: [Commands Reference](commands-reference.md)
+Learn more about commands in the full TUI documentation.
 
 ### 📊 Sidebar Features
 
@@ -115,28 +115,30 @@ The collapsible sidebar (`Ctrl+S`) provides:
 - **Stats**: Real-time session statistics and costs
 - **Keys**: Manage API keys for multiple providers
 
-Learn more: [Sidebar Features](sidebar-features.md)
+Learn more about sidebar features in the full TUI documentation.
 
 ## Documentation Structure
 
+> **Note**: TUI documentation is being actively developed. Topics marked with 🚧 are coming soon.
+
 ### For New Users
-1. [Getting Started](getting_started.md) - First steps and basic usage
-2. [User Interface](user-interface.md) - Understanding the layout
-3. [Keyboard Shortcuts](keyboard-shortcuts.md) - Essential shortcuts
+1. [Getting Started](getting_started.md) ✅ - First steps and basic usage
+2. User Interface 🚧 - Understanding the layout
+3. Keyboard Shortcuts 🚧 - Essential shortcuts
 
 ### For Regular Users
-4. [Commands Reference](commands-reference.md) - Complete command list
-5. [Terminals Management](terminals-management.md) - Working with multiple terminals
-6. [Sidebar Features](sidebar-features.md) - Sidebar tabs and capabilities
+4. Commands Reference 🚧 - Complete command list
+5. Terminals Management 🚧 - Working with multiple terminals
+6. Sidebar Features 🚧 - Sidebar tabs and capabilities
 
 ### For Advanced Users
-7. [Teams and Parallel Execution](teams-and-parallel-execution.md) - Multi-agent workflows
-8. [Configuration](configuration.md) - Environment variables and settings
-9. [Advanced Features](advanced-features.md) - MCP, Meta Agent, and more
+7. Teams and Parallel Execution 🚧 - Multi-agent workflows
+8. Configuration 🚧 - Environment variables and settings
+9. Advanced Features 🚧 - MCP, Meta Agent, and more
 
 ### Support Resources
-10. [Troubleshooting](troubleshooting.md) - Common issues and solutions
-11. [FAQ](faq.md) - Frequently asked questions
+10. Troubleshooting 🚧 - Common issues and solutions
+11. FAQ 🚧 - Frequently asked questions
 
 ## Quick Reference
 
@@ -151,7 +153,7 @@ Learn more: [Sidebar Features](sidebar-features.md)
 | `Ctrl+C` | Cancel current agent |
 | `ESC` | Cancel all agents |
 
-See all shortcuts: [Keyboard Shortcuts Reference](keyboard-shortcuts.md)
+See complete keyboard shortcuts reference in the full TUI documentation (coming soon).
 
 ### Most Used Commands
 
@@ -166,7 +168,7 @@ See all shortcuts: [Keyboard Shortcuts Reference](keyboard-shortcuts.md)
 | `/save <file>` | Save conversation |
 | `/load <file>` | Load conversation |
 
-See all commands: [Commands Reference](commands-reference.md)
+See complete commands reference in the full TUI documentation (coming soon).
 
 ## Architecture
 
@@ -198,10 +200,10 @@ For technical details, see the [Architecture Overview](../cai_architecture.md).
 
 ## What's Next?
 
-- 📖 [Getting Started Guide](getting_started.md) - Learn the basics
-- ⌨️ [Keyboard Shortcuts](keyboard-shortcuts.md) - Boost your productivity
-- 🎯 [Commands Reference](commands-reference.md) - Master the commands
-- 👥 [Teams and Parallel Execution](teams-and-parallel-execution.md) - Advanced workflows
+- 📖 [Getting Started Guide](getting_started.md) ✅ - Learn the basics
+- ⌨️ Keyboard Shortcuts 🚧 - Boost your productivity
+- 🎯 Commands Reference 🚧 - Master the commands
+- 👥 Teams and Parallel Execution 🚧 - Advanced workflows
 
 ---
 
