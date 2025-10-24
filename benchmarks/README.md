@@ -103,11 +103,11 @@ Currently, supporting the following benchmarks, refer to [`ctf_configs.jsonl`](.
 
 | Category | Benchmark | Difficulty | Description |
 |----------|-----------|------------|-------------|
-| :one: `jeopardy` | Base | 🚩 - 🚩🚩🚩 | `21` curated CTFs that measures initial penetration testing capabilities across challenges in rev, misc, pwn, web, crypto and forensics. *This benchmark has been saturated and frontier Cybersecurity models are able to conquer most*. |
-| :one: `jeopardy` | [Cybench](https://github.com/andyzorigin/cybench) | 🚩 - 🚩🚩🚩🚩🚩 | A curated list with `35` CTFs stemming from the popular *`Cybench` Framework for Evaluating Cybersecurity Capabilities and Risk*[^7]. |
-| :one: `jeopardy` | RCTF2 | 🚩 - 🚩🚩🚩🚩🚩 |  `27` Robotics CTFs challenges to attack and defend robots and robotic frameworks. Robots and robotics-related technologies considered include ROS, ROS 2, manipulators, AGVs and AMRs, collaborative robots, legged robots, humanoids and more. |
-| :two: `A&D` | `A&D` | 🚩 - 🚩🚩🚩🚩 | A compilation of `10` **n** vs **n** attack and defense challenges wherein each team defends their own vulnerable assets while simultaneously attacking others'. Includes IT and OT/ICS themed challenges across multiple difficulty levels. |
-| :three: `cyber-range` |  Cyber Ranges | 🚩🚩 - 🚩🚩🚩🚩|  12 Cyber Ranges with 16 challenges to practice and test cybersecurity skills in realistic simulated environments. |
+| :one: `jeopardy` [^8] | Base | 🚩 - 🚩🚩🚩 | `21` curated CTFs that measures initial penetration testing capabilities across challenges in rev, misc, pwn, web, crypto and forensics. *This benchmark has been saturated and frontier Cybersecurity models are able to conquer most*. |
+| :one: `jeopardy` [^8] | [Cybench](https://github.com/andyzorigin/cybench) | 🚩 - 🚩🚩🚩🚩🚩 | A curated list with `35` CTFs stemming from the popular *`Cybench` Framework for Evaluating Cybersecurity Capabilities and Risk*[^7]. |
+| :one: `jeopardy` [^8] | RCTF2 | 🚩 - 🚩🚩🚩🚩🚩 |  `27` Robotics CTFs challenges to attack and defend robots and robotic frameworks. Robots and robotics-related technologies considered include ROS, ROS 2, manipulators, AGVs and AMRs, collaborative robots, legged robots, humanoids and more. |
+| :two: `A&D` [^8] | `A&D` | 🚩 - 🚩🚩🚩🚩 | A compilation of `10` **n** vs **n** attack and defense challenges wherein each team defends their own vulnerable assets while simultaneously attacking others'. Includes IT and OT/ICS themed challenges across multiple difficulty levels. |
+| :three: `cyber-range` [^8] |  Cyber Ranges | 🚩🚩 - 🚩🚩🚩🚩|  12 Cyber Ranges with 16 challenges to practice and test cybersecurity skills in realistic simulated environments. |
 | :four: `knowledge` | [SecEval](https://github.com/XuanwuAI/SecEval) | N/A | Benchmark designed to evaluate large language models (LLMs) on security-related tasks. It includes various real-world scenarios such as phishing email analysis, vulnerability classification, and response generation. |
 | :four: `knowledge` | [CyberMetric](https://github.com/CyberMetric) | N/A | Benchmark framework that focuses on measuring the performance of AI systems in cybersecurity-specific question answering, knowledge extraction, and contextual understanding. It emphasizes both domain knowledge and reasoning ability. |
 | :four: `knowledge` | [CTIBench](https://github.com/xashru/cti-bench) | N/A | Benchmark focused on evaluating LLM models' capabilities in understanding and processing Cyber Threat Intelligence (CTI) information. |
@@ -220,11 +220,17 @@ python benchmarks/eval.py --model claude-3-7-sonnet-20250219 --dataset_file benc
 
 ## About `Privacy Knowledge`: CyberPII-Bench
 
-[Review benchmark readme](cyberPII-bench/README.md)
+**How to run different CyberPII-Bench for alais1**
+[For more information related to the metrics review benchmark readme](cyberPII-bench/README.md)
+
+```bash
+python benchmarks/eval.py --model alias1 --dataset_file benchmarks/cyberPII-bench/memory01_gold.csv --eval cyberpii-bench --backend alias
+````
+
 
 ## About more benchmarks
 
-### `Jeopardy CTF`
+### `Jeopardy CTF` [^8]
 
 <details>
 <summary>"Base" Benchmark</summary>
@@ -355,7 +361,7 @@ python benchmarks/eval.py --model claude-3-7-sonnet-20250219 --dataset_file benc
 </details>
 
 
-### `A&D`
+### `A&D` [^8]
 
 <details>
 <summary>"Attack/Defense CTF" Benchmark</summary>
@@ -375,7 +381,7 @@ python benchmarks/eval.py --model claude-3-7-sonnet-20250219 --dataset_file benc
 
 </details>
 
-### Cyber Ranges
+### Cyber Ranges [^8]
 
 <details>
 <summary>"Cyber Ranges" Benchmark</summary>
