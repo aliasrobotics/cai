@@ -1,4 +1,3 @@
-# CAI Production Container - Minimalistisch & Effizient
 FROM kalilinux/kali-rolling
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -9,50 +8,54 @@ RUN apt-get update --allow-insecure-repositories && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# pentesting stuff
+# Core system + Python
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        python3 \
-        python3-pip \
-        curl \
-        wget \
-        git \
-        nmap \
-        iputils-ping \
-        dnsutils \
-        ca-certificates \
-        netcat-traditional \
-        burpsuite \
-        sqlmap \
-        nikto \
-        dirb \
-        gobuster \
+        python3 python3-pip python3-dev \
+        curl wget git ca-certificates \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# FIX: pip system-packages Warning (whatever)
+# Install kali-linux-headless (brings most pentesting tools + dependencies)
+# This includes: nmap, nikto, dirb, gobuster, sqlmap, netcat, ssh, etc.
+RUN apt-get update && \
+    echo "console-setup console-setup/variant select Latin1 and Latin5 - western Europe and Turkic languages" | debconf-set-selections && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        kali-linux-headless \
+        seclists \
+        burpsuite \
+        default-jre \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Metasploit
+ RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > /tmp/msfinstall && \
+     chmod 755 /tmp/msfinstall && \
+     /tmp/msfinstall && \
+     rm /tmp/msfinstall
+
+# FIX: pip system-packages warning
 RUN mkdir -p /root/.pip && \
     echo "[global]" > /root/.pip/pip.conf && \
     echo "break-system-packages = true" >> /root/.pip/pip.conf
 
-# pip upgrade
+# Upgrade pip
 RUN pip3 install --upgrade pip setuptools wheel
-
 
 WORKDIR /opt/cai
 
-# CAI Framework install
+# Install CAI 
 RUN pip3 install cai-framework
 
-# .env Template (overriden by volume mount.. but just to be safe)
+# .env Template (overwritten if .env file present in logs)
 RUN echo 'OPENAI_API_KEY="sk-1234"' > /opt/cai/.env && \
     echo 'ANTHROPIC_API_KEY=""' >> /opt/cai/.env && \
-	echo 'DEEPSEEK_API_KEY=""' >> /opt/cai/.env && \
+    echo 'DEEPSEEK_API_KEY=""' >> /opt/cai/.env && \
     echo 'OLLAMA_API_BASE=""' >> /opt/cai/.env && \
     echo 'PROMPT_TOOLKIT_NO_CPR=1' >> /opt/cai/.env && \
     echo 'CAI_STREAM=false' >> /opt/cai/.env
 
-# Logs 
+#  logs directory
 RUN mkdir -p /opt/cai/logs
 
 # Startup Script
@@ -69,8 +72,5 @@ RUN echo '#!/bin/bash' > /opt/cai/start.sh && \
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python3 -c "import cai; print('OK')" || exit 1
 
-# Default: start cai
 ENTRYPOINT ["/opt/cai/start.sh"]
-
-# Fallback other stuff goes here?
 CMD []
