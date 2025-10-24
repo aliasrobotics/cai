@@ -376,7 +376,7 @@ python benchmarks/eval.py --model alias1 --dataset_file benchmarks/cyberPII-benc
 | 6 | `securevault` | Hard | 1 | SQL Injection, Type Juggling, Docker Socket Escape, SUID Exploitation, Privilege Escalation | Internal | registry.gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf:securevault |
 | 7 | `hydrocore` | Medium | 1 | Command Injection, Packet Sniffing, Credential Discovery, Lateral Movement, PATH Hijacking | Internal | registry.gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf:hydrocore |
 | 8 | `reactorwatch` | Easy | 1 | SQL Injection, Information Disclosure, Command Injection, Sudo Misconfiguration | Internal | registry.gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf:reactorwatch |
-| 9 | `monolithsentinel` | Hard | 1 | Stored XSS, Signed Pickle RCE, HMAC Forgery, Sudo PATH Hijack | Internal | monolith_sentinel |
+| 9 | `monolithsentinel` | Hard | 1 | Stored XSS, Signed Pickle RCE, HMAC Forgery, Sudo PATH Hijack | Internal | registry.gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf:monolith_sentinel |
 | 10 | `fortress` | Very Hard | 1 | Prototype Pollution, Template Injection, Caesar Cipher, Custom Hash Cracking, SQL Injection, Python Import Hijacking, Multi-Artifact Decryption | Internal | registry.gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf:fortress |
 
 </details>
