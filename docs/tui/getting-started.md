@@ -9,8 +9,7 @@ Before starting, ensure you have:
 - ✅ CAI installed (see [Installation Guide](../cai_installation.md))
 - ✅ Python 3.9+ installed
 - ✅ A valid `ALIAS_API_KEY` from [Alias Robotics](https://aliasrobotics.com)
-- ✅ A modern terminal with 256+ color support
-- ✅ Minimum terminal window size: 120x40 characters
+
 
 ## Step 1: Launch the TUI
 
@@ -27,7 +26,7 @@ If your `ALIAS_API_KEY` is not configured, you'll see an authentication error. D
 You can start the TUI with a prompt ready to go:
 
 ```bash
-cai --tui "scan 192.168.1.1 for vulnerabilities"
+cai --tui "scan 198.51.100.50 for vulnerabilities"
 ```
 
 ### Alternative: Launch with YAML Configuration
@@ -99,9 +98,11 @@ Press **Enter**.
 
 | Model | Provider | Best For | Cost |
 |-------|----------|----------|------|
-| `alias1` | Alias Robotics | **Recommended** - Balanced | Medium |
-| `gpt-4o` | OpenAI | Complex reasoning | High |
-| `claude-3-5-sonnet-20241022` | Anthropic | Long contexts | High |
+| `alias1` | Alias Robotics | **Recommended** - Balanced performance | Medium |
+| `gpt-5` | OpenAI | Latest reasoning and code generation | Very High |
+| `gpt-4o` | OpenAI | Complex reasoning and multi-modal | High |
+| `claude-4-5` | Anthropic | Advanced reasoning and long contexts | Very High |
+| `claude-3-5-sonnet-20241022` | Anthropic | Fast responses with good quality | High |
 
 > **💡 Tip**: You can change models at any time without losing your conversation history.
 
@@ -163,7 +164,7 @@ Now you're ready to interact with CAI!
 In the input field at the bottom (marked with `CAI>`), type:
 
 ```
-Scan 192.168.1.1 for open ports and services
+Scan 198.51.100.50 for open ports and services
 ```
 
 Press **Enter**.
@@ -308,21 +309,12 @@ Open the sidebar (`Ctrl+S`) and go to **"Stats"** tab to see:
 
 ## Common First-Time Issues
 
-### Issue: "ALIAS_API_KEY is invalid or not set"
-
-**Solution**: Follow Step 2 above to configure your API key properly.
-
-### Issue: Dropdown menus are too narrow
-
-**Solution**: This is expected behavior in 3+ terminal layouts. The overlay that appears when you click is fully readable.
-
 ### Issue: Agent is not responding
 
 **Solution**: 
 - Press `Ctrl+C` to cancel the current agent
 - Check your internet connection
 - Verify your API key is valid
-- Try a different model: `/model alias0`
 
 ### Issue: Terminal output is cluttered
 
