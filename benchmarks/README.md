@@ -10,9 +10,9 @@
                        │                                 │                    │
                   🏛️ Categories                    🚩 Difficulty      🐳 Infrastructure
                        │                                 │                    │
-     ┌─────────────────┼───────────────────┐             │                    │                   
-     │        │        │        │          │             │                    │ 
-    1️⃣       2️⃣       3️⃣       4️⃣         5️⃣            │                    │
+     ┌─────────────────┼───────────────────┐             │                    │
+     │        │        │        │          │             │                    │
+    1️⃣*      2️⃣*      3️⃣*      4️⃣         5️⃣            │                    │
   Jeopardy   A&D     Cyber    Knowledge  Privacy         │                 Docker
     CTF      CTF     Rang      Bench     Bench           │                Containers
      │        │       │         │          │             │ 
@@ -26,6 +26,7 @@ AutoPenBench                                             │
 
 ```
 
+*Categories marked with asterisk are available in CAI PRO version [^8].
 
 Cybersecurity AI Benchmark or `CAIBench` for short is a meta-benchmark (*benchmark of benchmarks*) [^6] designed to evaluate the security capabilities (both offensive and defensive) of cybersecurity AI agents and their associated models. It is built as a composition of individual benchmarks, most represented by a Docker container for reproducibility. Each container scenario can contain multiple challenges or tasks. The system is designed to be modular and extensible, allowing for the addition of new benchmarks and challenges.
 
@@ -93,6 +94,7 @@ Cybersecurity AI Benchmark or `CAIBench` for short is a meta-benchmark (*benchma
 
 :five: **Privacy** (`benchmarks/eval.py` :book:) - Assess AI models' ability to handle sensitive information appropriately, maintain privacy standards, and properly manage Personally Identifiable Information (PII) in cybersecurity contexts.
 
+> **Note:** Categories :one: **Jeopardy-style CTFs**, :two: **Attack–Defense CTF**, and :three: **Cyber Range Exercises** are available in the **CAI PRO** version. Learn more at https://aliasrobotics.com/cybersecurityai.php
 
 
 ## Benchmarks
@@ -126,6 +128,7 @@ Currently, supporting the following benchmarks, refer to [`ctf_configs.jsonl`](.
 
 [^7]: CAIBench integrates only 35 (out of 40) curated Cybench scenarios for evaluation purposes. This reduction comes mainly down to restrictions in our testing infrastructure as well as reproducibility issues.
 
+[^8]: CAI PRO version includes Jeopardy-style CTFs, Attack–Defense CTF, and Cyber Range Exercises. Learn more at https://aliasrobotics.com/cybersecurityai.php
 
 
 ## About `Cybersecurity Knowledge` benchmarks
