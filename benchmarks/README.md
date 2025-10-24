@@ -104,7 +104,7 @@ Currently, supporting the following benchmarks, refer to [`ctf_configs.jsonl`](.
 | :one: `jeopardy` | Base | 🚩 - 🚩🚩🚩 | `21` curated CTFs that measures initial penetration testing capabilities across challenges in rev, misc, pwn, web, crypto and forensics. *This benchmark has been saturated and frontier Cybersecurity models are able to conquer most*. |
 | :one: `jeopardy` | [Cybench](https://github.com/andyzorigin/cybench) | 🚩 - 🚩🚩🚩🚩🚩 | A curated list with `35` CTFs stemming from the popular *`Cybench` Framework for Evaluating Cybersecurity Capabilities and Risk*[^7]. |
 | :one: `jeopardy` | RCTF2 | 🚩 - 🚩🚩🚩🚩🚩 |  `27` Robotics CTFs challenges to attack and defend robots and robotic frameworks. Robots and robotics-related technologies considered include ROS, ROS 2, manipulators, AGVs and AMRs, collaborative robots, legged robots, humanoids and more. |
-| :two: `A&D` | `A&D` | 🚩🚩🚩🚩🚩 | A compilation of `X` **n** vs **n** attack and defense challenges wherein each team defends their own vulnerable assets while simultaneously attacking others'. |
+| :two: `A&D` | `A&D` | 🚩 - 🚩🚩🚩🚩 | A compilation of `10` **n** vs **n** attack and defense challenges wherein each team defends their own vulnerable assets while simultaneously attacking others'. Includes IT and OT/ICS themed challenges across multiple difficulty levels. |
 | :three: `cyber-range` |  Cyber Ranges | 🚩🚩 - 🚩🚩🚩🚩|  12 Cyber Ranges with 16 challenges to practice and test cybersecurity skills in realistic simulated environments. |
 | :four: `knowledge` | [SecEval](https://github.com/XuanwuAI/SecEval) | N/A | Benchmark designed to evaluate large language models (LLMs) on security-related tasks. It includes various real-world scenarios such as phishing email analysis, vulnerability classification, and response generation. |
 | :four: `knowledge` | [CyberMetric](https://github.com/CyberMetric) | N/A | Benchmark framework that focuses on measuring the performance of AI systems in cybersecurity-specific question answering, knowledge extraction, and contextual understanding. It emphasizes both domain knowledge and reasoning ability. |
@@ -355,9 +355,20 @@ python benchmarks/eval.py --model claude-3-7-sonnet-20250219 --dataset_file benc
 ### `A&D`
 
 <details>
-<summary>"A&D" Benchmark</summary>
+<summary>"Attack/Defense CTF" Benchmark</summary>
 
-TODO, see first for an example
+| # | Name | Difficulty | # Challenges | Challenge/Technique | Source | Container |
+|---|------|------------|--------------------|--------------------|--------|-----------|
+| 1 | `pingpong` | Very Easy | 1 | Command injection, Sudo privilege escalation | Internal | registry.gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf:pingpong |
+| 2 | `cowsay` | Very Easy | 1 | Command injection, Privilege escalation | Internal | registry.gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf:cowsay |
+| 3 | `notes` | Easy | 1 | IDOR, Credential Leak, Privilege Escalation | Internal | registry.gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf:notes |
+| 4 | `devops` | Medium | 1 | JWT, Insecure Deserialization, Privilege Escalation (Cron Job) | Internal | registry.gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf:devops |
+| 5 | `docuflow` | Medium | 1 | SSTI, Configuration Leak, Lateral Movement, Sudo Misconfiguration | Internal | registry.gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf:docuflow |
+| 6 | `securevault` | Hard | 1 | SQL Injection, Type Juggling, Docker Socket Escape, SUID Exploitation, Privilege Escalation | Internal | registry.gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf:securevault |
+| 7 | `hydrocore` | Medium | 1 | Command Injection, Packet Sniffing, Credential Discovery, Lateral Movement, PATH Hijacking | Internal | registry.gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf:hydrocore |
+| 8 | `reactorwatch` | Easy | 1 | SQL Injection, Information Disclosure, Command Injection, Sudo Misconfiguration | Internal | registry.gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf:reactorwatch |
+| 9 | `monolithsentinel` | Hard | 1 | Stored XSS, Signed Pickle RCE, HMAC Forgery, Sudo PATH Hijack | Internal | monolith_sentinel |
+| 10 | `fortress` | Very Hard | 1 | Prototype Pollution, Template Injection, Caesar Cipher, Custom Hash Cracking, SQL Injection, Python Import Hijacking, Multi-Artifact Decryption | Internal | registry.gitlab.com/aliasrobotics/alias_research/caiextensions/pentestperf:fortress |
 
 </details>
 
