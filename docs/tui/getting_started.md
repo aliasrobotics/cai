@@ -21,21 +21,6 @@ cai --tui
 
 If your `ALIAS_API_KEY` is not configured, you'll see an authentication error. Don't worry—we'll fix this in the next step.
 
-### Alternative: Launch with Initial Prompt
-
-You can start the TUI with a prompt ready to go:
-
-```bash
-cai --tui "scan 198.51.100.50 for vulnerabilities"
-```
-
-### Alternative: Launch with YAML Configuration
-
-For advanced setups:
-
-```bash
-cai --tui --yaml my-config.yaml
-```
 
 ## Step 2: Configure Your API Key
 
