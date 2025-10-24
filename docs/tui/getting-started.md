@@ -345,7 +345,6 @@ Congratulations! You've completed the basics of CAI TUI. Here's what to explore 
 
 ### Customize Your Setup
 - ⚙️ [Configuration](configuration.md) - Environment variables and settings
-- 🎨 [Themes](user-interface.md#themes) - Change color schemes
 
 ### Get Help
 - ❓ [FAQ](faq.md) - Common questions
