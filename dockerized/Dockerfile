@@ -39,8 +39,7 @@ RUN mkdir -p /root/.pip && \
     echo "[global]" > /root/.pip/pip.conf && \
     echo "break-system-packages = true" >> /root/.pip/pip.conf
 
-# Upgrade pip
-RUN pip3 install --upgrade pip setuptools wheel
+
 
 WORKDIR /opt/cai
 
