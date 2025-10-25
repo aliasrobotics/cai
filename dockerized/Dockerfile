@@ -44,7 +44,7 @@ RUN mkdir -p /root/.pip && \
 WORKDIR /opt/cai
 
 # Install CAI 
-RUN pip3 install cai-framework
+RUN pip3 install  --ignore-installed cai-framework
 
 # .env Template (overwritten if .env file present in logs)
 RUN echo 'OPENAI_API_KEY="sk-1234"' > /opt/cai/.env && \
