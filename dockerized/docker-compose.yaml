@@ -23,9 +23,9 @@ services:
       # Optional: Docker socket if cai should use docker should it though?
       # - /var/run/docker.sock:/var/run/docker.sock
     
-    #  WSL: host.docker.internal Access
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    # OPTIONAL WSL: host.docker.internal Access if ollama runs on windows host instead of inside wsl.
+    # extra_hosts:
+    #  - "host.docker.internal:host-gateway"
     
     # Env Vars (Fallback, .env wins if present)
     environment:
