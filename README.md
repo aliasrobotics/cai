@@ -337,6 +337,7 @@ pip install cai-framework
 Always create a new virtual environment to ensure proper dependency installation when updating CAI.
 
 The following subsections provide a more detailed walkthrough on selected popular Operating Systems. Refer to the [Development](#development) section for developer-related install instructions.
+For API Keys env syntax  check litellm Documentation. [LiteLLM Documentation](https://docs.litellm.ai/docs/tutorials/installation)
 
 ### OS X
 ```bash
@@ -412,12 +413,26 @@ python3 -m venv cai_env
 # Install the package from the local directory
 source cai_env/bin/activate && pip install cai-framework
 
-# Generate a .env file and set up with defaults
-echo -e 'OPENAI_API_KEY="sk-1234"\nANTHROPIC_API_KEY=""\nOLLAMA=""\nPROMPT_TOOLKIT_NO_CPR=1\nCAI_STREAM=false' > .env
+# Generate a .env file and set up with defaults. If Ollama runs on your windows host, wsl needs to use host.docker.internal for it to become reachable
+echo -e 'OPENAI_API_KEY="sk-1234"\nANTHROPIC_API_KEY=""\nOLLAMA=""\nOLLAMA_API_BASE="http://host.docker.internal:11434"\nPROMPT_TOOLKIT_NO_CPR=1\nCAI_STREAM=false' > .env
 
 # Launch CAI
 cai  # first launch it can take up to 30 seconds
 ```
+
+You might run into issues running cai on ubuntu since some agents assume they are running on a Kali Instance and are not able to find the tools needed. 
+So as an alternative you can use the docker compose file in the dockerized folder instead. This also works from within wsl if docker is installed.
+in that case fetch the dockerized folder (no need for the whole repo) and run from within it.
+For API Keys env syntax  check litellm Documentation. [LiteLLM Documentation](https://docs.litellm.ai/docs/tutorials/installation)
+
+```bash
+#build and run docker compose Build takes around 20 min.
+docker compose build && docker compose up -d
+
+#access cai
+docker compose exec cai cai
+```
+
 
 ### Android
 
