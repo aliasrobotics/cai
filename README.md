@@ -413,8 +413,8 @@ python3 -m venv cai_env
 # Install the package from the local directory
 source cai_env/bin/activate && pip install cai-framework
 
-# Generate a .env file and set up with defaults. If Ollama runs on your windows host, wsl needs to use host.docker.internal for it to become reachable
-echo -e 'OPENAI_API_KEY="sk-1234"\nANTHROPIC_API_KEY=""\nOLLAMA=""\nOLLAMA_API_BASE="http://host.docker.internal:11434"\nPROMPT_TOOLKIT_NO_CPR=1\nCAI_STREAM=false' > .env
+# Generate a .env file and set up with defaults. If Ollama runs on your windows host, wsl needs to use your host IP for it to become reachable
+echo -e 'OPENAI_API_KEY="sk-1234"\nANTHROPIC_API_KEY=""\nOLLAMA=""\nOLLAMA_API_BASE="http://Your.Host.Ip.Here:11434"\nPROMPT_TOOLKIT_NO_CPR=1\nCAI_STREAM=false' > .env
 
 # Launch CAI
 cai  # first launch it can take up to 30 seconds
