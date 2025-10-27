@@ -18,10 +18,8 @@ CAI TUI commands are organized into the following categories:
 3. [Terminal Control](#terminal-control)
 4. [History and Memory](#history-and-memory)
 5. [Session Management](#session-management)
-6. [Parallel Execution](#parallel-execution)
-7. [MCP Integration](#mcp-integration)
-8. [Utility Commands](#utility-commands)
-9. [Navigation and UI](#navigation-and-ui)
+6. [Utility Commands](#utility-commands)
+7. [Navigation and UI](#navigation-and-ui)
 
 ---
 
@@ -49,22 +47,29 @@ Switch between agents or list all available agents.
 /a bug_bounter_agent
 ```
 
-**Available Agents (Community Edition)**:
-- `redteam_agent` - Offensive security testing
-- `blueteam_agent` - Defensive security analysis
-- `bug_bounter_agent` - Bug bounty hunting
-- `retester_agent` - Retesting and validation
-- `one_tool_agent` - Basic single-tool execution
+**Available Agents**:
+- `redteam_agent` - Offensive security testing and penetration testing
+- `blueteam_agent` - Defensive security analysis and hardening
+- `bug_bounter_agent` - Bug bounty hunting and vulnerability research
+- `retester_agent` - Retesting and validation of vulnerabilities
+- `one_tool_agent` - Basic single-tool execution (minimalist approach)
 - `dfir_agent` - Digital forensics and incident response
-- `reporting_agent` - Report generation and documentation
+- `reporting_agent` - Report generation and security documentation
 - `reverse_engineering_agent` - Binary analysis and reverse engineering
 - `network_security_analyzer_agent` - Network security assessment
-- `wifi_security_agent` - WiFi security testing
-- `memory_analysis_agent` - Memory forensics
-- `dns_smtp_agent` - DNS and SMTP analysis
-- `replay_attack_agent` - Replay attack testing
-- `subghz_sdr_agent` - Sub-GHz and SDR analysis
-- `thought_agent` - Reasoning and planning
+- `wifi_security_agent` - WiFi security testing and wireless analysis
+- `memory_analysis_agent` - Memory forensics and analysis
+- `dns_smtp_agent` - DNS and SMTP protocol analysis
+- `replay_attack_agent` - Replay attack testing and analysis
+- `subghz_sdr_agent` - Sub-GHz and Software Defined Radio (SDR) analysis
+- `thought_agent` - Reasoning, planning, and analysis
+- `use_case_agent` - Use case analysis and scenario planning
+- `flag_discriminator` - CTF flag identification and discrimination
+- `cybersecurity_engineer` - Cybersecurity engineering and architecture
+- `selection_agent` - Intelligent agent selection and routing
+- `bb_triage_swarm_pattern` - Bug bounty triage swarm pattern
+- `redteam_swarm_pattern` - Red team swarm coordination pattern
+- `offsec_pattern` - Offensive security pattern orchestration
 
 **Notes**:
 - Agent changes are immediate and affect only the active terminal
@@ -80,8 +85,7 @@ Switch between agents or list all available agents.
 CAI TUI uses model dropdowns in each terminal header for model management. Models are configured via environment variables and aliases.
 
 **Available Models**:
-- `alias0` - Primary model alias (configured via `CAI_MODEL`)
-- `alias1` - Secondary model alias
+- `alias1` - Cybersecurity focus model [Recommended]
 - `gpt-4o` - OpenAI GPT-4 Optimized
 - `gpt-4-turbo` - OpenAI GPT-4 Turbo
 - `claude-3-5-sonnet-20241022` - Anthropic Claude 3.5 Sonnet
@@ -111,7 +115,9 @@ export CAI_ANTHROPIC_API_KEY=sk-... # Anthropic API key
 
 ### Terminal-Specific Commands
 
-Send commands to specific terminals using the `T<num>:` prefix.
+Send commands to specific terminals using either the prefix notation or the flag notation.
+
+#### Method 1: Prefix Notation
 
 **Syntax**:
 ```
@@ -124,7 +130,7 @@ T<terminal_number>:<command>
 T2:/agent blueteam_agent
 
 # Change model in Terminal 3
-T3:/model gpt-4o
+T3:/model alias1
 
 # Clear Terminal 1
 T1:/clear
@@ -132,7 +138,47 @@ T1:/clear
 # Execute command in Terminal 4
 T4:scan target.com for vulnerabilities
 ```
+#### Method 2: Flag Notation
 
+**Syntax**:
+
+```
+<command> t<terminal_number>
+
+```
+
+**Examples**:
+```bash
+# Switch agent in Terminal 2
+/agent blueteam_agent t2
+
+# Change model in Terminal 3
+/model alias1 t3
+
+# Clear Terminal 1
+/clear t1
+
+# Execute any command in Terminal 4
+/help t4
+
+# Send prompt to Terminal 2
+Scan target.com for XSS vulnerabilities t2
+```
+
+**Supported Flags**:
+- `t1` - Target Terminal 1
+- `t2` - Target Terminal 2
+- `t3` - Target Terminal 3
+- `t4` - Target Terminal 4
+- (Additional terminals if configured: `t5`, `t6`, etc.)
+
+**Notes**:
+- Both methods achieve the same result
+- Flag notation is more concise for quick commands
+- Prefix notation is clearer for complex prompts
+- You can target any terminal without focusing it first
+- Useful for scripting and automation
+- Works with all commands (slash commands and prompts)
 
 **Keyboard Shortcut**: Click the `[+]` button in the top bar
 
@@ -463,7 +509,6 @@ Clear the terminal output.
 **Keyboard Shortcut**: `Ctrl+Q`
 
 **Notes**:
-- Prompts for confirmation if agents are running
 - Unsaved sessions will be lost
 - Graceful shutdown of all terminals
 
@@ -492,60 +537,12 @@ Show or hide the sidebar.
 
 **Alternative**: Click the `[≡]` button in the top bar
 
-### Tab Navigation
-
-Switch between main TUI tabs (Terminal, CTR, Help).
-
-**Keyboard Shortcuts**:
-- `Ctrl+1` - Show Terminal tab
-- `Ctrl+2` - Show CTR tab
-- `Ctrl+Tab` - Cycle through tabs
-
-**Alternative**: Click tab headers in the top bar
-
-### Theme Cycling
-
-Cycle through available visual themes.
-
-**Keyboard Shortcut**: `Ctrl+Shift+T`
-
-**Available Themes**:
-- Default (dark)
-- Light
-- High Contrast
-- Minimal
-- Custom (if configured)
-
-### Terminal View Toggle
-
-Toggle between showing all terminals and only the focused one.
-
-**Keyboard Shortcut**: `Ctrl+T`
-
-**Use Cases**:
-- Focus mode for single-agent work
-- Maximize screen real estate
-- Presentation mode
-
-### Queue Display
-
-Show the prompt queue status.
-
-**Keyboard Shortcut**: `Ctrl+Shift+Q`
-
-**Alternative**: Switch to Queue tab in sidebar (`Alt+2`)
 
 ### Clear Input
 
 Clear the prompt input field.
 
 **Keyboard Shortcut**: `Ctrl+U`
-
-### Broadcast Prompt
-
-Send the same prompt to all active terminals simultaneously.
-
-**Keyboard Shortcut**: `Ctrl+Shift+A`
 
 **Use Cases**:
 - Parallel agent execution
