@@ -28,6 +28,11 @@ AutoPenBench                                             │
 
 *Categories marked with asterisk are available in CAI PRO version [^8].
 
+
+| PLOT1 | PLOT2 |
+|------------------------------------------------|---------------------------------|
+| PLOT3 | PLOT4 |
+
 Cybersecurity AI Benchmark or `CAIBench` for short is a meta-benchmark (*benchmark of benchmarks*) [^6] designed to evaluate the security capabilities (both offensive and defensive) of cybersecurity AI agents and their associated models. It is built as a composition of individual benchmarks, most represented by a Docker container for reproducibility. Each container scenario can contain multiple challenges or tasks. The system is designed to be modular and extensible, allowing for the addition of new benchmarks and challenges.
 
 - [`C`ybersecurity `AI` `Bench`mark (`CAIBench`): Meta-benchmark for evaluating Cybersecurity AI agents](#cybersecurity-ai-benchmark-caibench-meta-benchmark-for-evaluating-cybersecurity-ai-agents)
