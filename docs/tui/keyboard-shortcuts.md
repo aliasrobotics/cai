@@ -41,30 +41,14 @@ Master the CAI TUI with these keyboard shortcuts for maximum productivity. All s
 
 ---
 
-### Tab Navigation
-
-| Shortcut | Action | Details |
-|----------|--------|---------|
-| `Ctrl+Tab` | Next tab | Cycles through Terminal → CTR → Help → Terminal |
-| `Ctrl+1` | Terminal tab | Jump directly to Terminal tab |
-| `Ctrl+2` | CTR tab | Jump directly to CTR (graph) tab |
-
-**Usage**:
-- Switch between main views instantly
-- Terminal tab: Main workspace with agents
-- CTR tab: Visual graph of agent relationships
-- Help tab: Built-in documentation
-
-**Alternative**: Click tab names in the top bar
-
 ## Terminal Management
 
 ### Opening Terminals
 
 | Shortcut | Action | Details |
 |----------|--------|---------|
-| Click `+` button | Add terminal | Creates new terminal with default settings |
-| `/add` command | Add terminal | Command-based terminal creation |
+| Click `Add +` button | Add terminal | Creates new terminal with default settings |
+
 
 **Default Settings**:
 - Agent: `redteam_agent`
@@ -78,7 +62,8 @@ Master the CAI TUI with these keyboard shortcuts for maximum productivity. All s
 | Shortcut | Action | Details |
 |----------|--------|---------|
 | `Ctrl+E` | Close current terminal | Closes the focused terminal |
-| `/remove T<num>` | Close specific terminal | Example: `/remove T3` |
+
+**Alternative**: Click directly on specific close terminal button.
 
 **Notes**:
 - Terminal 1 cannot be closed (main terminal)
@@ -120,26 +105,6 @@ Master the CAI TUI with these keyboard shortcuts for maximum productivity. All s
 
 ---
 
-### Parallel Execution
-
-| Shortcut | Action | Details |
-|----------|--------|---------|
-| `Ctrl+Shift+A` | Prompt all agents | Sends the current input to all active terminals in parallel |
-
-**Usage Flow**:
-1. Type your prompt in the input field
-2. Press `Ctrl+Shift+A` instead of `Enter`
-3. All terminals receive and process the prompt simultaneously
-
-**Use Cases**:
-- Multi-perspective analysis (red team + blue team)
-- Bug bounty triage with multiple agents
-- Comprehensive security assessment
-
-**Alternative**: Use `/parallel` commands for more control
-
-Learn more: [Teams and Parallel Execution](teams-and-parallel-execution.md)
-
 ## Utility Shortcuts
 
 ### Command Palette
@@ -152,40 +117,6 @@ Learn more: [Teams and Parallel Execution](teams-and-parallel-execution.md)
 - Search available commands
 - Quick access to any action
 - Fuzzy search support
-
----
-
-### Queue Management
-
-| Shortcut | Action | Details |
-|----------|--------|---------|
-| `Ctrl+Shift+Q` | Show queue | Displays the current prompt queue in main terminal |
-
-**Alternative Commands**:
-- `/queue` - Show queue
-- `/queue add <prompt>` - Add to queue
-- `/queue remove N` - Remove item N
-- `/queue clear` - Clear queue
-
-Learn more: [Commands Reference - Queue Management](commands-reference.md#queue-management)
-
----
-
-### Theme Cycling
-
-| Shortcut | Action | Details |
-|----------|--------|---------|
-| `Ctrl+Shift+T` | Cycle themes | Switches between available color themes |
-
-**Available Themes**:
-- Dark (default teal theme)
-- Light
-- Textual Dark
-- Textual Light
-
-**Alternative**: Set `CAI_THEME` environment variable
-
-Learn more: [User Interface - Themes](user-interface.md#themes)
 
 ---
 
@@ -226,7 +157,6 @@ Learn more: [User Interface - Themes](user-interface.md#themes)
 **Examples**:
 - Type `/ag` + `Tab` → `/agent`
 - Type `/mod` + `Tab` → `/model`
-- Type `/para` + `Tab` → `/parallel`
 
 **Behavior**:
 - Single match: Completes automatically
@@ -257,26 +187,6 @@ Learn more: [User Interface - Themes](user-interface.md#themes)
 
 ---
 
-### Command Suggestions
-
-| Shortcut | Action | Details |
-|----------|--------|---------|
-| `Ctrl+Space` | Show suggestions | Displays available commands matching current input |
-
-**Usage**:
-- Type partial command
-- Press `Ctrl+Space`
-- Select from suggested commands
-
-**Suggestion Categories**:
-- `/agent` commands
-- `/model` commands
-- `/parallel` commands
-- `/queue` commands
-- Other commands
-
----
-
 ### Send Prompt
 
 | Shortcut | Action | Details |
@@ -303,19 +213,6 @@ Learn more: [User Interface - Themes](user-interface.md#themes)
 
 ---
 
-### Copy All Content
-
-| Shortcut | Action | Details |
-|----------|--------|---------|
-| `Ctrl+Shift+Z` | Copy all | Copies entire terminal content (including scrolled) to clipboard |
-
-**Use Cases**:
-- Complete session documentation
-- Comprehensive reporting
-- Full conversation export
-
-**Alternative**: Use `/save` command for structured export to file
-
 ## Platform-Specific Notes
 
 ### macOS
@@ -334,7 +231,7 @@ All shortcuts work as documented. If using tmux/screen:
 
 All shortcuts work in Windows Terminal and modern terminals. In older terminals:
 - Some `Ctrl+Shift+` combinations may not work
-- Use command alternatives (e.g., `/queue` instead of `Ctrl+Shift+Q`)
+
 
 ## Custom Shortcuts
 
@@ -350,7 +247,6 @@ CAI TUI currently does not support custom keyboard shortcuts. This feature may b
 2. **Use `Ctrl+N`/`Ctrl+B`** to switch terminals instead of mouse
 3. **Master `Tab` completion** for faster command input
 4. **Use `↑`** to repeat similar prompts with modifications
-5. **Leverage `Ctrl+Shift+A`** for parallel team analysis
 
 ### Recommended Shortcuts to Memorize First
 
@@ -368,9 +264,7 @@ Priority 2 (Common):
 - `ESC` - Cancel all
 
 Priority 3 (Advanced):
-- `Ctrl+Shift+A` - Parallel prompt
 - `Ctrl+E` - Close terminal
-- `Ctrl+Shift+Q` - Show queue
 - `Ctrl+P` - Command palette
 
 ## Troubleshooting Shortcuts
@@ -396,9 +290,8 @@ Priority 3 (Advanced):
 
 If you frequently press `Ctrl+Q` by accident:
 
-**Workaround**: Use the `/exit` or `/quit` command instead
+**Workaround**: Use the close session button instead
 
-**Future Feature**: Exit confirmation dialog (planned)
 
 ## See Also
 
