@@ -295,9 +295,9 @@ If you frequently press `Ctrl+Q` by accident:
 
 ## See Also
 
-- 🎯 [Commands Reference](commands-reference.md) - All available commands
-- 🖥️ [User Interface](user-interface.md) - Visual guide to the interface
-- 📖 [Getting Started](getting-started.md) - Basic usage tutorial
+- 🎯 [Commands Reference](commands_reference.md) - All available commands
+- 🖥️ [User Interface](user_interface.md) - Visual guide to the interface
+- 📖 [Getting Started](getting_started.md) - Basic usage tutorial
 
 ---
 
