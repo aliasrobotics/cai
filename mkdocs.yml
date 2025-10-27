@@ -22,13 +22,14 @@ nav:
   - Intro: index.md
   - Installation: cai_installation.md
   - Quickstart: cai_quickstart.md
-  - List of Models: 
+  - List of Models:
       - Available Models: cai_list_of_models.md
       - Providers:
           - OpenRouter: providers/openrouter.md
           - Ollama: providers/ollama.md
           - Azure OpenAI: providers/azure.md
   - Architecture: cai_architecture.md
+  - Benchmark: cai_benchmark.md
   - Development: cai_development.md
   - Start Building:
     #- Intro: index.md
