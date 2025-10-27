@@ -87,7 +87,7 @@ Each terminal maintains its own:
 - Isolated conversation history
 - Separate execution context
 
-Learn more about terminal management in the full TUI documentation.
+Learn more: Terminals Management 🚧 (coming soon)
 
 ### 👥 Preconfigured Teams
 
@@ -97,7 +97,7 @@ Access specialized agent teams from the sidebar:
 - **Team: 2 Red + 2 Blue**: Dual-perspective security analysis
 - **Team: Red + Blue + Retester + Bug**: Comprehensive assessment workflow
 
-Learn more about Teams and Parallel Execution in the full TUI documentation.
+Learn more: Teams and Parallel Execution 🚧 (coming soon)
 
 ### 🎯 Smart Agent Selection
 
@@ -109,7 +109,7 @@ Use the `selection_agent` to get intelligent agent recommendations based on your
 
 Or simply select it from the agent dropdown.
 
-Learn more about commands in the full TUI documentation.
+Learn more: [Commands Reference](commands_reference.md) ✅
 
 ### 📊 Sidebar Features
 
@@ -120,7 +120,7 @@ The collapsible sidebar (`Ctrl+S`) provides:
 - **Stats**: Real-time session statistics and costs
 - **Keys**: Manage API keys for multiple providers
 
-Learn more about sidebar features in the full TUI documentation.
+Learn more: Sidebar Features 🚧 (coming soon)
 
 ## Documentation Structure
 
@@ -128,11 +128,11 @@ Learn more about sidebar features in the full TUI documentation.
 
 ### For New Users
 1. [Getting Started](getting_started.md) ✅ - First steps and basic usage
-2. User Interface 🚧 - Understanding the layout
-3. Keyboard Shortcuts 🚧 - Essential shortcuts
+2. [User Interface](user_interface.md) ✅ - Understanding the layout
+3. [Keyboard Shortcuts](keyboard_shortcuts.md) ✅ - Essential shortcuts
 
 ### For Regular Users
-4. Commands Reference 🚧 - Complete command list
+4. [Commands Reference](commands_reference.md) ✅ - Complete command list
 5. Terminals Management 🚧 - Working with multiple terminals
 6. Sidebar Features 🚧 - Sidebar tabs and capabilities
 
@@ -158,7 +158,7 @@ Learn more about sidebar features in the full TUI documentation.
 | `Ctrl+C` | Cancel current agent |
 | `ESC` | Cancel all agents |
 
-See complete keyboard shortcuts reference in the full TUI documentation (coming soon).
+See the complete [Keyboard Shortcuts Reference](keyboard_shortcuts.md) ✅ for all shortcuts.
 
 ### Most Used Commands
 
@@ -173,7 +173,7 @@ See complete keyboard shortcuts reference in the full TUI documentation (coming 
 | `/save <file>` | Save conversation |
 | `/load <file>` | Load conversation |
 
-See complete commands reference in the full TUI documentation (coming soon).
+See the complete [Commands Reference](commands_reference.md) ✅ for all commands.
 
 ## Architecture
 
@@ -206,8 +206,9 @@ For technical details, see the [Architecture Overview](../cai_architecture.md).
 ## What's Next?
 
 - 📖 [Getting Started Guide](getting_started.md) ✅ - Learn the basics
-- ⌨️ Keyboard Shortcuts 🚧 - Boost your productivity
-- 🎯 Commands Reference 🚧 - Master the commands
+- 🖥️ [User Interface](user_interface.md) ✅ - Understand the layout
+- ⌨️ [Keyboard Shortcuts](keyboard_shortcuts.md) ✅ - Boost your productivity
+- 🎯 [Commands Reference](commands_reference.md) ✅ - Master the commands
 - 👥 Teams and Parallel Execution 🚧 - Advanced workflows
 
 ---
