@@ -38,32 +38,109 @@ The sidebar contains four main tabs accessible via mouse click or keyboard short
 
 ### 1. Teams Tab 
 
-The Teams tab displays preconfigured agent teams for parallel testing scenarios:
+The Teams tab displays preconfigured agent teams for parallel testing scenarios. CAI TUI includes **11 preconfigured teams** designed for different security testing workflows.
 
 **Team Buttons**:
 - Compact labels show team composition (e.g., `#1: 2 red + 2 bug`)
-- Click to apply team configuration to all terminals
-- Hover to see detailed tooltip with full agent names and terminal assignments
+- Click to apply team configuration to all 4 terminals simultaneously
+- Hover to see detailed tooltip with full agent names and terminal-by-terminal assignments
 
 **Tooltip Information**:
-- Team number and composition (e.g., "#2: 1 redteam_agent + 3 bug_bounter_agent")
+Each team button displays a rich tooltip on hover showing:
+- Team number and full composition (e.g., "#1: 2 redteam_agent + 2 bug_bounter_agent")
 - Terminal-by-terminal breakdown:
-  - T1: redteam_agent
-  - T2: bug_bounter_agent
-  - T3: bug_bounter_agent
-  - T4: bug_bounter_agent
+  - **T1**: Agent assigned to Terminal 1
+  - **T2**: Agent assigned to Terminal 2
+  - **T3**: Agent assigned to Terminal 3
+  - **T4**: Agent assigned to Terminal 4
 
-**Available Teams**:
-- **Team 1**: 2 Red Team + 2 Bug Bounty agents
-- **Team 2**: 1 Red Team + 3 Bug Bounty agents
-- **Team 3**: 2 Red Team + 2 Blue Team agents
-- **Team 4**: 2 Blue Team + 2 Bug Bounty agents
+#### Available Preconfigured Teams
+
+**Team #1: 2 Red + 2 Bug Bounty**
+- **T1**: redteam_agent
+- **T2**: redteam_agent
+- **T3**: bug_bounter_agent
+- **T4**: bug_bounter_agent
+- **Best for**: Comprehensive vulnerability discovery combining offensive testing with bug bounty methodology
+
+**Team #2: 1 Red + 3 Bug Bounty**
+- **T1**: redteam_agent
+- **T2**: bug_bounter_agent
+- **T3**: bug_bounter_agent
+- **T4**: bug_bounter_agent
+- **Best for**: Bug bounty programs with red team leadership and multiple hunters focusing on different attack surfaces
+
+**Team #3: 2 Red + 2 Blue**
+- **T1**: redteam_agent
+- **T2**: redteam_agent
+- **T3**: blueteam_agent
+- **T4**: blueteam_agent
+- **Best for**: Adversarial testing with simultaneous offensive and defensive perspectives
+
+**Team #4: 2 Blue + 2 Bug Bounty**
+- **T1**: blueteam_agent
+- **T2**: blueteam_agent
+- **T3**: bug_bounter_agent
+- **T4**: bug_bounter_agent
+- **Best for**: Defense-focused assessments with vulnerability validation from bug bounty perspective
+
+**Team #5: Red + Blue + Retester + Bug**
+- **T1**: redteam_agent
+- **T2**: blueteam_agent
+- **T3**: retester_agent
+- **T4**: bug_bounter_agent
+- **Best for**: Complete security lifecycle from discovery to validation with mixed specialties
+
+**Team #6: 2 Red + 2 Retester**
+- **T1**: redteam_agent
+- **T2**: redteam_agent
+- **T3**: retester_agent
+- **T4**: retester_agent
+- **Best for**: Aggressive offensive testing with immediate vulnerability retesting and validation
+
+**Team #7: 2 Blue + 2 Retester**
+- **T1**: blueteam_agent
+- **T2**: blueteam_agent
+- **T3**: retester_agent
+- **T4**: retester_agent
+- **Best for**: Defensive security validation with continuous retesting of hardening measures
+
+**Team #8: 4 Red Team**
+- **T1**: redteam_agent
+- **T2**: redteam_agent
+- **T3**: redteam_agent
+- **T4**: redteam_agent
+- **Best for**: Maximum offensive power, CTF competitions, intensive penetration testing campaigns
+
+**Team #9: 4 Blue Team**
+- **T1**: blueteam_agent
+- **T2**: blueteam_agent
+- **T3**: blueteam_agent
+- **T4**: blueteam_agent
+- **Best for**: Comprehensive defensive analysis, security architecture review, hardening validation
+
+**Team #10: 4 Bug Bounty**
+- **T1**: bug_bounter_agent
+- **T2**: bug_bounter_agent
+- **T3**: bug_bounter_agent
+- **T4**: bug_bounter_agent
+- **Best for**: Bug bounty hunts, vulnerability research, OWASP Top 10 testing across multiple surfaces
+
+**Team #11: 4 Retester**
+- **T1**: retester_agent
+- **T2**: retester_agent
+- **T3**: retester_agent
+- **T4**: retester_agent
+- **Best for**: Large-scale retesting campaigns, verification of fixes, regression testing
+
+#### Using Teams
 
 When you select a team:
-- All terminals are reconfigured automatically
-- Agent dropdowns update to reflect new assignments
-- Terminal headers show the assigned agent
-- Previous conversations are preserved
+1. All 4 terminals are automatically reconfigured with the designated agents
+2. Agent dropdowns in each terminal header update to reflect new assignments
+3. Terminal output areas are preserved (previous conversations remain visible)
+4. Each terminal is ready to receive prompts immediately
+5. You can broadcast the same prompt to all terminals or send individual prompts
 
 ### 2. Queue Tab
 
