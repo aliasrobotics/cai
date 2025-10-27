@@ -22,13 +22,13 @@ The top bar provides global controls and information:
 
 - **Terminal**: Main CAI interface label indicating the active application view.
 
-- **Add+ button**: Creates and adds a new terminal to the current session. Click to spawn an additional terminal window (up to 4 terminals supported) for parallel agent execution.
+- **Add+ button**: Creates and adds a new terminal to the current session. 
 
-- **Graph**: Opens the session statistics and cost monitoring dashboard, providing real-time insights into token usage, API costs, and performance metrics across all active terminals.
+- **Graph**: Visual conversation flow representation.
 
-- **Help**: Launches the comprehensive user guide with detailed documentation, keyboard shortcuts reference, and troubleshooting resources. Quick access to all TUI documentation.
+- **Help**: Launches the comprehensive user guide with detailed documentation, keyboard shortcuts reference, and pro tips.
 
-- **[×] Close**: Exits the TUI application safely. Prompts to save unsaved sessions before closing.
+- **[×] Close**: Exits the TUI application.
 
 ---
 
