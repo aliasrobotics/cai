@@ -18,36 +18,25 @@ The CAI TUI interface is divided into several key areas:
 
 The top bar provides global controls and information:
 
-- **[≡] Menu Button**: Opens the command palette for quick access to all TUI commands
-- **Terminal CTR Help**: Shows current help context and available shortcuts
-- **[±] Maximize**: Toggles fullscreen mode for the active terminal
-- **[×] Close**: Exits the TUI application
+- **[≡] Sidebar toggle**: Toggles the visibility of the sidebar containing Teams, Queue, Stats, and Keys tabs. Press `Ctrl+S` or click this icon to show/hide the sidebar and maximize terminal space.
 
-### Command Palette
+- **Terminal**: Main CAI interface label indicating the active application view.
 
-Press `Ctrl+P` or click the menu button to open the command palette, which provides:
+- **Add+ button**: Creates and adds a new terminal to the current session. Click to spawn an additional terminal window (up to 4 terminals supported) for parallel agent execution.
 
-- Quick command search and execution
-- Fuzzy matching for command names
-- Keyboard navigation (arrow keys, Enter)
-- Recent commands history
-- Command descriptions and shortcuts
+- **Graph**: Opens the session statistics and cost monitoring dashboard, providing real-time insights into token usage, API costs, and performance metrics across all active terminals.
 
-Available commands include:
-- `clear` - Clear terminal output
-- `save` - Save current session
-- `load` - Load previous session
-- `export` - Export conversation
-- `reset` - Reset agent context
-- `help` - Show help information
+- **Help**: Launches the comprehensive user guide with detailed documentation, keyboard shortcuts reference, and troubleshooting resources. Quick access to all TUI documentation.
+
+- **[×] Close**: Exits the TUI application safely. Prompts to save unsaved sessions before closing.
 
 ---
 
 ## Sidebar
 
-The sidebar contains four main tabs accessible via mouse click or keyboard shortcuts (`Alt+1` through `Alt+4`):
+The sidebar contains four main tabs accessible via mouse click or keyboard shortcuts:
 
-### 1. Teams Tab (`Alt+1`)
+### 1. Teams Tab 
 
 The Teams tab displays preconfigured agent teams for parallel testing scenarios:
 
@@ -76,7 +65,7 @@ When you select a team:
 - Terminal headers show the assigned agent
 - Previous conversations are preserved
 
-### 2. Queue Tab (`Alt+2`)
+### 2. Queue Tab
 
 The Queue tab manages prompt queuing and broadcast execution:
 
@@ -100,7 +89,7 @@ The Queue tab manages prompt queuing and broadcast execution:
 ```
 
 
-### 3. Stats Tab (`Alt+3`)
+### 3. Stats Tab
 
 The Stats tab provides real-time cost tracking and usage statistics:
 
@@ -123,12 +112,11 @@ The Stats tab provides real-time cost tracking and usage statistics:
 ```
 Total Cost: $0.47
 ═══════════════════════
-Terminal 1: $0.15 (3 interactions)
-Terminal 2: $0.12 (2 interactions)
-Terminal 3: $0.10 (2 interactions)
-Terminal 4: $0.10 (2 interactions)
-Model: alias1 ($0.015/1K in, $0.060/1K out)
-Tokens: 1,240 input, 6,850 output
+Terminal 1: $0.15 
+Terminal 2: $0.12 
+Terminal 3: $0.10 
+Terminal 4: $0.10 
+
 ```
 
 
@@ -137,26 +125,18 @@ Tokens: 1,240 input, 6,850 output
 - Warning when approaching limit
 - Automatic pause when limit exceeded
 
-### 4. Keys Tab (`Alt+4`)
+### 4. Keys Tab
 
-The Keys tab displays and manages API key status:
+The Keys tab displays and manages API keys:
 
 **Key Information**:
 - API key provider (OpenAI, Anthropic, etc.)
-- Key validity status
-- Last validation time
-- Rate limit information
+- Masked API keys
 
 **Key Management**:
-- View masked API keys
-- Test key validity
 - Update keys without restarting
 - Environment variable status
 
-**Example Display**:
-
-
----
 
 ## Terminal Components
 
@@ -179,7 +159,7 @@ The header bar above each terminal shows:
 
 **Model Dropdown**:
 - Click to open model selection menu
-- Shows configured models (alias0, alias1, gpt-4o, etc.)
+- Shows configured models (alias1, gpt-5, gpt-4o, etc.)
 - Displays model aliases and actual names
 - Updates immediately upon selection
 
@@ -210,11 +190,6 @@ The main terminal display area shows:
 - Progressive rendering of tool outputs
 - Live progress indicators
 - Smooth scrolling
-
-**Example Output**:
-
-
-
 
 ### Terminal States
 
@@ -254,10 +229,7 @@ The TUI supports multiple layout configurations for parallel agent execution:
 
 Default view showing one terminal at full width:
 
-
-
-
-
+![Single Terminal Layout](../media/CAI-1terminal.png)
 
 **Use Cases**:
 - Single-agent workflows
@@ -270,7 +242,7 @@ Default view showing one terminal at full width:
 
 Side-by-side view for two terminals:
 
-
+![Two Terminal Split Layout](../media/CAI-2terminals.png)
 
 **Use Cases**:
 - Comparing two agent approaches
@@ -283,8 +255,7 @@ Side-by-side view for two terminals:
 
 Three terminals with one full-width top terminal:
 
-
-
+![Three Terminal Layout](../media/CAI-3terminals.png)
 
 **Use Cases**:
 - Full team operations (Teams 1-4)
@@ -298,14 +269,12 @@ Three terminals with one full-width top terminal:
 
 For more than 4 terminals (experimental):
 
-
+![Four Terminal Grid Layout](../media/cai-tui-main.png)
 
 **Use Cases**:
 - Large-scale testing
 - Custom configurations
 - Advanced workflows
-
-**Activation**: Manual configuration via startup YAML
 
 ---
 
@@ -328,7 +297,6 @@ The bottom status bar displays global information:
 - **Mode**: Current mode (broadcast, queue, normal)
 - **Shortcuts**: Context-sensitive keyboard hints
 
-**Example**:
 
 ## Input Area
 
@@ -362,20 +330,6 @@ The TUI provides intelligent autocompletion for:
 - `/agent` - Switch agent
 - `/model` - Switch model
 
-**Agent Names**:
-- Type `@` to trigger agent name completion
-- Fuzzy matching supported
-- Shows agent descriptions
-
-**File Paths**:
-- Type `/path/` to trigger path completion
-- Shows recent files and directories
-- Supports tab completion
-
-**Example**:
-
-
----
 
 ## Responsive Design
 
@@ -413,6 +367,26 @@ The TUI automatically:
 - Adjusts table column widths
 - Scales terminal grid based on available space
 - Hides non-essential UI elements when space is limited
+
+---
+
+## Command Palette
+
+Press `Ctrl+P` or click the menu button to open the command palette, which provides:
+
+- Quick command search and execution
+- Fuzzy matching for command names
+- Keyboard navigation (arrow keys, Enter)
+- Recent commands history
+- Command descriptions and shortcuts
+
+Available commands include:
+- `clear` - Clear terminal output
+- `save` - Save current session
+- `load` - Load previous session
+- `export` - Export conversation
+- `reset` - Reset agent context
+- `help` - Show help information
 
 ---
 
