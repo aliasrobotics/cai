@@ -1,5 +1,10 @@
 # Getting Started with CAI TUI
 
+> **⚡ CAI-Pro Exclusive Feature**  
+> The Terminal User Interface (TUI) is available exclusively in **CAI-Pro**. To access this feature and unlock advanced multi-agent workflows, visit [Alias Robotics](https://aliasrobotics.com) for more information.
+
+---
+
 This guide will walk you through launching the CAI TUI for the first time and performing your first security assessment.
 
 ## Prerequisites

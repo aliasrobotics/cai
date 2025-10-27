@@ -1,5 +1,10 @@
 # CAI Terminal User Interface (TUI)
 
+> **⚡ CAI-Pro Exclusive Feature**  
+> The Terminal User Interface (TUI) is available exclusively in **CAI-Pro**. To access this feature and unlock advanced multi-agent workflows, visit [Alias Robotics](https://aliasrobotics.com) for more information.
+
+---
+
 The CAI TUI provides a modern, terminal-based interface for interacting with CAI agents, enabling powerful multi-agent workflows, parallel execution, and advanced security testing capabilities.
 
 ![CAI TUI Interface](../media/cai-tui-main.png)
