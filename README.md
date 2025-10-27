@@ -330,6 +330,13 @@ Cybersecurity AI is a critical field, yet many groups are misguidedly pursuing i
 
 ## :nut_and_bolt: Install
 
+> [!NOTE]
+> **CAI Professional Edition Users**: If you have an active CAI Pro subscription, we provide dedicated installation guides for versions 0.5 and 0.6. Official support is available for Ubuntu 24.04 (x86_64). Installation instructions for other operating systems are provided as-is without official support:
+> - [CAI Pro v0.6 Installation Guide](docs/Installation_Guide_for_CAI_Pro_v0.6.md)
+> - [CAI Pro v0.5 Installation Guide](docs/Installation_Guide_for_CAI_Pro_v0.5.md)
+
+### Community Edition Installation
+
 ```bash
 pip install cai-framework
 ```
