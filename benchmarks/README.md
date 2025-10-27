@@ -28,10 +28,24 @@ AutoPenBench                                             │
 
 *Categories marked with asterisk are available in CAI PRO version [^8].
 
-
-| ![](utils/stackplot.png) | ![](utils/base_1col.png) |
-|------------------------------------------------|---------------------------------|
-| ![](utils/cyberpii_benchmark.png) | ![](utils/caibench_spider.png) |
+<table>
+  <tr>
+    <th style="text-align:center;"><b>Best performance in Agent vs Agent A&amp;D</b></th>
+    <th style="text-align:center;"><b>Model performance in Jeopardy CTFs Base Benchmark</b></th>
+  </tr>
+  <tr>
+    <td align="center"><img src="utils/stackplot.png" alt="stackplot" /></td>
+    <td align="center"><img src="utils/base_1col.png" alt="base_1col" /></td>
+  </tr>
+  <tr>
+    <th style="text-align:center;"><b>Model performance in CyberPII Privacy Benchmark</b></th>
+    <th style="text-align:center;"><b>Model performance overall</b></th>
+  </tr>
+  <tr>
+    <td align="center"><img src="utils/cyberpii_benchmark.png" alt="cyberpii" /></td>
+    <td align="center"><img src="utils/caibench_spider.png" alt="caibench" /></td>
+  </tr>
+</table>
 
 Cybersecurity AI Benchmark or `CAIBench` for short is a meta-benchmark (*benchmark of benchmarks*) [^6] designed to evaluate the security capabilities (both offensive and defensive) of cybersecurity AI agents and their associated models. It is built as a composition of individual benchmarks, most represented by a Docker container for reproducibility. Each container scenario can contain multiple challenges or tasks. The system is designed to be modular and extensible, allowing for the addition of new benchmarks and challenges.
 
