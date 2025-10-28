@@ -158,8 +158,8 @@ Assign specific roles to terminals:
 - **Use available terminals**: Switch to idle terminals instead of queuing
 
 ### Model Selection
-- **Fast models for reconnaissance**: Use `gpt-4o-mini` or `alias1` for enumeration
-- **Powerful models for exploitation**: Use `claude-sonnet-4.5` or `gpt-5` for complex tasks
+- **Fast models for reconnaissance**: Use `alias0-fast` or `alias1` for enumeration
+- **Powerful models for exploitation**: Use `alias1` for complex tasks
 - **Mix models strategically**: Different models for different terminal roles
 
 ### Cost Management
