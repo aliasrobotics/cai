@@ -248,7 +248,7 @@ CAI TUI automatically adjusts terminal layouts based on the number of active ter
 
 **Steps**:
 1. Open sidebar (`Ctrl+S`)
-2. Navigate to Teams tab (`Alt+1`)
+2. Navigate to Teams tab
 3. Click desired team button (e.g., "#1: 2 red + 2 bug")
 4. All 4 terminals are configured automatically
 
