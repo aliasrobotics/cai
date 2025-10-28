@@ -195,13 +195,6 @@ Use the Queue tab to:
 - **Plan workflow**: Know when terminals will be available
 - **Avoid conflicts**: Prevent overloading terminals with too many commands
 
-**Example queue display**:
-
-Terminal 2: scan target.com for SQLi vulnerabilities
-Terminal 3: analyze authentication mechanisms
-Terminal 1: enumerate API endpoints
-
-
 ### Best Practices
 
 ✅ **Monitor before sending**: Check the queue before adding more commands to busy terminals
@@ -316,7 +309,6 @@ To use ALIAS1 with your API key, configure it in the Keys tab or via `.env` file
 
 ```bash
 ALIAS_API_KEY=your-alias1-key-here
-```
 ```
 
 ---
