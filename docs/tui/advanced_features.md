@@ -63,7 +63,7 @@ MCP allows agents to:
 
 ### Configuration and Setup
 
-For detailed instructions on enabling, configuring, and using MCP with CAI, including setup guides, supported servers, security considerations, and practical examples, see the complete [MCP Configuration Guide](../cai_getting_started/MCP.md).
+For detailed instructions on enabling, configuring, and using MCP with CAI, including setup guides, supported servers, security considerations, and practical examples, see the complete [MCP Configuration Guide](../cai/getting-started/MCP.md).
 
 **Learn more about the protocol**: [https://modelcontextprotocol.io](https://modelcontextprotocol.io)
 
