@@ -36,8 +36,7 @@ In CAI TUI, a **terminal** is an independent execution environment where:
 
 Each terminal consists of:
 
-[Insertar imagen]
-
+![Terminal Anatomy](../media/CAI-1terminal.png)
 
 **Header Components**:
 - **Terminal Number** (T1, T2, T3, T4)
