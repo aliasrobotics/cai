@@ -60,7 +60,7 @@ Each terminal consists of:
 ### Default Behavior
 
 - **Terminal 1 (T1)** is always the main terminal and cannot be closed
-- New terminals start with `redteam_agent` and the default model (`CAI_MODEL`)
+- New terminals start with `redteam_agent` and the default model (`Alias1`)
 - Each terminal maintains independent conversation history
 - Terminals can run different agents and models simultaneously
 
@@ -199,7 +199,7 @@ CAI TUI automatically adjusts terminal layouts based on the number of active ter
 
 **Display**: 2×2 grid
 
-[Insertar imagen]
+![Quad Terminal Layout](../media/cai-tui-main.png)
 
 **When to Use**:
 - Full team operations
@@ -213,7 +213,7 @@ CAI TUI automatically adjusts terminal layouts based on the number of active ter
 
 **Display**: Scrollable 2-column grid
 
-[Insertar imagen]
+![Scrollable Terminal Layout](../media/CAI-5+terminals.png)
 
 **When to Use**:
 - Large-scale testing campaigns
@@ -223,7 +223,6 @@ CAI TUI automatically adjusts terminal layouts based on the number of active ter
 **Notes**:
 - Scrollbar appears on the right
 - Keyboard navigation still works
-- Performance may degrade with 8+ terminals
 
 ---
 
@@ -233,15 +232,13 @@ CAI TUI automatically adjusts terminal layouts based on the number of active ter
 
 #### Method 1: Manual Addition
 
-**Command**: `/add`
-
-**Keyboard Shortcut**: Click `[+]` button in top bar
+**Keyboard Shortcut**: Click `[Add+]` button in top bar
 
 **Example Workflow**:
 
 ```
 1. Start CAI TUI (1 terminal by default)
-2. Click [+] or type /add
+2. Click [+]
 3. New terminal appears (T2)
 4. Select agent from dropdown
 5. Start working
@@ -273,14 +270,6 @@ CAI TUI automatically adjusts terminal layouts based on the number of active ter
 - Terminal numbers do not shift
 - History is lost (save session first if needed)
 
-#### Command-Based Removal
-
-**Command**: `/remove T<num>`
-
-**Examples**:
-```bash
-/remove T2    # Remove Terminal 2
-/remove T4    # Remove Terminal 4
 ```
 
 **Notes**:
@@ -300,15 +289,6 @@ CAI TUI automatically adjusts terminal layouts based on the number of active ter
 
 Click anywhere in the terminal output area to focus it.
 
-#### Command-Based Focus
-
-**Command**: `/focus T<num>`
-
-**Examples**:
-```bash
-/focus T1
-/focus T3
-```
 
 ### Visual Focus Indicators
 
@@ -331,7 +311,7 @@ CAI TUI includes 11 preconfigured teams optimized for common security workflows.
 ### Accessing Teams
 
 1. Open sidebar (`Ctrl+S`)
-2. Click Teams tab (`Alt+1`)
+2. Click Teams tab
 3. Browse available teams
 4. Click team button to apply
 
@@ -346,7 +326,7 @@ CAI TUI includes 11 preconfigured teams optimized for common security workflows.
 | **#5** | red + blue + retester + bug | Full security lifecycle coverage |
 | **#6** | 2 redteam + 2 retester | Aggressive testing with validation |
 | **#7** | 2 blueteam + 2 retester | Defensive validation and retesting |
-| **#8** | 4 redteam | Maximum offensive power (CTFs) |
+| **#8** | 4 redteam | Maximum offensive power  |
 | **#9** | 4 blueteam | Comprehensive defensive analysis |
 | **#10** | 4 bug_bounter | Intense bug bounty hunting |
 | **#11** | 4 retester | Large-scale retesting campaigns |
@@ -369,33 +349,6 @@ To create custom team configurations:
 2. Save the session: `/save my_custom_team.json`
 3. Load it later: `/load my_custom_team.json`
 
-Alternatively, create a startup YAML:
-
-```yaml
-agents:
-  - agent_name: "network_security_analyzer_agent"
-    team: "Custom Team"
-    agent_index: 1
-  
-  - agent_name: "redteam_agent"
-    team: "Custom Team"
-    agent_index: 2
-  
-  - agent_name: "dfir_agent"
-    team: "Custom Team"
-    agent_index: 3
-  
-  - agent_name: "reporting_agent"
-    team: "Custom Team"
-    agent_index: 4
-```
-
-Launch with:
-```bash
-export CAI_TUI_STARTUP_YAML=custom_team.yaml
-cai --tui
-```
-
 ---
 
 ## Parallel Execution Patterns
@@ -407,7 +360,7 @@ cai --tui
 **Steps**:
 1. Select a team (e.g., Team #3: 2 Red + 2 Blue)
 2. Type prompt in input area
-3. Press `Ctrl+Shift+A` (broadcast)
+3. Add "all" flag at the end of the prompt
 4. Watch all terminals execute simultaneously
 
 **Example**:
@@ -580,28 +533,6 @@ T2:Scan target.com for open ports
 - Efficient multi-terminal management
 - Script-friendly
 
-### Session Templates
-
-Create reusable session templates for common workflows.
-
-**Example Template** (`web_pentest_team.json`):
-```json
-{
-  "terminals": [
-    {"number": 1, "agent": "bug_bounter_agent", "model": "gpt-4o"},
-    {"number": 2, "agent": "redteam_agent", "model": "alias1"},
-    {"number": 3, "agent": "retester_agent", "model": "gpt-4o"},
-    {"number": 4, "agent": "reporting_agent", "model": "gpt-4o"}
-  ],
-  "history": []
-}
-```
-
-**Usage**:
-```bash
-/load web_pentest_team.json
-```
-
 ### Dynamic Terminal Allocation
 
 Adjust terminal count based on task complexity.
@@ -694,7 +625,7 @@ T4 > [REPORT] Document all findings
 
 ### 7. Use Broadcast Wisely
 
-Broadcast (`Ctrl+Shift+A`) is powerful but expensive. Use it when you truly need multiple perspectives on the same task.
+Broadcast is powerful but expensive. Use it when you truly need multiple perspectives on the same task.
 
 ### 8. Leverage Terminal Independence
 
