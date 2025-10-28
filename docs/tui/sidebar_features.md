@@ -5,7 +5,12 @@
 
 ---
 
-The CAI TUI sidebar is a powerful vertical panel that provides quick access to essential features and information. It's always visible on the left side of the interface and contains multiple tabs for different functionalities.
+The CAI TUI sidebar is a powerful vertical panel that provides quick access to essential features and information. It can be toggled on/off to maximize screen space:
+
+- **Toggle button**: Click the sidebar toggle button in the top bar
+- **Keyboard shortcut**: Press `Ctrl+S` to show/hide the sidebar
+
+When hidden, the sidebar collapses completely, giving you full width for terminal content. Toggle it back to access teams, queue, stats, and API keys.
 
 ---
 
@@ -26,56 +31,77 @@ The **Teams** tab provides instant access to preconfigured multi-agent team setu
 
 ### Available Teams
 
-**Team 1: Offensive Security Focus**
+**Team 1: 2 Red + 2 Bug**
 - Terminal 1: `redteam_agent`
 - Terminal 2: `redteam_agent`
 - Terminal 3: `bug_bounter_agent`
 - Terminal 4: `bug_bounter_agent`
 - **Use Case**: Penetration testing and vulnerability discovery with dual red team + bug bounty approach
 
-**Team 2: Red Team Intensive**
+**Team 2: 1 Red (T1) + 3 Bug**
 - Terminal 1: `redteam_agent`
-- Terminal 2: `redteam_agent`
-- Terminal 3: `redteam_agent`
-- Terminal 4: `redteam_agent`
-- **Use Case**: Full offensive operations with maximum red team coverage
-
-**Team 3: Balanced Offense/Defense**
-- Terminal 1: `redteam_agent`
-- Terminal 2: `redteam_agent`
-- Terminal 3: `blueteam_agent`
-- Terminal 4: `blueteam_agent`
-- **Use Case**: Combined offensive testing and defensive analysis
-
-**Team 4: Bug Bounty + Defense**
-- Terminal 1: `bug_bounter_agent`
 - Terminal 2: `bug_bounter_agent`
+- Terminal 3: `bug_bounter_agent`
+- Terminal 4: `bug_bounter_agent`
+- **Use Case**: Red team coordination with intensive bug bounty hunting
+
+**Team 3: 2 Red + 2 Blue**
+- Terminal 1: `redteam_agent`
+- Terminal 2: `redteam_agent`
 - Terminal 3: `blueteam_agent`
 - Terminal 4: `blueteam_agent`
-- **Use Case**: Vulnerability research with defensive validation
+- **Use Case**: Balanced offensive testing and defensive analysis
 
-**Team 5: Red Team + Retesting**
+**Team 4: 2 Blue + 2 Bug**
+- Terminal 1: `blueteam_agent`
+- Terminal 2: `blueteam_agent`
+- Terminal 3: `bug_bounter_agent`
+- Terminal 4: `bug_bounter_agent`
+- **Use Case**: Defensive analysis with vulnerability research
+
+**Team 5: Red + Blue + Retester + Bug**
+- Terminal 1: `redteam_agent`
+- Terminal 2: `blueteam_agent`
+- Terminal 3: `retester_agent`
+- Terminal 4: `bug_bounter_agent`
+- **Use Case**: Comprehensive security workflow with offense, defense, validation, and research
+
+**Team 6: 2 Red + 2 Retester**
 - Terminal 1: `redteam_agent`
 - Terminal 2: `redteam_agent`
 - Terminal 3: `retester_agent`
 - Terminal 4: `retester_agent`
 - **Use Case**: Offensive testing with immediate vulnerability validation
 
-**Team 6: Bug Bounty + Validation**
-- Terminal 1: `bug_bounter_agent`
-- Terminal 2: `bug_bounter_agent`
+**Team 7: 2 Blue + 2 Retester**
+- Terminal 1: `blueteam_agent`
+- Terminal 2: `blueteam_agent`
 - Terminal 3: `retester_agent`
 - Terminal 4: `retester_agent`
-- **Use Case**: Vulnerability discovery with comprehensive retesting
+- **Use Case**: Defensive validation with retesting confirmation
 
-**Team 7: Unified Defense**
+**Team 8: 4 Red**
+- Terminal 1: `redteam_agent`
+- Terminal 2: `redteam_agent`
+- Terminal 3: `redteam_agent`
+- Terminal 4: `redteam_agent`
+- **Use Case**: Full offensive operations with maximum red team coverage
+
+**Team 9: 4 Blue**
 - Terminal 1: `blueteam_agent`
 - Terminal 2: `blueteam_agent`
 - Terminal 3: `blueteam_agent`
 - Terminal 4: `blueteam_agent`
-- **Use Case**: Full defensive posture analysis and hardening
+- **Use Case**: Unified defensive posture analysis and hardening
 
-**Team 8: Retesting Focus**
+**Team 10: 4 Bug**
+- Terminal 1: `bug_bounter_agent`
+- Terminal 2: `bug_bounter_agent`
+- Terminal 3: `bug_bounter_agent`
+- Terminal 4: `bug_bounter_agent`
+- **Use Case**: Intensive bug bounty hunting and vulnerability research
+
+**Team 11: 4 Retester**
 - Terminal 1: `retester_agent`
 - Terminal 2: `retester_agent`
 - Terminal 3: `retester_agent`
@@ -130,75 +156,59 @@ T4: bug_bounter_agent
 
 ## Queue Tab
 
-The **Queue** tab manages command execution across multiple terminals, allowing you to schedule and control parallel operations.
+The **Queue** tab displays commands that are automatically queued when terminals are busy. This tab provides real-time visibility into pending operations.
+
+### Automatic Queuing
+
+Commands are automatically added to the queue when you:
+- **Send prompts to busy terminals**: New commands wait while previous ones execute
+- **Issue rapid commands**: Quick successive prompts queue automatically
+- **Work across terminals**: Commands accumulate independently per terminal
 
 ### Queue Display
 
 The queue shows:
 - **Pending commands**: Commands waiting to execute
-- **Command content**: Full text of each queued command
+- **Command content**: Full text of each queued prompt
 - **Target terminal**: Which terminal will execute the command
 - **Execution order**: Commands execute in FIFO (First In, First Out) order
+- **Real-time updates**: Queue updates automatically as commands are added or completed
 
-### Adding Commands to Queue
+### How It Works
 
-**Method 1: Slash Command**
-```bash
-/queue add <command>
-```
+**Automatic execution flow**:
+1. You send a prompt to a terminal that's already processing
+2. The new prompt is automatically added to that terminal's queue
+3. When the current operation completes, the queued prompt executes immediately
+4. No manual intervention required
 
-**Method 2: Interactive Input**
-1. Focus the queue tab
-2. Type your command
-3. Press `Enter` to add to queue
+**Visual feedback**:
+- **Pending**: Command waiting to execute (displayed in queue)
+- **Executing**: Command currently running (queue updates)
+- **Completed**: Command finished (removed from queue)
 
-**Examples**:
-```bash
-# Add reconnaissance command
-/queue add nmap -sV -sC target.com
+### Monitoring the Queue
 
-# Add vulnerability scan
-/queue add nikto -h https://target.com
+Use the Queue tab to:
+- **Track pending work**: See what commands are waiting
+- **Verify execution order**: Confirm commands will run in the correct sequence
+- **Plan workflow**: Know when terminals will be available
+- **Avoid conflicts**: Prevent overloading terminals with too many commands
 
-# Add exploit attempt
-/queue add exploit db/cve-2024-1234
-```
+**Example queue display**:
 
-### Queue Management Commands
+Terminal 2: scan target.com for SQLi vulnerabilities
+Terminal 3: analyze authentication mechanisms
+Terminal 1: enumerate API endpoints
 
-**View Queue**:
-```bash
-/queue list
-```
 
-**Clear Queue**:
-```bash
-/queue clear
-```
+### Best Practices
 
-**Remove Specific Item**:
-```bash
-/queue remove <index>
-```
+✅ **Monitor before sending**: Check the queue before adding more commands to busy terminals
 
-**Execute Queue**:
-```bash
-/queue run
-```
+✅ **Use multiple terminals**: Distribute work across terminals to avoid queue buildup
 
-### Queue Execution
-
-When you execute the queue:
-1. Commands dispatch to available terminals
-2. Terminals process commands in parallel
-3. Queue updates in real-time as commands complete
-4. You can continue working while queue executes
-
-**Execution behavior**:
-- **Parallel**: Multiple terminals execute simultaneously
-- **Automatic**: No manual intervention required
-- **Resumable**: Pause and resume queue execution
-- **Persistent**: Queue survives terminal switches
+✅ **Wait for completion**: For complex operations, wait until current task finishes before queuing more
 
 ---
 
@@ -234,10 +244,10 @@ Terminal 4: 6,789 tokens
 **Cost breakdown example**:
 
 ```
-Terminal 1 (gpt-4o): $0.45
-Terminal 2 (claude-sonnet-4): $0.32
-Terminal 3 (gpt-4o-mini): $0.08
-Terminal 4 (gpt-4o): $0.51
+Terminal 1 (alias1): $0.45
+Terminal 2 (gpt-5): $0.32
+Terminal 3 (alias1): $0.08
+Terminal 4 (claude-sonnet-4.5): $0.51
 
 Session Total: $1.36
 ```
@@ -275,12 +285,41 @@ The **Keys** tab allows you to manage API keys for different LLM providers direc
 ### Supported Providers
 
 CAI supports API keys for:
+- **ALIAS1** (Alias model - Optimized for cybersecurity tasks)
 - **OpenAI** (GPT models)
 - **Anthropic** (Claude models)
 - **Google** (Gemini models)
 - **Groq** (Fast inference models)
 - **OpenRouter** (Multi-provider routing)
 - **Custom providers** (Self-hosted models)
+
+#### About ALIAS1
+
+**ALIAS1** is Alias Robotics' proprietary large language model, specifically fine-tuned and optimized for cybersecurity operations. It is the **default model** in CAI-Pro and offers:
+
+- **Specialized cybersecurity knowledge**: Deep understanding of offensive/defensive security
+- **Tool integration**: Native support for security tools and frameworks
+- **Cost efficiency**: Competitive pricing for professional security workflows
+- **Privacy**: Self-hosted option available for sensitive operations
+- **Performance**: Optimized response times for security tasks
+- **Default selection**: Pre-configured as the primary model for all terminals
+
+**Learn more**: [https://aliasrobotics.com/alias1](https://aliasrobotics.com/alias1)
+
+ALIAS1 is automatically configured when you launch the CAI --tui. To explicitly set or verify the model:
+
+```bash
+/model alias1
+```
+
+To use ALIAS1 with your API key, configure it in the Keys tab or via `.env` file:
+
+```bash
+ALIAS_API_KEY=your-alias1-key-here
+```
+```
+
+---
 
 ### Adding API Keys
 
@@ -290,28 +329,18 @@ CAI supports API keys for:
 3. Enter your API key
 4. Press `Enter` to save
 
-**Command method**:
-```bash
-/key set openai sk-...
-/key set anthropic sk-ant-...
-/key set google AIza...
-```
-
 ### Viewing Configured Keys
 
 The Keys tab displays:
 - **Provider names**: Which providers are configured
-- **Key status**: Valid, invalid, or missing
 - **Masked keys**: Shows only last 4 characters for security
-- **Last updated**: When the key was last modified
 
 **Example display**:
 
 ```
-OpenAI: sk-...abc123 ✓
-Anthropic: sk-ant-...xyz789 ✓
-Google: Not configured
-Groq: gsk-...def456 ✓
+ALIAS_API_KEY:sk-12hk......2t4
+OpenAI_API_KEY: sk-...abc123 
+ANTHROPIC_API_KEY: sk-ant-...xyz789 
 ```
 
 ### Key Security
@@ -329,29 +358,18 @@ CAI automatically validates keys:
 - **On first use**: Tests actual API connectivity
 - **Real-time feedback**: Immediate error messages for invalid keys
 
-**Validation errors**:
-
-```
-❌ Invalid OpenAI key: Authentication failed
-❌ Anthropic key expired: Please renew
-✓ Google key validated successfully
-```
-
 ### Managing Keys via Config File
 
 You can also manage keys by editing the `.env` file directly:
 
 ```bash
 # .env file
+ALIAS_API_KEY=sk-212...
 OPENAI_API_KEY=sk-...
 ANTHROPIC_API_KEY=sk-ant-...
 GOOGLE_API_KEY=AIza...
 GROQ_API_KEY=gsk-...
 ```
-
-**After editing `.env`**:
-1. Restart the TUI to load new keys
-2. Or use `/reload` command to refresh without restart
 
 ---
 
@@ -401,8 +419,6 @@ GROQ_API_KEY=gsk-...
 
 ✅ **Configure on first launch**: Set up all keys before starting work
 
-✅ **Rotate regularly**: Update keys periodically for security
-
 ✅ **Use environment variables**: For production, prefer `.env` over interactive input
 
 ---
@@ -418,14 +434,6 @@ GROQ_API_KEY=gsk-...
 - Check that team configuration file exists
 - Verify agent names are correct
 
-### Queue not executing
-
-**Symptom**: Commands remain in queue without executing
-
-**Solutions**:
-- Ensure terminals are not blocked by active prompts
-- Check for errors in the status bar
-- Try `/queue clear` and re-add commands
 
 ### Stats showing zero
 
