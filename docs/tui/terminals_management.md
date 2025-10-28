@@ -183,16 +183,17 @@ CAI TUI automatically adjusts terminal layouts based on the number of active ter
 
 ### Triple Terminal Layout
 
-**Display**: One full-width top terminal, two bottom terminals
+**Display**: Three-column vertical split
 
 ![Triple Terminal Layout](../media/CAI-3terminals.png)
 
 **When to Use**:
-- Main coordinator with two specialists
-- Discovery + dual validation
-- One leadership agent, two execution agents
+- Three parallel perspectives on the same task
+- Comparing three different agents or models
+- Balanced multi-agent workflows
+- Mid-complexity security assessments
 
-**Activation**: Configured via startup YAML or custom configuration
+**Activation**: Automatically triggered when 3 terminals are active
 
 ### Quad (Four Terminal) Layout
 
