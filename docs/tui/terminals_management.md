@@ -270,13 +270,6 @@ CAI TUI automatically adjusts terminal layouts based on the number of active ter
 - Terminal numbers do not shift
 - History is lost (save session first if needed)
 
-```
-
-**Notes**:
-- Explicit terminal targeting
-- Cannot remove T1
-- Confirmation not required
-
 ### Focusing Terminals
 
 #### Keyboard Navigation
