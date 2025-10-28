@@ -61,40 +61,11 @@ MCP allows agents to:
 - **Execute tools**: Run system commands and scripts
 - **Interact with services**: Connect to databases, cloud platforms, etc.
 
-### Enabling MCP
+### Configuration and Setup
 
-```bash
-# In .env
-CAI_ENABLE_MCP=true
-```
+For detailed instructions on enabling, configuring, and using MCP with CAI, including setup guides, supported servers, security considerations, and practical examples, see the complete [MCP Configuration Guide](../cai_getting_started/MCP.md).
 
-**⚠️ Security Warning**: MCP grants agents powerful system access. Use with caution and enable guardrails.
-
-### Example Use Cases
-
-**Browser automation**:
-```bash
-Use MCP to open Chrome and test the login form at example.com
-```
-
-**Tool integration**:
-```bash
-Use Burp Suite via MCP to intercept traffic from target.com
-```
-
-**System interaction**:
-```bash
-Execute nmap scan via MCP and analyze results
-```
-
-### Supported MCP Servers
-
-- **Browser automation**: Chrome/Firefox control via Playwright
-- **Security tools**: Burp Suite, ZAP, Metasploit integration
-- **Cloud platforms**: AWS, Azure, GCP APIs
-- **Custom servers**: Build your own MCP server
-
-**Learn more**: [https://modelcontextprotocol.io](https://modelcontextprotocol.io)
+**Learn more about the protocol**: [https://modelcontextprotocol.io](https://modelcontextprotocol.io)
 
 ---
 
@@ -242,14 +213,6 @@ custom_agents:
 
 Advanced team coordination patterns for sophisticated workflows.
 
-### Swarm Patterns
-
-Agents collaborate with shared intelligence:
-- **Team 11**: Bug Bounty Triage Swarm
-- **Team 12**: Red Team Swarm
-
-Swarm agents communicate findings and coordinate automatically.
-
 ### Split vs. Shared Context
 
 **Split context** (independent analysis):
@@ -280,9 +243,9 @@ CAI_COST_HARD_LIMIT=50.0       # Stop at $50
 
 ### Model Selection Strategy
 
-- **Reconnaissance**: Use `gpt-4o-mini` or `alias1` (fast, cheap)
-- **Exploitation**: Use `claude-sonnet-4` or `gpt-4o` (powerful, expensive)
-- **Validation**: Use `gpt-4o-mini` (fast, cheap)
+- **Reconnaissance**: Use `alias0-fast` or `alias1` (fast, cheap)
+- **Exploitation**: Use `alias1` (powerful)
+- **Validation**: Use `alias1` (fast)
 
 ### Token Management
 
@@ -318,30 +281,6 @@ T4: Reporting → aggregates all results
 ```
 
 ---
-
-## Integration with External Tools
-
-Connect CAI to your existing security stack.
-
-### Burp Suite Integration
-
-```bash
-# Enable MCP and configure Burp
-CAI_ENABLE_MCP=true
-MCP_BURP_PROXY=http://localhost:8080
-```
-
-```bash
-# Use in prompts
-Proxy traffic through Burp and test for XSS
-```
-
-### Metasploit Integration
-
-```bash
-# Configure MSF via MCP
-MCP_MSF_RPC=http://localhost:55553
-```
 
 ### Custom Tool Integration
 
