@@ -38,8 +38,6 @@ T2:/load previous_pentest.json
 /save my_assessment.json
 ```
 
-Sessions are automatically saved to `~/.cai/sessions/` when auto-save is enabled.
-
 ### Best Practices
 
 - Load relevant sessions at the start of related work
@@ -256,6 +254,4 @@ Build your own MCP servers to integrate proprietary tools.
 ---
 
 *Last updated: October 2025 | CAI TUI v0.6+*
-
-**Need help?** Press `F1` or type `/help` for context-sensitive assistance.
 
