@@ -6,6 +6,10 @@ pip install cai-framework
 
 ## OS X
 ```bash
+# Install homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install dependencies
 brew update && \
     brew install git python@3.12
 
