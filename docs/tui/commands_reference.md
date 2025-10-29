@@ -564,7 +564,6 @@ Cancel running operations.
 - [Terminals Management](terminals_management.md) - Advanced multi-terminal workflows
 - [Keyboard Shortcuts](keyboard_shortcuts.md) - Complete keyboard reference
 - [User Interface Guide](user_interface.md) - Visual components and layouts
-- [Teams Configuration](teams_preconfigured.md) - Using and customizing teams
 
 For questions or issues, visit [CAI GitHub Issues](https://github.com/aliasrobotics/cai/issues).
 

@@ -208,3 +208,4 @@ Test multiple theories simultaneously:
 
 **Quick Reference**: Press `F1` or type `/help teams` for team-specific help.
 
+
