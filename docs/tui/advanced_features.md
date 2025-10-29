@@ -85,7 +85,7 @@ Guardrails provide:
 
 ```bash
 # In .env
-CAI_ENABLE_GUARDRAILS=true
+CAI_GUARDRAILS=true
 ```
 
 **Recommended**: Always enable guardrails in production environments.
@@ -111,18 +111,7 @@ CAI_ENABLE_GUARDRAILS=true
 - Automatically redacts API keys, passwords, and tokens from outputs
 - Prevents accidental credential leakage
 
-### Configuration
-
-Fine-tune guardrails in `config.yaml`:
-
-```yaml
-guardrails:
-  enabled: true
-  block_dangerous_commands: true
-  prompt_injection_detection: true
-  output_sanitization: true
-  rate_limit_requests: 100  # per hour
-```
+For detailed configuration options, advanced usage patterns, and best practices for guardrails, see the complete [Guardrails Documentation](../guardrails.md).
 
 ---
 
@@ -130,15 +119,6 @@ guardrails:
 
 Advanced session handling for complex, multi-stage assessments.
 
-### Auto-Save Sessions
-
-Automatically save your work:
-
-```bash
-# In .env
-CAI_AUTO_SAVE_SESSION=true
-CAI_SESSION_INTERVAL=300  # Save every 5 minutes
-```
 
 ### Session Structure
 
@@ -156,13 +136,6 @@ Sessions contain:
 
 # Load existing session
 /load assessment_name.json
-
-# List available sessions
-/sessions list
-
-# Export session for sharing
-/export assessment_name.json --format markdown
-```
 
 ### Multi-Session Workflows
 
@@ -184,22 +157,6 @@ Combine sessions for complex assessments:
 ## Custom Agents
 
 Create specialized agents for your unique workflows (requires CAI PRO).
-
-### Agent Configuration
-
-Define custom agents in `agents.yaml`:
-
-```yaml
-custom_agents:
-  - name: my_custom_agent
-    description: Specialized agent for my workflow
-    system_prompt: |
-      You are a specialized security agent focused on...
-    tools:
-      - nmap
-      - burpsuite
-    model: alias1
-```
 
 ### Loading Custom Agents
 
@@ -237,8 +194,7 @@ Set spending thresholds:
 
 ```bash
 # In .env
-CAI_COST_ALERT_THRESHOLD=10.0  # Alert at $10
-CAI_COST_HARD_LIMIT=50.0       # Stop at $50
+CAI_PRICE_LIMIT=50.0       # Stop at $50
 ```
 
 ### Model Selection Strategy
