@@ -760,7 +760,17 @@ class OpenAIChatCompletionsModel(Model):
                 and response.usage.completion_tokens_details
                 and hasattr(response.usage.completion_tokens_details, "reasoning_tokens")
             ):
-                reasoning_tokens = response.usage.completion_tokens_details.reasoning_tokens
+                # Guard against None or unexpected types for reasoning_tokens
+                try:
+                    reasoning_tokens = response.usage.completion_tokens_details.reasoning_tokens
+                    if reasoning_tokens is None:
+                        reasoning_tokens = 0
+                    else:
+                        # coerce numeric-like values to int
+                        reasoning_tokens = int(reasoning_tokens)
+                except Exception:
+                    reasoning_tokens = 0
+
                 self.total_reasoning_tokens += reasoning_tokens
             
             # Process costs for non-streaming mode
