@@ -11,7 +11,7 @@ This guide will walk you through launching the CAI TUI for the first time and pe
 
 Before starting, ensure you have:
 
-- ✅ CAI installed (see [Installation Guide](../cai_installation.md))
+- ✅ CAI installed (see [Installation Guide](../Installation_Guide_for_CAI_Pro_v0.6.md))
 - ✅ Python 3.9+ installed
 - ✅ A valid `ALIAS_API_KEY` from [Alias Robotics](https://aliasrobotics.com)
 
