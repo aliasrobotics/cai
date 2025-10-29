@@ -9,41 +9,6 @@ Common issues and solutions when using CAI TUI.
 
 ---
 
-## Installation Issues
-
-### Package Installation Fails
-
-**Symptom**: `pip install` errors or dependency conflicts
-
-**Solutions**:
-- Update pip: `pip install --upgrade pip`
-- Use Python 3.10+: `python --version`
-- Try clean install: `pip install --force-reinstall cai`
-
----
-
-## Launch Issues
-
-### TUI Won't Start
-
-**Symptom**: `cai` command not found or crashes on launch
-
-**Solutions**:
-- Verify installation: `pip show cai`
-- Check Python path: `which python`
-- Review error logs: `~/.cai/logs/`
-
-### Terminal Display Issues
-
-**Symptom**: Broken UI, missing colors, or garbled text
-
-**Solutions**:
-- Use modern terminal (recommended: Alacritty, iTerm2, Windows Terminal)
-- Check terminal size: minimum 80x24
-- Verify TERM variable: `echo $TERM`
-
----
-
 ## API Configuration
 
 ### API Key Not Working
@@ -84,7 +49,8 @@ Common issues and solutions when using CAI TUI.
 
 **Solutions**:
 - Verify correct agent selected
-- Use `/clear` to reset context
+- Use `/compact` to reduce context 
+- Use `/flush` to clean conversation history
 - Check agent description matches your needs
 
 ---
@@ -97,7 +63,6 @@ Common issues and solutions when using CAI TUI.
 
 **Solutions**:
 - Check maximum terminals reached (depends on layout)
-- Try different layout: `Ctrl+L`
 - Restart TUI
 
 ### Terminal Not Responding
@@ -106,7 +71,6 @@ Common issues and solutions when using CAI TUI.
 
 **Solutions**:
 - Click terminal to focus
-- Use `Ctrl+1/2/3/4` to switch focus
 - Check if prompt is running
 
 ---
@@ -119,7 +83,8 @@ Common issues and solutions when using CAI TUI.
 
 **Solutions**:
 - Try faster model (e.g., gpt-4o-mini)
-- Reduce context with `/clear`
+- Reduce context with `/compact`
+- Clear conversation history with `/flush`
 - Check network latency
 
 ### High Memory Usage
@@ -187,9 +152,8 @@ Common issues and solutions when using CAI TUI.
 If your issue isn't covered here:
 
 1. **Check logs**: `~/.cai/logs/latest.log`
-2. **Press F1**: Context-sensitive help in TUI
-3. **Review documentation**: Other guides in `docs/tui/`
-4. **Report issues**: Contact support with error logs
+2. **Review documentation**: Other guides in `docs/tui/`
+3. **Report issues**: Contact support with error logs
 
 ---
 
