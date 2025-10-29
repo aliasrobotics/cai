@@ -87,7 +87,7 @@ Each terminal maintains its own:
 - Isolated conversation history
 - Separate execution context
 
-Learn more: Terminals Management 🚧 (coming soon)
+Learn more: [Terminals Management](terminals_management.md)
 
 ### 👥 Preconfigured Teams
 
@@ -97,7 +97,7 @@ Access specialized agent teams from the sidebar:
 - **Team: 2 Red + 2 Blue**: Dual-perspective security analysis
 - **Team: Red + Blue + Retester + Bug**: Comprehensive assessment workflow
 
-Learn more: Teams and Parallel Execution 🚧 (coming soon)
+Learn more: [Teams and Parallel Execution](teams_and_parallel_execution.md)
 
 ### 🎯 Smart Agent Selection
 
@@ -109,7 +109,7 @@ Use the `selection_agent` to get intelligent agent recommendations based on your
 
 Or simply select it from the agent dropdown.
 
-Learn more: [Commands Reference](commands_reference.md) ✅
+Learn more: [Commands Reference](commands_reference.md)
 
 ### 📊 Sidebar Features
 
@@ -120,30 +120,26 @@ The collapsible sidebar (`Ctrl+S`) provides:
 - **Stats**: Real-time session statistics and costs
 - **Keys**: Manage API keys for multiple providers
 
-Learn more: Sidebar Features 🚧 (coming soon)
+Learn more: [Sidebar Features](sidebar_features.md)
 
 ## Documentation Structure
 
-> **Note**: TUI documentation is being actively developed. Topics marked with 🚧 are coming soon.
-
 ### For New Users
-1. [Getting Started](getting_started.md) ✅ - First steps and basic usage
-2. [User Interface](user_interface.md) ✅ - Understanding the layout
-3. [Keyboard Shortcuts](keyboard_shortcuts.md) ✅ - Essential shortcuts
+1. [Getting Started](getting_started.md) - First steps and basic usage
+2. [User Interface](user_interface.md) - Understanding the layout
+3. [Keyboard Shortcuts](keyboard_shortcuts.md) - Essential shortcuts
 
 ### For Regular Users
-4. [Commands Reference](commands_reference.md) ✅ - Complete command list
-5. Terminals Management 🚧 - Working with multiple terminals
-6. Sidebar Features 🚧 - Sidebar tabs and capabilities
+4. [Commands Reference](commands_reference.md) - Complete command list
+5. [Terminals Management](terminals_management.md) - Working with multiple terminals
+6. [Sidebar Features](sidebar_features.md) - Sidebar tabs and capabilities
 
 ### For Advanced Users
-7. Teams and Parallel Execution 🚧 - Multi-agent workflows
-8. Configuration 🚧 - Environment variables and settings
-9. Advanced Features 🚧 - MCP, Meta Agent, and more
+7. [Teams and Parallel Execution](teams_and_parallel_execution.md) - Multi-agent workflows
+8. [Advanced Features](advanced_features.md) - MCP, ICL, and more
 
 ### Support Resources
-10. Troubleshooting 🚧 - Common issues and solutions
-11. FAQ 🚧 - Frequently asked questions
+9. [Troubleshooting](troubleshooting.md) - Common issues and solutions
 
 ## Quick Reference
 
@@ -158,7 +154,7 @@ Learn more: Sidebar Features 🚧 (coming soon)
 | `Ctrl+C` | Cancel current agent |
 | `ESC` | Cancel all agents |
 
-See the complete [Keyboard Shortcuts Reference](keyboard_shortcuts.md) ✅ for all shortcuts.
+See the complete [Keyboard Shortcuts Reference](keyboard_shortcuts.md) for all shortcuts.
 
 ### Most Used Commands
 
@@ -173,7 +169,7 @@ See the complete [Keyboard Shortcuts Reference](keyboard_shortcuts.md) ✅ for a
 | `/save <file>` | Save conversation |
 | `/load <file>` | Load conversation |
 
-See the complete [Commands Reference](commands_reference.md) ✅ for all commands.
+See the complete [Commands Reference](commands_reference.md) for all commands.
 
 ## Architecture
 
@@ -205,11 +201,11 @@ For technical details, see the [Architecture Overview](../cai_architecture.md).
 
 ## What's Next?
 
-- 📖 [Getting Started Guide](getting_started.md) ✅ - Learn the basics
-- 🖥️ [User Interface](user_interface.md) ✅ - Understand the layout
-- ⌨️ [Keyboard Shortcuts](keyboard_shortcuts.md) ✅ - Boost your productivity
-- 🎯 [Commands Reference](commands_reference.md) ✅ - Master the commands
-- 👥 Teams and Parallel Execution 🚧 - Advanced workflows
+- 📖 [Getting Started Guide](getting_started.md) - Learn the basics
+- 🖥️ [User Interface](user_interface.md) - Understand the layout
+- ⌨️ [Keyboard Shortcuts](keyboard_shortcuts.md) - Boost your productivity
+- 🎯 [Commands Reference](commands_reference.md) - Master the commands
+- 👥 [Teams and Parallel Execution](teams_and_parallel_execution.md) - Advanced workflows
 
 ---
 
