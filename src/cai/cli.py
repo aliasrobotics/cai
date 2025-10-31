@@ -1625,14 +1625,29 @@ def run_cai_cli(
                             raise
                 else:
                     # Use non-streamed response
-                    try:
-                        response = asyncio.run(Runner.run(agent, conversation_input))
-                    except InputGuardrailTripwireTriggered as e:
-                        # Display a user-friendly warning for input guardrails
-                        reason = "Potential security threat detected in input"
-                        if hasattr(e, 'guardrail_result') and e.guardrail_result:
-                            if hasattr(e.guardrail_result, 'output') and e.guardrail_result.output:
-                                reason = e.guardrail_result.output.output_info.get("reason", reason)
+                    from litellm.exceptions import Timeout
+                    
+                    max_retries = 3
+                    last_input = conversation_input
+                    
+                    for attempt in range(max_retries):
+                        try:
+                            response = asyncio.run(Runner.run(agent, last_input))
+                            break  # Success, exit retry loop
+                        except Timeout as e:
+                            if attempt < max_retries - 1:
+                                print(f"⏱️  Timeout on attempt {attempt + 1}/{max_retries}, retrying with 'continue'...")
+                                last_input = "continue"
+                            else:
+                                print("❌ Max retries reached")
+                                raise
+                        except InputGuardrailTripwireTriggered as e:
+                            # Display a user-friendly warning for input guardrails
+                            reason = "Potential security threat detected in input"
+                            if hasattr(e, 'guardrail_result') and e.guardrail_result:
+                                if hasattr(e.guardrail_result, 'output') and e.guardrail_result.output:
+                                    reason = e.guardrail_result.output.output_info.get("reason", reason)
+                            raise  # Re-raise InputGuardrailTripwireTriggered
                         
                         # Use red color for the warning message
                         print(f"\n\033[91m🛡️  INPUT SECURITY GUARDRAIL TRIGGERED\033[0m")
