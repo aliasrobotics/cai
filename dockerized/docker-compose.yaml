@@ -1,0 +1,51 @@
+
+services:
+  cai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cai
+    
+    # Host-Net for scanning (WSL should do that?)
+    network_mode: host
+    
+    # nmap raw sockets
+    privileged: true
+    
+    # Volumes
+    volumes:
+      # .env file
+      - ./config/.env:/config/.env:ro
+      
+      # Logs persistence
+      - ./logs:/opt/cai/logs
+      
+      # Optional: Docker socket if cai should use docker should it though?
+      # - /var/run/docker.sock:/var/run/docker.sock
+    
+
+    # Env Vars (Fallback, .env wins if present)
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-sk-1234}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - OLLAMA_API_BASE=${OLLAMA_API_BASE:-}
+      - PROMPT_TOOLKIT_NO_CPR=1
+      - CAI_STREAM=false
+    
+    # Interactive
+    stdin_open: true
+    tty: true
+    
+    # Restart
+    restart: unless-stopped
+    
+    # Resource Limits? Wsl doesnt like those? Mpf.
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 6G
+        reservations:
+          cpus: '1'
+          memory: 2G
