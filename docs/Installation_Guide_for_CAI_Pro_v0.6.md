@@ -1,5 +1,7 @@
 # Installation Guide for CAI Pro v0.6
 
+← [Back to Installation Guide](../README.md#nut_and_bolt-install)
+
 ## Welcome to CAI Pro!
 
 If your subscription is active, you have received a confirmation email. Then, get and save your API-Key and please follow these instructions to install CAI Pro on your system.
@@ -45,6 +47,10 @@ Although we do not provide official support for other operating systems, we offe
 ### OS X
 
 ```bash
+# Install homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install dependencies
 brew update && \
 brew install git python@3.12
 
@@ -128,4 +134,8 @@ cp .env.example .env  # edit here your keys/models
 # Launch CAI
 cai
 ```
+
+---
+
+**[⬅️ Return to Main Installation Guide](../README.md#nut_and_bolt-install)**
 

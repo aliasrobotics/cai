@@ -1,5 +1,7 @@
 # Installation Guide for CAI Pro v0.5
 
+← [Back to Installation Guide](../README.md#nut_and_bolt-install)
+
 ## Welcome to CAI Pro!
 
 If your subscription is active, you have received a confirmation email. Then, get and save your API-Key and please follow these instructions to install CAI Pro on your system.
@@ -130,4 +132,8 @@ cp .env.example .env  # edit here your keys/models
 # Launch CAI
 cai
 ```
+
+---
+
+**[⬅️ Return to Main Installation Guide](../README.md#nut_and_bolt-install)**
 
