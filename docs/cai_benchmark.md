@@ -49,6 +49,49 @@ AutoPenBench                                             │
 
 Cybersecurity AI Benchmark or `CAIBench` for short is a meta-benchmark (*benchmark of benchmarks*) [^6] designed to evaluate the security capabilities (both offensive and defensive) of cybersecurity AI agents and their associated models. It is built as a composition of individual benchmarks, most represented by a Docker container for reproducibility. Each container scenario can contain multiple challenges or tasks. The system is designed to be modular and extensible, allowing for the addition of new benchmarks and challenges.
 
+---
+
+## 📚 Research & Publications
+
+CAIBench and the CAI framework are backed by extensive peer-reviewed research validating their effectiveness:
+
+### Core Papers
+
+- 📊 [**CAIBench: Cybersecurity AI Benchmark**](https://arxiv.org/pdf/2510.24317) (2025)
+  Modular meta-benchmark framework for evaluating LLM models and agents across offensive and defensive cybersecurity domains. Establishes standardized evaluation methodology for cybersecurity AI systems.
+
+- 🎯 [**Evaluating Agentic Cybersecurity in Attack/Defense CTFs**](https://arxiv.org/pdf/2510.17521) (2025)
+  Real-world evaluation showing defensive agents achieved **54.3% patching success** versus **28.3% offensive initial access** in live CTF environments. Validates practical effectiveness of CAI agents.
+
+- 🚀 [**Cybersecurity AI (CAI): An Open, Bug Bounty-Ready Framework**](https://arxiv.org/pdf/2504.06017) (2025)
+  Core framework paper demonstrating that CAI **outperforms humans by up to 3,600× in specific security testing scenarios**, establishing a new standard for automated security assessment.
+
+### Related Research
+
+- 🛡️ [**Hacking the AI Hackers via Prompt Injection**](https://arxiv.org/pdf/2508.21669) (2025)
+  Demonstrates prompt injection attacks against AI security tools with four-layer guardrail defenses. Critical for understanding AI agent security.
+
+- 📚 [**CAI Fluency: Educational Framework**](https://arxiv.org/pdf/2508.13588) (2025)
+  Comprehensive educational platform for democratizing cybersecurity AI knowledge and application.
+
+- 🤖 [**The Dangerous Gap Between Automation and Autonomy**](https://www.arxiv.org/pdf/2506.23592) (2025)
+  Establishes 6-level taxonomy distinguishing automation from autonomy in Cybersecurity AI systems.
+
+- 🤖 [**Humanoid Robots as Attack Vectors**](https://arxiv.org/pdf/2509.14139) (2025)
+  Systematic security assessment of humanoid robots, demonstrating advanced vulnerability research capabilities.
+
+- 🤖 [**PentestGPT: GPT-empowered Penetration Testing Tool**](https://github.com/aliasrobotics/cai/raw/main/docs/files/PentestGPT_paper.pdf) (2024)
+  Pioneering work on LLMs in cybersecurity, laying foundation for modern agentic security frameworks.
+
+**📖 View all 24+ publications:** [Alias Robotics Research Library →](https://aliasrobotics.com/research-security.php#papers)
+
+!!! tip "Model Recommendations"
+    Based on CAIBench evaluations, **`alias1`** consistently demonstrates superior performance across all cybersecurity benchmark categories compared to general-purpose models like GPT-4o and Claude 3.5.
+
+    **[Learn more about alias1 →](cai_pro.md)**
+
+---
+
 ## Difficulty classification
 
 

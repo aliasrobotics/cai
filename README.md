@@ -12,6 +12,10 @@
 
 
 <a href="https://trendshift.io/repositories/14317" target="_blank"><img src="https://trendshift.io/api/badge/repositories/14317" alt="aliasrobotics%2Fcai | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+<a href="https://defiant.vc/api/european-open-source/badge?domain=aliasrobotics.com&style=most-starred-top-3" target="_blank"><img src="https://defiant.vc/api/european-open-source/badge?domain=aliasrobotics.com&style=most-starred-top-3" alt="European Open Source - Most Starred Top 3" style=" height: 75px;" height="75"/></a>
+<a href="https://defiant.vc/api/european-open-source/badge?domain=aliasrobotics.com&style=most-forked-top-3" target="_blank"><img src="https://defiant.vc/api/european-open-source/badge?domain=aliasrobotics.com&style=most-forked-top-3" alt="European Open Source - Most Forked Top 3" style="height: 75px;" height="75"/></a>
+
+
 
 [![version](https://badge.fury.io/py/cai-framework.svg)](https://badge.fury.io/py/cai-framework)
 [![downloads](https://static.pepy.tech/badge/cai-framework)](https://pepy.tech/projects/cai-framework)
@@ -21,11 +25,13 @@
 [![Android](https://img.shields.io/badge/Android-Supported-brightgreen?logo=android&logoColor=white)](https://github.com/aliasrobotics/cai)
 [![Discord](https://img.shields.io/badge/Discord-7289DA?logo=discord&logoColor=white)](https://discord.gg/fnUFcTaQAC)
 [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-b31b1b.svg)](https://arxiv.org/pdf/2504.06017)
-[![arXiv](https://img.shields.io/badge/arXiv-2506.23592-b31b1b.svg)](https://arxiv.org/abs/2506.23592)
-[![arXiv](https://img.shields.io/badge/arXiv-2508.13588-b31b1b.svg)](https://arxiv.org/abs/2508.13588)
-[![arXiv](https://img.shields.io/badge/arXiv-2508.21669-b31b1b.svg)](https://arxiv.org/abs/2508.21669)
-[![arXiv](https://img.shields.io/badge/arXiv-2509.14096-b31b1b.svg)](https://arxiv.org/abs/2509.14096) 
-[![arXiv](https://img.shields.io/badge/arXiv-2509.14139-b31b1b.svg)](https://arxiv.org/abs/2509.14139)
+[![arXiv](https://img.shields.io/badge/arXiv-2506.23592-b31b1b.svg)](https://arxiv.org/pdf/2506.23592)
+[![arXiv](https://img.shields.io/badge/arXiv-2508.13588-b31b1b.svg)](https://arxiv.org/pdf/2508.13588)
+[![arXiv](https://img.shields.io/badge/arXiv-2508.21669-b31b1b.svg)](https://arxiv.org/pdf/2508.21669)
+[![arXiv](https://img.shields.io/badge/arXiv-2509.14096-b31b1b.svg)](https://arxiv.org/pdf/2509.14096) 
+[![arXiv](https://img.shields.io/badge/arXiv-2509.14139-b31b1b.svg)](https://arxiv.org/pdf/2509.14139)
+[![arXiv](https://img.shields.io/badge/arXiv-2510.17521-b31b1b.svg)](https://arxiv.org/pdf/2510.17521)
+[![arXiv](https://img.shields.io/badge/arXiv-2510.24317-b31b1b.svg)](https://arxiv.org/pdf/2510.24317)
 
 
 </div>
@@ -196,7 +202,7 @@ Cybersecurity AI (CAI) is a lightweight, open-source framework that empowers sec
 
 ### 📊 Research Impact
 - Pioneered LLM-powered AI Security with PentestGPT, establishing the foundation for the `Cybersecurity AI` research domain [![arXiv](https://img.shields.io/badge/arXiv-2308.06782-4a9b8e.svg)](https://arxiv.org/pdf/2308.06782)
-- Established the `Cybersecurity AI` research line with **6 papers and technical reports**, with active research collaborations [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-63bfab.svg)](https://arxiv.org/pdf/2504.06017) [![arXiv](https://img.shields.io/badge/arXiv-2506.23592-7dd3c0.svg)](https://arxiv.org/abs/2506.23592) [![arXiv](https://img.shields.io/badge/arXiv-2508.13588-52a896.svg)](https://arxiv.org/abs/2508.13588) [![arXiv](https://img.shields.io/badge/arXiv-2508.21669-85e0d1.svg)](https://arxiv.org/abs/2508.21669) [![arXiv](https://img.shields.io/badge/arXiv-2509.14096-3e8b7a.svg)](https://arxiv.org/abs/2509.14096) [![arXiv](https://img.shields.io/badge/arXiv-2509.14139-6bc7b5.svg)](https://arxiv.org/abs/2509.14139)
+- Established the `Cybersecurity AI` research line with **8 papers and technical reports**, with active research collaborations [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-63bfab.svg)](https://arxiv.org/pdf/2504.06017) [![arXiv](https://img.shields.io/badge/arXiv-2506.23592-7dd3c0.svg)](https://arxiv.org/abs/2506.23592) [![arXiv](https://img.shields.io/badge/arXiv-2508.13588-52a896.svg)](https://arxiv.org/abs/2508.13588) [![arXiv](https://img.shields.io/badge/arXiv-2508.21669-85e0d1.svg)](https://arxiv.org/abs/2508.21669) [![arXiv](https://img.shields.io/badge/arXiv-2509.14096-3e8b7a.svg)](https://arxiv.org/abs/2509.14096) [![arXiv](https://img.shields.io/badge/arXiv-2509.14139-6bc7b5.svg)](https://arxiv.org/abs/2509.14139) [![arXiv](https://img.shields.io/badge/arXiv-2510.17521-b31b1b.svg)](https://arxiv.org/abs/2510.17521) [![arXiv](https://img.shields.io/badge/arXiv-2510.24317-b31b1b.svg)](https://arxiv.org/abs/2510.24317)
 
 - Demonstrated **3,600× performance improvement** over human penetration testers in standardized CTF benchmark evaluations [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-63bfab.svg)](https://arxiv.org/pdf/2504.06017)
 - Identified **CVSS 4.3-7.5 severity vulnerabilities** in production systems through automated security assessment [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-63bfab.svg)](https://arxiv.org/pdf/2504.06017)
@@ -210,14 +216,14 @@ Cybersecurity AI (CAI) is a lightweight, open-source framework that empowers sec
 
 ### 📚 Research products: `Cybersecurity AI`
 
-|  CAI, An Open, Bug Bounty-Ready Cybersecurity AI [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-63bfab.svg)](https://arxiv.org/pdf/2504.06017) |  The Dangerous Gap Between Automation and Autonomy [![arXiv](https://img.shields.io/badge/arXiv-2506.23592-7dd3c0.svg)](https://arxiv.org/abs/2506.23592) |  CAI Fluency, A Framework for Cybersecurity AI Fluency [![arXiv](https://img.shields.io/badge/arXiv-2508.13588-52a896.svg)](https://arxiv.org/abs/2508.13588) |
-|---|---|---|
-| [<img src="https://aliasrobotics.com/img/paper-cai.png" width="350">](https://arxiv.org/pdf/2504.06017) | [<img src="https://aliasrobotics.com/img/cai_automation_vs_autonomy.png" width="350">](https://www.arxiv.org/pdf/2506.23592) | [<img src="https://aliasrobotics.com/img/cai_fluency_cover.png" width="350">](https://arxiv.org/pdf/2508.13588) |
+|  CAI, An Open, Bug Bounty-Ready Cybersecurity AI [![arXiv](https://img.shields.io/badge/arXiv-2504.06017-63bfab.svg)](https://arxiv.org/pdf/2504.06017) |  The Dangerous Gap Between Automation and Autonomy [![arXiv](https://img.shields.io/badge/arXiv-2506.23592-7dd3c0.svg)](https://arxiv.org/abs/2506.23592) |  CAI Fluency, A Framework for Cybersecurity AI Fluency [![arXiv](https://img.shields.io/badge/arXiv-2508.13588-52a896.svg)](https://arxiv.org/abs/2508.13588) | Hacking the AI Hackers via Prompt Injection [![arXiv](https://img.shields.io/badge/arXiv-2508.21669-85e0d1.svg)](https://arxiv.org/abs/2508.21669) |
+|---|---|---|---|
+| [<img src="https://aliasrobotics.com/img/paper-cai.png" width="350">](https://arxiv.org/pdf/2504.06017) | [<img src="https://aliasrobotics.com/img/cai_automation_vs_autonomy.png" width="350">](https://www.arxiv.org/pdf/2506.23592) | [<img src="https://aliasrobotics.com/img/cai_fluency_cover.png" width="350">](https://arxiv.org/pdf/2508.13588) | [<img src="https://aliasrobotics.com/img/aihackers.jpeg" width="350">](https://arxiv.org/pdf/2508.21669) |
 
 
-| Hacking the AI Hackers via Prompt Injection [![arXiv](https://img.shields.io/badge/arXiv-2508.21669-85e0d1.svg)](https://arxiv.org/abs/2508.21669) | Humanoid Robots as Attack Vectors [![arXiv](https://img.shields.io/badge/arXiv-2509.14139-6bc7b5.svg)](https://arxiv.org/abs/2509.14139) | The Cybersecurity of a Humanoid Robot [![arXiv](https://img.shields.io/badge/arXiv-2509.14096-3e8b7a.svg)](https://arxiv.org/abs/2509.14096) |
-|---|---|---|
-| [<img src="https://aliasrobotics.com/img/aihackers.jpeg" width="350">](https://arxiv.org/pdf/2508.21669) | [<img src="https://aliasrobotics.com/img/humanoids-cover.png" width="350">](https://arxiv.org/pdf/2509.14139) | [<img src="https://aliasrobotics.com/img/humanoid.png" width="350">](https://arxiv.org/pdf/2509.14096) |
+ | Humanoid Robots as Attack Vectors [![arXiv](https://img.shields.io/badge/arXiv-2509.14139-6bc7b5.svg)](https://arxiv.org/abs/2509.14139) | The Cybersecurity of a Humanoid Robot [![arXiv](https://img.shields.io/badge/arXiv-2509.14096-3e8b7a.svg)](https://arxiv.org/abs/2509.14096) |   Evaluating Agentic Cybersecurity in Attack/Defense CTFs [![arXiv](https://img.shields.io/badge/arXiv-2510.17521-b31b1b.svg)](https://arxiv.org/abs/2510.17521) | CAIBench: A Meta-Benchmark for Evaluating Cybersecurity AI Agents [![arXiv](https://img.shields.io/badge/arXiv-2510.24317-b31b1b.svg)](https://arxiv.org/abs/2510.24317) |
+|---|---|---|---|
+|  [<img src="https://aliasrobotics.com/img/humanoids-cover.png" width="350">](https://arxiv.org/pdf/2509.14139) | [<img src="https://aliasrobotics.com/img/humanoid.png" width="350">](https://arxiv.org/pdf/2509.14096) | [<img src="https://aliasrobotics.com/img/cai_ad.png" width="350">](https://arxiv.org/pdf/2510.17521) | [<img src="https://aliasrobotics.com/img/caibench_banner2.png" width="350">](https://arxiv.org/pdf/2510.24317) |
 
 
 
@@ -1083,6 +1089,37 @@ Use ```/agent``` to list all the agents available.
 ![cai-008-config](imgs/readme_imgs/cai-008-config.png)
 </details>
 
+<details>
+<summary> How can I monitor context usage and token consumption? /context or /ctx 🚀 CAI PRO </summary>
+
+> **⚡ CAI PRO Exclusive Feature**
+> The `/context` command is available exclusively in **[CAI PRO](https://aliasrobotics.com/cybersecurityai.php)**. To access this feature and unlock advanced monitoring capabilities, visit [Alias Robotics](https://aliasrobotics.com/cybersecurityai.php) for more information.
+
+Use ```/context``` (or the short form ```/ctx```) to view your current context window usage and token statistics.
+
+This command displays:
+- Total context usage (used tokens / max tokens) with percentage
+- Visual grid representation with the CAI logo showing filled context
+- Detailed breakdown by category:
+  - System prompt tokens
+  - Tool definitions tokens
+  - Memory/RAG tokens
+  - User prompts tokens
+  - Assistant responses tokens
+  - Tool calls tokens
+  - Tool results tokens
+- Free space available
+
+**Why this matters**: Different models have different context limits (e.g., GPT-4: 128k tokens, Claude: 200k tokens). Monitoring your context usage helps you avoid hitting these limits during long conversations, which could cause errors or require conversation truncation.
+
+```bash
+# Show context usage
+/context
+
+# Or use the short form
+/ctx
+```
+</details>
 
 <details>
 <summary> How to know more about the CLI? /help </summary>
@@ -1151,53 +1188,57 @@ The easiest way to get around this is to simply install [`python3.12`](https://w
 </details>
 
 ## Citation
-If you want to cite our work, please use the following:
+
+If you want to cite our work, please use the following (ordered by publication date):
 
 ```bibtex
-@misc{mayoralvilches2025caiopenbugbountyready,
-      title={CAI: An Open, Bug Bounty-Ready Cybersecurity AI},
-      author={Víctor Mayoral-Vilches and Luis Javier Navarrete-Lozano and María Sanz-Gómez and Lidia Salas Espejo and Martiño Crespo-Álvarez and Francisco Oca-Gonzalez and Francesco Balassone and Alfonso Glera-Picón and Unai Ayucar-Carbajo and Jon Ander Ruiz-Alcalde and Stefan Rass and Martin Pinzger and Endika Gil-Uriarte},
-      year={2025},
-      eprint={2504.06017},
-      archivePrefix={arXiv},
-      primaryClass={cs.CR},
-      url={https://arxiv.org/abs/2504.06017},
+@article{mayoral2025cai,
+  title={CAI: An Open, Bug Bounty-Ready Cybersecurity AI},
+  author={Mayoral-Vilches, V{\'\i}ctor and Navarrete-Lozano, Luis Javier and Sanz-G{\'o}mez, Mar{\'\i}a and Espejo, Lidia Salas and Crespo-{\'A}lvarez, Marti{\~n}o and Oca-Gonzalez, Francisco and Balassone, Francesco and Glera-Pic{\'o}n, Alfonso and Ayucar-Carbajo, Unai and Ruiz-Alcalde, Jon Ander and Rass, Stefan and Pinzger, Martin and Gil-Uriarte, Endika},
+  journal={arXiv preprint arXiv:2504.06017},
+  year={2025}
 }
-```
 
-```bibtex
-@misc{mayoralvilches2025cybersecurityaidangerousgap,
-      title={Cybersecurity AI: The Dangerous Gap Between Automation and Autonomy}, 
-      author={Víctor Mayoral-Vilches},
-      year={2025},
-      eprint={2506.23592},
-      archivePrefix={arXiv},
-      primaryClass={cs.CR},
-      url={https://arxiv.org/abs/2506.23592}, 
+@article{mayoral2025automation,
+  title={Cybersecurity AI: The Dangerous Gap Between Automation and Autonomy},
+  author={Mayoral-Vilches, V{\'\i}ctor},
+  journal={arXiv preprint arXiv:2506.23592},
+  year={2025}
 }
-```
 
-```bibtex
-@misc{mayoralvilches2025caifluencyframeworkcybersecurity,
-      title={CAI Fluency: A Framework for Cybersecurity AI Fluency}, 
-      author={Víctor Mayoral-Vilches and Jasmin Wachter and Cristóbal R. J. Veas Chavez and Cathrin Schachner and Luis Javier Navarrete-Lozano and María Sanz-Gómez},
-      year={2025},
-      eprint={2508.13588},
-      archivePrefix={arXiv},
-      primaryClass={cs.CR},
-      url={https://arxiv.org/abs/2508.13588}, 
+@article{mayoral2025fluency,
+  title={CAI Fluency: A Framework for Cybersecurity AI Fluency},
+  author={Mayoral-Vilches, V{\'\i}ctor and Wachter, Jasmin and Chavez, Crist{\'o}bal RJ and Schachner, Cathrin and Navarrete-Lozano, Luis Javier and Sanz-G{\'o}mez, Mar{\'\i}a},
+  journal={arXiv preprint arXiv:2508.13588},
+  year={2025}
 }
-```
 
-```bibtex
-@misc{mayoralvilches2025cybersecurityaihackingai,
-      title={Cybersecurity AI: Hacking the AI Hackers via Prompt Injection}, 
-      author={Víctor Mayoral-Vilches and Per Mannermaa Rynning},
-      year={2025},
-      eprint={2508.21669},
-      archivePrefix={arXiv},
-      primaryClass={cs.CR},
-      url={https://arxiv.org/abs/2508.21669}, 
+@article{mayoral2025hacking,
+  title={Cybersecurity AI: Hacking the AI Hackers via Prompt Injection},
+  author={Mayoral-Vilches, V{\'\i}ctor and Rynning, Per Mannermaa},
+  journal={arXiv preprint arXiv:2508.21669},
+  year={2025}
+}
+
+@article{mayoral2025humanoid,
+  title={Cybersecurity AI: Humanoid Robots as Attack Vectors},
+  author={Mayoral-Vilches, V{\'\i}ctor},
+  journal={arXiv preprint arXiv:2509.14139},
+  year={2025}
+}
+
+@article{balassone2025evaluation,
+  title={Cybersecurity AI: Evaluating Agentic Cybersecurity in Attack/Defense CTFs},
+  author={Balassone, Francesco and Mayoral-Vilches, V{\'\i}ctor and Rass, Stefan and Pinzger, Martin and Perrone, Gaetano and Romano, Simon Pietro and Schartner, Peter},
+  journal={arXiv preprint arXiv:2510.17521},
+  year={2025}
+}
+
+@article{mayoral2025caibench,
+  title={CAIBench: A Meta-Benchmark for Evaluating Cybersecurity AI Agents},
+  author={Mayoral-Vilches, V{\'\i}ctor and Balassone, Francesco and Navarrete-Lozano, Luis Javier and Sanz-G{\'o}mez, Mar{\'\i}a and Crespo-{\'A}lvarez, Marti{\~n}o and Rass, Stefan and Pinzger, Martin},
+  journal={arXiv preprint arXiv:2510.24317},
+  year={2025}
 }
 ```
 

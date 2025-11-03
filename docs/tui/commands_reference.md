@@ -377,6 +377,51 @@ Load a previously saved conversation.
 
 ## Utility Commands
 
+### `/context [agent_name]` or `/ctx` 🚀 **CAI PRO Exclusive**
+
+> **⚡ CAI PRO Exclusive Feature**
+> The `/context` command is available exclusively in **[CAI PRO](https://aliasrobotics.com/cybersecurityai.php)**. To access this feature and unlock advanced monitoring capabilities, visit [Alias Robotics](https://aliasrobotics.com/cybersecurityai.php) for more information.
+
+Display context window usage and token statistics for the current conversation.
+
+**Syntax**:
+```
+/context [agent_name]
+/ctx [agent_name]
+```
+
+**Examples**:
+```bash
+# Show context usage for active terminal
+/context
+
+# Show context usage for specific agent
+/context redteam_agent
+
+# Compact syntax
+/ctx
+```
+
+**Output Includes**:
+- Total context usage (used/max tokens) with percentage
+- Visual grid representation with CAI logo
+- Breakdown by category:
+  - System prompt tokens
+  - Tool definitions tokens
+  - Memory files (RAG) tokens
+  - User prompts tokens
+  - Assistant responses tokens
+  - Tool calls tokens
+  - Tool results tokens
+- Free space available
+- Color-coded visualization for easy identification
+
+**Notes**:
+- Context usage helps monitor when you're approaching model limits
+- Different models have different context windows (e.g., GPT-4: 128k, Claude: 200k)
+- Use `/context` regularly during long conversations to avoid hitting limits
+- Context usage is terminal-specific in TUI mode
+
 ### `/cost [agent_name]`
 
 Display API usage costs and token statistics.

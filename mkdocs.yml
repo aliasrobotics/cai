@@ -15,100 +15,98 @@ theme:
     # Enables annotations in code blocks
     - content.code.annotate
   palette:
-    primary: black
+    primary: custom
   logo: assets/imago.png
   favicon: assets/imago.png
+  icon:
+    repo: fontawesome/brands/github
+repo_url: https://github.com/aliasrobotics/cai
+repo_name: aliasrobotics/cai
 nav:
-  - Intro: index.md
-  - Installation: cai_installation.md
-  - Quickstart: cai_quickstart.md
-  - List of Models:
+  - Getting Started:
+      - Welcome: index.md
+      - Installation: cai_installation.md
+      - Quickstart: cai_quickstart.md
       - Available Models: cai_list_of_models.md
-      - Providers:
+      - Model Providers:
           - OpenRouter: providers/openrouter.md
           - Ollama: providers/ollama.md
           - Azure OpenAI: providers/azure.md
-  - Architecture: cai_architecture.md
-  - Benchmark: cai_benchmark.md
-  - Development: cai_development.md
-  - Start Building:
-    #- Intro: index.md
-    #- Quickstart: quickstart.md
-    #- Examples: examples.md
-    - Documentation:
-        - agents.md  
-        - running_agents.md 
-        - results.md
-        - streaming.md
-        - tools.md
-        #- mcp.md
-        #- cai_mcp.md
-        - handoffs.md
-        - tracing.md
-        - context.md
-        - guardrails.md
-        - multi_agent.md
-        #- models.md
-        #- config.md
-        #- visualization.md
-        # - Voice agents:
-        #     - voice/quickstart.md
-        #     - voice/pipeline.md
-        #     - voice/tracing.md
-    - API Reference:
-        - Agents:
-            #- ref/index.md
-            - ref/agent.md
-            - ref/run.md
-            - ref/tool.md
-            - ref/result.md
-            - ref/stream_events.md
-            - ref/handoffs.md
-            - ref/lifecycle.md
-            - ref/items.md
-            - ref/run_context.md
-            - ref/usage.md
-            - ref/exceptions.md
-            - ref/guardrail.md
-            - ref/model_settings.md
-            - ref/agent_output.md
-            - ref/function_schema.md
-            - ref/models/interface.md
-            - ref/models/openai_chatcompletions.md
-            - ref/models/openai_responses.md
-            # - ref/mcp/server.md
-            # - ref/mcp/util.md
-        # - Tracing:
-        #     - ref/tracing/index.md
-        #     - ref/tracing/create.md
-        #     - ref/tracing/traces.md
-        #     - ref/tracing/spans.md
-        #     - ref/tracing/processor_interface.md
-        #     - ref/tracing/processors.md
-        #     - ref/tracing/scope.md
-        #     - ref/tracing/setup.md
-        #     - ref/tracing/span_data.md
-        #     - ref/tracing/util.md
-        # - Voice:
-        #     - ref/voice/pipeline.md
-        #     - ref/voice/workflow.md
-        #     - ref/voice/input.md
-        #     - ref/voice/result.md
-        #     - ref/voice/pipeline_config.md
-        #     - ref/voice/events.md
-        #     - ref/voice/exceptions.md
-        #     - ref/voice/model.md
-        #     - ref/voice/utils.md
-        #     - ref/voice/models/openai_provider.md
-        #     - ref/voice/models/openai_stt.md
-        #     - ref/voice/models/openai_tts.md
-        - Extensions:
-            - ref/extensions/handoff_filters.md
-            - ref/extensions/handoff_prompt.md
-  - More About CAI:          
-    - FAQ: cai_faq.md
-    - Find Us: cai_find_us.md
-    - Citation & Acknowledgments: cai_citation_and_acknowledgments.md
+
+  - '🚀 CAI PRO': cai_pro.md
+
+  - Core Concepts:
+      - Architecture: cai_architecture.md
+      - Agents: agents.md
+      - Tools: tools.md
+      - Handoffs: handoffs.md
+      - Multi-Agent Systems: multi_agent.md
+
+  - Benchmarking:
+      - Overview: benchmarking/overview.md
+      - Running Benchmarks: benchmarking/running_benchmarks.md
+      - Attack & Defense CTFs: benchmarking/attack_defense.md
+      - Jeopardy CTFs: benchmarking/jeopardy_ctfs.md
+      - Cyber Ranges: benchmarking/cyber_ranges.md
+      - Knowledge Benchmarks: benchmarking/knowledge_benchmarks.md
+      - Privacy Benchmarks: benchmarking/privacy_benchmarks.md
+
+  - Guides:
+      - Running Agents: running_agents.md
+      - Working with Results: results.md
+      - Streaming: streaming.md
+      - Tracing & Debugging: tracing.md
+      - Context Management: context.md
+      - Guardrails & Security: guardrails.md
+
+  - Terminal UI (TUI):
+      - Overview: tui/tui_index.md
+      - Getting Started: tui/getting_started.md
+      - User Interface: tui/user_interface.md
+      - Terminals Management: tui/terminals_management.md
+      - Teams & Parallel Execution: tui/teams_and_parallel_execution.md
+      - Sidebar Features: tui/sidebar_features.md
+      - Keyboard Shortcuts: tui/keyboard_shortcuts.md
+      - Commands Reference: tui/commands_reference.md
+      - Advanced Features: tui/advanced_features.md
+      - Troubleshooting: tui/troubleshooting.md
+
+  - API Reference:
+      - Agents:
+          - Agent: ref/agent.md
+          - Runner: ref/run.md
+          - Tool: ref/tool.md
+          - Result: ref/result.md
+          - Stream Events: ref/stream_events.md
+          - Handoffs: ref/handoffs.md
+          - Lifecycle: ref/lifecycle.md
+          - Items: ref/items.md
+          - Run Context: ref/run_context.md
+          - Usage: ref/usage.md
+          - Exceptions: ref/exceptions.md
+          - Guardrail: ref/guardrail.md
+          - Model Settings: ref/model_settings.md
+          - Agent Output: ref/agent_output.md
+          - Function Schema: ref/function_schema.md
+      - Models:
+          - Interface: ref/models/interface.md
+          - OpenAI Chat Completions: ref/models/openai_chatcompletions.md
+          - OpenAI Responses: ref/models/openai_responses.md
+      - Extensions:
+          - Handoff Filters: ref/extensions/handoff_filters.md
+          - Handoff Prompt: ref/extensions/handoff_prompt.md
+
+  - Advanced:
+      # - Benchmarks: cai_benchmark.md
+      - Development: cai_development.md
+
+  - Research:
+      - Overview: research.md
+
+  - Resources:
+      - FAQ: cai_faq.md
+      - Find Us: cai_find_us.md
+      - Citation & Acknowledgments: cai_citation_and_acknowledgments.md
 plugins:
   - search
   - autorefs

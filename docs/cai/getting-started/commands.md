@@ -27,6 +27,42 @@ This document provides documentation for all commands available in the CAI (Cont
   - Configure CTF (Capture The Flag) variables
   - Manage configuration through environment variables
 
+### **Context Usage Monitoring (`context.py`)** 🚀 **CAI PRO Exclusive**
+### **ContextCommand**
+> **⚡ CAI PRO Exclusive Feature**
+> The `/context` command is available exclusively in **[CAI PRO](https://aliasrobotics.com/cybersecurityai.php)**. To access this feature and unlock advanced monitoring capabilities, visit [Alias Robotics](https://aliasrobotics.com/cybersecurityai.php) for more information.
+
+- **Command**: `/context` or `/ctx`
+- **Purpose**: View context usage and token statistics for the current conversation
+- **Features**:
+  - Display total context usage (used/max tokens) with percentage
+  - Visual grid representation of context usage with CAI logo
+  - Detailed breakdown by category:
+    - System prompt tokens
+    - Tool definitions tokens
+    - Memory/RAG tokens
+    - User prompts tokens
+    - Assistant responses tokens
+    - Tool calls tokens
+    - Tool results tokens
+  - Free space visualization
+  - Context usage tracking across conversation history
+  - Real-time token consumption monitoring
+- **Usage Example**:
+  ```bash
+  # Show context usage for current agent
+  /context
+
+  # Alternative short form
+  /ctx
+  ```
+- **Output Includes**:
+  - Visual grid showing filled vs free context space
+  - Percentage breakdown per category
+  - Token counts formatted with 'k' suffix for thousands
+  - Color-coded categories for easy identification
+  - Summary of total input tokens from last iteration
+
 ### **Cost Tracking (`cost.py`)**
 ### **CostCommand**
 - **Command**: `/cost`

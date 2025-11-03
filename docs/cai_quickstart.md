@@ -1,3 +1,9 @@
+# Quickstart
+
+!!! tip "🚀 Upgrade to CAI PRO"
+    Get access to unrestricted `alias1` model, Terminal UI with parallel agents, and professional support. Perfect for security professionals and teams.
+    **[Explore CAI PRO features →](cai_pro.md)**
+
 To start CAI after installing it, just type `cai` in the CLI:
 
 ```bash

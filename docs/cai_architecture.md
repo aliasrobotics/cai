@@ -24,12 +24,31 @@ CAI focuses on making cybersecurity agent **coordination** and **execution** lig
 ```
 
 
+---
+
+## 📚 Research Foundation
+
+The CAI architecture is built on rigorous research establishing best practices for cybersecurity AI systems:
+
+!!! tip "Key Research Papers"
+    - 🚀 [**CAI Framework**](https://arxiv.org/pdf/2504.06017) (2025) - Core architecture demonstrating 3,600× speedup over manual testing
+    - 🤖 [**Automation vs Autonomy**](https://www.arxiv.org/pdf/2506.23592) (2025) - 6-level taxonomy defining cybersecurity AI capabilities
+    - 🎯 [**Agentic Cybersecurity Evaluation**](https://arxiv.org/pdf/2510.17521) (2025) - Real-world validation of agent coordination patterns
+    - 🛡️ [**Prompt Injection Defense**](https://arxiv.org/pdf/2508.21669) (2025) - Four-layer guardrail system architecture
+    - 📊 [**CAIBench**](https://arxiv.org/pdf/2510.24317) (2025) - Meta-benchmark framework for evaluating agent performance
+
+**📖 Explore all research:** [Alias Robotics Research Library →](https://aliasrobotics.com/research-security.php#papers)
+
+The architecture emphasizes **transparency**, **modularity**, and **human oversight** to ensure responsible and effective cybersecurity automation. Our [research demonstrates](https://arxiv.org/pdf/2506.23592) that semi-autonomous systems with human-in-the-loop capabilities significantly outperform fully autonomous approaches for complex security tasks.
+
+---
+
 If you want to dive deeper into the code, check the following files as a start point for using CAI:
 
 ```
 cai
-├── benchmarks 
-├── ci  
+├── benchmarks
+├── ci
 ├── docs
 ├── examples                     # Basic use of CAI for start building on your own
 ├── src
@@ -44,8 +63,8 @@ cai
 │        │   ├── commands
 │        │   └── ui
 │        ├── sdk                 # Necessary class for chat completions
-│        │   └── agents 
-│        │       └── model             
+│        │   └── agents
+│        │       └── model
 │        ├── tools               # Agent tools
 │        │   └──common.py
 │        └── util.py             # Utility functions
@@ -53,6 +72,7 @@ cai
 └── tools                        # Usable tools
 ```
 
+---
 
 ### 🔹 Agent
 

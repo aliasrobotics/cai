@@ -1,7 +1,12 @@
+# Installation
 
 ```bash
 pip install cai-framework
 ```
+
+!!! tip "🚀 Looking for CAI PRO?"
+    **CAI PRO** includes unlimited access to our state-of-the-art `alias1` model, Terminal UI, and professional support.
+    **[Learn more about CAI PRO →](cai_pro.md)**
 
 The following subsections provide a more detailed walkthrough on selected popular Operating Systems. Refer to the [Development](cai_development.md) section for developer-related install instructions.
 

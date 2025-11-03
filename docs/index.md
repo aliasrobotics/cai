@@ -16,11 +16,36 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
 ## Key Features
 
 - 🤖 **300+ AI Models**: Support for OpenAI, Anthropic, DeepSeek, Ollama, and more
-- 🔧 **Built-in Security Tools**: Ready-to-use tools for reconnaissance, exploitation, and privilege escalation  
+- 🔧 **Built-in Security Tools**: Ready-to-use tools for reconnaissance, exploitation, and privilege escalation
 - 🏆 **Battle-tested**: Proven in HackTheBox CTFs, bug bounties, and real-world security case studies
 - 🎯 **Agent-based Architecture**: Modular framework design to build specialized agents for different security tasks
 - 🛡️ **Guardrails Protection**: Built-in defenses against prompt injection and dangerous command execution
 - 📚 **Research-oriented**: Research foundation to democratize cybersecurity AI for the community
+
+---
+
+## 🚀 CAI PRO - Professional Edition
+
+<div class="highlight-box" markdown>
+
+### Upgrade to Unrestricted AI for Security Professionals
+
+**CAI PRO** delivers the power you need for professional security testing:
+
+- ✅ **Unlimited `alias1` tokens** - Our state-of-the-art cybersecurity model that beats GPT-5 in benchmarks
+- ✅ **Terminal User Interface (TUI)** - Multi-agent parallel execution with visual monitoring
+- ✅ **Context Monitoring** - Real-time token tracking and optimization
+- ✅ **Zero Refusals** - Unrestricted AI specifically trained for offensive security
+- ✅ **European Hosting** - GDPR & NIS2 compliant with guaranteed data privacy
+- ✅ **Professional Support** - Dedicated technical assistance from security experts
+
+**Pricing**: €350/month · Commercial license included · Cancel anytime
+
+**[Learn More & Upgrade to CAI PRO →](cai_pro.md)**
+
+</div>
+
+---
 
 | CAI with `alias0` on ROS message injection attacks in MiR-100 robot | CAI with `alias0` on API vulnerability discovery at Mercado Libre |
 |-----------------------------------------------|---------------------------------|
@@ -58,7 +83,30 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
 <a href="https://arxiv.org/pdf/2504.06017"><img src="https://img.shields.io/badge/arXiv-2504.06017-b31b1b.svg" alt="arXiv"></a>
 </p>
 
+---
 
+## 📊 Research-Backed Performance
+
+CAI's capabilities are validated through rigorous peer-reviewed research demonstrating state-of-the-art performance:
+
+!!! tip "Research Highlights"
+    - 🚀 **[3,600× faster](https://arxiv.org/pdf/2504.06017)** than manual security testing in specific scenarios
+    - 🎯 **[54.3% patching success](https://arxiv.org/pdf/2510.17521)** in real-world CTF defense scenarios
+    - 📊 **[Superior benchmark performance](https://arxiv.org/pdf/2510.24317)** via CAIBench meta-framework evaluation
+    - 🛡️ **[Four-layer guardrails](https://arxiv.org/pdf/2508.21669)** against prompt injection attacks
+
+### Key Publications
+
+- 📊 [**CAIBench**](https://arxiv.org/pdf/2510.24317) - Modular meta-benchmark framework for evaluating cybersecurity AI agents
+- 🎯 [**Agentic Cybersecurity Evaluation**](https://arxiv.org/pdf/2510.17521) - Real-world CTF performance validation
+- 🚀 [**CAI Framework**](https://arxiv.org/pdf/2504.06017) - Core architecture demonstrating 3,600× speedup
+- 🛡️ [**Prompt Injection Defense**](https://arxiv.org/pdf/2508.21669) - Security guardrails for AI agents
+- 📚 [**CAI Fluency**](https://arxiv.org/pdf/2508.13588) - Educational framework for democratizing AI security
+- 🤖 [**Automation vs Autonomy**](https://www.arxiv.org/pdf/2506.23592) - 6-level taxonomy for cybersecurity AI
+
+**📖 Explore all 24+ papers:** [Alias Robotics Research Library →](https://aliasrobotics.com/research-security.php#papers)
+
+---
 
 > ⚠️ CAI is in active development, so don't expect it to work flawlessly. Instead, contribute by raising an issue or [sending a PR](https://github.com/aliasrobotics/cai/pulls).
 >
@@ -120,27 +168,55 @@ Cybersecurity AI is a critical field, yet many groups are misguidedly pursuing i
 If you want to cite our work, please use the following:
 
 ```bibtex
-@misc{mayoralvilches2025caiopenbugbountyready,
-      title={CAI: An Open, Bug Bounty-Ready Cybersecurity AI},
-      author={Víctor Mayoral-Vilches and Luis Javier Navarrete-Lozano and María Sanz-Gómez and Lidia Salas Espejo and Martiño Crespo-Álvarez and Francisco Oca-Gonzalez and Francesco Balassone and Alfonso Glera-Picón and Unai Ayucar-Carbajo and Jon Ander Ruiz-Alcalde and Stefan Rass and Martin Pinzger and Endika Gil-Uriarte},
-      year={2025},
-      eprint={2504.06017},
-      archivePrefix={arXiv},
-      primaryClass={cs.CR},
-      url={https://arxiv.org/abs/2504.06017},
+@article{mayoral2025cai,
+  title={CAI: An Open, Bug Bounty-Ready Cybersecurity AI},
+  author={Mayoral-Vilches, V{\'\i}ctor and Navarrete-Lozano, Luis Javier and Sanz-G{\'o}mez, Mar{\'\i}a and Espejo, Lidia Salas and Crespo-{\'A}lvarez, Marti{\~n}o and Oca-Gonzalez, Francisco and Balassone, Francesco and Glera-Pic{\'o}n, Alfonso and Ayucar-Carbajo, Unai and Ruiz-Alcalde, Jon Ander and Rass, Stefan and Pinzger, Martin and Gil-Uriarte, Endika},
+  journal={arXiv preprint arXiv:2504.06017},
+  year={2025}
 }
-```
 
-```bibtex
-@misc{mayoralvilches2025cybersecurityaidangerousgap,
-      title={Cybersecurity AI: The Dangerous Gap Between Automation and Autonomy}, 
-      author={Víctor Mayoral-Vilches},
-      year={2025},
-      eprint={2506.23592},
-      archivePrefix={arXiv},
-      primaryClass={cs.CR},
-      url={https://arxiv.org/abs/2506.23592}, 
+@article{mayoral2025automation,
+  title={Cybersecurity AI: The Dangerous Gap Between Automation and Autonomy},
+  author={Mayoral-Vilches, V{\'\i}ctor},
+  journal={arXiv preprint arXiv:2506.23592},
+  year={2025}
 }
+
+@article{mayoral2025fluency,
+  title={CAI Fluency: A Framework for Cybersecurity AI Fluency},
+  author={Mayoral-Vilches, V{\'\i}ctor and Wachter, Jasmin and Chavez, Crist{\'o}bal RJ and Schachner, Cathrin and Navarrete-Lozano, Luis Javier and Sanz-G{\'o}mez, Mar{\'\i}a},
+  journal={arXiv preprint arXiv:2508.13588},
+  year={2025}
+}
+
+@article{mayoral2025hacking,
+  title={Cybersecurity AI: Hacking the AI Hackers via Prompt Injection},
+  author={Mayoral-Vilches, V{\'\i}ctor and Rynning, Per Mannermaa},
+  journal={arXiv preprint arXiv:2508.21669},
+  year={2025}
+}
+
+@article{mayoral2025humanoid,
+  title={Cybersecurity AI: Humanoid Robots as Attack Vectors},
+  author={Mayoral-Vilches, V{\'\i}ctor},
+  journal={arXiv preprint arXiv:2509.14139},
+  year={2025}
+}
+
+@article{balassone2025evaluation,
+  title={Cybersecurity AI: Evaluating Agentic Cybersecurity in Attack/Defense CTFs},
+  author={Balassone, Francesco and Mayoral-Vilches, V{\'\i}ctor and Rass, Stefan and Pinzger, Martin and Perrone, Gaetano and Romano, Simon Pietro and Schartner, Peter},
+  journal={arXiv preprint arXiv:2510.17521},
+  year={2025}
+}
+
+@article{mayoral2025caibench,
+  title={CAIBench: A Meta-Benchmark for Evaluating Cybersecurity AI Agents},
+  author={Mayoral-Vilches, V{\'\i}ctor and Balassone, Francesco and Navarrete-Lozano, Luis Javier and Sanz-G{\'o}mez, Mar{\'\i}a and Crespo-{\'A}lvarez, Marti{\~n}o and Rass, Stefan and Pinzger, Martin},
+  journal={arXiv preprint arXiv:2510.24317},
+  year={2025}
+} 
+
 ```
 
 ## Acknowledgements
