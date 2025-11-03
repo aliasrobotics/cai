@@ -1,7 +1,7 @@
 # Troubleshooting
 
 > **⚡ CAI-Pro Exclusive Feature**  
-> The Terminal User Interface (TUI) is available exclusively in **CAI-Pro**. To access this feature and unlock advanced multi-agent workflows, visit [Alias Robotics](https://aliasrobotics.com) for more information.
+> The Terminal User Interface (TUI) is available exclusively in **CAI-Pro**. To access this feature and unlock advanced multi-agent workflows, visit [Alias Robotics](https://aliasrobotics.com/cybersecurityai.php) for more information.
 
 ---
 
@@ -160,9 +160,9 @@ If your issue isn't covered here:
 ## Related Documentation
 
 - [Getting Started](getting_started.md) - Setup and configuration
-- [Configuration](configuration.md) - Environment variables and settings
 - [Commands Reference](commands_reference.md) - All available commands
 - [User Interface](user_interface.md) - UI components explained
+- [Advanced Features](advanced_features.md) - Environment variables and settings
 
 ---
 

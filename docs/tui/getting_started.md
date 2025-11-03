@@ -1,7 +1,7 @@
 # Getting Started with CAI TUI
 
 > **⚡ CAI-Pro Exclusive Feature**  
-> The Terminal User Interface (TUI) is available exclusively in **CAI-Pro**. To access this feature and unlock advanced multi-agent workflows, visit [Alias Robotics](https://aliasrobotics.com) for more information.
+> The Terminal User Interface (TUI) is available exclusively in **CAI-Pro**. To access this feature and unlock advanced multi-agent workflows, visit [Alias Robotics](https://aliasrobotics.com/cybersecurityai.php) for more information.
 
 ---
 
@@ -324,22 +324,15 @@ Open the sidebar (`Ctrl+S`) and go to **"Stats"** tab to see:
 
 Congratulations! You've completed the basics of CAI TUI. Here's what to explore next:
 
-> **Note**: Additional TUI documentation is currently being developed. Topics marked with 🚧 will be available soon.
-
 ### Learn More Commands
-- 📖 Commands Reference 🚧 - Master all available commands
-- ⌨️ Keyboard Shortcuts 🚧 - Speed up your workflow
+- 📖 [Commands Reference](commands_reference.md) - Master all available commands
+- ⌨️ [Keyboard Shortcuts](keyboard_shortcuts.md) - Speed up your workflow
 
 ### Explore Advanced Features
-- 👥 Teams and Parallel Execution 🚧 - Multi-agent workflows
-- 🔧 MCP Integration 🚧 - Connect external tools
-- 💾 Session Management 🚧 - Advanced save/load
-
-### Customize Your Setup
-- ⚙️ Configuration 🚧 - Environment variables and settings
+- 👥 [Teams and Parallel Execution](teams_and_parallel_execution.md) - Multi-agent workflows
+- 🚀 [Advanced Features](advanced_features.md) - MCP, ICL, and more
 
 ### Get Help
-- ❓ FAQ 🚧 - Common questions
-- 🔧 Troubleshooting 🚧 - Solve issues
+- 🔧 [Troubleshooting](troubleshooting.md) - Solve issues
 - 💬 [Community Discord](https://discord.gg/aliasrobotics) - Ask questions
 

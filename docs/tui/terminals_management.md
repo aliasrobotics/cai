@@ -1,7 +1,7 @@
 # CAI TUI Terminals Management
 
 > **⚡ CAI-Pro Exclusive Feature**  
-> The Terminal User Interface (TUI) is available exclusively in **CAI-Pro**. To access this feature and unlock advanced multi-agent workflows, visit [Alias Robotics](https://aliasrobotics.com) for more information.
+> The Terminal User Interface (TUI) is available exclusively in **CAI-Pro**. To access this feature and unlock advanced multi-agent workflows, visit [Alias Robotics](https://aliasrobotics.com/cybersecurityai.php) for more information.
 
 ---
 
@@ -676,8 +676,8 @@ Each terminal is independent - use this for:
 
 - [Commands Reference](commands_reference.md) - Complete command documentation
 - [Keyboard Shortcuts](keyboard_shortcuts.md) - All keyboard shortcuts
-- [Teams Configuration](teams_preconfigured.md) - Deep dive into teams
-- [Session Management](session_management.md) - Save, load, and export sessions
+- [Sidebar Features](sidebar_features.md) - Teams tab and other sidebar capabilities
+- [Advanced Features](advanced_features.md) - MCP, ICL, and session management
 
 For questions or issues, visit [CAI GitHub Issues](https://github.com/aliasrobotics/cai/issues).
 
