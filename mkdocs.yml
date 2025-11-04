@@ -58,6 +58,7 @@ nav:
       - Tracing & Debugging: tracing.md
       - Context Management: context.md
       - Guardrails & Security: guardrails.md
+      - Environment Variables: environment_variables.md
 
   - Terminal UI (TUI):
       - Overview: tui/tui_index.md
