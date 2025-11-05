@@ -514,3 +514,106 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ====================
+   Enhanced Navigation Styling - Refined & Professional
+   Only affects left sidebar navigation, not TOC
+   ==================== */
+
+/* Target ONLY the primary (left) sidebar navigation */
+.md-sidebar--primary .md-sidebar__scrollwrap {
+    /* Main navigation sections - subtle but clear hierarchy */
+}
+
+/* Main sections (Getting Started, CAI PRO, User Interfaces, etc.) */
+.md-sidebar--primary .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__link {
+    color: #529d86 !important;
+    font-weight: 600 !important;
+    font-size: 0.75rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding-top: 0.6rem !important;
+    padding-bottom: 0.4rem !important;
+    margin-top: 0.3rem;
+    border-left: 2px solid transparent;
+    transition: all 0.15s ease;
+}
+
+/* Hover effect for main sections - subtle */
+.md-sidebar--primary .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__link:hover {
+    border-left-color: #529d86;
+    background-color: rgba(82, 157, 134, 0.04);
+}
+
+/* Active main section - slightly more visible */
+.md-sidebar--primary .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__link--active {
+    color: #428072 !important;
+    border-left-color: #529d86;
+    background-color: rgba(82, 157, 134, 0.06);
+    font-weight: 700 !important;
+}
+
+/* Subsections (TUI, CLI, etc.) - keep normal weight */
+.md-sidebar--primary .md-nav__item--nested > .md-nav__link {
+    font-size: 0.7rem !important;
+    font-weight: 500 !important;
+}
+
+/* Regular links - no changes to size */
+.md-sidebar--primary .md-nav__link {
+    font-size: 0.7rem;
+}
+
+/* Active page in navigation - green highlight */
+.md-sidebar--primary .md-nav__link--active {
+    color: #529d86 !important;
+    font-weight: 500;
+}
+
+/* Spacing between sections - subtle */
+.md-sidebar--primary .md-nav--primary > .md-nav__list > .md-nav__item {
+    margin-bottom: 0.2rem;
+}
+
+/* Special styling for CAI PRO section - very subtle gradient */
+.md-sidebar--primary .md-nav__item > .md-nav__link[title*="CAI PRO"],
+.md-sidebar--primary .md-nav__item > .md-nav__link[title*="🚀"] {
+    background: linear-gradient(90deg, rgba(82, 157, 134, 0.05) 0%, rgba(82, 157, 134, 0.01) 100%);
+    border-left-width: 3px;
+}
+
+/* Table of Contents (right sidebar) - Apply color scheme, keep sizes */
+.md-sidebar--secondary .md-nav__link {
+    font-size: inherit !important;
+    text-transform: none !important;
+    transition: color 0.15s ease;
+}
+
+/* TOC - Main headings (h1, h2) with green color */
+.md-sidebar--secondary .md-nav__list > .md-nav__item > .md-nav__link {
+    color: #529d86 !important;
+    font-weight: 600 !important;
+}
+
+/* TOC - Sub-headings (h3, h4) with darker gray */
+.md-sidebar--secondary .md-nav__list .md-nav__item .md-nav__item > .md-nav__link {
+    color: #5a5a5a !important;
+    font-weight: 500 !important;
+}
+
+/* TOC - Hover effect */
+.md-sidebar--secondary .md-nav__link:hover {
+    color: #428072 !important;
+}
+
+/* TOC - Active/current section */
+.md-sidebar--secondary .md-nav__link--active {
+    color: #529d86 !important;
+    font-weight: 700 !important;
+}
+
+/* Smooth transitions for better UX */
+.md-sidebar--primary .md-nav__link,
+.md-sidebar--secondary .md-nav__link {
+    transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
