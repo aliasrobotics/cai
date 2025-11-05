@@ -23,18 +23,52 @@ theme:
 repo_url: https://github.com/aliasrobotics/cai
 repo_name: aliasrobotics/cai
 nav:
+  # ========================================
+  # GETTING STARTED (Simplificado)
+  # ========================================
   - Getting Started:
       - Welcome: index.md
       - Installation: cai_installation.md
       - Quickstart: cai_quickstart.md
-      - Available Models: cai_list_of_models.md
-      - Model Providers:
-          - OpenRouter: providers/openrouter.md
-          - Ollama: providers/ollama.md
-          - Azure OpenAI: providers/azure.md
 
-  - '🚀 CAI PRO': cai_pro.md
+  # ========================================
+  # CAI PRO (EXPANDIDO - COMERCIAL) ⭐
+  # ========================================
+  - '🚀 CAI PRO - Professional Edition':
+      - Why CAI PRO?: cai_pro.md
+      - Alias1 Model: cai_pro_alias1.md
+      - Exclusive Features: cai_pro_features.md
+      - Pricing & Plans: cai_pro_pricing.md
+      - Get Started with PRO: cai_pro_quickstart.md
+      - Contact Sales: cai_pro_contact.md
 
+  # ========================================
+  # USER INTERFACES (NUEVO AGRUPAMIENTO)
+  # ========================================
+  - User Interfaces:
+      # Terminal UI (TUI) - Subsección
+      - Terminal UI (TUI):
+          - Overview: tui/tui_index.md
+          - Getting Started: tui/getting_started.md
+          - User Interface: tui/user_interface.md
+          - Terminals Management: tui/terminals_management.md
+          - Teams & Parallel Execution: tui/teams_and_parallel_execution.md
+          - Sidebar Features: tui/sidebar_features.md
+          - Keyboard Shortcuts: tui/keyboard_shortcuts.md
+          - Commands Reference: tui/commands_reference.md
+          - Advanced Features: tui/advanced_features.md
+          - Troubleshooting: tui/troubleshooting.md
+      
+      # Command Line Interface (CLI) - Subsección
+      - Command Line Interface (CLI):
+          - Overview: cli/cli_index.md
+          - Getting Started: cli/getting_started.md
+          - Commands Reference: cli/commands_reference.md
+          - Advanced Usage: cli/advanced_usage.md
+
+  # ========================================
+  # CORE CONCEPTS
+  # ========================================
   - Core Concepts:
       - Architecture: cai_architecture.md
       - Agents: agents.md
@@ -42,15 +76,21 @@ nav:
       - Handoffs: handoffs.md
       - Multi-Agent Systems: multi_agent.md
 
-  - Benchmarking:
-      - Overview: benchmarking/overview.md
-      - Running Benchmarks: benchmarking/running_benchmarks.md
-      - Attack & Defense CTFs: benchmarking/attack_defense.md
-      - Jeopardy CTFs: benchmarking/jeopardy_ctfs.md
-      - Cyber Ranges: benchmarking/cyber_ranges.md
-      - Knowledge Benchmarks: benchmarking/knowledge_benchmarks.md
-      - Privacy Benchmarks: benchmarking/privacy_benchmarks.md
+  # ========================================
+  # MODELS & PROVIDERS (REORGANIZADO)
+  # ========================================
+  - Models & Providers:
+      # TODO: Crear página destacada para Alias Models
+      # - '⭐ Alias Models (CAI PRO)': cai_alias_models.md
+      - Available Models: cai_list_of_models.md
+      - Model Providers:
+          - OpenRouter: providers/openrouter.md
+          - Ollama: providers/ollama.md
+          - Azure OpenAI: providers/azure.md
 
+  # ========================================
+  # GUIDES
+  # ========================================
   - Guides:
       - Running Agents: running_agents.md
       - Working with Results: results.md
@@ -60,18 +100,29 @@ nav:
       - Guardrails & Security: guardrails.md
       - Environment Variables: environment_variables.md
 
-  - Terminal UI (TUI):
-      - Overview: tui/tui_index.md
-      - Getting Started: tui/getting_started.md
-      - User Interface: tui/user_interface.md
-      - Terminals Management: tui/terminals_management.md
-      - Teams & Parallel Execution: tui/teams_and_parallel_execution.md
-      - Sidebar Features: tui/sidebar_features.md
-      - Keyboard Shortcuts: tui/keyboard_shortcuts.md
-      - Commands Reference: tui/commands_reference.md
-      - Advanced Features: tui/advanced_features.md
-      - Troubleshooting: tui/troubleshooting.md
+  # ========================================
+  # BENCHMARKING (CREDIBILIDAD)
+  # ========================================
+  - Benchmarking:
+      - Overview: benchmarking/overview.md
+      - Running Benchmarks: benchmarking/running_benchmarks.md
+      - Attack & Defense CTFs: benchmarking/attack_defense.md
+      - Jeopardy CTFs: benchmarking/jeopardy_ctfs.md
+      - Cyber Ranges: benchmarking/cyber_ranges.md
+      - Knowledge Benchmarks: benchmarking/knowledge_benchmarks.md
+      - Privacy Benchmarks: benchmarking/privacy_benchmarks.md
 
+  # ========================================
+  # RESEARCH (CREDIBILIDAD CIENTÍFICA)
+  # ========================================
+  - Research:
+      - Overview: research.md
+      # TODO: Opcional - expandir research
+      # - Publications: research_publications.md
+
+  # ========================================
+  # API REFERENCE (TÉCNICO)
+  # ========================================
   - API Reference:
       - Agents:
           - Agent: ref/agent.md
@@ -97,13 +148,15 @@ nav:
           - Handoff Filters: ref/extensions/handoff_filters.md
           - Handoff Prompt: ref/extensions/handoff_prompt.md
 
+  # ========================================
+  # ADVANCED
+  # ========================================
   - Advanced:
-      # - Benchmarks: cai_benchmark.md
       - Development: cai_development.md
 
-  - Research:
-      - Overview: research.md
-
+  # ========================================
+  # RESOURCES
+  # ========================================
   - Resources:
       - FAQ: cai_faq.md
       - Find Us: cai_find_us.md
@@ -115,9 +168,8 @@ plugins:
       handlers:
         python:
           paths: ["src"]
-          selection:
-            docstring_style: google
           options:
+            docstring_style: google
             # Shows links to other members in signatures
             signature_crossrefs: true
             # Orders members by source order, rather than alphabetical
