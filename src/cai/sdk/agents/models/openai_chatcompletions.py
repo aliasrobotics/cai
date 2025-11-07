@@ -8,6 +8,7 @@ import json
 import os
 import re
 import time
+import sys
 from collections.abc import AsyncIterator, Iterable
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Literal, cast, overload
