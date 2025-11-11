@@ -2835,6 +2835,13 @@ class OpenAIChatCompletionsModel(Model):
                 if hasattr(model_settings, "reasoning_effort"):
                     kwargs["reasoning_effort"] = model_settings.reasoning_effort
 
+
+        if os.getenv("LITELLM_PROXY_API_BASE"):
+            kwargs["api_base"] = os.getenv("LITELLM_PROXY_API_BASE")
+            if os.getenv("LITELLM_PROXY_API_KEY"):
+                kwargs["api_key"] =  os.getenv("LITELLM_PROXY_API_KEY")
+            else:
+                kwargs["api_key"] = None
         # Filter out NotGiven values to avoid JSON serialization issues
         filtered_kwargs = {}
         for key, value in kwargs.items():
