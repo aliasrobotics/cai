@@ -532,6 +532,17 @@ Or directly from the command line:
 OLLAMA_API_BASE="https://custom-openai-proxy.com/v1" cai
 ```
 
+Or alternatively, utilize [LiteLLM Proxy Gateway](https://docs.litellm.ai/docs/proxy/quick_start) to access all supported LLM providers through a unified interface (given that your provided proxy also supports them):
+
+```bash
+# Set environment variables to use LiteLLM proxy
+export LITELLM_PROXY_API_BASE="http://localhost:4000"
+export LITELLM_PROXY_API_KEY="your-proxy-key"
+cai
+```
+
+See the [LiteLLM Proxy documentation](https://docs.litellm.ai/docs/proxy/quick_start) for setup instructions.
+
 
 ## :triangular_ruler: Architecture:
 
