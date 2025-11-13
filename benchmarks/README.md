@@ -123,8 +123,6 @@ Cybersecurity AI Benchmark or `CAIBench` for short is a meta-benchmark (*benchma
 
 :five: **Privacy** (`benchmarks/eval.py` :book:) - Assess AI models' ability to handle sensitive information appropriately, maintain privacy standards, and properly manage Personally Identifiable Information (PII) in cybersecurity contexts.
 
-> **Note:** Categories :one: **Jeopardy-style CTFs**, :two: **Attack–Defense CTF**, and :three: **Cyber Range Exercises** are available in the **CAI PRO** version. Learn more at https://aliasrobotics.com/cybersecurityai.php
-
 
 ## Benchmarks
 
