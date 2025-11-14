@@ -182,6 +182,33 @@ custom_agent = Agent(
 )
 ```
 
+### Extend Existing Agents
+
+This example demonstrates extending Red Team Agent to write 'Red Team Agent at your service.' at the end of each message:
+
+```python
+from cai.cli import run_cai_cli
+from cai.agents.red_teamer import redteam_agent
+from cai.util import load_prompt_template
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Customize the red team agent's instructions
+redteam_prompt = load_prompt_template("prompts/system_red_team_agent.md")
+
+# Custom instruction to append
+custom_append = "\n\nAt the end of each message, write 'Red Team Agent at your service.'"
+modified_prompt = str(redteam_prompt) + custom_append
+
+# Save the new instructions back to the red team agent
+redteam_agent.instructions = modified_prompt
+
+# Run your brand new red team agent with the CAI CLI
+run_cai_cli(redteam_agent)
+```
+
 If you want to create your own custom tools for your agents, see the [tools documentation](tools.md) for detailed instructions.
 
 If you want to create Multi-Agent Patterns, see [multi_agent documentation](multi_agent.md) for orchestration patterns. 
