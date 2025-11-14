@@ -34,16 +34,16 @@ AutoPenBench                                             │
     <th style="text-align:center;"><b>Model performance in Jeopardy CTFs Base Benchmark</b></th>
   </tr>
   <tr>
-    <td align="center"><img src="assets/images/stackplot.png" alt="stackplot" /></td>
-    <td align="center"><img src="assets/images/base_1col.png" alt="base_1col" /></td>
+    <td align="center"><img src="/assets/images/stackplot.png" alt="stackplot" /></td>
+    <td align="center"><img src="/assets/images/base_1col.png" alt="base_1col" /></td>
   </tr>
   <tr>
     <th style="text-align:center;"><b>Model performance in CyberPII Privacy Benchmark</b></th>
     <th style="text-align:center;"><b>Model performance overall</b></th>
   </tr>
   <tr>
-    <td align="center"><img src="assets/images/cyberpii_benchmark.png" alt="cyberpii" /></td>
-    <td align="center"><img src="assets/images/caibench_spider.png" alt="caibench" /></td>
+    <td align="center"><img src="/assets/images/cyberpii_benchmark.png" alt="cyberpii" /></td>
+    <td align="center"><img src="/assets/images/caibench_spider.png" alt="caibench" /></td>
   </tr>
 </table>
 

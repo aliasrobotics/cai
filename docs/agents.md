@@ -8,18 +8,33 @@ CAI provides a comprehensive suite of specialized agents for different cybersecu
 
 | Agent | Description | Primary Use Case | Key Tools |
 |-------|-------------|------------------|-----------|
-| **redteam_agent** | Offensive security specialist for penetration testing | Active exploitation, vulnerability discovery | nmap, metasploit, burp |
-| **blueteam_agent** | Defensive security expert for threat mitigation | Security hardening, incident response | wireshark, suricata, osquery |
-| **bug_bounter_agent** | Bug bounty hunter optimized for vulnerability research | Web app security, API testing | ffuf, sqlmap, nuclei |
-| **one_tool_agent** | Minimalist agent focused on single-tool execution | Quick scans, specific tool operations | Generic Linux commands |
-| **dfir_agent** | Digital Forensics and Incident Response expert | Log analysis, forensic investigation | volatility, autopsy, log2timeline |
-| **reverse_engineering_agent** | Binary analysis and reverse engineering | Malware analysis, firmware reversing | ghidra, radare2, ida |
-| **memory_analysis_agent** | Memory dump analysis specialist | RAM forensics, process analysis | volatility, rekall |
-| **network_traffic_analyzer** | Network packet analysis expert | PCAP analysis, traffic inspection | wireshark, tcpdump, tshark |
-| **android_sast_agent** | Android Static Application Security Testing | APK analysis, Android vulnerability scanning | jadx, apktool, mobsf |
-| **wifi_security_tester** | Wireless network security assessment | WiFi penetration testing, WPA cracking | aircrack-ng, reaver, wifite |
-| **replay_attack_agent** | Replay attack execution specialist | Protocol replay, authentication bypass | custom scripts, burp |
-| **subghz_sdr_agent** | Sub-GHz SDR signal analysis expert | RF analysis, IoT protocol testing | hackrf, gqrx, urh |
+| **redteam_agent** | Offensive security specialist for penetration testing | Active exploitation, vulnerability discovery | generic_linux_command, execute_code, web_search |
+| **blueteam_agent** | Defensive security expert for threat mitigation | Security hardening, incident response | generic_linux_command, ssh_command, execute_code, web_search |
+| **bug_bounter_agent** | Bug bounty hunter optimized for vulnerability research | Web app security, API testing | generic_linux_command, execute_code, shodan_search, google_search |
+| **one_tool_agent** | Minimalist agent focused on single-tool execution | Quick scans, specific tool operations | generic_linux_command |
+| **dfir_agent** | Digital Forensics and Incident Response expert | Log analysis, forensic investigation | generic_linux_command, ssh_command, execute_code, think, web_search, shodan_search |
+| **reverse_engineering_agent** | Binary analysis and reverse engineering | Malware analysis, firmware reversing | generic_linux_command, ssh_command, execute_code, web_search |
+| **memory_analysis_agent** | Memory dump analysis specialist | RAM forensics, process analysis | generic_linux_command, ssh_command, execute_code, web_search |
+| **network_security_analyzer_agent** | Network packet analysis expert | PCAP analysis, traffic inspection | generic_linux_command, ssh_command, execute_code, capture_remote_traffic, web_search |
+| **app_logic_mapper** | Android application logic mapper | APK analysis, app logic understanding | generic_linux_command, execute_code |
+| **android_sast** | Android SAST specialist | Static application security testing for Android | app_mapper (handoff), generic_linux_command, execute_code |
+| **wifi_security_agent** | Wireless network security assessment | WiFi penetration testing, WPA cracking | generic_linux_command, ssh_command, execute_code, web_search |
+| **replay_attack_agent** | Replay attack execution specialist | Protocol replay, authentication bypass | generic_linux_command, ssh_command, execute_code, capture_remote_traffic, web_search |
+| **subghz_sdr_agent** | Sub-GHz SDR signal analysis expert | RF analysis, IoT protocol testing | generic_linux_command, ssh_command, execute_code, web_search |
+| **selection_agent** ⭐ | Agent selection and routing | Automatically selects the best agent for a task | check_available_agents, analyze_task_requirements, get_agent_number, web_search |
+| **retester_agent** | Vulnerability retesting specialist | Re-validates previously discovered vulnerabilities | generic_linux_command, execute_code, google_search |
+| **reporting_agent** | Security report generation | Creates formatted security reports from findings | generic_linux_command, execute_code |
+| **dns_smtp_agent** | DNS and SMTP security testing | Email security and DNS configuration analysis | check_mail_spoofing_vulnerability, execute_cli_command |
+| **thought_agent** | Strategic planning and analysis | Analyzes and plans next steps in security assessments | think |
+| **use_case_agent** | Case study generation | Creates high-quality cybersecurity case studies | null_tool |
+| **flag_discriminator** | Flag extraction specialist | Extracts flags from CTF challenge outputs | handoff to one_tool_agent |
+| **redteam_gctr_agent** ⭐ | Red team with CTR game-theoretic analysis | Offensive security with strategic game theory | generic_linux_command, execute_code, web_search |
+| **blueteam_gctr_agent** ⭐ | Blue team with CTR game-theoretic analysis | Defensive security with strategic game theory | generic_linux_command, ssh_command, execute_code, web_search |
+| **bug_bounter_gctr_agent** ⭐ | Bug bounty with CTR game-theoretic analysis | Vulnerability research with strategic analysis | generic_linux_command, execute_code, shodan_search, google_search |
+| **purple_redteam_agent** ⭐ | Purple team red component with shared GCTR | Red team operations with shared GCTR tracking | generic_linux_command, execute_code, web_search |
+| **purple_blueteam_agent** ⭐ | Purple team blue component with shared GCTR | Blue team operations with shared GCTR tracking | generic_linux_command, ssh_command, execute_code, web_search |
+
+⭐ this is a [CAI PRO](https://aliasrobotics.com/cybersecurityai.php) capability.
 
 ### Quick Start with Agents
 
@@ -106,7 +121,7 @@ CAI> Analyze the memory dump for secrets
 
 ```bash
 # 1. Network traffic analysis
-CAI>/agent network_traffic_analyzer
+CAI>/agent network_security_analyzer_agent
 CAI> Analyze capture.pcap for suspicious activity
 
 # 2. Forensic investigation
@@ -120,37 +135,56 @@ CAI> Provide mitigation strategies based on findings
 
 ---
 
-## Basic Configuration
 
-Key agent properties include:
+## Creating Custom Agents
 
--   `name`: Name of the agent (e.g., the name of `one_tool_agent` is 'CTF Agent')
--   `instructions`: The system prompt that defines agent behavior
+CAI makes it easy to create custom agents tailored to your specific security needs. Custom agents can be configured with specialized instructions, tools, guardrails, and models.
+
+### Key Agent Properties
+
+-   `name`: Display name of the agent (e.g., 'Custom Pentester')
+-   `description`: Brief description of the agent's purpose
+-   `instructions`: The system prompt that defines agent behavior (can be static string or dynamic function)
 -   `model`: Which LLM to use, with optional `model_settings` to configure parameters like temperature, top_p, etc.
 -   `tools`: Tools that the agent can use to achieve its tasks
+-   `input_guardrails`: Security guardrails that validate and filter inputs before processing
+-   `output_guardrails`: Security guardrails that validate outputs before execution
 -   `handoffs`: Allows an agent to delegate tasks to another agent
 
-## Example: `one_tool_agent.py`
+### Complete Custom Agent Example
+
+This example demonstrates creating a security-focused agent with all recommended components:
 
 ```python
+import os
 from cai.sdk.agents import Agent, OpenAIChatCompletionsModel
-from cai.tools.reconnaissance.generic_linux_command import generic_linux_command 
+from cai.tools.reconnaissance.generic_linux_command import generic_linux_command
 from openai import AsyncOpenAI
+from cai.util import create_system_prompt_renderer
 
-one_tool_agent = Agent(
-    name="CTF agent",
-    description="Agent focused on conquering security challenges using generic linux commands",
-    instructions="You are a Cybersecurity expert Leader facing a CTF challenge.",
+# Define agent instructions
+instructions = """Behave as a pentester and
+                 use the generic_linux_command tool
+                 to run simulated Linux commands.
+                 Stay focused, concise, and task-oriented."""
+
+custom_agent = Agent(
+    name="Custom Pentester",
+    description="Offensive security pentesting agent with guardrails.",
+    instructions=create_system_prompt_renderer(instructions),
     tools=[
         generic_linux_command,
     ],
     model=OpenAIChatCompletionsModel(
-        model="qwen2.5:14b",
+        model=os.getenv("CAI_MODEL", "alias1"),
         openai_client=AsyncOpenAI(),
-    )
+    ),
 )
 ```
 
+If you want to create your own custom tools for your agents, see the [tools documentation](tools.md) for detailed instructions.
+
+If you want to create Multi-Agent Patterns, see [multi_agent documentation](multi_agent.md) for orchestration patterns. 
 
 ## Context
 
