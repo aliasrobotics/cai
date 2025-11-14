@@ -120,15 +120,25 @@ Cybersecurity AI (CAI) is a lightweight, open-source framework that empowers sec
 
 
 
-| [`OT` - CAI and alias0 on: Ecoforest Heat Pumps](https://aliasrobotics.com/case-study-ecoforest.php) | [`Robotics` - CAI and alias0 on: Mobile Industrial Robots (MiR)](https://aliasrobotics.com/case-study-cai-mir.php) |
+| [`Robotics` - CAI and alias1 on: Unitree G1 Humanoid Robot](https://aliasrobotics.com/case-study-humanoid-robot-g1.php) | [`OT` - CAI and alias1 on: Dragos OT CTF 2025](https://aliasrobotics.com/case-study-dragos-CTF.php) |
 |------------------------------------------------|---------------------------------|
-| CAI discovers critical vulnerability in Ecoforest heat pumps allowing unauthorized remote access and potential catastrophic failures. AI-powered security testing reveals exposed credentials and DES encryption weaknesses affecting all of their deployed units across Europe.  | CAI-powered security testing of MiR (Mobile Industrial Robot) platform through automated ROS message injection attacks. This study demonstrates how AI-driven vulnerability discovery can expose unauthorized access to robot control systems and alarm triggers.  |
-| [![](https://aliasrobotics.com/img/case-study-portada-ecoforest.png)](https://aliasrobotics.com/case-study-ecoforest.php) | [![](https://aliasrobotics.com/img/case-study-portada-mir-cai.png)](https://aliasrobotics.com/case-study-cai-mir.php) |
+| CAI-powered security analysis of Unitree G1 humanoid robot exposing critical GDPR violations through unauthorized telemetry transmission to China-related servers. AI-driven investigation revealed world-writable RSA keys, disabled SSL verification, and continuous surveillance capabilities affecting consumer robotics platforms. | CAI achieved Top-10 ranking in Dragos OT CTF 2025, competing autonomously against world-class human experts in industrial control systems security. The AI agent solved 32 of 34 challenges with a 37% velocity advantage in early phases, demonstrating advanced capabilities in OT protocol exploitation and infrastructure analysis. |
+| [![](docs/assets/images/case-study-humanoid-portada.png)](https://aliasrobotics.com/case-study-humanoid-robot-g1.php) | [![](docs/assets/images/case-study-dragosCTF.png)](https://aliasrobotics.com/case-study-dragos-CTF.php) |
 
-| [`IT` (Web) - CAI and alias0 on: Mercado Libre's e-commerce](https://aliasrobotics.com/case-study-mercado-libre.php) | [`OT` - CAI and alias0 on: MQTT broker](https://aliasrobotics.com/case-study-cai-mqtt-broker.php) |
+| [`IT` (Bug Bounty) - CAI and alias1 on: HackerOne Platform](https://aliasrobotics.com/case-study-hackerone.php) | [`OT` - CAI and alias0 on: Ecoforest Heat Pumps](https://aliasrobotics.com/case-study-ecoforest.php) |
 |------------------------------------------------|---------------------------------|
-|  CAI-powered API vulnerability discovery at Mercado Libre through automated enumeration attacks. This study demonstrates how AI-driven security testing can expose user data exposure risks in e-commerce platforms at scale.  |  CAI-powered testing exposed critical flaws in an MQTT broker within a Dockerized OT network. Without authentication, CAI subscribed to temperature and humidity topics and injected false values, corrupting data shown in Grafana dashboards. |
-| [![](https://aliasrobotics.com/img/case-study-portada-mercado-libre.png)](https://aliasrobotics.com/case-study-mercado-libre.php) | [![](https://aliasrobotics.com/img/case-study-portada-mqtt-broker-cai.png)](https://aliasrobotics.com/case-study-cai-mqtt-broker.php) |
+| CAI-powered vulnerability discovery on HackerOne bug bounty platform demonstrating AI-driven security testing capabilities in production environments. This study showcases how autonomous AI agents can identify and report security vulnerabilities following responsible disclosure practices in real-world bug bounty programs. | CAI discovers critical vulnerability in Ecoforest heat pumps allowing unauthorized remote access and potential catastrophic failures. AI-powered security testing reveals exposed credentials and DES encryption weaknesses affecting all of their deployed units across Europe.  |
+| [![](docs/assets/images/case-study-hackerone.png)](https://aliasrobotics.com/case-study-hackerone.php) | [![](https://aliasrobotics.com/img/case-study-portada-ecoforest.png)](https://aliasrobotics.com/case-study-ecoforest.php) |
+
+| [`Robotics` - CAI and alias0 on: Mobile Industrial Robots (MiR)](https://aliasrobotics.com/case-study-cai-mir.php) | [`IT` (Web) - CAI and alias0 on: Mercado Libre's e-commerce](https://aliasrobotics.com/case-study-mercado-libre.php) |
+|------------------------------------------------|---------------------------------|
+| CAI-powered security testing of MiR (Mobile Industrial Robot) platform through automated ROS message injection attacks. This study demonstrates how AI-driven vulnerability discovery can expose unauthorized access to robot control systems and alarm triggers.  |  CAI-powered API vulnerability discovery at Mercado Libre through automated enumeration attacks. This study demonstrates how AI-driven security testing can expose user data exposure risks in e-commerce platforms at scale.  |
+| [![](https://aliasrobotics.com/img/case-study-portada-mir-cai.png)](https://aliasrobotics.com/case-study-cai-mir.php) | [![](https://aliasrobotics.com/img/case-study-portada-mercado-libre.png)](https://aliasrobotics.com/case-study-mercado-libre.php) |
+
+| [`OT` - CAI and alias0 on: MQTT broker](https://aliasrobotics.com/case-study-cai-mqtt-broker.php) |
+|------------------------------------------------|
+|  CAI-powered testing exposed critical flaws in an MQTT broker within a Dockerized OT network. Without authentication, CAI subscribed to temperature and humidity topics and injected false values, corrupting data shown in Grafana dashboards. |
+| [![](https://aliasrobotics.com/img/case-study-portada-mqtt-broker-cai.png)](https://aliasrobotics.com/case-study-cai-mqtt-broker.php) |
 
 
 
