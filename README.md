@@ -135,10 +135,10 @@ Cybersecurity AI (CAI) is a lightweight, open-source framework that empowers sec
 | CAI-powered security testing of MiR (Mobile Industrial Robot) platform through automated ROS message injection attacks. This study demonstrates how AI-driven vulnerability discovery can expose unauthorized access to robot control systems and alarm triggers.  |  CAI-powered API vulnerability discovery at Mercado Libre through automated enumeration attacks. This study demonstrates how AI-driven security testing can expose user data exposure risks in e-commerce platforms at scale.  |
 | [![](https://aliasrobotics.com/img/case-study-portada-mir-cai.png)](https://aliasrobotics.com/case-study-cai-mir.php) | [![](https://aliasrobotics.com/img/case-study-portada-mercado-libre.png)](https://aliasrobotics.com/case-study-mercado-libre.php) |
 
-| [`OT` - CAI and alias0 on: MQTT broker](https://aliasrobotics.com/case-study-cai-mqtt-broker.php) |
-|------------------------------------------------|
-|  CAI-powered testing exposed critical flaws in an MQTT broker within a Dockerized OT network. Without authentication, CAI subscribed to temperature and humidity topics and injected false values, corrupting data shown in Grafana dashboards. |
-| [![](https://aliasrobotics.com/img/case-study-portada-mqtt-broker-cai.png)](https://aliasrobotics.com/case-study-cai-mqtt-broker.php) |
+| [`OT` - CAI and alias0 on: MQTT broker](https://aliasrobotics.com/case-study-cai-mqtt-broker.php) | [`IT` (Web) - CAI and alias0 on: PortSwigger Web Security Academy](https://aliasrobotics.com/case-study-portswigger-1.php) |
+|------------------------------------------------|---------------------------------|
+|  CAI-powered testing exposed critical flaws in an MQTT broker within a Dockerized OT network. Without authentication, CAI subscribed to temperature and humidity topics and injected false values, corrupting data shown in Grafana dashboards. | CAI-powered race condition exploitation in file upload vulnerability. This study demonstrates how AI-driven security testing can identify and exploit timing windows in web applications, successfully uploading and executing web shells through automated parallel requests. |
+| [![](https://aliasrobotics.com/img/case-study-portada-mqtt-broker-cai.png)](https://aliasrobotics.com/case-study-cai-mqtt-broker.php) | [![](docs/assets/images/portada-portswigger-web-1.jpg)](https://aliasrobotics.com/case-study-portswigger-1.php) |
 
 
 
