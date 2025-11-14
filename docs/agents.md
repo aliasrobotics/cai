@@ -184,7 +184,7 @@ custom_agent = Agent(
 
 ### Extend Existing Agents
 
-This example demonstrates extending Red Team Agent to write 'Red Team Agent at your service.' at the end of each message:
+This example demonstrates extending Red Team Agent **instructions** to write 'Red Team Agent at your service.' at the end of each message:
 
 ```python
 from cai.cli import run_cai_cli
@@ -206,6 +206,35 @@ modified_prompt = str(redteam_prompt) + custom_append
 redteam_agent.instructions = modified_prompt
 
 # Run your brand new red team agent with the CAI CLI
+run_cai_cli(redteam_agent)
+```
+
+In the same way you could add a **custom/existing tools**:
+
+```python
+from cai.cli import run_cai_cli
+from cai.agents.red_teamer import redteam_agent
+from cai.sdk.agents.tool import function_tool
+from cai.tools.reconnaissance.shodan import shodan_search, shodan_host_info
+from dotenv import load_dotenv
+
+# Create new fucntion for a tool
+@function_tool
+def hello_world() -> str:
+    """
+    Prints Hello, World!
+    Args: None
+    Returns: str: A greeting message.
+    """
+    return "Hello, World!"
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Add the new function and CAI shodan tools to the red team agent
+redteam_agent.tools.extend([shodan_search, shodan_host_info, hello_world])
+
+# Run the red team agent
 run_cai_cli(redteam_agent)
 ```
 
