@@ -1508,6 +1508,31 @@ def run_cai_cli(
                                             agent.model.add_to_message_history(tool_msg)
 
                             return result
+                        except OutputGuardrailTripwireTriggered as e:
+                            # Handle guardrail exception specifically - MUST come before broad Exception handler
+                            # Clean up streaming display before showing error
+                            try:
+                                from cai.util import cleanup_all_streaming_resources
+                                cleanup_all_streaming_resources()
+                            except Exception:
+                                pass
+                            
+                            # Clean up the async generator
+                            if stream_iterator is not None:
+                                try:
+                                    await stream_iterator.aclose()
+                                except Exception:
+                                    pass
+                            
+                            # Clean up the result object if it has cleanup methods
+                            if result is not None and hasattr(result, '_cleanup_tasks'):
+                                try:
+                                    result._cleanup_tasks()
+                                except Exception:
+                                    pass
+                            
+                            # Re-raise to be caught by outer handler which shows user-friendly message
+                            raise
                         except (KeyboardInterrupt, asyncio.CancelledError) as e:
                             # Handle interruption specifically
                             
@@ -1554,8 +1579,12 @@ def run_cai_cli(
                                     result._cleanup_tasks()
                                 except Exception:
                                     pass
+                            
+                            # Re-raise OutputGuardrailTripwireTriggered to be handled by outer handler
+                            if isinstance(e, OutputGuardrailTripwireTriggered):
+                                raise
                                     
-                            # Log error for debugging
+                            # Log error for debugging (non-guardrail exceptions)
                             logger = logging.getLogger(__name__)
                             logger.error(f"Error occurred during streaming: {str(e)}", exc_info=True)
                             
