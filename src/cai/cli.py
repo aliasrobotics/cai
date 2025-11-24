@@ -141,6 +141,7 @@ if os.getenv("CAI_DEBUG", "1") != "2":
 
 import asyncio
 import logging
+import shlex
 import time
 
 # Configure comprehensive error filtering
@@ -1295,7 +1296,19 @@ def run_cai_cli(
 
             # Handle special commands
             if user_input.startswith("/") or user_input.startswith("$"):
-                parts = user_input.strip().split()
+                # Remove newlines from pasted input
+                cleaned_input = user_input.strip().replace('\n', '').replace('\r', '')
+
+                try:
+                    # Parse with shell-like quoting support
+                    parts = shlex.split(cleaned_input)
+                except ValueError:
+                    # Fallback to simple split on error
+                    parts = cleaned_input.split()
+
+                if not parts:
+                    continue
+
                 command = parts[0]
                 args = parts[1:] if len(parts) > 1 else None
 

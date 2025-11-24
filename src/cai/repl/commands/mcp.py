@@ -10,27 +10,31 @@ USAGE EXAMPLES:
 1. Load an SSE (Server-Sent Events) MCP server:
    /mcp load http://localhost:9876/sse burp
 
-2. Load a STDIO MCP server:
+2. Load an SSE server with authentication headers:
+   /mcp load https://mcp.ai.hackthebox.com/v1/ctf/sse htb --header "Authorization: Bearer YOUR_TOKEN"
+   /mcp load https://api.example.com/mcp myapi -H "X-API-Key: secret" -H "Custom-Header: value"
+
+3. Load a STDIO MCP server:
    /mcp load stdio myserver python mcp_server.py
    /mcp load stdio myserver node server.js --port 8080
 
-3. List all active MCP connections:
+4. List all active MCP connections:
    /mcp list
 
-4. Add MCP tools to an agent:
+5. Add MCP tools to an agent:
    /mcp add burp redteam_agent     # Add by agent name
    /mcp add burp 13                 # Add by agent number
 
-5. List tools from a specific server:
+6. List tools from a specific server:
    /mcp tools burp
 
-6. Check server connection status:
+7. Check server connection status:
    /mcp status
 
-7. Remove a server connection:
+8. Remove a server connection:
    /mcp remove burp
 
-8. Show help:
+9. Show help:
    /mcp help
 
 NOTES:
@@ -466,9 +470,20 @@ The MCP command allows you to manage Model Context Protocol servers and integrat
 
 **SSE (Server-Sent Events) Server:**
 ```
-/mcp load <url> <name>
+/mcp load <url> <name> [--header "Key: Value" | -H "Key: Value"]
 ```
 Example: `/mcp load http://localhost:9876/sse burp`
+
+**SSE Server with Authentication:**
+```
+/mcp load <url> <name> --header "Authorization: Bearer TOKEN"
+```
+Example: `/mcp load https://mcp.ai.hackthebox.com/v1/ctf/sse htb --header "Authorization: Bearer eyJ0..."`
+
+You can specify multiple headers by repeating the flag:
+```
+/mcp load <url> <name> -H "Header1: Value1" -H "Header2: Value2"
+```
 
 **STDIO Server:**
 ```
@@ -598,8 +613,8 @@ Example: `/mcp add burp 13`
         """Handle /mcp load command.
 
         Usage:
-            /mcp load <url> <name>  - Load SSE server
-            /mcp load stdio <name> <command> [args...] - Load stdio server
+            /mcp load <url> <name> [--header "Key: Value"] - Load SSE server with optional auth headers
+            /mcp load stdio <name> <command> [args...]     - Load stdio server
 
         Args:
             args: List of command arguments
@@ -610,8 +625,8 @@ Example: `/mcp add burp 13`
         if not args or len(args) < 2:
             console.print("[red]Error: Invalid arguments[/red]")
             console.print("Usage:")
-            console.print("  /mcp load <url> <name>  - For SSE servers")
-            console.print("  /mcp load stdio <name> <command> [args...]")
+            console.print("  /mcp load <url> <name> [--header \"Key: Value\"]  - For SSE servers")
+            console.print("  /mcp load stdio <name> <command> [args...]        - For STDIO servers")
             return False
 
         # Check if it's a stdio server
@@ -630,14 +645,40 @@ Example: `/mcp add burp 13`
             url = args[0]
             name = args[1]
 
-            return self._load_sse_server(url, name)
+            # Parse headers from remaining arguments
+            headers = {}
+            i = 2
+            while i < len(args):
+                if args[i] in ["--header", "-H"]:
+                    if i + 1 >= len(args):
+                        console.print("[red]Error: --header requires a value[/red]")
+                        return False
 
-    def _load_sse_server(self, url: str, name: str) -> bool:
+                    # Parse header in format "Key: Value"
+                    header_str = args[i + 1]
+                    if ":" not in header_str:
+                        console.print(f"[red]Error: Invalid header format '{header_str}'. Use 'Key: Value'[/red]")
+                        return False
+
+                    key, value = header_str.split(":", 1)
+                    # Strip quotes and whitespace from key and value
+                    key = key.strip().strip('"').strip("'")
+                    value = value.strip().strip('"').strip("'")
+                    headers[key] = value
+                    i += 2
+                else:
+                    console.print(f"[yellow]Warning: Unknown argument '{args[i]}' ignored[/yellow]")
+                    i += 1
+
+            return self._load_sse_server(url, name, headers if headers else None)
+
+    def _load_sse_server(self, url: str, name: str, headers: Optional[Dict[str, str]] = None) -> bool:
         """Load an SSE MCP server.
 
         Args:
             url: URL of the SSE server
             name: Name to identify the server
+            headers: Optional HTTP headers for authentication (e.g., {"Authorization": "Bearer token"})
 
         Returns:
             True if successful
@@ -647,7 +688,10 @@ Example: `/mcp add burp 13`
             console.print(f"[dim]Use '/mcp remove {name}' first if you want to reload it.[/dim]")
             return True
 
-        console.print(f"Connecting to SSE server at {url}...")
+        if headers:
+            console.print(f"Connecting to SSE server at {url} with authentication headers...")
+        else:
+            console.print(f"Connecting to SSE server at {url}...")
 
         async def connect_and_test():
             params: MCPServerSseParams = {
@@ -655,6 +699,10 @@ Example: `/mcp add burp 13`
                 "timeout": 10,  # Connection timeout
                 "sse_read_timeout": 300  # 5 minutes for SSE reads
             }
+            # Add headers if provided
+            if headers:
+                params["headers"] = headers
+
             server = MCPServerSse(params, name=name, cache_tools_list=True)
 
             # Connect to the server with retry logic
