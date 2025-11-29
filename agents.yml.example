@@ -19,6 +19,11 @@ parallel_agents:
     prompt: "Search for bugs and create detailed reports"
     unified_context: false
 
+  - name: web_pentester_agent
+    model: alias1
+    prompt: "Agent that specializes in web application penetration testing."
+    unified_context: false
+
 # Example with unified context (agents share message history)
 # parallel_agents:
 #   - name: redteam_agent
