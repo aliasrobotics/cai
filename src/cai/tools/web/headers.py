@@ -8,8 +8,10 @@ analysis, parameter inspection, and security vulnerability detection.
 
 from urllib.parse import urlparse
 import requests  # pylint: disable=E0401
+from cai.sdk.agents import function_tool
 
 
+@function_tool(strict_mode=False)
 def web_request_framework(  # noqa: E501 # pylint: disable=too-many-arguments,too-many-locals,too-many-branches
                             url: str = "",
                             method: str = "GET",
