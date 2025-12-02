@@ -292,6 +292,7 @@ Cybersecurity AI is a critical field, yet many groups are misguidedly pursuing i
 - [Mindfort](www.mindfort.ai)
 - [Mindgard](https://mindgard.ai/)
 - [NDAY Security](https://ndaysecurity.com/)
+- [NeuralTrust](https://neuraltrust.ai/es)
 - [Penligent](https://penligent.ai/) 
 - [Runsybil](https://www.runsybil.com)
 - [Selfhack](https://www.selfhack.fi)
