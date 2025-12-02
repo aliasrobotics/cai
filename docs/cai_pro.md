@@ -282,7 +282,7 @@ Yes! Contact research@aliasrobotics.com for:
 ### Is my security testing data private?
 
 **Absolutely.** CAI PRO guarantees:
-- **No training on your data**: Your pentesting activities never improve our models (unless you explicitly opt-in)
+- **No training on your data**: Your pentesting activities never improve our models (unless you explicitly opt in)
 - **European hosting**: All data processed in GDPR-compliant datacenters
 - **No third-party sharing**: Unlike OpenAI/Anthropic, we never send your data elsewhere
 - **Encryption**: End-to-end encryption for all communications

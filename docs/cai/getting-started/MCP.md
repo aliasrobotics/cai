@@ -57,7 +57,7 @@ https://github.com/user-attachments/assets/386a1fd3-3469-4f84-9396-2a5236febe1f
 
 1) Install node, following the instructions on the [official site](https://nodejs.org/en/download/current)
 
-2) Instal Chrome (Chromium is not compatible with this functionality)
+2) Install Chrome (Chromium is not compatible with this functionality)
 
 3) Run the following commands:
 	```

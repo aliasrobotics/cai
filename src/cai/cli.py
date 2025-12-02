@@ -45,7 +45,7 @@ Environment Variables
             (default: "false")
         CAI_MEMORY_OFFLINE: Enable/disable offline memory
             (default: "false")
-        CAI_ENV_CONTEXT: Add enviroment context, dirs and
+        CAI_ENV_CONTEXT: Add environment context, dirs and
             current env available (default: "true")
         CAI_MEMORY_ONLINE_INTERVAL: Number of turns between
             online memory updates (default: "5")

@@ -76,7 +76,7 @@ cai
 
 ### 🔹 Agent
 
-At its core, CAI abstracts its cybersecurity behavior via `Agents` and agentic `Patterns`. An Agent in *an intelligent system that interacts with some environment*. More technically, within CAI we embrace a robotics-centric definition wherein an agent is anything that can be viewed as a system perceiving its environment through sensors, reasoning about its goals and and acting accordingly upon that environment through actuators (*adapted* from Russel & Norvig, AI: A Modern Approach). In cybersecurity, an `Agent` interacts with systems and networks, using peripherals and network interfaces as sensors, reasons accordingly and then executes network actions as if actuators. Correspondingly, in CAI, `Agent`s implement the `ReACT` (Reasoning and Action) agent model[3].
+At its core, CAI abstracts its cybersecurity behavior via `Agents` and agentic `Patterns`. An Agent in *an intelligent system that interacts with some environment*. More technically, within CAI we embrace a robotics-centric definition wherein an agent is anything that can be viewed as a system perceiving its environment through sensors, reasoning about its goals and acting accordingly upon that environment through actuators (*adapted* from Russel & Norvig, AI: A Modern Approach). In cybersecurity, an `Agent` interacts with systems and networks, using peripherals and network interfaces as sensors, reasons accordingly and then executes network actions as if actuators. Correspondingly, in CAI, `Agent`s implement the `ReACT` (Reasoning and Action) agent model[3].
 
 For more details, including examples and implementation guidance, see the [Agents documentation](agents.md).
 
@@ -87,7 +87,7 @@ For more details, including examples and implementation guidance, see the [Agent
 
 You may find different [tools](src/cai/tools). They are grouped in 6 major categories inspired by the security kill chain[2]:
 
-1. Reconnaissance and weaponization - *reconnaissance*  (crypto, listing, etc)
+1. Reconnaissance and weaponization - *reconnaissance*  (crypto, listing, etc,)
 2. Exploitation - *exploitation*
 3. Privilege escalation - *escalation*
 4. Lateral movement - *lateral*
@@ -116,7 +116,7 @@ wherein:
 - **\\(C\\) (Communication Protocol):** A messaging function \\( C: A \times A \to M \\), where \\( M \\) is a message space, defining how agents share information.
 - **\\(E\\) (Execution Model):** A function \\( E: A \times I \to O \\) where \\( I \\) is the input space and \\( O \\) is the output space, defining how agents perform tasks.
 
-When building `Patterns`, we generall y classify them among one of the following categories, though others exist:
+When building `Patterns`, we generally classify them among one of the following categories, though others exist:
 
 | **Agentic** `Pattern` **categories** | **Description** |
 |--------------------|------------------------|
@@ -134,7 +134,7 @@ Moreover in this new version we could orchestrate agents and add decision mechan
 During the agentic flow (conversation), we distinguish between **interactions** and **turns**.
 
 - **Interactions** are sequential exchanges between one or multiple agents. Each agent executing its logic corresponds with one *interaction*. Since an `Agent` in CAI generally implements the `ReACT` agent model[3], each *interaction* consists of 1) a reasoning step via an LLM inference and 2) act by calling zero-to-n `Tools`. 
-- **Turns**: A turn represents a cycle of one ore more **interactions** which finishes when the `Agent` (or `Pattern`) executing returns `None`, judging there're no further actions to undertake.
+- **Turns**: A turn represents a cycle of one or more **interactions** which finishes when the `Agent` (or `Pattern`) executing returns `None`, judging there're no further actions to undertake.
 
 
 > CAI Agents are not related to Assistants in the Assistants API. They are named similarly for convenience, but are otherwise completely unrelated. CAI is entirely powered by the Chat Completions API and is hence stateless between calls.

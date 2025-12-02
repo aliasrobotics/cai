@@ -24,7 +24,7 @@ _bug_bounter_agent_copy.handoffs = []
 # Create handoffs using the SDK handoff function
 _retester_handoff = handoff(
     agent=_retester_agent_copy,
-    tool_description_override="Transfer to Retester Agent for vulnerablity confirmation and triage"
+    tool_description_override="Transfer to Retester Agent for vulnerability confirmation and triage"
 )
 
 _bug_bounter_handoff = handoff(

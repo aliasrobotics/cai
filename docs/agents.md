@@ -246,7 +246,7 @@ If you want to create Multi-Agent Patterns, see [multi_agent documentation](mult
 
 There are two main context types. See [context](context.md) for details.
 
-Agents are generic on their `context` type. Context is a dependency-injection tool: it's an object you create and pass to `Runner.run()`, that is passed to every agent, tool, handoff etc, and it serves as a grab bag of dependencies and state for the agent run. You can provide any Python object as the context.
+Agents are generic on their `context` type. Context is a dependency-injection tool: it's an object you create and pass to `Runner.run()`, that is passed to every agent, tool, handoff, etc., and it serves as a grab bag of dependencies and state for the agent run. You can provide any Python object as the context.
 
 ```python
 @dataclass

@@ -106,7 +106,7 @@ def capture_remote_traffic(ip, username, password, interface, capture_filter="",
         raise RuntimeError(f"Unexpected error: {str(e)}")
 
 
-@function_tool # TODO: not ideal to decorete this context manager.
+@function_tool # TODO: not ideal to decorate this context manager.
 @contextmanager
 def remote_capture_session(ip, username, password, interface, capture_filter="", port=22):
     """

@@ -22,7 +22,7 @@ While orchestrating via LLM is powerful, orchestrating via code makes tasks more
 
 - Using structured outputs to generate well formed data that you can inspect with your code. 
 
-- Using a determinitstic pattern: Breaking down a task into a series of smaller steps. Chaining multiple agents, each step can be performed by an agent, and the output of one agent is used as input to the next. 
+- Using a deterministic pattern: Breaking down a task into a series of smaller steps. Chaining multiple agents, each step can be performed by an agent, and the output of one agent is used as input to the next. 
 
 - Using [Guardrails](guardrails.md) and LLM_as_judge: They are agents that evaluates and provides feedback, until they says the inputs/outputs passes certain criteria. The agent ensures inputs/outputs are appropriate.
 

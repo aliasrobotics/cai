@@ -175,7 +175,7 @@ Currently, supporting the following benchmarks, refer to [`ctf_configs.jsonl`](h
 
 [^5]: **Very Hard (`Elite`)**: Designed for elite, highly skilled participants requiring innovation. Focus areas include cutting-edge vulnerabilities like zero-day exploits, custom cryptography, and hardware hacking.
 
-[^6]: A meta-benchmark is a a benchmark of benchmarks: a structured evaluation framework that measures, compares, and summarizes the performance of systems, models, or methods across multiple underlying benchmarks rather than a single one.
+[^6]: A meta-benchmark is a benchmark of benchmarks: a structured evaluation framework that measures, compares, and summarizes the performance of systems, models, or methods across multiple underlying benchmarks rather than a single one.
 
 [^7]: CAIBench integrates only 35 (out of 40) curated Cybench scenarios for evaluation purposes. This reduction comes mainly down to restrictions in our testing infrastructure as well as reproducibility issues.
 

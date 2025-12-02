@@ -361,6 +361,6 @@ GDPR compliant - data processed in EU only
 
 <small>
 *Questions? **contact@aliasrobotics.com** · +34 945 19 85 15*  
-*Privacy: Your data stays in Europe (GDPR compliant)*
+*Privacy: Your data stays in Europe (GDPR-compliant)*
 </small>
 
