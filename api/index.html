@@ -1,0 +1,4375 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../cai_pro_features/">
+      
+      
+        <link rel="next" href="../cai_pro_pricing/">
+      
+      
+      <link rel="icon" href="../assets/imago.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+    
+    
+      
+        <title>⭐ API Server (CAI PRO) - CAI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.4af4bdda.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#cai-api-backend" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="CAI" class="md-header__button md-logo" aria-label="CAI" data-md-component="logo">
+      
+  <img src="../assets/imago.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CAI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              ⭐ API Server (CAI PRO)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aliasrobotics/cai" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliasrobotics/cai
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="CAI" class="md-nav__button md-logo" aria-label="CAI" data-md-component="logo">
+      
+  <img src="../assets/imago.png" alt="logo">
+
+    </a>
+    CAI
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aliasrobotics/cai" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliasrobotics/cai
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Welcome
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quickstart
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Professional Edition
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Professional Edition
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_pro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    🤔 Why CAI PRO?
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_pro_alias1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    ⭐ Alias1 Model
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_pro_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    🔥 Exclusive Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    ⭐ API Server (CAI PRO)
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    ⭐ API Server (CAI PRO)
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#start-the-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      Start the server
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Start the server">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      Authentication
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#content-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Content types
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      Endpoints
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Endpoints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-apiv1health" class="md-nav__link">
+    <span class="md-ellipsis">
+      GET /api/v1/health
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-apiv1commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      GET /api/v1/commands
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1commandscommand" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/commands/{command}
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/sessions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-apiv1sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      GET /api/v1/sessions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-apiv1sessionsid" class="md-nav__link">
+    <span class="md-ellipsis">
+      GET /api/v1/sessions/{id}
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete-apiv1sessionsid" class="md-nav__link">
+    <span class="md-ellipsis">
+      DELETE /api/v1/sessions/{id}
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1sessionsidreset" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/sessions/{id}/reset
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1sessionsidmessages" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/sessions/{id}/messages
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1sessionsidmessagesstream-sse" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/sessions/{id}/messages/stream (SSE)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1sessionsidmessagesstream_tokens-sse" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/sessions/{id}/messages/stream_tokens (SSE)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#schemas-requestresponse-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      Schemas (request/response fields)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Schemas (request/response fields)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#item-messages-entry-non-streamed-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      Item: messages[] entry (non-streamed endpoint)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#streaming-events-reasoning_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      Streaming events (reasoning_step)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#errors-and-status-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Errors and status codes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-a-client-quick-recipes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Building a client (quick recipes)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#request-examples-quick-copypaste" class="md-nav__link">
+    <span class="md-ellipsis">
+      Request examples (quick copy/paste)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-clis" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example CLIs
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Example CLIs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-apiv1agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      GET /api/v1/agents
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-apiv1models" class="md-nav__link">
+    <span class="md-ellipsis">
+      GET /api/v1/models
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1sessionsidinterrupt" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/sessions/{id}/interrupt
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1sessionsidreload" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/sessions/{id}/reload
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1sessionsiduxfinal_messagestream_tokens-sse" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/sessions/{id}/ux/final_message/stream_tokens (SSE)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1uxtitle" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/ux/title
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1uxsummarize" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/ux/summarize
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_pro_pricing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    💰 Pricing & Plans
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_pro_quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    🚀 Get Started with PRO
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_pro_contact/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    📞 Contact Sales
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    User Interfaces
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            User Interfaces
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Mobile UI (iOS)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            Mobile UI (iOS)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mui/mui_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mui/getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mui/user_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    User Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mui/gestures_shortcuts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Gestures & Shortcuts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mui/chat_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Chat Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Terminal UI (TUI)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Terminal UI (TUI)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/tui_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/user_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    User Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/terminals_management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Terminals Management
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/teams_and_parallel_execution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Teams & Parallel Execution
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/sidebar_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Sidebar Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/keyboard_shortcuts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Keyboard Shortcuts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/commands_reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Commands Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/advanced_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Advanced Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Command Line Interface (CLI)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            Command Line Interface (CLI)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/cli_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/commands_reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Commands Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/advanced_usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Advanced Usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Core Concepts
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Core Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agents
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tools
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../handoffs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handoffs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../multi_agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Multi-Agent Systems
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Models & Providers
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Models & Providers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_list_of_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Available Models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Model Providers
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            Model Providers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../providers/openrouter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenRouter
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../providers/ollama/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Ollama
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../providers/azure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Azure OpenAI
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../running_agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Running Agents
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../continue_mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Continue Mode
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working with Results
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Streaming
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tracing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tracing & Debugging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Context Management
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guardrails/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Guardrails & Security
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../council/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LLM Council
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../environment_variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Environment Variables
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Benchmarking
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Benchmarking
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarking/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarking/running_benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Running Benchmarks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarking/attack_defense/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Attack & Defense CTFs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarking/jeopardy_ctfs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jeopardy CTFs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarking/cyber_ranges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Cyber Ranges
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarking/knowledge_benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Knowledge Benchmarks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarking/privacy_benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Privacy Benchmarks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Research
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            Research
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    API Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1" id="__nav_9_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Agents
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1">
+            <span class="md-nav__icon md-icon"></span>
+            Agents
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agent
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Runner
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/tool/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tool
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/result/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Result
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/stream_events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Stream Events
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/handoffs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handoffs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Lifecycle
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/items/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Items
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/run_context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Run Context
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Exceptions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/guardrail/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Guardrail
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/model_settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Model Settings
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/agent_output/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agent Output
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/function_schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Function Schema
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_2" id="__nav_9_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Models
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_2">
+            <span class="md-nav__icon md-icon"></span>
+            Models
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/models/interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/models/openai_chatcompletions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenAI Chat Completions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/models/openai_responses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenAI Responses
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_3" id="__nav_9_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Extensions
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_3">
+            <span class="md-nav__icon md-icon"></span>
+            Extensions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/extensions/handoff_filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handoff Filters
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/extensions/handoff_prompt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handoff Prompt
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Advanced
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Development
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Resources
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            Resources
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_find_us/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Find Us
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_citation_and_acknowledgments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Citation & Acknowledgments
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#start-the-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      Start the server
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Start the server">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      Authentication
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#content-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Content types
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      Endpoints
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Endpoints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-apiv1health" class="md-nav__link">
+    <span class="md-ellipsis">
+      GET /api/v1/health
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-apiv1commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      GET /api/v1/commands
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1commandscommand" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/commands/{command}
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/sessions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-apiv1sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      GET /api/v1/sessions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-apiv1sessionsid" class="md-nav__link">
+    <span class="md-ellipsis">
+      GET /api/v1/sessions/{id}
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete-apiv1sessionsid" class="md-nav__link">
+    <span class="md-ellipsis">
+      DELETE /api/v1/sessions/{id}
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1sessionsidreset" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/sessions/{id}/reset
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1sessionsidmessages" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/sessions/{id}/messages
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1sessionsidmessagesstream-sse" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/sessions/{id}/messages/stream (SSE)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1sessionsidmessagesstream_tokens-sse" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/sessions/{id}/messages/stream_tokens (SSE)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#schemas-requestresponse-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      Schemas (request/response fields)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Schemas (request/response fields)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#item-messages-entry-non-streamed-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      Item: messages[] entry (non-streamed endpoint)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#streaming-events-reasoning_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      Streaming events (reasoning_step)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#errors-and-status-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Errors and status codes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-a-client-quick-recipes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Building a client (quick recipes)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#request-examples-quick-copypaste" class="md-nav__link">
+    <span class="md-ellipsis">
+      Request examples (quick copy/paste)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-clis" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example CLIs
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Example CLIs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-apiv1agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      GET /api/v1/agents
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-apiv1models" class="md-nav__link">
+    <span class="md-ellipsis">
+      GET /api/v1/models
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1sessionsidinterrupt" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/sessions/{id}/interrupt
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1sessionsidreload" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/sessions/{id}/reload
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1sessionsiduxfinal_messagestream_tokens-sse" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/sessions/{id}/ux/final_message/stream_tokens (SSE)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1uxtitle" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/ux/title
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1uxsummarize" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/ux/summarize
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="cai-api-backend">CAI API Backend</h1>
+<p>The <code>cai --api</code> mode exposes a stateful HTTP backend built with FastAPI. It uses per-session agents to keep conversation state and REST routes to run REPL commands or send prompts to the model.</p>
+<h2 id="start-the-server">Start the server</h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1">cai<span class="w"> </span>--api<span class="w"> </span>--api-host<span class="w"> </span><span class="m">0</span>.0.0.0<span class="w"> </span>--api-port<span class="w"> </span><span class="m">8080</span>
+</span><span id="__span-0-2"><span class="c1"># If 8080 (or your chosen port) is busy, the server auto-picks</span>
+</span><span id="__span-0-3"><span class="c1"># the next free port and prints it in the console.</span>
+</span></code></pre></div>
+<p>CLI flags and environment variables:</p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Env</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--api</code></td>
+<td><code>CAI_API_MODE</code></td>
+<td>Enable the HTTP backend.</td>
+</tr>
+<tr>
+<td><code>--api-host</code></td>
+<td><code>CAI_API_HOST</code></td>
+<td>Bind host/interface (default 127.0.0.1).</td>
+</tr>
+<tr>
+<td><code>--api-port</code></td>
+<td><code>CAI_API_PORT</code></td>
+<td>Bind port (default 8000).</td>
+</tr>
+<tr>
+<td><code>--api-reload</code></td>
+<td><code>CAI_API_RELOAD</code></td>
+<td>Dev autoreload.</td>
+</tr>
+<tr>
+<td><code>--api-workers</code></td>
+<td><code>CAI_API_WORKERS</code></td>
+<td>Worker processes (ignored with reload).</td>
+</tr>
+</tbody>
+</table>
+<p>Interactive docs at <code>/api/docs</code> and OpenAPI spec at <code>/api/openapi.json</code>.</p>
+<h3 id="authentication">Authentication</h3>
+<ul>
+<li>The API uses the client’s <code>ALIAS_API_KEY</code> as the secret. Set <code>ALIAS_API_KEY</code> and send it in header <code>X-CAI-API-Key</code> (customizable via <code>CAI_API_KEY_HEADER</code>).</li>
+<li>If <code>ALIAS_API_KEY</code> is not set, the API is unprotected (local dev only). For compatibility, <code>CAI_API_KEY</code> is accepted as a fallback.</li>
+</ul>
+<p>Verbose/auth logging
+- Server logs level: set <code>CAI_API_LOG_LEVEL</code> to <code>debug</code> (or <code>trace</code>) before <code>cai --api</code>.
+- Request logging (method/path/headers/body preview): <code>CAI_API_LOG_REQUESTS=true</code>.
+- Authentication decisions (why 401): <code>CAI_API_LOG_AUTH=true</code>.
+- Dev autoreload: <code>CAI_API_RELOAD=true</code>.</p>
+<p>Example:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><span class="nv">ALIAS_API_KEY</span><span class="o">=</span><span class="s2">&quot;your_key&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-2"><span class="nv">CAI_API_LOG_LEVEL</span><span class="o">=</span>debug<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-3"><span class="nv">CAI_API_LOG_REQUESTS</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-4"><span class="nv">CAI_API_LOG_AUTH</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-5"><span class="nv">CAI_API_RELOAD</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-6">cai<span class="w"> </span>--api<span class="w"> </span>--api-host<span class="w"> </span><span class="m">0</span>.0.0.0<span class="w"> </span>--api-port<span class="w"> </span><span class="m">8080</span>
+</span></code></pre></div></p>
+<h3 id="content-types">Content types</h3>
+<ul>
+<li>JSON for request/response payloads.</li>
+<li>Server-Sent Events (SSE) for streaming endpoint (<code>text/event-stream</code>).</li>
+</ul>
+<h2 id="endpoints">Endpoints</h2>
+<p>Below are the endpoints with request/response examples and headers. For authenticated calls, include:</p>
+<ul>
+<li><code>X-CAI-API-Key: $ALIAS_API_KEY</code></li>
+</ul>
+<p>Quick index
+- GET /api/v1/health
+- GET /api/v1/commands
+- POST /api/v1/commands/{command}
+- POST /api/v1/sessions
+- GET /api/v1/sessions
+- GET /api/v1/sessions/{id}
+- DELETE /api/v1/sessions/{id}
+- POST /api/v1/sessions/{id}/reset
+- POST /api/v1/sessions/{id}/messages
+- POST /api/v1/sessions/{id}/messages/stream
+- GET /api/v1/sessions/{id}/history
+- POST /api/v1/sessions/{id}/interrupt
+- POST /api/v1/sessions/{id}/reload
+- GET /api/v1/agents
+- GET /api/v1/models
+- POST /api/v1/sessions/{id}/ux/final_message/stream_tokens
+- POST /api/v1/ux/title
+- POST /api/v1/ux/summarize</p>
+<h3 id="get-apiv1health">GET /api/v1/health</h3>
+<ul>
+<li>Description: Liveness check. No auth required.</li>
+<li>Response 200:</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-2-1"><span class="p">{</span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="s2">&quot;ok&quot;</span><span class="p">,</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="s2">&quot;&lt;semver or dev&gt;&quot;</span><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="get-apiv1commands">GET /api/v1/commands</h3>
+<ul>
+<li>Description: List all REPL commands (names, aliases, subcommands).</li>
+<li>Headers: <code>X-CAI-API-Key</code></li>
+<li>Response 200:</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-3-1"><span class="p">{</span>
+</span><span id="__span-3-2"><span class="w">  </span><span class="nt">&quot;commands&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-3-3"><span class="w">    </span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;/memory&quot;</span><span class="p">,</span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="s2">&quot;memory ops&quot;</span><span class="p">,</span><span class="nt">&quot;aliases&quot;</span><span class="p">:[],</span><span class="nt">&quot;subcommands&quot;</span><span class="p">:[</span><span class="s2">&quot;show&quot;</span><span class="p">]},</span>
+</span><span id="__span-3-4"><span class="w">    </span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;/help&quot;</span><span class="p">,</span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="s2">&quot;display help&quot;</span><span class="p">,</span><span class="nt">&quot;aliases&quot;</span><span class="p">:[</span><span class="s2">&quot;/h&quot;</span><span class="p">],</span><span class="nt">&quot;subcommands&quot;</span><span class="p">:[]}</span>
+</span><span id="__span-3-5"><span class="w">  </span><span class="p">]</span>
+</span><span id="__span-3-6"><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="post-apiv1commandscommand">POST /api/v1/commands/{command}</h3>
+<ul>
+<li>Description: Execute a REPL command.</li>
+<li>Headers: <code>X-CAI-API-Key</code>, <code>Content-Type: application/json</code></li>
+<li>Body:</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><span class="p">{</span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;show&quot;</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;auto_correct&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li>Response 200:</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-5-1"><span class="p">{</span><span class="nt">&quot;handled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;suggested_command&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;stdout&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;stderr&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;exit_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="post-apiv1sessions">POST /api/v1/sessions</h3>
+<ul>
+<li>Description: Create a new stateful session with its own agent instance and memory.</li>
+<li>Headers: <code>X-CAI-API-Key</code>, <code>Content-Type: application/json</code></li>
+<li>Body:</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-6-1"><span class="p">{</span><span class="nt">&quot;agent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;redteam_agent&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;model&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;alias1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;stateful&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}}</span>
+</span></code></pre></div>
+<ul>
+<li>Response 201 (SessionDetailModel): includes summary + empty history initially.</li>
+</ul>
+<h3 id="get-apiv1sessions">GET /api/v1/sessions</h3>
+<ul>
+<li>Description: List active sessions (summaries).</li>
+<li>Headers: <code>X-CAI-API-Key</code></li>
+<li>Response 200:</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-7-1"><span class="p">{</span><span class="nt">&quot;sessions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;&lt;uuid&gt;&quot;</span><span class="p">,</span><span class="nt">&quot;agent&quot;</span><span class="p">:</span><span class="s2">&quot;redteam_agent&quot;</span><span class="p">,</span><span class="nt">&quot;model&quot;</span><span class="p">:</span><span class="s2">&quot;alias1&quot;</span><span class="p">,</span><span class="nt">&quot;stateful&quot;</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span><span class="nt">&quot;history_length&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="s2">&quot;...&quot;</span><span class="p">,</span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="s2">&quot;...&quot;</span><span class="p">,</span><span class="nt">&quot;metadata&quot;</span><span class="p">:{}}]}</span>
+</span></code></pre></div>
+<h3 id="get-apiv1sessionsid">GET /api/v1/sessions/{id}</h3>
+<ul>
+<li>Description: Get session detail (summary + full history).</li>
+<li>Headers: <code>X-CAI-API-Key</code></li>
+</ul>
+<h3 id="delete-apiv1sessionsid">DELETE /api/v1/sessions/{id}</h3>
+<ul>
+<li>Description: Delete a session.</li>
+<li>Headers: <code>X-CAI-API-Key</code></li>
+<li>Response: 204 No Content</li>
+</ul>
+<h3 id="post-apiv1sessionsidreset">POST /api/v1/sessions/{id}/reset</h3>
+<ul>
+<li>Description: Reset the session agent and clear history.</li>
+<li>Headers: <code>X-CAI-API-Key</code></li>
+<li>Response 200: SessionDetailModel</li>
+</ul>
+<h3 id="post-apiv1sessionsidmessages">POST /api/v1/sessions/{id}/messages</h3>
+<ul>
+<li>Description: Non-streamed inference. Runs the agent and returns the final result.</li>
+<li>Headers: <code>X-CAI-API-Key</code>, <code>Content-Type: application/json</code></li>
+<li>Body (InferenceRequest):</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-8-1"><span class="p">{</span><span class="nt">&quot;input&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;List current risks&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;context&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;org&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;acme&quot;</span><span class="p">},</span><span class="w"> </span><span class="nt">&quot;max_turns&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li>Response 200 (InferenceResponse):</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-9-1"><span class="p">{</span>
+</span><span id="__span-9-2"><span class="w">  </span><span class="nt">&quot;session&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;uuid&gt;&quot;</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="p">},</span>
+</span><span id="__span-9-3"><span class="w">  </span><span class="nt">&quot;result&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-4"><span class="w">    </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="cm">/* semantic items: messages, tool calls, outputs, ... */</span><span class="p">],</span>
+</span><span id="__span-9-5"><span class="w">    </span><span class="nt">&quot;history&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="cm">/* updated message list */</span><span class="p">],</span>
+</span><span id="__span-9-6"><span class="w">    </span><span class="nt">&quot;final_output&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="cm">/* typed final output if agent uses an output schema, else string */</span><span class="p">},</span>
+</span><span id="__span-9-7"><span class="w">    </span><span class="nt">&quot;text_output&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;assistant final text, if any&gt;&quot;</span><span class="p">,</span>
+</span><span id="__span-9-8"><span class="w">    </span><span class="nt">&quot;input_guardrails&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+</span><span id="__span-9-9"><span class="w">    </span><span class="nt">&quot;output_guardrails&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+</span><span id="__span-9-10"><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-9-11"><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="post-apiv1sessionsidmessagesstream-sse">POST /api/v1/sessions/{id}/messages/stream (SSE)</h3>
+<ul>
+<li>Description: Stream high-level reasoning steps live (no token streaming) and a final summary. Under the hood the API performs non-streaming model calls and streams steps via server-side hooks (tools, handoffs, messages).</li>
+<li>Headers: <code>X-CAI-API-Key</code>, <code>Content-Type: application/json</code>, <code>Accept: text/event-stream</code></li>
+<li>Body (InferenceRequest): same as non-streamed.</li>
+<li>Stream format: Server-Sent Events with two event types:</li>
+<li><code>event: reasoning_step</code> — One event per step with JSON <code>data</code> (examples below).</li>
+<li><code>event: final</code> — Final event with <code>{ steps, final_message, final_output }</code>.</li>
+</ul>
+<p>Reasoning step payloads (no token deltas):</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-10-1"><span class="c1">// Message generated by the assistant</span>
+</span><span id="__span-10-2"><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;message&quot;</span><span class="p">,</span><span class="nt">&quot;agent&quot;</span><span class="p">:</span><span class="s2">&quot;Red Team&quot;</span><span class="p">,</span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="s2">&quot;...full assistant message...&quot;</span><span class="p">}</span>
+</span><span id="__span-10-3">
+</span><span id="__span-10-4"><span class="c1">// Tool call</span>
+</span><span id="__span-10-5"><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;tool_call&quot;</span><span class="p">,</span><span class="nt">&quot;agent&quot;</span><span class="p">:</span><span class="s2">&quot;Red Team&quot;</span><span class="p">,</span><span class="nt">&quot;tool&quot;</span><span class="p">:</span><span class="s2">&quot;nmap_scan&quot;</span><span class="p">,</span><span class="nt">&quot;arguments&quot;</span><span class="p">:{</span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="s2">&quot;10.0.0.5&quot;</span><span class="p">}}</span>
+</span><span id="__span-10-6">
+</span><span id="__span-10-7"><span class="c1">// Tool output</span>
+</span><span id="__span-10-8"><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;tool_output&quot;</span><span class="p">,</span><span class="nt">&quot;agent&quot;</span><span class="p">:</span><span class="s2">&quot;Red Team&quot;</span><span class="p">,</span><span class="nt">&quot;output&quot;</span><span class="p">:</span><span class="s2">&quot;open ports: 22,80&quot;</span><span class="p">}</span>
+</span><span id="__span-10-9">
+</span><span id="__span-10-10"><span class="c1">// Agent switch (handoff)</span>
+</span><span id="__span-10-11"><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;handoff&quot;</span><span class="p">,</span><span class="nt">&quot;from_agent&quot;</span><span class="p">:</span><span class="s2">&quot;Coordinator&quot;</span><span class="p">,</span><span class="nt">&quot;to_agent&quot;</span><span class="p">:</span><span class="s2">&quot;Exploiter&quot;</span><span class="p">}</span>
+</span><span id="__span-10-12">
+</span><span id="__span-10-13"><span class="c1">// Explicit agent switch signal</span>
+</span><span id="__span-10-14"><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;agent_switched&quot;</span><span class="p">,</span><span class="nt">&quot;agent&quot;</span><span class="p">:</span><span class="s2">&quot;Exploiter&quot;</span><span class="p">}</span>
+</span></code></pre></div>
+<p>Final event payload:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-11-1"><span class="p">{</span>
+</span><span id="__span-11-2"><span class="w">  </span><span class="nt">&quot;steps&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="cm">/* the same reasoning steps emitted during the stream */</span><span class="w"> </span><span class="p">],</span>
+</span><span id="__span-11-3"><span class="w">  </span><span class="nt">&quot;final_message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...last assistant message (if any)...&quot;</span><span class="p">,</span>
+</span><span id="__span-11-4"><span class="w">  </span><span class="nt">&quot;final_output&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="cm">/* structured output if present, else string/null */</span><span class="p">}</span>
+</span><span id="__span-11-5"><span class="p">}</span>
+</span></code></pre></div>
+<p>Example with curl (SSE):</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1">curl<span class="w"> </span>-N<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-2"><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Accept: text/event-stream&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-3"><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-4"><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;X-CAI-API-Key: </span><span class="nv">$ALIAS_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-5"><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;input&quot;: &quot;List current risks&quot;}&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-6"><span class="w">  </span>http://localhost:8080/api/v1/sessions/&lt;SESSION_ID&gt;/messages/stream
+</span></code></pre></div>
+<h3 id="post-apiv1sessionsidmessagesstream_tokens-sse">POST /api/v1/sessions/{id}/messages/stream_tokens (SSE)</h3>
+<ul>
+<li>Description: Token-level streaming (plus reasoning steps). This endpoint enables provider streaming internally and emits token deltas as they arrive. Use this only if you need character/token granularity.</li>
+<li>Headers: <code>X-CAI-API-Key</code>, <code>Content-Type: application/json</code>, <code>Accept: text/event-stream</code></li>
+<li>Body (InferenceRequest): same as non-streamed.</li>
+<li>Stream events:</li>
+<li><code>event: token</code> with data <code>{ "type": "token_delta", "text": "..." }</code> for each emitted text delta.</li>
+<li><code>event: token</code> with data <code>{ "type": "message_start" }</code> and <code>{ "type": "message_end" }</code> to mark boundaries.</li>
+<li><code>event: reasoning_step</code> for high-level steps (same schema as /messages/stream).</li>
+<li><code>event: final</code> with the same summary payload as /messages/stream.</li>
+</ul>
+<p>Notes
+- Token streaming can be quite chatty; ensure your client handles backpressure and uses streaming-friendly APIs.
+- For iOS, prefer URLSession streaming (see sample below); Safari’s EventSource cannot set custom headers.</p>
+<p>curl example (tokens):
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1">curl<span class="w"> </span>-N<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-13-2"><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Accept: text/event-stream&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-13-3"><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-13-4"><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;X-CAI-API-Key: </span><span class="nv">$ALIAS_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-13-5"><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;input&quot;: &quot;Write a haiku about ports&quot;}&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-13-6"><span class="w">  </span>http://localhost:8080/api/v1/sessions/&lt;SESSION_ID&gt;/messages/stream_tokens
+</span></code></pre></div></p>
+<p>iOS (Swift) streaming example (tokens)
+<div class="language-swift highlight"><pre><span></span><code><span id="__span-14-1"><span class="kd">let</span><span class="w"> </span><span class="nv">sid</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;&lt;SESSION_ID&gt;&quot;</span>
+</span><span id="__span-14-2"><span class="kd">var</span><span class="w"> </span><span class="nv">req</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">URLRequest</span><span class="p">(</span><span class="n">url</span><span class="p">:</span><span class="w"> </span><span class="n">URL</span><span class="p">(</span><span class="n">string</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;http://127.0.0.1:8080/api/v1/sessions/</span><span class="si">\(</span><span class="n">sid</span><span class="si">)</span><span class="s">/messages/stream_tokens&quot;</span><span class="p">)</span><span class="o">!</span><span class="p">)</span>
+</span><span id="__span-14-3"><span class="n">req</span><span class="p">.</span><span class="n">httpMethod</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;POST&quot;</span>
+</span><span id="__span-14-4"><span class="n">req</span><span class="p">.</span><span class="n">addValue</span><span class="p">(</span><span class="s">&quot;text/event-stream&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">forHTTPHeaderField</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Accept&quot;</span><span class="p">)</span>
+</span><span id="__span-14-5"><span class="n">req</span><span class="p">.</span><span class="n">addValue</span><span class="p">(</span><span class="s">&quot;application/json&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">forHTTPHeaderField</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Content-Type&quot;</span><span class="p">)</span>
+</span><span id="__span-14-6"><span class="n">req</span><span class="p">.</span><span class="n">addValue</span><span class="p">(</span><span class="n">ProcessInfo</span><span class="p">.</span><span class="n">processInfo</span><span class="p">.</span><span class="n">environment</span><span class="p">[</span><span class="s">&quot;ALIAS_API_KEY&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">??</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">forHTTPHeaderField</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;X-CAI-API-Key&quot;</span><span class="p">)</span>
+</span><span id="__span-14-7"><span class="n">req</span><span class="p">.</span><span class="n">httpBody</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">try</span><span class="p">!</span><span class="w"> </span><span class="n">JSONSerialization</span><span class="p">.</span><span class="n">data</span><span class="p">(</span><span class="n">withJSONObject</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;input&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Hi&quot;</span><span class="p">],</span><span class="w"> </span><span class="n">options</span><span class="p">:</span><span class="w"> </span><span class="p">[])</span>
+</span><span id="__span-14-8">
+</span><span id="__span-14-9"><span class="kd">let</span><span class="w"> </span><span class="nv">task</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">URLSession</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">streamTask</span><span class="p">(</span><span class="n">with</span><span class="p">:</span><span class="w"> </span><span class="n">req</span><span class="p">)</span>
+</span><span id="__span-14-10"><span class="n">task</span><span class="p">.</span><span class="n">resume</span><span class="p">()</span>
+</span><span id="__span-14-11"><span class="n">task</span><span class="p">.</span><span class="n">readData</span><span class="p">(</span><span class="n">ofMinLength</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">maxLength</span><span class="p">:</span><span class="w"> </span><span class="mi">8192</span><span class="p">,</span><span class="w"> </span><span class="n">timeout</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">atEOF</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="w"> </span><span class="k">in</span>
+</span><span id="__span-14-12"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nv">data</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nv">s</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">String</span><span class="p">(</span><span class="n">data</span><span class="p">:</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">encoding</span><span class="p">:</span><span class="w"> </span><span class="p">.</span><span class="n">utf8</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-14-13"><span class="w">        </span><span class="c1">// parse SSE lines: event: &lt;name&gt; / data: &lt;json&gt;</span>
+</span><span id="__span-14-14"><span class="w">        </span><span class="bp">print</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</span><span id="__span-14-15"><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-14-16"><span class="p">}</span>
+</span></code></pre></div></p>
+<p>Implementation notes (for curious devs)
+- API streaming never enables OpenAI chat completions token streaming. Instead:
+  - We run the agent with non-streaming model calls and emit events via RunHooks (tools start/end, handoffs, agent switches).
+  - We add one message step after each assistant turn (full text, no token deltas).
+  - This guarantees that model streaming is always off while still providing live step updates.</p>
+<h2 id="schemas-requestresponse-fields">Schemas (request/response fields)</h2>
+<ul>
+<li>HealthResponse</li>
+<li>status: string</li>
+<li>
+<p>version: string</p>
+</li>
+<li>
+<p>CommandMetadata</p>
+</li>
+<li>name: string (e.g., "/memory")</li>
+<li>description: string</li>
+<li>aliases: string[] (e.g., ["/h"]) </li>
+<li>
+<p>subcommands: string[] (e.g., ["show"]) </p>
+</li>
+<li>
+<p>CommandsResponse</p>
+</li>
+<li>
+<p>commands: CommandMetadata[]</p>
+</li>
+<li>
+<p>CommandRequest</p>
+</li>
+<li>args: string[] (optional)</li>
+<li>
+<p>auto_correct: boolean (default true)</p>
+</li>
+<li>
+<p>CommandResponse</p>
+</li>
+<li>handled: boolean</li>
+<li>suggested_command: string | null</li>
+<li>stdout: string</li>
+<li>stderr: string</li>
+<li>
+<p>exit_code: number | null</p>
+</li>
+<li>
+<p>CreateSessionRequest</p>
+</li>
+<li>agent: string (optional; default from CAI_AGENT_TYPE)</li>
+<li>model: string (optional; default from CAI_MODEL)</li>
+<li>stateful: boolean (default true)</li>
+<li>
+<p>metadata: object (optional)</p>
+</li>
+<li>
+<p>SessionSummary</p>
+</li>
+<li>id: string (UUID)</li>
+<li>agent: string</li>
+<li>model: string</li>
+<li>stateful: boolean</li>
+<li>created_at: ISO8601 string</li>
+<li>updated_at: ISO8601 string</li>
+<li>history_length: number</li>
+<li>
+<p>metadata: object</p>
+</li>
+<li>
+<p>SessionDetail</p>
+</li>
+<li>All SessionSummary fields, plus:</li>
+<li>
+<p>history: ResponseInputItem[] (OpenAI Responses input items list – user/system/assistant/tool items)</p>
+</li>
+<li>
+<p>SessionsResponse</p>
+</li>
+<li>
+<p>sessions: SessionSummary[]</p>
+</li>
+<li>
+<p>InferenceRequest</p>
+</li>
+<li>input: string | ResponseInputItem[]</li>
+<li>context: object (optional)</li>
+<li>
+<p>max_turns: number (optional)</p>
+</li>
+<li>
+<p>RunResultPayload</p>
+</li>
+<li>messages: Item[] (list of semantic items generated during the run; see below)</li>
+<li>history: ResponseInputItem[] (original input plus generated items, suitable to continue)</li>
+<li>final_output: any (typed result if the agent defines an output schema; otherwise text or null)</li>
+<li>text_output: string | null (last assistant text message, if any)</li>
+<li>input_guardrails: object[] (guardrail outputs for input)</li>
+<li>output_guardrails: object[] (guardrail outputs for final output)</li>
+</ul>
+<h3 id="item-messages-entry-non-streamed-endpoint">Item: messages[] entry (non-streamed endpoint)</h3>
+<ul>
+<li>Common envelope:</li>
+<li>type: string (e.g., "message_output_item", "tool_call_item", "tool_call_output_item", "handoff_output_item")</li>
+<li>agent: string | null (agent name that produced it)</li>
+<li>payload: object (raw Pydantic model dump for the underlying output/input item)</li>
+<li>
+<p>output: any (only present for tool_call_output_item; the structured tool return value)</p>
+</li>
+<li>
+<p>message_output_item</p>
+</li>
+<li>payload: ResponseOutputMessage (OpenAI Responses message with content array)</li>
+<li>
+<p>text extraction: text_output consolidates last text chunk</p>
+</li>
+<li>
+<p>tool_call_item</p>
+</li>
+<li>payload: ResponseFunctionToolCall | ResponseComputerToolCall | ResponseFileSearchToolCall</li>
+<li>
+<p>typical fields (function call): name, arguments</p>
+</li>
+<li>
+<p>tool_call_output_item</p>
+</li>
+<li>
+<p>output: any (decoded tool result)</p>
+</li>
+<li>
+<p>handoff_output_item</p>
+</li>
+<li>payload: handoff input item</li>
+<li>Includes implicit source/target agent names in the envelope (agent + payload content)</li>
+</ul>
+<h3 id="streaming-events-reasoning_step">Streaming events (reasoning_step)</h3>
+<ul>
+<li>Emitted from /messages/stream; one SSE per step.</li>
+<li>step.type values and fields:</li>
+<li>message<ul>
+<li>agent: string | null</li>
+<li>text: string (full assistant message; no token deltas)</li>
+</ul>
+</li>
+<li>tool_call<ul>
+<li>agent: string | null</li>
+<li>tool: string (tool/function name)</li>
+<li>arguments: object | string (as available)</li>
+</ul>
+</li>
+<li>tool_output<ul>
+<li>agent: string | null</li>
+<li>output: any (structured tool output)</li>
+</ul>
+</li>
+<li>handoff<ul>
+<li>from_agent: string | null</li>
+<li>to_agent: string | null</li>
+</ul>
+</li>
+<li>agent_switched<ul>
+<li>agent: string | null (new active agent)</li>
+</ul>
+</li>
+</ul>
+<p>Final event (event: final)
+- steps: the array of emitted reasoning_step payloads
+- final_message: string | null
+- final_output: any</p>
+<h2 id="errors-and-status-codes">Errors and status codes</h2>
+<ul>
+<li>401 Unauthorized — missing/invalid <code>X-CAI-API-Key</code> when auth is enabled</li>
+<li>{"detail":"Invalid or missing API key"}</li>
+<li>404 Not Found — e.g., unknown session id</li>
+<li>{"detail":"Session not found"}</li>
+<li>422 Unprocessable Entity — malformed request body</li>
+<li>Standard FastAPI validation error</li>
+<li>500 Internal Server Error — unexpected agent execution failure</li>
+<li>{"detail":"Agent execution failed: ..."}</li>
+</ul>
+<h2 id="building-a-client-quick-recipes">Building a client (quick recipes)</h2>
+<p>Python (requests; SSE via iter_lines)
+<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+</span><span id="__span-15-2"><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="__span-15-3"><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+</span><span id="__span-15-4">
+</span><span id="__span-15-5"><span class="n">BASE</span> <span class="o">=</span> <span class="s2">&quot;http://127.0.0.1:8080/api/v1&quot;</span>
+</span><span id="__span-15-6"><span class="n">HEADERS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;X-CAI-API-Key&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ALIAS_API_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+</span><span id="__span-15-7">
+</span><span id="__span-15-8"><span class="c1"># 1) Create session</span>
+</span><span id="__span-15-9"><span class="n">sess</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BASE</span><span class="si">}</span><span class="s2">/sessions&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">HEADERS</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;agent&quot;</span><span class="p">:</span><span class="s2">&quot;redteam_agent&quot;</span><span class="p">,</span><span class="s2">&quot;model&quot;</span><span class="p">:</span><span class="s2">&quot;alias1&quot;</span><span class="p">,</span><span class="s2">&quot;stateful&quot;</span><span class="p">:</span><span class="kc">True</span><span class="p">})</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</span><span id="__span-15-10"><span class="n">sid</span> <span class="o">=</span> <span class="n">sess</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+</span><span id="__span-15-11">
+</span><span id="__span-15-12"><span class="c1"># 2) Non-streamed</span>
+</span><span id="__span-15-13"><span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BASE</span><span class="si">}</span><span class="s2">/sessions/</span><span class="si">{</span><span class="n">sid</span><span class="si">}</span><span class="s2">/messages&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">HEADERS</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;input&quot;</span><span class="p">:</span><span class="s2">&quot;List current risks&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</span><span id="__span-15-14"><span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">][</span><span class="s2">&quot;text_output&quot;</span><span class="p">])</span>  <span class="c1"># final message</span>
+</span><span id="__span-15-15">
+</span><span id="__span-15-16"><span class="c1"># 3) Streaming (SSE)</span>
+</span><span id="__span-15-17"><span class="n">stream_headers</span> <span class="o">=</span> <span class="n">HEADERS</span> <span class="o">|</span> <span class="p">{</span><span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="s2">&quot;text/event-stream&quot;</span><span class="p">}</span>
+</span><span id="__span-15-18"><span class="k">with</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BASE</span><span class="si">}</span><span class="s2">/sessions/</span><span class="si">{</span><span class="n">sid</span><span class="si">}</span><span class="s2">/messages/stream&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">stream_headers</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;input&quot;</span><span class="p">:</span><span class="s2">&quot;List current risks&quot;</span><span class="p">},</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">r</span><span class="p">:</span>
+</span><span id="__span-15-19">    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">iter_lines</span><span class="p">(</span><span class="n">decode_unicode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+</span><span id="__span-15-20">        <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+</span><span id="__span-15-21">            <span class="k">continue</span>
+</span><span id="__span-15-22">        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;event:&quot;</span><span class="p">):</span>
+</span><span id="__span-15-23">            <span class="n">evt</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</span><span id="__span-15-24">        <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;data:&quot;</span><span class="p">):</span>
+</span><span id="__span-15-25">            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+</span><span id="__span-15-26">            <span class="k">if</span> <span class="n">evt</span> <span class="o">==</span> <span class="s2">&quot;reasoning_step&quot;</span><span class="p">:</span>
+</span><span id="__span-15-27">                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;step:&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</span><span id="__span-15-28">            <span class="k">elif</span> <span class="n">evt</span> <span class="o">==</span> <span class="s2">&quot;final&quot;</span><span class="p">:</span>
+</span><span id="__span-15-29">                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;final:&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</span></code></pre></div></p>
+<p>Node (browser/EventSource)
+<div class="language-js highlight"><pre><span></span><code><span id="__span-16-1"><span class="kd">const</span><span class="w"> </span><span class="nx">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">ALIAS_API_KEY</span><span class="p">;</span>
+</span><span id="__span-16-2"><span class="kd">const</span><span class="w"> </span><span class="nx">sid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&lt;SESSION_ID&gt;&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// create via POST /sessions</span>
+</span><span id="__span-16-3"><span class="kd">const</span><span class="w"> </span><span class="nx">es</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">EventSource</span><span class="p">(</span><span class="sb">`http://localhost:8080/api/v1/sessions/</span><span class="si">${</span><span class="nx">sid</span><span class="si">}</span><span class="sb">/messages/stream`</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-16-4"><span class="w">  </span><span class="nx">withCredentials</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span>
+</span><span id="__span-16-5"><span class="p">});</span>
+</span><span id="__span-16-6"><span class="c1">// Note: To send headers with SSE in the browser, proxy or use fetch+ReadableStream.</span>
+</span><span id="__span-16-7"><span class="nx">es</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;reasoning_step&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">ev</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;step&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">ev</span><span class="p">.</span><span class="nx">data</span><span class="p">)));</span>
+</span><span id="__span-16-8"><span class="nx">es</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;final&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">ev</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;final&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">ev</span><span class="p">.</span><span class="nx">data</span><span class="p">)));</span>
+</span></code></pre></div></p>
+<p>Node (fetch + ReadableStream; set auth header)
+<div class="language-js highlight"><pre><span></span><code><span id="__span-17-1"><span class="k">import</span><span class="w"> </span><span class="nx">fetch</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;node-fetch&#39;</span><span class="p">;</span>
+</span><span id="__span-17-2"><span class="kd">const</span><span class="w"> </span><span class="nx">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">ALIAS_API_KEY</span><span class="p">;</span>
+</span><span id="__span-17-3"><span class="kd">const</span><span class="w"> </span><span class="nx">sid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SID</span><span class="p">;</span>
+</span><span id="__span-17-4"><span class="kd">const</span><span class="w"> </span><span class="nx">resp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="sb">`http://localhost:8080/api/v1/sessions/</span><span class="si">${</span><span class="nx">sid</span><span class="si">}</span><span class="sb">/messages/stream`</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-17-5"><span class="w">  </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
+</span><span id="__span-17-6"><span class="w">  </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span><span class="s1">&#39;application/json&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Accept&#39;</span><span class="o">:</span><span class="s1">&#39;text/event-stream&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;X-CAI-API-Key&#39;</span><span class="o">:</span><span class="w"> </span><span class="nx">key</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-17-7"><span class="w">  </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span><span class="w"> </span><span class="nx">input</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;List current risks&#39;</span><span class="w"> </span><span class="p">})</span>
+</span><span id="__span-17-8"><span class="p">});</span>
+</span><span id="__span-17-9"><span class="k">for</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">chunk</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">resp</span><span class="p">.</span><span class="nx">body</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-17-10"><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">chunk</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span>
+</span><span id="__span-17-11"><span class="w">  </span><span class="c1">// parse SSE lines: event: &lt;name&gt; / data: &lt;json&gt;</span>
+</span><span id="__span-17-12"><span class="w">  </span><span class="nx">process</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">s</span><span class="p">);</span>
+</span><span id="__span-17-13"><span class="p">}</span>
+</span></code></pre></div></p>
+<p>Best practices
+- Always include <code>Accept: text/event-stream</code> for streaming.
+- Expect multiple <code>reasoning_step</code> events, then exactly one <code>final</code> event.
+- No token deltas are emitted; each message step contains the full assistant message text.
+- Tool calls can be frequent; handle backpressure in your client.
+- Keep your connection timeouts relaxed for long runs.</p>
+<h2 id="request-examples-quick-copypaste">Request examples (quick copy/paste)</h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><span class="c1"># Healthcheck</span>
+</span><span id="__span-18-2">curl<span class="w"> </span>-s<span class="w"> </span>http://localhost:8080/api/v1/health
+</span><span id="__span-18-3">
+</span><span id="__span-18-4"><span class="c1"># List agents</span>
+</span><span id="__span-18-5">curl<span class="w"> </span>-s<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;X-CAI-API-Key: </span><span class="nv">$ALIAS_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span>http://localhost:8080/api/v1/agents<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>.
+</span><span id="__span-18-6">
+</span><span id="__span-18-7"><span class="c1"># List models</span>
+</span><span id="__span-18-8">curl<span class="w"> </span>-s<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;X-CAI-API-Key: </span><span class="nv">$ALIAS_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span>http://localhost:8080/api/v1/models<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>.
+</span><span id="__span-18-9">
+</span><span id="__span-18-10"><span class="c1"># List commands</span>
+</span><span id="__span-18-11">curl<span class="w"> </span>-s<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;X-CAI-API-Key: </span><span class="nv">$ALIAS_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span>http://localhost:8080/api/v1/commands
+</span><span id="__span-18-12">
+</span><span id="__span-18-13"><span class="c1"># Run a command</span>
+</span><span id="__span-18-14">curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8080/api/v1/commands/memory<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-15"><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-16"><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;X-CAI-API-Key: </span><span class="nv">$ALIAS_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-17"><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;args&quot;: [&quot;show&quot;]}&#39;</span>
+</span><span id="__span-18-18">
+</span><span id="__span-18-19"><span class="c1"># Create a session</span>
+</span><span id="__span-18-20">curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8080/api/v1/sessions<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-21"><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-22"><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;X-CAI-API-Key: </span><span class="nv">$ALIAS_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-23"><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;agent&quot;: &quot;redteam_agent&quot;, &quot;model&quot;: &quot;alias1&quot;, &quot;stateful&quot;: true}&#39;</span>
+</span><span id="__span-18-24">
+</span><span id="__span-18-25"><span class="c1"># Interrupt and reload</span>
+</span><span id="__span-18-26">curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;X-CAI-API-Key: </span><span class="nv">$ALIAS_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-27"><span class="w">  </span>http://localhost:8080/api/v1/sessions/&lt;SESSION_ID&gt;/interrupt
+</span><span id="__span-18-28">curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;X-CAI-API-Key: </span><span class="nv">$ALIAS_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-29"><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;preserve_history&quot;: true}&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-30"><span class="w">  </span>http://localhost:8080/api/v1/sessions/&lt;SESSION_ID&gt;/reload
+</span><span id="__span-18-31">
+</span><span id="__span-18-32"><span class="c1"># Send a non-streamed prompt</span>
+</span><span id="__span-18-33">curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8080/api/v1/sessions/&lt;SESSION_ID&gt;/messages<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-34"><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-35"><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;X-CAI-API-Key: </span><span class="nv">$ALIAS_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-36"><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;input&quot;: &quot;List current risks&quot;}&#39;</span>
+</span><span id="__span-18-37">
+</span><span id="__span-18-38"><span class="c1"># Stream reasoning steps (SSE)</span>
+</span><span id="__span-18-39">curl<span class="w"> </span>-N<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8080/api/v1/sessions/&lt;SESSION_ID&gt;/messages/stream<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-40"><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-41"><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Accept: text/event-stream&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-42"><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;X-CAI-API-Key: </span><span class="nv">$ALIAS_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-43"><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;input&quot;: &quot;List current risks&quot;}&#39;</span>
+</span><span id="__span-18-44">
+</span><span id="__span-18-45"><span class="c1"># Reset and delete session</span>
+</span><span id="__span-18-46">curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;X-CAI-API-Key: </span><span class="nv">$ALIAS_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span>http://localhost:8080/api/v1/sessions/&lt;SESSION_ID&gt;/reset
+</span><span id="__span-18-47">curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>DELETE<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;X-CAI-API-Key: </span><span class="nv">$ALIAS_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span>http://localhost:8080/api/v1/sessions/&lt;SESSION_ID&gt;
+</span></code></pre></div>
+<h2 id="example-clis">Example CLIs</h2>
+<ul>
+<li><code>examples/cai_api_cli.py</code> — minimal loop: prompts → responses.</li>
+<li><code>examples/cai_api_tester.py</code> — interactive menu that covers all endpoints including streaming.</li>
+</ul>
+<h3 id="get-apiv1agents">GET /api/v1/agents</h3>
+<ul>
+<li>Description: List available agents and patterns in the runtime (from <code>cai.agents</code>).</li>
+<li>Headers: <code>X-CAI-API-Key</code></li>
+<li>Response 200 (AgentsResponse):</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-19-1"><span class="p">{</span>
+</span><span id="__span-19-2"><span class="w">  </span><span class="nt">&quot;agents&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-19-3"><span class="w">    </span><span class="p">{</span>
+</span><span id="__span-19-4"><span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;redteam_agent&quot;</span><span class="p">,</span>
+</span><span id="__span-19-5"><span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-19-6"><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;agent&quot;</span><span class="p">,</span>
+</span><span id="__span-19-7"><span class="w">      </span><span class="nt">&quot;pattern_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+</span><span id="__span-19-8"><span class="w">      </span><span class="nt">&quot;tools&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-19-9"><span class="w">        </span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nmap_scan&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Scan a host or subnet&quot;</span><span class="p">},</span>
+</span><span id="__span-19-10"><span class="w">        </span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http_get&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Fetch a URL&quot;</span><span class="p">}</span>
+</span><span id="__span-19-11"><span class="w">      </span><span class="p">]</span>
+</span><span id="__span-19-12"><span class="w">    </span><span class="p">},</span>
+</span><span id="__span-19-13"><span class="w">    </span><span class="p">{</span>
+</span><span id="__span-19-14"><span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;swarm_pattern&quot;</span><span class="p">,</span>
+</span><span id="__span-19-15"><span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Swarm agentic pattern&quot;</span><span class="p">,</span>
+</span><span id="__span-19-16"><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pattern&quot;</span><span class="p">,</span>
+</span><span id="__span-19-17"><span class="w">      </span><span class="nt">&quot;pattern_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;swarm&quot;</span><span class="p">,</span>
+</span><span id="__span-19-18"><span class="w">      </span><span class="nt">&quot;tools&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+</span><span id="__span-19-19"><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-19-20"><span class="w">  </span><span class="p">]</span>
+</span><span id="__span-19-21"><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="get-apiv1models">GET /api/v1/models</h3>
+<ul>
+<li>Description: List known models by combining predefined model catalog and <code>pricings/pricing.json</code> if present.</li>
+<li>Headers: <code>X-CAI-API-Key</code></li>
+<li>Response 200 (ModelsResponse):</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-20-1"><span class="p">{</span>
+</span><span id="__span-20-2"><span class="w">  </span><span class="nt">&quot;models&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-20-3"><span class="w">    </span><span class="p">{</span>
+</span><span id="__span-20-4"><span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;alias1&quot;</span><span class="p">,</span>
+</span><span id="__span-20-5"><span class="w">      </span><span class="nt">&quot;provider&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;OpenAI&quot;</span><span class="p">,</span>
+</span><span id="__span-20-6"><span class="w">      </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Alias&quot;</span><span class="p">,</span>
+</span><span id="__span-20-7"><span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Best model for Cybersecurity AI tasks&quot;</span><span class="p">,</span>
+</span><span id="__span-20-8"><span class="w">      </span><span class="nt">&quot;input_cost&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.50</span><span class="p">,</span>
+</span><span id="__span-20-9"><span class="w">      </span><span class="nt">&quot;output_cost&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.50</span><span class="p">,</span>
+</span><span id="__span-20-10"><span class="w">      </span><span class="nt">&quot;pricing&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-20-11"><span class="w">        </span><span class="nt">&quot;input_cost_per_token&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.000005</span><span class="p">,</span>
+</span><span id="__span-20-12"><span class="w">        </span><span class="nt">&quot;output_cost_per_token&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.000005</span><span class="p">,</span>
+</span><span id="__span-20-13"><span class="w">        </span><span class="nt">&quot;max_tokens&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">128000</span><span class="p">,</span>
+</span><span id="__span-20-14"><span class="w">        </span><span class="nt">&quot;max_input_tokens&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">200000</span><span class="p">,</span>
+</span><span id="__span-20-15"><span class="w">        </span><span class="nt">&quot;max_output_tokens&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">128000</span><span class="p">,</span>
+</span><span id="__span-20-16"><span class="w">        </span><span class="nt">&quot;supports_function_calling&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-20-17"><span class="w">        </span><span class="nt">&quot;supports_vision&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-20-18"><span class="w">        </span><span class="nt">&quot;supports_response_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-20-19"><span class="w">        </span><span class="nt">&quot;supports_tool_choice&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+</span><span id="__span-20-20"><span class="w">      </span><span class="p">}</span>
+</span><span id="__span-20-21"><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-20-22"><span class="w">  </span><span class="p">]</span>
+</span><span id="__span-20-23"><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="post-apiv1sessionsidinterrupt">POST /api/v1/sessions/{id}/interrupt</h3>
+<ul>
+<li>Description: Interrupt the currently running work (if any) for the given session. Cancels the active server-side run task.</li>
+<li>Headers: <code>X-CAI-API-Key</code></li>
+<li>Response 200:</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-21-1"><span class="p">{</span><span class="nt">&quot;interrupted&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="post-apiv1sessionsidreload">POST /api/v1/sessions/{id}/reload</h3>
+<ul>
+<li>Description: Recreate the session’s agent. Optionally preserve message history.</li>
+<li>Headers: <code>X-CAI-API-Key</code>, <code>Content-Type: application/json</code></li>
+<li>Body:</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-22-1"><span class="p">{</span><span class="nt">&quot;preserve_history&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li>Response 200: SessionDetailModel</li>
+</ul>
+<!-- Removed: /api/v1/sessions/{id}/ux/summarize and /api/v1/sessions/{id}/ux/title endpoints -->
+
+<h3 id="post-apiv1sessionsiduxfinal_messagestream_tokens-sse">POST /api/v1/sessions/{id}/ux/final_message/stream_tokens (SSE)</h3>
+<ul>
+<li>Description: Stream a final assistant message (token-level) that explains to the user what just happened. Your app calls this after a task completes, sending a prompt (tone/instructions) and optionally the steps you observed client-side; if you omit steps, the backend uses server-side steps.</li>
+<li>Headers: <code>X-CAI-API-Key</code>, <code>Content-Type: application/json</code>, <code>Accept: text/event-stream</code></li>
+<li>Body (FinalMessageRequest):</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-23-1"><span class="p">{</span>
+</span><span id="__span-23-2"><span class="w">  </span><span class="nt">&quot;prompt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Explain to the user what we found and next steps.&quot;</span><span class="p">,</span>
+</span><span id="__span-23-3"><span class="w">  </span><span class="nt">&quot;steps&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="cm">/* optional: client-collected steps; otherwise server uses session.last_steps */</span><span class="w"> </span><span class="p">],</span>
+</span><span id="__span-23-4"><span class="w">  </span><span class="nt">&quot;include_history&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-23-5"><span class="w">  </span><span class="nt">&quot;max_turns&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span>
+</span><span id="__span-23-6"><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li>Stream events:</li>
+<li><code>event: token</code> with <code>{ "type": "message_start" }</code></li>
+<li><code>event: token</code> with <code>{ "type": "token_delta", "text": "..." }</code> repeated</li>
+<li><code>event: token</code> with <code>{ "type": "message_end" }</code></li>
+<li><code>event: reasoning_step</code> may appear if the UX agent emits steps</li>
+<li><code>event: final</code> with <code>{ "steps": [...], "final_message": "...", "final_output": ... }</code></li>
+</ul>
+<p>Notes for iOS</p>
+<h3 id="post-apiv1uxtitle">POST /api/v1/ux/title</h3>
+<ul>
+<li>Description: Genera un título conciso mediante una única tool call en el modelo <code>alias1</code> vía LiteLLM. No usa sesiones.</li>
+<li>Headers: <code>X-CAI-API-Key</code>, <code>Content-Type: application/json</code></li>
+<li>Body:</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-24-1"><span class="p">{</span>
+</span><span id="__span-24-2"><span class="w">  </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-24-3"><span class="w">    </span><span class="p">{</span><span class="nt">&quot;role&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;user&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Analiza CVE-2024-...&quot;</span><span class="p">}</span>
+</span><span id="__span-24-4"><span class="w">  </span><span class="p">],</span>
+</span><span id="__span-24-5"><span class="w">  </span><span class="nt">&quot;title_hint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;(opcional)&quot;</span>
+</span><span id="__span-24-6"><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li>Response 200:</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-25-1"><span class="p">{</span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Analizando CVE-2024-...&quot;</span><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="post-apiv1uxsummarize">POST /api/v1/ux/summarize</h3>
+<ul>
+<li>Description: Devuelve un resumen en una línea usando una única tool call en <code>alias1</code> vía LiteLLM. No usa sesiones.</li>
+<li>Headers: <code>X-CAI-API-Key</code>, <code>Content-Type: application/json</code></li>
+<li>Body:</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-26-1"><span class="p">{</span>
+</span><span id="__span-26-2"><span class="w">  </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-26-3"><span class="w">    </span><span class="p">{</span><span class="nt">&quot;role&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;user&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Escanea 10.0.0.5&quot;</span><span class="p">}</span>
+</span><span id="__span-26-4"><span class="w">  </span><span class="p">],</span>
+</span><span id="__span-26-5"><span class="w">  </span><span class="nt">&quot;steps&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-26-6"><span class="w">    </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;tool_call&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;agent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Red Team&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;tool&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nmap_scan&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;10.0.0.5&quot;</span><span class="p">}},</span>
+</span><span id="__span-26-7"><span class="w">    </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;tool_output&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;agent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Red Team&quot;</span><span class="p">}</span>
+</span><span id="__span-26-8"><span class="w">  </span><span class="p">],</span>
+</span><span id="__span-26-9"><span class="w">  </span><span class="nt">&quot;max_len&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span>
+</span><span id="__span-26-10"><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li>Response 200:</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-27-1"><span class="p">{</span><span class="nt">&quot;summary_text&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Tool output procesado por Red Team&quot;</span><span class="p">}</span>
+</span></code></pre></div>
+<p>Implementation notes
+- Ambos endpoints fuerzan <code>tool_choice: required</code> con una única función <code>produce_title_and_summary</code> y usan siempre <code>model: alias1</code> con <code>api_base</code> Alias y <code>ALIAS_API_KEY</code>.
+- El servidor no almacena ni lee estado de sesión.
+- Call this to stream the “final message” of a task. Use a UX prompt tuned to your voice (“Explain briefly in a friendly tone, with next steps”).
+- If you already collected steps client-side, pass them; otherwise the backend uses <code>session.last_steps</code>.
+- Render arriving <code>token_delta</code> chunks into the chat bubble; close on <code>message_end</code>/<code>final</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.select", "navigation.path", "navigation.sections", "navigation.expand", "content.code.annotate"], "search": "../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>
