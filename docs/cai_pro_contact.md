@@ -336,7 +336,7 @@ Review these resources to answer common questions:
 [CAI Terms & Conditions](https://aliasrobotics.com/terms-and-conditions.php)
 
 **Privacy Policy:**  
-GDPR compliant - data processed in EU only
+GDPR-compliant - data processed in EU only
 
 **License Information:**
 - CAI FREE: [Open source license](https://github.com/aliasrobotics/cai/blob/main/LICENSE)

@@ -1216,7 +1216,7 @@ CAI> /agent bug_bounter_agent ; test https://target.com ; /cost
 
 ---
 
-### Auto-loading Queue from File
+### Autoloading Queue from File
 
 Load and execute prompts automatically on startup.
 
