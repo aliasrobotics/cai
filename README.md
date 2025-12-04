@@ -534,12 +534,12 @@ CAI supports configuring a custom OpenAI API base URL via the `OPENAI_BASE_URL` 
 
 Example `.env` entry configuration:
 ```
-OLLAMA_API_BASE="https://custom-openai-proxy.com/v1"
+OPENAI_BASE_URL="https://custom-openai-proxy.com/v1"
 ```
 
 Or directly from the command line:
 ```bash
-OLLAMA_API_BASE="https://custom-openai-proxy.com/v1" cai
+OPENAI_BASE_URL="https://custom-openai-proxy.com/v1" cai
 ```
 
 
