@@ -545,21 +545,21 @@ OLLAMA_API_BASE="https://custom-openai-proxy.com/v1" cai
 
 ## :triangular_ruler: Architecture:
 
-CAI focuses on making cybersecurity agent **coordination** and **execution** lightweight, highly controllable, and useful for humans. To do so it builds upon 8 pillars: `Agent`s, `Tools`, `Handoffs`, `Patterns`, `Turns`, `Tracing`, `Guardrails` and `HITL`.
+CAI focuses on making cybersecurity agent **coordination** and **execution** lightweight, highly controllable, and useful for humans. To do so it builds upon 8 pillars: `Agents`, `Tools`, `Handoffs`, `Patterns`, `Turns`, `Tracing`, `Guardrails` and `HITL`.
 
 ```
                   ┌───────────────┐           ┌───────────┐
-                  │      HITL     │◀─────────▶│   Turns   │
+                  │      HITL     │◀────────▶│   Turns   │
                   └───────┬───────┘           └───────────┘
                           │
                           ▼
 ┌───────────┐       ┌───────────┐       ┌───────────┐      ┌───────────┐
-│  Patterns │◀─────▶│  Handoffs │◀────▶ │   Agents  │◀────▶│    LLMs   │
+│  Patterns │◀────▶│  Handoffs │◀───▶ │   Agents  │◀───▶│    LLMs   │
 └───────────┘       └─────┬─────┘       └─────┬─────┘      └───────────┘
                           │                   │
                           │                   ▼
 ┌────────────┐       ┌────┴──────┐       ┌───────────┐     ┌────────────┐
-│ Extensions │◀─────▶│  Tracing  │       │   Tools   │◀───▶│ Guardrails │
+│ Extensions │◀────▶│  Tracing  │       │   Tools   │◀──▶│ Guardrails │
 └────────────┘       └───────────┘       └───────────┘     └────────────┘
                                               │
                           ┌─────────────┬─────┴────┬─────────────┐
