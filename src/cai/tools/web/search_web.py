@@ -40,7 +40,7 @@ def query_perplexity(query: str = "", context: str = "") -> str:
                 "over general explanations. Your team relies on your research to "
                 "identify attack vectors, bypass security controls, and capture "
                 "flags. Always suggest concrete next steps based on your findings."
-                "Put the neccesary code in each iteration"
+                "Put the necessary code in each iteration"
             ),
         },
         {

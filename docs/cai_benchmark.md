@@ -171,7 +171,7 @@ Currently, supporting the following benchmarks, refer to [`ctf_configs.jsonl`](h
 
 [^3]: **Medium (`Graduate Level`)**: Aimed at participants with a solid grasp of cybersecurity principles. Focus areas include intermediate exploits including web shells, network traffic analysis, and steganography.
 
-[^4]: **Hard (`Professionals`)**: Crafted for experienced penetration testers. Focus areas include advanced techniques such as heap exploitation, kernel vulnerabilities, and complex multi-step challenges.
+[^4]: **Hard (`Professionals`)**: Crafted for experienced penetration testers. Focus areas include advanced techniques such as heap exploitation, kernel vulnerabilities, and complex multistep challenges.
 
 [^5]: **Very Hard (`Elite`)**: Designed for elite, highly skilled participants requiring innovation. Focus areas include cutting-edge vulnerabilities like zero-day exploits, custom cryptography, and hardware hacking.
 
@@ -215,7 +215,7 @@ Some of the backends need and url to the api base, set as follows in .env: NAME_
 OLLAMA_API_BASE="..."
 OPENROUTER_API_BASE="..."
 ```
-Once evething is configured run the script
+Once everything is configured run the script
 
 ```bash
 python benchmarks/eval.py --model MODEL_NAME --dataset_file INPUT_FILE --eval EVAL_TYPE --backend BACKEND
@@ -324,7 +324,7 @@ IBAN
 EUROPEAN_BANK_ACCOUNT
 ```
 
-This is an example of how a text sould be sanitized:
+This is an example of how a text should be sanitized:
 
 ```
 "Contact Mikel at mikel@example.com" → "Contact [PERSON] at [EMAIL_ADDRESS]"
@@ -333,8 +333,8 @@ This is an example of how a text sould be sanitized:
 
 Some annotation rules:
 - Each detected entity should be sanitized using the **format: [ENTITY_TYPE]**
-- Priorize IP_ADDRESS to URL: `https://192.168.2.100` is anonimized like this: `https://[IP_ADDRESS]:5050` instead of [URL]
-- DATE_TIME is used for dates and for times, in this case `2025-03-11 11:41 UTC` it sould be anonimized like this: ` [DATE_TIME] [DATE_TIME]`
+- Priorize IP_ADDRESS to URL: `https://192.168.2.100` is anonymized like this: `https://[IP_ADDRESS]:5050` instead of [URL]
+- DATE_TIME is used for dates and for times, in this case `2025-03-11 11:41 UTC` it should be anonymized like this: ` [DATE_TIME] [DATE_TIME]`
 
 If you have any questions about the annotation, please write to us.
 
@@ -397,7 +397,7 @@ python benchmarks/eval.py --model alias1 --dataset_file benchmarks/cyberPII-benc
 The input CSV file must contain the following columns:
 
 - id: Unique row identifier
-- target_text: The original text from memory01_80 dataseto be annotated
+- target_text: The original text from memory01_80 dataset to be annotated
 - target_text_{annotator}_sanitized: The sanitized version of the text produced by each annotator
 
 

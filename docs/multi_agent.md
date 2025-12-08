@@ -26,7 +26,7 @@ While orchestrating via LLM is powerful, orchestrating via code makes tasks more
 
 - Using [Guardrails](guardrails.md) and LLM_as_judge: They are agents that evaluates and provides feedback, until they says the inputs/outputs passes certain criteria. The agent ensures inputs/outputs are appropriate.
 
-- Paralelization of task: Running multiple agents in parallel. This is useful for speed when you have multiple tasks.
+- Parallelization of task: Running multiple agents in parallel. This is useful for speed when you have multiple tasks.
 
 ## Running Agents in Parallel
 
