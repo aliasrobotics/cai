@@ -1,0 +1,5096 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../user_interface/">
+      
+      
+        <link rel="next" href="../teams_and_parallel_execution/">
+      
+      
+      <link rel="icon" href="../../assets/imago.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+    
+    
+      
+        <title>Terminals Management - CAI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#cai-tui-terminals-management" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="CAI" class="md-header__button md-logo" aria-label="CAI" data-md-component="logo">
+      
+  <img src="../../assets/imago.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CAI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Terminals Management
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aliasrobotics/cai" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliasrobotics/cai
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="CAI" class="md-nav__button md-logo" aria-label="CAI" data-md-component="logo">
+      
+  <img src="../../assets/imago.png" alt="logo">
+
+    </a>
+    CAI
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aliasrobotics/cai" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliasrobotics/cai
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Welcome
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quickstart
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Professional Edition
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Professional Edition
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_pro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    🤔 Why CAI PRO?
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_pro_alias1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    ⭐ Alias1 Model
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_pro_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    🔥 Exclusive Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    ⭐ API Server (CAI PRO)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_pro_pricing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    💰 Pricing & Plans
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_pro_quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    🚀 Get Started with PRO
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_pro_contact/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    📞 Contact Sales
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    User Interfaces
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            User Interfaces
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Mobile UI (iOS)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            Mobile UI (iOS)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mui/mui_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mui/getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mui/user_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    User Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mui/gestures_shortcuts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Gestures & Shortcuts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mui/chat_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Chat Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Terminal UI (TUI)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Terminal UI (TUI)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    User Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Terminals Management
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Terminals Management
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      Table of Contents
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#terminal-basics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal Basics
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Terminal Basics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-a-terminal" class="md-nav__link">
+    <span class="md-ellipsis">
+      What is a Terminal?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terminal-anatomy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal Anatomy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#default-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      Default Behavior
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-terminal-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multi-Terminal Workflows
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Multi-Terminal Workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-use-multiple-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why Use Multiple Terminals?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-multi-terminal-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Multi-Terminal Patterns
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Multi-Terminal Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pattern-1-offensive-defensive-2-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 1: Offensive + Defensive (2 Terminals)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-2-discover-validate-report-3-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 2: Discover + Validate + Report (3 Terminals)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-3-full-security-team-4-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 3: Full Security Team (4 Terminals)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#terminal-layouts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal Layouts
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Terminal Layouts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#single-terminal-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      Single Terminal Layout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#split-two-terminal-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      Split (Two Terminal) Layout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#triple-terminal-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      Triple Terminal Layout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quad-four-terminal-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quad (Four Terminal) Layout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scrollable-layout-5-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scrollable Layout (5+ Terminals)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#terminal-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal Operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Terminal Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#creating-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating Terminals
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Creating Terminals">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#method-1-manual-addition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Method 1: Manual Addition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#method-2-team-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Method 2: Team Selection
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removing-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removing Terminals
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Removing Terminals">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#close-focused-terminal" class="md-nav__link">
+    <span class="md-ellipsis">
+      Close Focused Terminal
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#focusing-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Focusing Terminals
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Focusing Terminals">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#keyboard-navigation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Keyboard Navigation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mouse-click" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mouse Click
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#visual-focus-indicators" class="md-nav__link">
+    <span class="md-ellipsis">
+      Visual Focus Indicators
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#team-based-configurations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Team-Based Configurations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Team-Based Configurations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#accessing-teams" class="md-nav__link">
+    <span class="md-ellipsis">
+      Accessing Teams
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#team-composition-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      Team Composition Reference
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#team-application-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      Team Application Behavior
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#customizing-teams" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customizing Teams
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parallel-execution-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parallel Execution Patterns
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parallel Execution Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pattern-1-broadcast-to-all-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 1: Broadcast to All Terminals
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-2-sequential-terminal-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 2: Sequential Terminal Execution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-3-parallel-independent-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 3: Parallel Independent Tasks
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-4-focused-execution-with-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 4: Focused Execution with Monitoring
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#terminal-state-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal State Management
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Terminal State Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terminal-states" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal States
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Terminal States">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-active-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Active State
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-focused-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Focused State
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-busy-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Busy State
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-error-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Error State
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#state-transitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      State Transitions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#managing-terminal-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      Managing Terminal State
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Managing Terminal State">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#canceling-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Canceling Execution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clearing-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Clearing Errors
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resetting-terminal" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resetting Terminal
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-techniques" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced Techniques
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Techniques">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terminal-specific-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal-Specific Commands
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dynamic-terminal-allocation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dynamic Terminal Allocation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terminal-output-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal Output Management
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Terminal Output Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#copy-terminal-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      Copy Terminal Output
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terminal-output-filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal Output Filtering
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clear-old-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      Clear Old Output
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-start-small-scale-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Start Small, Scale Up
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-use-preconfigured-teams" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Use Preconfigured Teams
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-name-your-sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Name Your Sessions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-monitor-costs-per-terminal" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Monitor Costs Per Terminal
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-clear-between-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Clear Between Tasks
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-document-terminal-roles" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Document Terminal Roles
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-use-broadcast-wisely" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Use Broadcast Wisely
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-leverage-terminal-independence" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Leverage Terminal Independence
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terminal-not-responding" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal Not Responding
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terminals-not-syncing-with-team-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminals Not Syncing with Team Selection
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#layout-not-adjusting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Layout Not Adjusting
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cost-tracking-incorrect" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cost Tracking Incorrect
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../teams_and_parallel_execution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Teams & Parallel Execution
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sidebar_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Sidebar Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../keyboard_shortcuts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Keyboard Shortcuts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands_reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Commands Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Advanced Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Command Line Interface (CLI)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            Command Line Interface (CLI)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cli_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/commands_reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Commands Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/advanced_usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Advanced Usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Core Concepts
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Core Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agents
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tools
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../handoffs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handoffs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../multi_agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Multi-Agent Systems
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Models & Providers
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Models & Providers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_list_of_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Available Models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Model Providers
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            Model Providers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../providers/openrouter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenRouter
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../providers/ollama/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Ollama
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../providers/azure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Azure OpenAI
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running_agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Running Agents
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../continue_mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Continue Mode
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working with Results
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Streaming
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tracing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tracing & Debugging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Context Management
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guardrails/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Guardrails & Security
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../council/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LLM Council
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../environment_variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Environment Variables
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Benchmarking
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Benchmarking
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarking/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarking/running_benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Running Benchmarks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarking/attack_defense/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Attack & Defense CTFs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarking/jeopardy_ctfs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jeopardy CTFs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarking/cyber_ranges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Cyber Ranges
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarking/knowledge_benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Knowledge Benchmarks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarking/privacy_benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Privacy Benchmarks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Research
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            Research
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    API Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1" id="__nav_9_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Agents
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1">
+            <span class="md-nav__icon md-icon"></span>
+            Agents
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agent
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Runner
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/tool/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tool
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/result/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Result
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/stream_events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Stream Events
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/handoffs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handoffs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Lifecycle
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/items/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Items
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/run_context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Run Context
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Exceptions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/guardrail/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Guardrail
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/model_settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Model Settings
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/agent_output/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agent Output
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/function_schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Function Schema
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_2" id="__nav_9_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Models
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_2">
+            <span class="md-nav__icon md-icon"></span>
+            Models
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/models/interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/models/openai_chatcompletions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenAI Chat Completions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/models/openai_responses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenAI Responses
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_3" id="__nav_9_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Extensions
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_3">
+            <span class="md-nav__icon md-icon"></span>
+            Extensions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/extensions/handoff_filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handoff Filters
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref/extensions/handoff_prompt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handoff Prompt
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Advanced
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Development
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Resources
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            Resources
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_find_us/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Find Us
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_citation_and_acknowledgments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Citation & Acknowledgments
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      Table of Contents
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#terminal-basics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal Basics
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Terminal Basics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-a-terminal" class="md-nav__link">
+    <span class="md-ellipsis">
+      What is a Terminal?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terminal-anatomy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal Anatomy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#default-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      Default Behavior
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-terminal-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multi-Terminal Workflows
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Multi-Terminal Workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-use-multiple-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why Use Multiple Terminals?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-multi-terminal-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Multi-Terminal Patterns
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Multi-Terminal Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pattern-1-offensive-defensive-2-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 1: Offensive + Defensive (2 Terminals)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-2-discover-validate-report-3-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 2: Discover + Validate + Report (3 Terminals)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-3-full-security-team-4-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 3: Full Security Team (4 Terminals)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#terminal-layouts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal Layouts
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Terminal Layouts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#single-terminal-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      Single Terminal Layout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#split-two-terminal-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      Split (Two Terminal) Layout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#triple-terminal-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      Triple Terminal Layout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quad-four-terminal-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quad (Four Terminal) Layout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scrollable-layout-5-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scrollable Layout (5+ Terminals)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#terminal-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal Operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Terminal Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#creating-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating Terminals
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Creating Terminals">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#method-1-manual-addition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Method 1: Manual Addition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#method-2-team-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Method 2: Team Selection
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removing-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removing Terminals
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Removing Terminals">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#close-focused-terminal" class="md-nav__link">
+    <span class="md-ellipsis">
+      Close Focused Terminal
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#focusing-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Focusing Terminals
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Focusing Terminals">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#keyboard-navigation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Keyboard Navigation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mouse-click" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mouse Click
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#visual-focus-indicators" class="md-nav__link">
+    <span class="md-ellipsis">
+      Visual Focus Indicators
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#team-based-configurations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Team-Based Configurations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Team-Based Configurations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#accessing-teams" class="md-nav__link">
+    <span class="md-ellipsis">
+      Accessing Teams
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#team-composition-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      Team Composition Reference
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#team-application-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      Team Application Behavior
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#customizing-teams" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customizing Teams
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parallel-execution-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parallel Execution Patterns
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parallel Execution Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pattern-1-broadcast-to-all-terminals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 1: Broadcast to All Terminals
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-2-sequential-terminal-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 2: Sequential Terminal Execution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-3-parallel-independent-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 3: Parallel Independent Tasks
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-4-focused-execution-with-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 4: Focused Execution with Monitoring
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#terminal-state-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal State Management
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Terminal State Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terminal-states" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal States
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Terminal States">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-active-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Active State
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-focused-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Focused State
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-busy-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Busy State
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-error-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Error State
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#state-transitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      State Transitions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#managing-terminal-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      Managing Terminal State
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Managing Terminal State">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#canceling-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Canceling Execution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clearing-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Clearing Errors
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resetting-terminal" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resetting Terminal
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-techniques" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced Techniques
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Techniques">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terminal-specific-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal-Specific Commands
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dynamic-terminal-allocation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dynamic Terminal Allocation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terminal-output-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal Output Management
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Terminal Output Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#copy-terminal-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      Copy Terminal Output
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terminal-output-filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal Output Filtering
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clear-old-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      Clear Old Output
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-start-small-scale-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Start Small, Scale Up
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-use-preconfigured-teams" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Use Preconfigured Teams
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-name-your-sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Name Your Sessions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-monitor-costs-per-terminal" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Monitor Costs Per Terminal
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-clear-between-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Clear Between Tasks
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-document-terminal-roles" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Document Terminal Roles
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-use-broadcast-wisely" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Use Broadcast Wisely
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-leverage-terminal-independence" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Leverage Terminal Independence
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terminal-not-responding" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal Not Responding
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terminals-not-syncing-with-team-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminals Not Syncing with Team Selection
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#layout-not-adjusting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Layout Not Adjusting
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cost-tracking-incorrect" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cost Tracking Incorrect
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="cai-tui-terminals-management">CAI TUI Terminals Management</h1>
+<blockquote>
+<p><strong>⚡ CAI-Pro Exclusive Feature</strong><br />
+The Terminal User Interface (TUI) is available exclusively in <strong>CAI-Pro</strong>. To access this feature and unlock advanced multi-agent workflows, visit <a href="https://aliasrobotics.com/cybersecurityai.php">Alias Robotics</a> for more information.</p>
+</blockquote>
+<hr />
+<p>This guide covers advanced terminal management in the CAI TUI, including multi-terminal workflows, layouts, team configurations, and parallel execution strategies.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#terminal-basics">Terminal Basics</a></li>
+<li><a href="#multi-terminal-workflows">Multi-Terminal Workflows</a></li>
+<li><a href="#terminal-layouts">Terminal Layouts</a></li>
+<li><a href="#terminal-operations">Terminal Operations</a></li>
+<li><a href="#team-based-configurations">Team-Based Configurations</a></li>
+<li><a href="#parallel-execution-patterns">Parallel Execution Patterns</a></li>
+<li><a href="#terminal-state-management">Terminal State Management</a></li>
+<li><a href="#advanced-techniques">Advanced Techniques</a></li>
+</ol>
+<hr />
+<h2 id="terminal-basics">Terminal Basics</h2>
+<h3 id="what-is-a-terminal">What is a Terminal?</h3>
+<p>In CAI TUI, a <strong>terminal</strong> is an independent execution environment where:
+- A single agent processes user prompts
+- Conversation history is maintained separately
+- Model selection can be configured independently
+- Cost tracking is isolated</p>
+<h3 id="terminal-anatomy">Terminal Anatomy</h3>
+<p>Each terminal consists of:</p>
+<p><img alt="Terminal Anatomy" src="../../media/CAI-1terminal.png" /></p>
+<p><strong>Header Components</strong>:
+- <strong>Terminal Number</strong> (T1, T2, T3, T4)
+- <strong>Agent Name</strong> with dropdown selector
+- <strong>Model Name</strong> with dropdown selector
+- <strong>Container Icon</strong> (if running in container mode)</p>
+<p><strong>Output Area</strong>:
+- Streaming agent responses
+- Tool call displays
+- Execution results
+- Error messages</p>
+<p><strong>Status Bar</strong> (global, not per-terminal):
+- Current agent
+- Active model
+- Session cost
+- Token count</p>
+<h3 id="default-behavior">Default Behavior</h3>
+<ul>
+<li><strong>Terminal 1 (T1)</strong> is always the main terminal and cannot be closed</li>
+<li>New terminals start with <code>redteam_agent</code> and the default model (<code>Alias1</code>)</li>
+<li>Each terminal maintains independent conversation history</li>
+<li>Terminals can run different agents and models simultaneously</li>
+</ul>
+<hr />
+<h2 id="multi-terminal-workflows">Multi-Terminal Workflows</h2>
+<h3 id="why-use-multiple-terminals">Why Use Multiple Terminals?</h3>
+<p>Multiple terminals enable:</p>
+<ol>
+<li><strong>Parallel Agent Execution</strong>: Run different agents simultaneously on the same task</li>
+<li><strong>Perspective Comparison</strong>: Compare red team vs. blue team approaches</li>
+<li><strong>Specialization</strong>: Assign specific roles to different agents</li>
+<li><strong>Efficiency</strong>: Execute independent tasks in parallel</li>
+<li><strong>Collaboration Simulation</strong>: Model team-based security workflows</li>
+</ol>
+<h3 id="common-multi-terminal-patterns">Common Multi-Terminal Patterns</h3>
+<h4 id="pattern-1-offensive-defensive-2-terminals">Pattern 1: Offensive + Defensive (2 Terminals)</h4>
+<p><strong>Use Case</strong>: Adversarial testing with real-time defense validation</p>
+<p><strong>Setup</strong>:
+- <strong>T1</strong>: <code>redteam_agent</code> - Performs offensive testing
+- <strong>T2</strong>: <code>blueteam_agent</code> - Analyzes defensive posture</p>
+<p><strong>Workflow</strong>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1">T1 &gt; Identify attack vectors on target web application
+</span><span id="__span-0-2">T2 &gt; Evaluate defensive controls for the same application
+</span></code></pre></div>
+<p><strong>Benefits</strong>:
+- Immediate validation of findings
+- Balanced security assessment
+- Real-time trade-off analysis</p>
+<h4 id="pattern-2-discover-validate-report-3-terminals">Pattern 2: Discover + Validate + Report (3 Terminals)</h4>
+<p><strong>Use Case</strong>: Complete vulnerability lifecycle from discovery to documentation</p>
+<p><strong>Setup</strong>:
+- <strong>T1</strong>: <code>bug_bounter_agent</code> - Discover vulnerabilities
+- <strong>T2</strong>: <code>retester_agent</code> - Validate findings
+- <strong>T3</strong>: <code>reporting_agent</code> - Document results</p>
+<p><strong>Workflow</strong>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1">T1 &gt; Hunt for authentication bypasses in target.com
+</span><span id="__span-1-2">T2 &gt; &lt;Wait for T1 findings&gt;
+</span><span id="__span-1-3">T2 &gt; Retest the authentication bypass found in T1
+</span><span id="__span-1-4">T3 &gt; &lt;After validation&gt;
+</span><span id="__span-1-5">T3 &gt; Generate report for confirmed authentication bypass
+</span></code></pre></div>
+<p><strong>Benefits</strong>:
+- Clear separation of concerns
+- Quality assurance built-in
+- Professional documentation</p>
+<h4 id="pattern-3-full-security-team-4-terminals">Pattern 3: Full Security Team (4 Terminals)</h4>
+<p><strong>Use Case</strong>: Comprehensive security assessment with maximum parallelization</p>
+<p><strong>Setup</strong> (Use Team #1 from sidebar):
+- <strong>T1</strong>: <code>redteam_agent</code> - Web application attacks
+- <strong>T2</strong>: <code>redteam_agent</code> - Network-level exploitation
+- <strong>T3</strong>: <code>bug_bounter_agent</code> - OWASP Top 10 focus
+- <strong>T4</strong>: <code>bug_bounter_agent</code> - API security testing</p>
+<p><strong>Workflow</strong>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1">&lt;Select Team #1 in sidebar&gt;
+</span><span id="__span-2-2">Prompt &gt; Perform comprehensive security assessment of target.com all
+</span></code></pre></div>
+<p><strong>Benefits</strong>:
+- Maximum parallel execution
+- Different attack surfaces covered
+- Diverse perspectives
+- Faster overall completion</p>
+<hr />
+<h2 id="terminal-layouts">Terminal Layouts</h2>
+<p>CAI TUI automatically adjusts terminal layouts based on the number of active terminals.</p>
+<h3 id="single-terminal-layout">Single Terminal Layout</h3>
+<p><strong>Display</strong>: Full-width terminal</p>
+<p><img alt="Single Terminal Layout" src="../../media/CAI-1terminal.png" /></p>
+<p><strong>When to Use</strong>:
+- Single-agent workflows
+- Learning and experimentation
+- Detailed analysis requiring maximum screen space
+- Report generation</p>
+<p><strong>Keyboard Shortcuts</strong>:
+- <code>Ctrl+T</code> to toggle fullscreen mode</p>
+<h3 id="split-two-terminal-layout">Split (Two Terminal) Layout</h3>
+<p><strong>Display</strong>: Side-by-side terminals</p>
+<p><img alt="Split Terminal Layout" src="../../media/CAI-2terminals.png" /></p>
+<p><strong>When to Use</strong>:
+- Comparing two approaches
+- Red team vs. Blue team analysis
+- Model comparison (same agent, different models)
+- Master-worker patterns</p>
+<p><strong>Activation</strong>: Automatically triggered when 2 terminals are active</p>
+<h3 id="triple-terminal-layout">Triple Terminal Layout</h3>
+<p><strong>Display</strong>: Three-column vertical split</p>
+<p><img alt="Triple Terminal Layout" src="../../media/CAI-3terminals.png" /></p>
+<p><strong>When to Use</strong>:
+- Three parallel perspectives on the same task
+- Comparing three different agents or models
+- Balanced multi-agent workflows
+- Mid-complexity security assessments</p>
+<p><strong>Activation</strong>: Automatically triggered when 3 terminals are active</p>
+<h3 id="quad-four-terminal-layout">Quad (Four Terminal) Layout</h3>
+<p><strong>Display</strong>: 2×2 grid</p>
+<p><img alt="Quad Terminal Layout" src="../../media/cai-tui-main.png" /></p>
+<p><strong>When to Use</strong>:
+- Full team operations
+- Maximum parallelization
+- Preconfigured team execution (Teams #1-#11)
+- Multi-dimensional analysis</p>
+<p><strong>Activation</strong>: Default for preconfigured teams</p>
+<h3 id="scrollable-layout-5-terminals">Scrollable Layout (5+ Terminals)</h3>
+<p><strong>Display</strong>: Scrollable 2-column grid</p>
+<p><img alt="Scrollable Terminal Layout" src="../../media/CAI-5%2Bterminals.png" /></p>
+<p><strong>When to Use</strong>:
+- Large-scale testing campaigns
+- Custom advanced workflows
+- Experimental configurations</p>
+<p><strong>Notes</strong>:
+- Scrollbar appears on the right
+- Keyboard navigation still works</p>
+<hr />
+<h2 id="terminal-operations">Terminal Operations</h2>
+<h3 id="creating-terminals">Creating Terminals</h3>
+<h4 id="method-1-manual-addition">Method 1: Manual Addition</h4>
+<p><strong>Keyboard Shortcut</strong>: Click <code>[Add+]</code> button in top bar</p>
+<p><strong>Example Workflow</strong>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1">1. Start CAI TUI (1 terminal by default)
+</span><span id="__span-3-2">2. Click [+]
+</span><span id="__span-3-3">3. New terminal appears (T2)
+</span><span id="__span-3-4">4. Select agent from dropdown
+</span><span id="__span-3-5">5. Start working
+</span></code></pre></div>
+<h4 id="method-2-team-selection">Method 2: Team Selection</h4>
+<p><strong>Steps</strong>:
+1. Open sidebar (<code>Ctrl+S</code>)
+2. Navigate to Teams tab
+3. Click desired team button (e.g., "#1: 2 red + 2 bug")
+4. All 4 terminals are configured automatically</p>
+<p><strong>Benefits of Team Selection</strong>:
+- Instant configuration of all terminals
+- Predefined agent assignments
+- Optimized for common workflows
+- One-click setup</p>
+<h3 id="removing-terminals">Removing Terminals</h3>
+<h4 id="close-focused-terminal">Close Focused Terminal</h4>
+<p><strong>Keyboard Shortcut</strong>: <code>Ctrl+E</code></p>
+<p><strong>Behavior</strong>:
+- Closes currently focused terminal
+- Terminal 1 (T1) cannot be closed
+- Terminal numbers do not shift
+- History is lost (save session first if needed)</p>
+<h3 id="focusing-terminals">Focusing Terminals</h3>
+<h4 id="keyboard-navigation">Keyboard Navigation</h4>
+<p><strong>Shortcuts</strong>:
+- <code>Ctrl+N</code> - Focus next terminal (T1 → T2 → T3 → T4 → T1)
+- <code>Ctrl+B</code> - Focus previous terminal (T1 → T4 → T3 → T2 → T1)</p>
+<h4 id="mouse-click">Mouse Click</h4>
+<p>Click anywhere in the terminal output area to focus it.</p>
+<h3 id="visual-focus-indicators">Visual Focus Indicators</h3>
+<p><strong>Focused Terminal</strong>:
+- Highlighted terminal header
+- Brighter output area
+- Active input cursor</p>
+<p><strong>Inactive Terminals</strong>:
+- Dimmed header
+- Normal output area
+- Background execution continues</p>
+<hr />
+<h2 id="team-based-configurations">Team-Based Configurations</h2>
+<p>CAI TUI includes 11 preconfigured teams optimized for common security workflows.</p>
+<h3 id="accessing-teams">Accessing Teams</h3>
+<ol>
+<li>Open sidebar (<code>Ctrl+S</code>)</li>
+<li>Click Teams tab</li>
+<li>Browse available teams</li>
+<li>Click team button to apply</li>
+</ol>
+<h3 id="team-composition-reference">Team Composition Reference</h3>
+<table>
+<thead>
+<tr>
+<th>Team</th>
+<th>Composition</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>#1</strong></td>
+<td>2 redteam + 2 bug_bounter</td>
+<td>Comprehensive vulnerability discovery</td>
+</tr>
+<tr>
+<td><strong>#2</strong></td>
+<td>1 redteam + 3 bug_bounter</td>
+<td>Bug bounty with red team leadership</td>
+</tr>
+<tr>
+<td><strong>#3</strong></td>
+<td>2 redteam + 2 blueteam</td>
+<td>Adversarial offense + defense testing</td>
+</tr>
+<tr>
+<td><strong>#4</strong></td>
+<td>2 blueteam + 2 bug_bounter</td>
+<td>Defense-focused with validation</td>
+</tr>
+<tr>
+<td><strong>#5</strong></td>
+<td>red + blue + retester + bug</td>
+<td>Full security lifecycle coverage</td>
+</tr>
+<tr>
+<td><strong>#6</strong></td>
+<td>2 redteam + 2 retester</td>
+<td>Aggressive testing with validation</td>
+</tr>
+<tr>
+<td><strong>#7</strong></td>
+<td>2 blueteam + 2 retester</td>
+<td>Defensive validation and retesting</td>
+</tr>
+<tr>
+<td><strong>#8</strong></td>
+<td>4 redteam</td>
+<td>Maximum offensive power</td>
+</tr>
+<tr>
+<td><strong>#9</strong></td>
+<td>4 blueteam</td>
+<td>Comprehensive defensive analysis</td>
+</tr>
+<tr>
+<td><strong>#10</strong></td>
+<td>4 bug_bounter</td>
+<td>Intense bug bounty hunting</td>
+</tr>
+<tr>
+<td><strong>#11</strong></td>
+<td>4 retester</td>
+<td>Large-scale retesting campaigns</td>
+</tr>
+</tbody>
+</table>
+<h3 id="team-application-behavior">Team Application Behavior</h3>
+<p>When you select a team:</p>
+<ol>
+<li><strong>All terminals are reconfigured</strong> with designated agents</li>
+<li><strong>Agent dropdowns update</strong> to reflect new assignments</li>
+<li><strong>Previous conversations are preserved</strong> in output areas</li>
+<li><strong>Each terminal is ready</strong> to receive prompts immediately</li>
+<li><strong>No cost impact</strong> - configuration is free</li>
+</ol>
+<h3 id="customizing-teams">Customizing Teams</h3>
+<p>To create custom team configurations:</p>
+<ol>
+<li>Manually configure each terminal with desired agents</li>
+<li>Save the session: <code>/save my_custom_team.json</code></li>
+<li>Load it later: <code>/load my_custom_team.json</code></li>
+</ol>
+<hr />
+<h2 id="parallel-execution-patterns">Parallel Execution Patterns</h2>
+<h3 id="pattern-1-broadcast-to-all-terminals">Pattern 1: Broadcast to All Terminals</h3>
+<p><strong>Use Case</strong>: Execute the same task with different agent perspectives</p>
+<p><strong>Steps</strong>:
+1. Select a team (e.g., Team #3: 2 Red + 2 Blue)
+2. Type prompt in input area
+3. Add "all" flag at the end of the prompt
+4. Watch all terminals execute simultaneously</p>
+<p><strong>Example</strong>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1">Prompt: Assess the security of https://target.com/api
+</span><span id="__span-4-2">Broadcast to: T1 (redteam), T2 (redteam), T3 (blueteam), T4 (blueteam)
+</span><span id="__span-4-3">Result: Four different perspectives on API security
+</span></code></pre></div>
+<h3 id="pattern-2-sequential-terminal-execution">Pattern 2: Sequential Terminal Execution</h3>
+<p><strong>Use Case</strong>: Pass results from one terminal to another</p>
+<p><strong>Steps</strong>:
+1. Execute in T1
+2. Wait for completion
+3. Reference T1 results in T2 prompt
+4. Continue chain</p>
+<p><strong>Example</strong>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1">T1 (bug_bounter) &gt; Find all input fields on target.com
+</span><span id="__span-5-2">&lt;Wait for results&gt;
+</span><span id="__span-5-3">T2 (redteam) &gt; Test the 5 input fields found by T1 for XSS vulnerabilities
+</span><span id="__span-5-4">&lt;Wait for results&gt;
+</span><span id="__span-5-5">T3 (retester) &gt; Validate the XSS findings from T2
+</span><span id="__span-5-6">&lt;Wait for results&gt;
+</span><span id="__span-5-7">T4 (reporting) &gt; Create report from T1, T2, and T3 findings
+</span></code></pre></div>
+<h3 id="pattern-3-parallel-independent-tasks">Pattern 3: Parallel Independent Tasks</h3>
+<p><strong>Use Case</strong>: Execute completely different tasks simultaneously</p>
+<p><strong>Setup</strong>:
+- <strong>T1</strong>: Scan network (nmap)
+- <strong>T2</strong>: Enumerate web dirs (ffuf)
+- <strong>T3</strong>: Check DNS records
+- <strong>T4</strong>: Analyze SSL/TLS config</p>
+<p><strong>Execution</strong>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1">T1 &gt; nmap -sV -A target.com
+</span><span id="__span-6-2">T2 &gt; ffuf -w wordlist.txt -u https://target.com/FUZZ
+</span><span id="__span-6-3">T3 &gt; Enumerate all DNS records for target.com
+</span><span id="__span-6-4">T4 &gt; Analyze SSL/TLS configuration of target.com
+</span></code></pre></div>
+<p><strong>Benefits</strong>:
+- Maximizes parallelization
+- Reduces total execution time
+- Efficient resource utilization</p>
+<h3 id="pattern-4-focused-execution-with-monitoring">Pattern 4: Focused Execution with Monitoring</h3>
+<p><strong>Use Case</strong>: One agent works while others monitor specific aspects</p>
+<p><strong>Setup</strong>:
+- <strong>T1</strong>: <code>redteam_agent</code> (main executor)
+- <strong>T2</strong>: <code>blueteam_agent</code> (monitors defensive gaps)
+- <strong>T3</strong>: <code>dfir_agent</code> (monitors artifacts/logs)
+- <strong>T4</strong>: <code>reporting_agent</code> (live documentation)</p>
+<p><strong>Workflow</strong>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1">T1 &gt; Perform full penetration test on target.com
+</span><span id="__span-7-2">&lt;While T1 works:&gt;
+</span><span id="__span-7-3">T2 &gt; Monitor defensive weaknesses as T1 progresses
+</span><span id="__span-7-4">T3 &gt; Track and analyze artifacts generated by T1
+</span><span id="__span-7-5">T4 &gt; Document findings in real-time from T1, T2, T3
+</span></code></pre></div>
+<hr />
+<h2 id="terminal-state-management">Terminal State Management</h2>
+<h3 id="terminal-states">Terminal States</h3>
+<p>Each terminal can be in one of four states:</p>
+<h4 id="1-active-state">1. Active State</h4>
+<ul>
+<li><strong>Visual</strong>: Normal border, bright colors</li>
+<li><strong>Behavior</strong>: Ready to receive input</li>
+<li><strong>Actions</strong>: Can send prompts, change agent/model</li>
+</ul>
+<h4 id="2-focused-state">2. Focused State</h4>
+<ul>
+<li><strong>Visual</strong>: Highlighted border (accent color)</li>
+<li><strong>Behavior</strong>: Receives keyboard input</li>
+<li><strong>Actions</strong>: All actions available, input directed here</li>
+</ul>
+<h4 id="3-busy-state">3. Busy State</h4>
+<ul>
+<li><strong>Visual</strong>: Spinner/progress indicator</li>
+<li><strong>Behavior</strong>: Agent is executing</li>
+<li><strong>Actions</strong>: Can cancel (<code>Ctrl+C</code>), cannot send new prompts</li>
+</ul>
+<h4 id="4-error-state">4. Error State</h4>
+<ul>
+<li><strong>Visual</strong>: Red border or error indicator</li>
+<li><strong>Behavior</strong>: Execution failed</li>
+<li><strong>Actions</strong>: Can retry, clear error, or continue</li>
+</ul>
+<h3 id="state-transitions">State Transitions</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1">Active ──[Send Prompt]──&gt; Busy ──[Complete]──&gt; Active
+</span><span id="__span-8-2">   │
+</span><span id="__span-8-3">   └──[Error]──&gt; Error ──[Clear]──&gt; Active
+</span><span id="__span-8-4">
+</span><span id="__span-8-5">Active ──[Focus Terminal]──&gt; Focused ──[Focus Other]──&gt; Active
+</span></code></pre></div>
+<h3 id="managing-terminal-state">Managing Terminal State</h3>
+<h4 id="canceling-execution">Canceling Execution</h4>
+<p><strong>Method 1</strong>: <code>Ctrl+C</code> (focused terminal only)</p>
+<p><strong>Method 2</strong>: <code>Escape</code> twice (all terminals)</p>
+<p><strong>Method 3</strong>: <code>/kill</code> command</p>
+<h4 id="clearing-errors">Clearing Errors</h4>
+<p><strong>Command</strong>: <code>/clear</code> (clears visual errors, preserves history)</p>
+<p><strong>Alternative</strong>: Click error message dismiss button (if shown)</p>
+<h4 id="resetting-terminal">Resetting Terminal</h4>
+<p><strong>Steps</strong>:
+1. <code>/flush</code> - Clear conversation history
+2. <code>/clear</code> - Clear visual output
+3. Select new agent (if desired)
+4. Start fresh</p>
+<hr />
+<h2 id="advanced-techniques">Advanced Techniques</h2>
+<h3 id="terminal-specific-commands">Terminal-Specific Commands</h3>
+<p>Target commands to specific terminals without focusing them.</p>
+<p><strong>Syntax</strong>: <code>T&lt;num&gt;:&lt;command&gt;</code></p>
+<p><strong>Examples</strong>:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><span class="c1"># Change agent in T2 without leaving T1</span>
+</span><span id="__span-9-2">T2:/agent<span class="w"> </span>blueteam_agent
+</span><span id="__span-9-3">
+</span><span id="__span-9-4"><span class="c1"># Clear T3 output</span>
+</span><span id="__span-9-5">T3:/clear
+</span><span id="__span-9-6">
+</span><span id="__span-9-7"><span class="c1"># Check T4 cost</span>
+</span><span id="__span-9-8">T4:/cost
+</span><span id="__span-9-9">
+</span><span id="__span-9-10"><span class="c1"># Execute prompt in T2</span>
+</span><span id="__span-9-11">T2:Scan<span class="w"> </span>target.com<span class="w"> </span><span class="k">for</span><span class="w"> </span>open<span class="w"> </span>ports
+</span></code></pre></div></p>
+<p><strong>Benefits</strong>:
+- No context switching required
+- Efficient multi-terminal management
+- Script-friendly</p>
+<h3 id="dynamic-terminal-allocation">Dynamic Terminal Allocation</h3>
+<p>Adjust terminal count based on task complexity.</p>
+<p><strong>Simple Task</strong> (1-2 terminals):
+- Single perspective sufficient
+- Limited scope
+- Quick execution</p>
+<p><strong>Medium Task</strong> (2-3 terminals):
+- Multiple perspectives valuable
+- Moderate complexity
+- Benefit from specialization</p>
+<p><strong>Complex Task</strong> (4 terminals):
+- Full team required
+- High complexity
+- Maximum parallelization needed</p>
+<h3 id="terminal-output-management">Terminal Output Management</h3>
+<h4 id="copy-terminal-output">Copy Terminal Output</h4>
+<p><strong>Method 1</strong>: Mouse selection + <code>Ctrl+C</code></p>
+<p><strong>Method 2</strong>: Export session + extract terminal data</p>
+<p><strong>Method 3</strong>: <code>/save</code> and process saved file</p>
+<h4 id="terminal-output-filtering">Terminal Output Filtering</h4>
+<p><strong>Technique</strong>: Use agent's built-in filtering</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1">Prompt: Summarize key findings from previous responses
+</span></code></pre></div>
+<h4 id="clear-old-output">Clear Old Output</h4>
+<p><strong>Command</strong>: <code>/clear</code> (visual only)</p>
+<p><strong>Alternative</strong>: <code>/flush</code> (history too)</p>
+<hr />
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-start-small-scale-up">1. Start Small, Scale Up</h3>
+<p>Begin with 1-2 terminals. Add more only when parallelization provides clear benefit.</p>
+<h3 id="2-use-preconfigured-teams">2. Use Preconfigured Teams</h3>
+<p>Leverage the 11 built-in teams instead of manual configuration.</p>
+<h3 id="3-name-your-sessions">3. Name Your Sessions</h3>
+<p>Save sessions with descriptive names:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1">/save<span class="w"> </span><span class="m">2025</span>-10-27_webapp_pentest_team3.json
+</span></code></pre></div></p>
+<h3 id="4-monitor-costs-per-terminal">4. Monitor Costs Per Terminal</h3>
+<p>Check costs regularly:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1">/cost<span class="w">    </span><span class="c1"># Current terminal</span>
+</span><span id="__span-12-2">/cost<span class="w"> </span>all<span class="w">  </span><span class="c1"># All terminals</span>
+</span></code></pre></div></p>
+<h3 id="5-clear-between-tasks">5. Clear Between Tasks</h3>
+<p>Reset terminals between unrelated tasks:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1">/flush<span class="w"> </span>all
+</span><span id="__span-13-2">/clear
+</span></code></pre></div></p>
+<h3 id="6-document-terminal-roles">6. Document Terminal Roles</h3>
+<p>Add a comment in the first prompt of each terminal:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1">T1 &gt; [RECON] Enumerate target.com infrastructure
+</span><span id="__span-14-2">T2 &gt; [EXPLOIT] Test for authentication bypass
+</span><span id="__span-14-3">T3 &gt; [VALIDATE] Confirm findings from T2
+</span><span id="__span-14-4">T4 &gt; [REPORT] Document all findings
+</span></code></pre></div>
+<h3 id="7-use-broadcast-wisely">7. Use Broadcast Wisely</h3>
+<p>Broadcast is powerful but expensive. Use it when you truly need multiple perspectives on the same task.</p>
+<h3 id="8-leverage-terminal-independence">8. Leverage Terminal Independence</h3>
+<p>Each terminal is independent - use this for:
+- Different phases of testing
+- Completely separate tasks
+- Long-running operations in background terminals</p>
+<hr />
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="terminal-not-responding">Terminal Not Responding</h3>
+<p><strong>Symptoms</strong>: Terminal stuck in busy state, no output</p>
+<p><strong>Solutions</strong>:
+1. Wait (some operations take time)
+2. Cancel with <code>Ctrl+C</code>
+3. Check <code>/mcp status</code> if using MCP tools
+4. Restart terminal: <code>/flush</code>, <code>/clear</code>, then retry</p>
+<h3 id="terminals-not-syncing-with-team-selection">Terminals Not Syncing with Team Selection</h3>
+<p><strong>Symptoms</strong>: Agent dropdowns don't update after selecting team</p>
+<p><strong>Solutions</strong>:
+1. Check that sidebar is visible (<code>Ctrl+S</code>)
+2. Click team button again
+3. Manually update agent dropdowns if issue persists
+4. Report bug with <code>cai --version</code> output</p>
+<h3 id="layout-not-adjusting">Layout Not Adjusting</h3>
+<p><strong>Symptoms</strong>: Terminal layout doesn't change when adding terminals</p>
+<p><strong>Solutions</strong>:
+1. Resize terminal window (trigger layout recalc)
+2. Toggle fullscreen mode (<code>Ctrl+T</code>) and back
+3. Restart TUI if issue persists</p>
+<h3 id="cost-tracking-incorrect">Cost Tracking Incorrect</h3>
+<p><strong>Symptoms</strong>: Cost numbers seem wrong or don't update</p>
+<p><strong>Solutions</strong>:
+1. Check <code>/cost all</code> for complete breakdown
+2. Verify model pricing with <code>/env</code>
+3. Check if multiple terminals using expensive models
+4. Save session and review cost data offline</p>
+<hr />
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><a href="../commands_reference/">Commands Reference</a> - Complete command documentation</li>
+<li><a href="../keyboard_shortcuts/">Keyboard Shortcuts</a> - All keyboard shortcuts</li>
+<li><a href="../sidebar_features/">Sidebar Features</a> - Teams tab and other sidebar capabilities</li>
+<li><a href="../advanced_features/">Advanced Features</a> - MCP, ICL, and session management</li>
+</ul>
+<p>For questions or issues, visit <a href="https://github.com/aliasrobotics/cai/issues">CAI GitHub Issues</a>.</p>
+<hr />
+<p><em>Last updated: October 2025 | CAI TUI v0.6+</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.copy", "content.code.select", "navigation.path", "navigation.sections", "navigation.expand", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>
