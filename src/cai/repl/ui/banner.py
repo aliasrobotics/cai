@@ -434,7 +434,7 @@ def display_quick_guide(console: Console):
             " and its privacy-first approach:\n",
             ("https://news.aliasrobotics.com/alias1-a-privacy-first-cybersecurity-ai/", "blue underline")
         ),
-        title="[bold yellow]🛡️ Alias0 - best model for cybersecurity [/bold yellow]",
+        title="[bold yellow]🛡️ Alias1 - best model for cybersecurity [/bold yellow]",
         border_style="yellow",
         padding=(1, 2),
         title_align="center"
