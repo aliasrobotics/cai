@@ -31,8 +31,14 @@ from wasabi import color
 
 from cai import is_pentestperf_available
 
+# Import caibench (pentestperf) if available
 if is_pentestperf_available():
-    import pentestperf as ptt
+    import cai.caibench as ptt
+    PTT_AVAILABLE = True
+else:
+    ptt = None
+    PTT_AVAILABLE = False
+
 import signal
 
 # Global timing variables for tracking active and idle time
@@ -4366,6 +4372,10 @@ def setup_ctf():
     ctf_name = os.getenv("CTF_NAME", None)
     if not ctf_name:
         print(color("CTF name not provided, necessary to run CTF", fg="white", bg="red"))
+        sys.exit(1)
+
+    if not PTT_AVAILABLE or ptt is None:
+        print(color("pentestperf module not available, cannot setup CTF", fg="white", bg="red"))
         sys.exit(1)
 
     print(
