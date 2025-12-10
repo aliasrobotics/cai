@@ -540,7 +540,46 @@ class ModelShowCommand(Command):
             total_models = 0
             displayed_models = 0
 
-            # Process and display models (use global cache for numbering)
+            # First, add predefined models (Alias, Claude, OpenAI, DeepSeek, Ollama Cloud)
+            predefined_models = get_all_predefined_models()
+            for model in predefined_models:
+                model_name = model["name"]
+                
+                # Skip if search term provided and not in model name
+                if search_term and search_term not in model_name.lower():
+                    continue
+                
+                displayed_models += 1
+                total_models += 1
+                
+                # Find index from global cache
+                try:
+                    model_index = _GLOBAL_MODEL_CACHE.index(model_name) + 1
+                except ValueError:
+                    continue
+                
+                # Format pricing info
+                input_cost_str = (
+                    f"${model['input_cost']:.2f}"
+                    if model['input_cost'] is not None else "Unknown"
+                )
+                output_cost_str = (
+                    f"${model['output_cost']:.2f}"
+                    if model['output_cost'] is not None else "Unknown"
+                )
+                
+                # Add row to table
+                model_table.add_row(
+                    str(model_index),
+                    model_name,
+                    model["provider"],
+                    "N/A",  # max_tokens
+                    input_cost_str,
+                    output_cost_str,
+                    model.get("description", "")
+                )
+
+            # Process and display LiteLLM models (use global cache for numbering)
             for model_name, model_info in sorted(model_data.items()):
                 # Find the model index from global cache
                 try:
