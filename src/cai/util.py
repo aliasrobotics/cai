@@ -764,6 +764,18 @@ def get_ollama_api_base():
     return "http://localhost:8000/v1"
 
 
+def get_ollama_auth_headers():
+    """Get authentication headers for Ollama Cloud if API key is set.
+    
+    Returns:
+        Dictionary with Authorization header if API key exists, empty dict otherwise
+    """
+    api_key = os.getenv("OLLAMA_API_KEY") or os.getenv("OPENAI_API_KEY")
+    if api_key:
+        return {"Authorization": f"Bearer {api_key}"}
+    return {}
+
+
 def load_prompt_template(template_path):
     """
     Load a prompt template from the package resources.

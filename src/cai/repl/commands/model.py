@@ -12,7 +12,7 @@ import requests  # pylint: disable=import-error
 from rich.console import Console  # pylint: disable=import-error
 from rich.table import Table  # pylint: disable=import-error
 from rich.panel import Panel  # pylint: disable=import-error
-from cai.util import get_ollama_api_base, COST_TRACKER
+from cai.util import get_ollama_api_base, get_ollama_auth_headers, COST_TRACKER
 from cai.repl.commands.base import Command, register_command
 
 console = Console()
@@ -99,6 +99,32 @@ def get_predefined_model_categories() -> Dict[str, List[Dict[str, str]]]:
                 "name": "deepseek-r1",
                 "description": "DeepSeek's specialized reasoning model"
             }
+        ],
+        "Ollama Cloud": [
+            {
+                "name": "ollama_cloud/gpt-oss:120b",
+                "description": (
+                    "Ollama Cloud - Large 120B parameter model (no GPU required)"
+                )
+            },
+            {
+                "name": "ollama_cloud/llama3.3:70b",
+                "description": (
+                    "Ollama Cloud - Llama 3.3 70B model (no GPU required)"
+                )
+            },
+            {
+                "name": "ollama_cloud/qwen2.5:72b",
+                "description": (
+                    "Ollama Cloud - Qwen 2.5 72B model (no GPU required)"
+                )
+            },
+            {
+                "name": "ollama_cloud/deepseek-v3:671b",
+                "description": (
+                    "Ollama Cloud - DeepSeek V3 671B model (no GPU required)"
+                )
+            }
         ]
     }
 
@@ -117,7 +143,8 @@ def get_all_predefined_models() -> List[Dict[str, Any]]:
         "Alias": "OpenAI",  # Alias models use OpenAI as base
         "Anthropic Claude": "Anthropic",
         "OpenAI": "OpenAI", 
-        "DeepSeek": "DeepSeek"
+        "DeepSeek": "DeepSeek",
+        "Ollama Cloud": "Ollama Cloud"
     }
     
     for category, models in model_categories.items():
