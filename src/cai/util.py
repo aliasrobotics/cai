@@ -744,8 +744,24 @@ install_pretty()
 
 
 def get_ollama_api_base():
-    """Get the Ollama API base URL from environment variable or default to localhost:8000."""
-    return os.environ.get("OLLAMA_API_BASE", "http://localhost:8000/v1")
+    """Get the Ollama API base URL from environment variable or default to localhost:8000.
+    
+    Supports both:
+    - OLLAMA_API_BASE: For local Ollama instances (e.g., http://localhost:8000/v1)
+    - OPENAI_BASE_URL: For Ollama Cloud or other OpenAI-compatible services (e.g., https://ollama.com/api/v1)
+    """
+    # First check OLLAMA_API_BASE for local Ollama
+    ollama_base = os.environ.get("OLLAMA_API_BASE")
+    if ollama_base:
+        return ollama_base
+    
+    # Then check OPENAI_BASE_URL for Ollama Cloud or other services
+    openai_base = os.environ.get("OPENAI_BASE_URL")
+    if openai_base and "ollama.com" in openai_base:
+        return openai_base
+    
+    # Default to local Ollama
+    return "http://localhost:8000/v1"
 
 
 def load_prompt_template(template_path):

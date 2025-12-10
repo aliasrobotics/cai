@@ -96,11 +96,20 @@ def update_toolbar_in_background():
         ollama_status = "unavailable"
         try:
             # Get Ollama models with a short timeout to prevent hanging
-            api_base = os.getenv(
-                "OLLAMA_API_BASE",
-                "http://host.docker.internal:8000/v1")
+            from cai.util import get_ollama_api_base
+            api_base = get_ollama_api_base()
+            
+            # Add authentication headers for Ollama Cloud if using OPENAI_BASE_URL
+            headers = {}
+            if "ollama.com" in api_base:
+                api_key = os.getenv("OPENAI_API_KEY")
+                if api_key:
+                    headers["Authorization"] = f"Bearer {api_key}"
+            
             response = requests.get(
-                f"{api_base.replace('/v1', '')}/api/tags", timeout=0.5)
+                f"{api_base.replace('/v1', '')}/api/tags",
+                headers=headers,
+                timeout=0.5)
 
             if response.status_code == 200:
                 data = response.json()

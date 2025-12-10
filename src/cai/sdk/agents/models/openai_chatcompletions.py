@@ -2708,7 +2708,23 @@ class OpenAIChatCompletionsModel(Model):
             provider = model_str.split("/")[0]
 
             # Apply provider-specific configurations
-            if provider == "deepseek":
+            if provider == "ollama_cloud":
+                # Ollama Cloud configuration
+                ollama_api_key = os.getenv("OLLAMA_API_KEY")
+                ollama_api_base = os.getenv("OLLAMA_API_BASE", "https://ollama.com")
+                
+                if ollama_api_key:
+                    kwargs["api_key"] = ollama_api_key
+                if ollama_api_base:
+                    kwargs["api_base"] = ollama_api_base
+                    
+                # Drop params not supported by Ollama
+                litellm.drop_params = True
+                kwargs.pop("parallel_tool_calls", None)
+                kwargs.pop("store", None)
+                if not converted_tools:
+                    kwargs.pop("tool_choice", None)
+            elif provider == "deepseek":
                 litellm.drop_params = True
                 kwargs.pop("parallel_tool_calls", None)
                 kwargs.pop("store", None)  # DeepSeek doesn't support store parameter
@@ -2845,6 +2861,51 @@ class OpenAIChatCompletionsModel(Model):
         # Add retry logic for rate limits
         max_retries = 3
         retry_count = 0
+        
+        # Check if this is Ollama Cloud (ollama_cloud/ prefix)
+        # Ollama Cloud is OpenAI-compatible, so we bypass LiteLLM to avoid parsing issues
+        is_ollama_cloud = "ollama_cloud/" in model_str
+        
+        if is_ollama_cloud:
+            # Use AsyncOpenAI client directly for Ollama Cloud
+            # Ollama Cloud is fully OpenAI-compatible at /v1/chat/completions
+            try:
+                # Configure the client with Ollama Cloud settings
+                ollama_api_key = os.getenv("OLLAMA_API_KEY") or os.getenv("OPENAI_API_KEY")
+                ollama_base_url = os.getenv("OLLAMA_API_BASE", "https://ollama.com")
+                
+                # Ensure the URL has /v1 for OpenAI compatibility
+                if not ollama_base_url.endswith("/v1"):
+                    ollama_base_url = f"{ollama_base_url}/v1"
+                
+                # Create a temporary client configured for Ollama Cloud
+                ollama_client = AsyncOpenAI(
+                    api_key=ollama_api_key,
+                    base_url=ollama_base_url
+                )
+                
+                # Remove the ollama_cloud/ prefix from the model name
+                clean_model = kwargs["model"].replace("ollama_cloud/", "")
+                kwargs["model"] = clean_model
+                
+                # Remove LiteLLM-specific parameters
+                kwargs.pop("extra_headers", None)
+                kwargs.pop("api_key", None)
+                kwargs.pop("api_base", None)
+                kwargs.pop("custom_llm_provider", None)
+                
+                # Call Ollama Cloud using OpenAI-compatible API
+                if stream:
+                    return await ollama_client.chat.completions.create(**kwargs)
+                else:
+                    return await ollama_client.chat.completions.create(**kwargs)
+                    
+            except Exception as e:
+                # If Ollama Cloud fails, raise with helpful message
+                raise Exception(
+                    f"Error connecting to Ollama Cloud: {str(e)}\n"
+                    f"Verify OLLAMA_API_KEY and OLLAMA_API_BASE are configured correctly."
+                ) from e
         
         while retry_count < max_retries:
             try:

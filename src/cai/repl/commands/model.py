@@ -175,7 +175,11 @@ def load_all_available_models() -> tuple[List[str], List[Dict[str, Any]]]:
     try:
         response = requests.get(LITELLM_URL, timeout=5)
         if response.status_code == 200:
-            litellm_names = sorted(response.json().keys())
+            # Filter out obsolete Ollama Cloud models (replaced by ollama_cloud/ prefix)
+            litellm_names = [
+                model_name for model_name in sorted(response.json().keys())
+                if not (model_name.startswith("ollama/") and "-cloud" in model_name)
+            ]
     except Exception:  # pylint: disable=broad-except
         pass
     
@@ -184,7 +188,17 @@ def load_all_available_models() -> tuple[List[str], List[Dict[str, Any]]]:
     ollama_names = []
     try:
         api_base = get_ollama_api_base()
-        response = requests.get(f"{api_base.replace('/v1', '')}/api/tags", timeout=1)
+        ollama_base = api_base.replace('/v1', '')
+        
+        # Add authentication headers for Ollama Cloud if needed
+        headers = {}
+        is_cloud = "ollama.com" in api_base
+        timeout = 5 if is_cloud else 1  # Cloud needs more time
+        
+        if is_cloud:
+            headers = get_ollama_auth_headers()
+        
+        response = requests.get(f"{ollama_base}/api/tags", headers=headers, timeout=timeout)
         if response.status_code == 200:
             data = response.json()
             ollama_data = data.get('models', data.get('items', []))
