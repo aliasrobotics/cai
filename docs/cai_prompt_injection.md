@@ -2,7 +2,7 @@
 
 ## Summary
 
-This implementation adds guardrails to protect CAI agents from prompt injection attacks when interacting with untrusted external content (web pages, server responses, CTF challenges, etc).
+This implementation adds guardrails to protect CAI agents from prompt injection attacks when interacting with untrusted external content (web pages, server responses, CTF challenges, etc.).
 
 ## Problem
 

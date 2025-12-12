@@ -307,8 +307,8 @@ This is an example of how a text sould be sanitized:
 
 Some annotation rules:
 - Each detected entity should be sanitized using the **format: [ENTITY_TYPE]**
-- Priorize IP_ADDRESS to URL: `https://192.168.2.100` is anonimized like this: `https://[IP_ADDRESS]:5050` instead of [URL]
-- DATE_TIME is used for dates and for times, in this case `2025-03-11 11:41 UTC` it sould be anonimized like this: ` [DATE_TIME] [DATE_TIME]`
+- Priorize IP_ADDRESS to URL: `https://192.168.2.100` is anonymized like this: `https://[IP_ADDRESS]:5050` instead of [URL]
+- DATE_TIME is used for dates and for times, in this case `2025-03-11 11:41 UTC` it should be anonymized like this: ` [DATE_TIME] [DATE_TIME]`
 
 If you have any questions about the annotation, please write to us.
 
