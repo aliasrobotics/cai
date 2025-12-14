@@ -35,6 +35,58 @@ def cat_file(file_path: str, args: str = "", ctf=None) -> str:
     command = f'cat {args} "{file_path}"'
     return run_command(command, ctf=ctf)
 
+@function_tool
+def text_search(pattern: str, file_path: str, args: str = "", ctf=None) -> str:
+    """
+    Search for a text pattern within a file or files.
+    
+    Args:
+        pattern: The text pattern to search for
+        file_path: Path to file or directory to search in
+        args: Additional arguments to pass to grep command
+
+    Returns:
+        str: The output of running the grep command
+    """
+    command = f'grep {args} "{pattern}" "{file_path}"'
+    return run_command(command, ctf=ctf)
+
+@function_tool
+def file_analysis(file_path: str, args: str = "", ctf=None) -> str:
+    """
+    Analyze file properties and content.
+    
+    Args:
+        file_path: Path to the file to analyze
+        args: Additional arguments to pass to file command
+
+    Returns:
+        str: The output of running file analysis commands
+    """
+    # Get basic file information
+    info_command = f'file {args} "{file_path}"'
+    info_result = run_command(info_command, ctf=ctf)
+    
+    # Get file size and permissions
+    stat_command = f'stat -c "%A %h %U %G %s %y %n" "{file_path}"'
+    stat_result = run_command(stat_command, ctf=ctf)
+    
+    return f"File Information:\n{info_result}\n\nFile Statistics:\n{stat_result}"
+
+@function_tool
+def file_permissions(file_path: str, args: str = "", ctf=None) -> str:
+    """
+    Check and display file permissions.
+    
+    Args:
+        file_path: Path to the file or directory to check permissions for
+        args: Additional arguments to pass to ls command
+
+    Returns:
+        str: The output of running permission checking commands
+    """
+    command = f'ls -la {args} "{file_path}"'
+    return run_command(command, ctf=ctf)
 
 # FileSearchTool
 # ListDirTool
