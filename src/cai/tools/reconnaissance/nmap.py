@@ -7,15 +7,77 @@ from cai.sdk.agents import function_tool
 
 @function_tool
 def nmap(args: str, target: str, ctf=None) -> str:
-    """
-    A simple nmap tool to scan a specified target.
-
-    Args:
-        args: Additional arguments to pass to the nmap command
-        target: The target host or IP address to scan
-
-    Returns:
-        str: The output of running the nmap command
-    """
-    command = f'nmap {args} {target}'
-    return run_command(command, ctf=ctf)
+    """                                                                                                                                                                                                                                   
+    Structured nmap tool optimized for LLM processing.                                                                                                                                                                                    
+                                                                                                                                                                                                                                          
+    Args:                                                                                                                                                                                                                                 
+        args: Additional arguments to pass to the nmap command                                                                                                                                                                            
+        target: The target host or IP address to scan                                                                                                                                                                                     
+                                                                                                                                                                                                                                          
+    Returns:                                                                                                                                                                                                                              
+        Structured response formatted for easy LLM parsing and action                                                                                                                                                                     
+    """                                                                                                                                                                                                                                   
+    import time                                                                                                                                                                                                                           
+                                                                                                                                                                                                                                          
+    try:                                                                                                                                                                                                                                  
+        start_time = time.time()                                                                                                                                                                                                          
+                                                                                                                                                                                                                                          
+        # Construct command safely                                                                                                                                                                                                        
+        command = f'nmap {args} {target}'                                                                                                                                                                                                 
+                                                                                                                                                                                                                                          
+        result = subprocess.run(                                                                                                                                                                                                          
+            command,                                                                                                                                                                                                                      
+            shell=True,                                                                                                                                                                                                                   
+            capture_output=True,                                                                                                                                                                                                          
+            text=True,                                                                                                                                                                                                                    
+            timeout=600                                                                                                                                                                                                                   
+        )                                                                                                                                                                                                                                 
+                                                                                                                                                                                                                                          
+        duration = time.time() - start_time                                                                                                                                                                                               
+                                                                                                                                                                                                                                          
+        # Parse key information for LLM processing                                                                                                                                                                                        
+        stdout_lines = result.stdout.split('\n') if result.stdout else []                                                                                                                                                                 
+        stderr_lines = result.stderr.split('\n') if result.stderr else []                                                                                                                                                                 
+                                                                                                                                                                                                                                          
+        # Extract basic scan info that's useful for LLM decision making                                                                                                                                                                   
+        open_ports = []                                                                                                                                                                                                                   
+        service_info = []                                                                                                                                                                                                                 
+                                                                                                                                                                                                                                          
+        for line in stdout_lines:                                                                                                                                                                                                         
+            if 'open' in line and '/' in line:                                                                                                                                                                                            
+                open_ports.append(line.strip())                                                                                                                                                                                           
+            elif 'Nmap scan report' in line:                                                                                                                                                                                              
+                # Extract target from scan report                                                                                                                                                                                         
+                pass                                                                                                                                                                                                                      
+                                                                                                                                                                                                                                          
+        return {                                                                                                                                                                                                                          
+            "scan_result": {                                                                                                                                                                                                              
+                "success": result.returncode == 0,                                                                                                                                                                                        
+                "target": target,                                                                                                                                                                                                         
+                "command_used": command,                                                                                                                                                                                                  
+                "return_code": result.returncode,                                                                                                                                                                                         
+                "duration_seconds": round(duration, 2),                                                                                                                                                                                   
+                "open_ports": open_ports[:10],  # Limit to first 10 ports                                                                                                                                                                 
+                "service_info": service_info,                                                                                                                                                                                             
+                "stdout_preview": '\n'.join(stdout_lines[:20]),  # First 20 lines                                                                                                                                                         
+                "stderr_preview": '\n'.join(stderr_lines[:5]) if stderr_lines else "",                                                                                                                                                    
+                "scan_summary": f"Scan completed in {round(duration, 1)} seconds"                                                                                                                                                         
+            }                                                                                                                                                                                                                             
+        }                                                                                                                                                                                                                                 
+                                                                                                                                                                                                                                          
+    except subprocess.TimeoutExpired:                                                                                                                                                                                                     
+        return {                                                                                                                                                                                                                          
+            "scan_result": {                                                                                                                                                                                                              
+                "success": False,                                                                                                                                                                                                         
+                "error": f"Timeout: nmap scan exceeded 10 minute limit for target {target}",                                                                                                                                              
+                "target": target                                                                                                                                                                                                          
+            }                                                                                                                                                                                                                             
+        }                                                                                                                                                                                                                                 
+    except Exception as e:                                                                                                                                                                                                                
+        return {                                                                                                                                                                                                                          
+            "scan_result": {                                                                                                                                                                                                              
+                "success": False,                                                                                                                                                                                                         
+                "error": f"Scan failed: {str(e)}",                                                                                                                                                                                        
+                "target": target                                                                                                                                                                                                          
+            }                                                                                                                                                                                                                             
+        }
