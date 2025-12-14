@@ -88,11 +88,25 @@ def file_permissions(file_path: str, args: str = "", ctf=None) -> str:
     command = f'ls -la {args} "{file_path}"'
     return run_command(command, ctf=ctf)
 
+@function_tool
+def string_extraction(file_path: str, args: str = "", ctf=None) -> str:
+    """
+    Extract printable strings from a file.
+    
+    Args:
+        file_path: Path to the file to extract strings from
+        args: Additional arguments to pass to the strings command
+
+    Returns:
+        str: The output of running the strings command
+    """
+    command = f'strings {args} "{file_path}"'
+    return run_command(command, ctf=ctf)
+
 # FileSearchTool
 # ListDirTool
 # TextSearchTool
 # FileAnalysisTool
-# StringExtractionTool
 # ReadFileTool
 # FilePermissionsTool
 # FileCompressionTool
