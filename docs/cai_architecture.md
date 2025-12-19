@@ -87,7 +87,7 @@ For more details, including examples and implementation guidance, see the [Agent
 
 You may find different [tools](src/cai/tools). They are grouped in 6 major categories inspired by the security kill chain[2]:
 
-1. Reconnaissance and weaponization - *reconnaissance*  (crypto, listing, etc,)
+1. Reconnaissance and weaponization - *reconnaissance*  (crypto, listing, etc.)
 2. Exploitation - *exploitation*
 3. Privilege escalation - *escalation*
 4. Lateral movement - *lateral*
@@ -118,14 +118,14 @@ wherein:
 
 When building `Patterns`, we generally classify them among one of the following categories, though others exist:
 
-| **Agentic** `Pattern` **categories** | **Description** |
-|--------------------|------------------------|
-| `Swarm` (Decentralized) | Agents share tasks and self-assign responsibilities without a central orchestrator. Handoffs occur dynamically. *An example of a peer-to-peer agentic pattern is the `CTF Agentic Pattern`, which involves a team of agents working together to solve a CTF challenge with dynamic handoffs.* |
-| `Hierarchical` | A top-level agent (e.g., "PlannerAgent") assigns tasks via structured handoffs to specialized sub-agents. Alternatively, the structure of the agents is harcoded into the agentic pattern with pre-defined handoffs. |
+| **Agentic** `Pattern` **categories** | **Description**                                                                                                                                                                                                                                                                                                                                               |
+|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Swarm` (Decentralized) | Agents share tasks and self-assign responsibilities without a central orchestrator. Handoffs occur dynamically. *An example of a peer-to-peer agentic pattern is the `CTF Agentic Pattern`, which involves a team of agents working together to solve a CTF challenge with dynamic handoffs.*                                                                 |
+| `Hierarchical` | A top-level agent (e.g., "PlannerAgent") assigns tasks via structured handoffs to specialized sub-agents. Alternatively, the structure of the agents is hardcoded into the agentic pattern with pre-defined handoffs.                                                                                                                                         |
 | `Chain-of-Thought` (Sequential Workflow) | A structured pipeline where Agent A produces an output, hands it to Agent B for reuse or refinement, and so on. Handoffs follow a linear sequence. *An example of a chain-of-thought agentic pattern is the `ReasonerAgent`, which involves a Reasoning-type LLM that provides context to the main agent to solve a CTF challenge with a linear sequence.*[1] |
-| `Auction-Based` (Competitive Allocation) | Agents "bid" on tasks based on priority, capability, or cost. A decision agent evaluates bids and hands off tasks to the best-fit agent. |
-| `Recursive` | A single agent continuously refines its own output, treating itself as both executor and evaluator, with handoffs (internal or external) to itself. *An example of a recursive agentic pattern is the `CodeAgent` (when used as a recursive agent), which continuously refines its own output by executing code and updating its own instructions.* |
-| `Parallelization` | Multiple agents run in parallel, each handling different subtasks or independent inputs simultaneously. This approach speeds up processing when tasks do not depend on each other. *For example, you can launch several agents to analyze different log files or scan multiple IP addresses at the same time, leveraging concurrency to improve efficiency.* |
+| `Auction-Based` (Competitive Allocation) | Agents "bid" on tasks based on priority, capability, or cost. A decision agent evaluates bids and hands off tasks to the best-fit agent.                                                                                                                                                                                                                      |
+| `Recursive` | A single agent continuously refines its own output, treating itself as both executor and evaluator, with handoffs (internal or external) to itself. *An example of a recursive agentic pattern is the `CodeAgent` (when used as a recursive agent), which continuously refines its own output by executing code and updating its own instructions.*           |
+| `Parallelization` | Multiple agents run in parallel, each handling different subtasks or independent inputs simultaneously. This approach speeds up processing when tasks do not depend on each other. *For example, you can launch several agents to analyze different log files or scan multiple IP addresses at the same time, leveraging concurrency to improve efficiency.*  |
  
 Moreover in this new version we could orchestrate agents and add decision mechanism in several ways. See [Orchestrating multiple agents](multi_agent.md)
 

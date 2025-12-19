@@ -15,6 +15,7 @@ something that hasn't been seen in other cybersecurity frameworks yet (Feb 2025)
 from cai.tools.common import run_command  # pylint: disable=E0401 # noqa: E501
 from cai.sdk.agents import function_tool
 
+import shlex
 
 @function_tool
 def run_ssh_command_with_credentials(
@@ -36,14 +37,25 @@ def run_ssh_command_with_credentials(
     Returns:
         str: Output from the remote command execution
     """
-    # Escape special characters in password and command to prevent shell injection
-    escaped_password = password.replace("'", "'\\''")
-    escaped_command = command.replace("'", "'\\''")
-    
+
+    try:
+        port = int(port)
+        if port <= 0 or port > 65535:
+            return "port is not a valid integer"
+    except Exception:
+        return "port is not a valid integer"
+
+    # Escape special characters to prevent shell injection
+    quoted_password = shlex.quote(password)
+    quoted_username = shlex.quote(username)
+    quoted_host = shlex.quote(host)
+    quoted_command = shlex.quote(command)
+    port = str(port)
+
     ssh_command = (
-        f"sshpass -p '{escaped_password}' "
+        f"sshpass -p {quoted_password} "
         f"ssh -o StrictHostKeyChecking=no "
-        f"{username}@{host} -p {port} "
-        f"'{escaped_command}'"
+        f"{quoted_username}@{quoted_host} -p {port} "
+        f"{quoted_command}"
     )
     return run_command(ssh_command)

@@ -31,8 +31,14 @@ from wasabi import color
 
 from cai import is_pentestperf_available
 
+# Import caibench (pentestperf) if available
 if is_pentestperf_available():
-    import pentestperf as ptt
+    import cai.caibench as ptt
+    PTT_AVAILABLE = True
+else:
+    ptt = None
+    PTT_AVAILABLE = False
+
 import signal
 
 # Global timing variables for tracking active and idle time
@@ -744,8 +750,36 @@ install_pretty()
 
 
 def get_ollama_api_base():
-    """Get the Ollama API base URL from environment variable or default to localhost:8000."""
-    return os.environ.get("OLLAMA_API_BASE", "http://localhost:8000/v1")
+    """Get the Ollama API base URL from environment variable or default to localhost:8000.
+    
+    Supports both:
+    - OLLAMA_API_BASE: For local Ollama instances (e.g., http://localhost:8000/v1)
+    - OPENAI_BASE_URL: For Ollama Cloud or other OpenAI-compatible services (e.g., https://ollama.com/api/v1)
+    """
+    # First check OLLAMA_API_BASE for local Ollama
+    ollama_base = os.environ.get("OLLAMA_API_BASE")
+    if ollama_base:
+        return ollama_base
+    
+    # Then check OPENAI_BASE_URL for Ollama Cloud or other services
+    openai_base = os.environ.get("OPENAI_BASE_URL")
+    if openai_base and "ollama.com" in openai_base:
+        return openai_base
+    
+    # Default to local Ollama
+    return "http://localhost:8000/v1"
+
+
+def get_ollama_auth_headers():
+    """Get authentication headers for Ollama Cloud if API key is set.
+    
+    Returns:
+        Dictionary with Authorization header if API key exists, empty dict otherwise
+    """
+    api_key = os.getenv("OLLAMA_API_KEY") or os.getenv("OPENAI_API_KEY")
+    if api_key:
+        return {"Authorization": f"Bearer {api_key}"}
+    return {}
 
 
 def load_prompt_template(template_path):
@@ -4338,6 +4372,10 @@ def setup_ctf():
     ctf_name = os.getenv("CTF_NAME", None)
     if not ctf_name:
         print(color("CTF name not provided, necessary to run CTF", fg="white", bg="red"))
+        sys.exit(1)
+
+    if not PTT_AVAILABLE or ptt is None:
+        print(color("pentestperf module not available, cannot setup CTF", fg="white", bg="red"))
         sys.exit(1)
 
     print(

@@ -12,6 +12,7 @@ import time
 import uuid
 import sys
 import shlex
+import select
 from wasabi import color  # pylint: disable=import-error
 from cai.util import format_time, start_active_timer, stop_active_timer, start_idle_timer, stop_idle_timer, cli_print_tool_output
 
@@ -265,16 +266,22 @@ class ShellSession:  # pylint: disable=too-many-instance-attributes
             self.is_running = False
             return str(e)
     def _read_output(self):
-        """Read output from the process"""
+        """Read output with non-blocking select"""
         try:
             while self.is_running and self.master is not None:
                 try:
-                    # Check if process has exited before reading
                     if self.process and self.process.poll() is not None:
                         self.is_running = False
                         break
                     
-                    # Read raw output chunk from PTY (don't require newlines)
+                    # Non-blocking check for data
+                    ready, _, _ = select.select([self.master], [], [], 0.5)
+                    if not ready:
+                        if self.process and self.process.poll() is not None:
+                            self.is_running = False
+                            break
+                        continue
+                    
                     output = os.read(self.master, 4096).decode('utf-8', errors='replace')
 
                     if output is not None and output != "":
@@ -694,27 +701,43 @@ async def _run_local_async(command, stdout=False, timeout=100, stream=False, cal
                 # Don't add refresh_rate to tool_args as it affects command deduplication
                 # The refresh behavior is already handled by the streaming update logic
             
-            # Stream stdout in real-time
-            async for line in process.stdout:
-                line_str = line.decode('utf-8', errors='replace')
-                
-                # Add to output collection
-                output_buffer.append(line_str)
-                buffer_size += 1
-                
-                # Only update periodically to reduce UI refreshes
-                if buffer_size >= update_interval:
-                    current_output = ''.join(output_buffer)
-                    update_tool_streaming(tool_name, tool_args, current_output, call_id, token_info)
-                    buffer_size = 0
+            # Stream stdout with idle detection
+            last_output = time.time()
+            while True:
+                if process.returncode is not None:
+                    break
+                try:
+                    line = await asyncio.wait_for(process.stdout.readline(), timeout=0.5)
+                    if line:
+                        output_buffer.append(line.decode('utf-8', errors='replace'))
+                        buffer_size += 1
+                        last_output = time.time()
+                        if buffer_size >= update_interval:
+                            update_tool_streaming(tool_name, tool_args, ''.join(output_buffer), call_id, token_info)
+                            buffer_size = 0
+                    else:
+                        break
+                except asyncio.TimeoutError:
+                    if time.time() - last_output > 10:
+                        process.terminate()
+                        try:
+                            await asyncio.wait_for(process.wait(), timeout=1.0)
+                        except asyncio.TimeoutError:
+                            process.kill()
+                            await process.wait()
+                        output_buffer.append("\n[Terminated: idle 10s, likely waiting for input]")
+                        break
             
-            # Wait for process to complete with timeout
-            try:
-                return_code = await asyncio.wait_for(process.wait(), timeout=timeout)
-            except asyncio.TimeoutError:
-                process.kill()
-                await process.wait()
-                raise subprocess.TimeoutExpired(command, timeout)
+            # Wait for process to complete
+            if process.returncode is None:
+                try:
+                    return_code = await asyncio.wait_for(process.wait(), timeout=timeout)
+                except asyncio.TimeoutError:
+                    process.kill()
+                    await process.wait()
+                    raise subprocess.TimeoutExpired(command, timeout)
+            else:
+                return_code = process.returncode
             
             process_execution_time = time.time() - process_start_time
             
@@ -743,7 +766,7 @@ async def _run_local_async(command, stdout=False, timeout=100, stream=False, cal
             
             return final_output
         else:
-            # Standard non-streaming async execution
+            # Non-streaming with idle detection
             process = await asyncio.create_subprocess_shell(
                 command,
                 stdout=asyncio.subprocess.PIPE,
@@ -751,15 +774,45 @@ async def _run_local_async(command, stdout=False, timeout=100, stream=False, cal
                 cwd=target_dir
             )
             
-            try:
-                stdout_data, stderr_data = await asyncio.wait_for(
-                    process.communicate(), 
-                    timeout=timeout
-                )
-            except asyncio.TimeoutError:
-                process.kill()
-                await process.wait()
-                raise subprocess.TimeoutExpired(command, timeout)
+            stdout_chunks, stderr_chunks = [], []
+            last_output = time.time()
+            start = time.time()
+            
+            while True:
+                if time.time() - start > timeout:
+                    process.kill()
+                    await process.wait()
+                    raise subprocess.TimeoutExpired(command, timeout)
+                if process.returncode is not None:
+                    break
+                try:
+                    out_task = asyncio.create_task(process.stdout.read(4096))
+                    err_task = asyncio.create_task(process.stderr.read(4096))
+                    done, pending = await asyncio.wait([out_task, err_task], timeout=0.5, return_when=asyncio.FIRST_COMPLETED)
+                    for task in pending:
+                        task.cancel()
+                    for task in done:
+                        data = await task
+                        if data:
+                            (stdout_chunks if task == out_task else stderr_chunks).append(data)
+                            last_output = time.time()
+                except asyncio.TimeoutError:
+                    pass
+                if time.time() - last_output > 10:
+                    try:
+                        await asyncio.wait_for(process.wait(), timeout=0.1)
+                        break
+                    except asyncio.TimeoutError:
+                        process.terminate()
+                        try:
+                            await asyncio.wait_for(process.wait(), timeout=1.0)
+                        except asyncio.TimeoutError:
+                            process.kill()
+                            await process.wait()
+                        stderr_chunks.append(b"\n[Terminated: idle 10s]")
+                        break
+            
+            stdout_data, stderr_data = b''.join(stdout_chunks), b''.join(stderr_chunks)
             
             # Decode output
             output = stdout_data.decode('utf-8', errors='replace') if stdout_data else ""
@@ -968,26 +1021,43 @@ async def _run_docker_async(command, container_id, stdout=False, timeout=100, st
             
             start_time = time.time()
             
-            # Read stdout line by line
-            async for line in process.stdout:
-                line_str = line.decode('utf-8', errors='replace')
-                output_buffer.append(line_str)
-                buffer_size += 1
-                
-                # Only update periodically to reduce UI refreshes
-                if buffer_size >= update_interval:
-                    # Show actual output as it's being collected
-                    current_output = ''.join(output_buffer)
-                    update_tool_streaming(tool_name, tool_args, current_output, call_id, token_info)
-                    buffer_size = 0
+            # Read stdout with idle detection
+            last_output = time.time()
+            while True:
+                if process.returncode is not None:
+                    break
+                try:
+                    line = await asyncio.wait_for(process.stdout.readline(), timeout=0.5)
+                    if line:
+                        output_buffer.append(line.decode('utf-8', errors='replace'))
+                        buffer_size += 1
+                        last_output = time.time()
+                        if buffer_size >= update_interval:
+                            update_tool_streaming(tool_name, tool_args, ''.join(output_buffer), call_id, token_info)
+                            buffer_size = 0
+                    else:
+                        break
+                except asyncio.TimeoutError:
+                    if time.time() - last_output > 10:
+                        process.terminate()
+                        try:
+                            await asyncio.wait_for(process.wait(), timeout=1.0)
+                        except asyncio.TimeoutError:
+                            process.kill()
+                            await process.wait()
+                        output_buffer.append("\n[Terminated: idle 10s]")
+                        break
             
             # Wait for process completion
-            try:
-                return_code = await asyncio.wait_for(process.wait(), timeout=timeout)
-            except asyncio.TimeoutError:
-                process.kill()
-                await process.wait()
-                raise subprocess.TimeoutExpired(command, timeout)
+            if process.returncode is None:
+                try:
+                    return_code = await asyncio.wait_for(process.wait(), timeout=timeout)
+                except asyncio.TimeoutError:
+                    process.kill()
+                    await process.wait()
+                    raise subprocess.TimeoutExpired(command, timeout)
+            else:
+                return_code = process.returncode
             
             execution_time = time.time() - start_time
             

@@ -12,7 +12,7 @@ import requests  # pylint: disable=import-error
 from rich.console import Console  # pylint: disable=import-error
 from rich.table import Table  # pylint: disable=import-error
 from rich.panel import Panel  # pylint: disable=import-error
-from cai.util import get_ollama_api_base, COST_TRACKER
+from cai.util import get_ollama_api_base, get_ollama_auth_headers, COST_TRACKER
 from cai.repl.commands.base import Command, register_command
 
 console = Console()
@@ -21,6 +21,10 @@ LITELLM_URL = (
     "https://raw.githubusercontent.com/BerriAI/litellm/main/"
     "model_prices_and_context_window.json"
 )
+
+# Global cache shared between /model and /model-show commands
+_GLOBAL_MODEL_CACHE = []
+_GLOBAL_MODEL_NUMBERS = {}
 
 
 def get_predefined_model_categories() -> Dict[str, List[Dict[str, str]]]:
@@ -95,6 +99,32 @@ def get_predefined_model_categories() -> Dict[str, List[Dict[str, str]]]:
                 "name": "deepseek-r1",
                 "description": "DeepSeek's specialized reasoning model"
             }
+        ],
+        "Ollama Cloud": [
+            {
+                "name": "ollama_cloud/gpt-oss:120b",
+                "description": (
+                    "Ollama Cloud - Large 120B parameter model (no GPU required)"
+                )
+            },
+            {
+                "name": "ollama_cloud/llama3.3:70b",
+                "description": (
+                    "Ollama Cloud - Llama 3.3 70B model (no GPU required)"
+                )
+            },
+            {
+                "name": "ollama_cloud/qwen2.5:72b",
+                "description": (
+                    "Ollama Cloud - Qwen 2.5 72B model (no GPU required)"
+                )
+            },
+            {
+                "name": "ollama_cloud/deepseek-v3:671b",
+                "description": (
+                    "Ollama Cloud - DeepSeek V3 671B model (no GPU required)"
+                )
+            }
         ]
     }
 
@@ -113,7 +143,8 @@ def get_all_predefined_models() -> List[Dict[str, Any]]:
         "Alias": "OpenAI",  # Alias models use OpenAI as base
         "Anthropic Claude": "Anthropic",
         "OpenAI": "OpenAI", 
-        "DeepSeek": "DeepSeek"
+        "DeepSeek": "DeepSeek",
+        "Ollama Cloud": "Ollama Cloud"
     }
     
     for category, models in model_categories.items():
@@ -153,6 +184,57 @@ def get_predefined_model_names() -> List[str]:
         List of model name strings
     """
     return [model["name"] for model in get_all_predefined_models()]
+
+
+def load_all_available_models() -> tuple[List[str], List[Dict[str, Any]]]:
+    """Load all available models (predefined + LiteLLM + Ollama) in consistent order.
+    
+    This ensures /model and /model-show use the same numbering.
+    
+    Returns:
+        Tuple of (all_model_names, ollama_models_data)
+    """
+    # Predefined models
+    predefined = [model["name"] for model in get_all_predefined_models()]
+    
+    # LiteLLM models
+    litellm_names = []
+    try:
+        response = requests.get(LITELLM_URL, timeout=5)
+        if response.status_code == 200:
+            # Filter out obsolete Ollama Cloud models (replaced by ollama_cloud/ prefix)
+            litellm_names = [
+                model_name for model_name in sorted(response.json().keys())
+                if not (model_name.startswith("ollama/") and "-cloud" in model_name)
+            ]
+    except Exception:  # pylint: disable=broad-except
+        pass
+    
+    # Ollama models
+    ollama_data = []
+    ollama_names = []
+    try:
+        api_base = get_ollama_api_base()
+        ollama_base = api_base.replace('/v1', '')
+        
+        # Add authentication headers for Ollama Cloud if needed
+        headers = {}
+        is_cloud = "ollama.com" in api_base
+        timeout = 5 if is_cloud else 1  # Cloud needs more time
+        
+        if is_cloud:
+            headers = get_ollama_auth_headers()
+        
+        response = requests.get(f"{ollama_base}/api/tags", headers=headers, timeout=timeout)
+        if response.status_code == 200:
+            data = response.json()
+            ollama_data = data.get('models', data.get('items', []))
+            ollama_names = [m.get('name', '') for m in ollama_data if m.get('name')]
+    except Exception:  # pylint: disable=broad-except
+        pass
+    
+    all_models = predefined + litellm_names + ollama_names
+    return all_models, ollama_data
 
 
 class ModelCommand(Command):
@@ -196,29 +278,21 @@ class ModelCommand(Command):
         Returns:
             bool: True if the model was changed successfully
         """
-        # Get all predefined models from the shared source of truth
-        # pylint: disable=invalid-name
-        ALL_MODELS = get_all_predefined_models()
-
-        # Also fetch LiteLLM model names to make numbering consistent with /model-show
-        litellm_model_names = []
-        try:
-            response = requests.get(LITELLM_URL, timeout=5)
-            if response.status_code == 200:
-                litellm_data = response.json()
-                # Add LiteLLM model names (sorted for consistency with /model-show)
-                litellm_model_names = sorted(litellm_data.keys())
-        except Exception:  # pylint: disable=broad-except
-            # Silently fail if LiteLLM is not available
-            pass
-
-        # Update cached models to include all models for number selection (consistent with /model-show)
-        predefined_model_names = [model["name"] for model in ALL_MODELS]
-        self.cached_models = predefined_model_names + litellm_model_names
-        self.cached_model_numbers = {
+        # Load all models with consistent numbering and update global cache
+        global _GLOBAL_MODEL_CACHE, _GLOBAL_MODEL_NUMBERS
+        _GLOBAL_MODEL_CACHE, ollama_models_data = load_all_available_models()
+        _GLOBAL_MODEL_NUMBERS = {
             str(i): model_name
-            for i, model_name in enumerate(self.cached_models, 1)
+            for i, model_name in enumerate(_GLOBAL_MODEL_CACHE, 1)
         }
+        self.cached_models = _GLOBAL_MODEL_CACHE
+        self.cached_model_numbers = _GLOBAL_MODEL_NUMBERS
+        
+        # Get predefined and litellm counts for display
+        ALL_MODELS = get_all_predefined_models()
+        predefined_model_names = [model["name"] for model in ALL_MODELS]
+        litellm_model_names = [m for m in self.cached_models[len(predefined_model_names):] 
+                               if m not in [d.get('name') for d in ollama_models_data]]
 
         if not args:  # pylint: disable=too-many-nested-blocks
             # Display current model
@@ -272,61 +346,35 @@ class ModelCommand(Command):
                     model["description"]
                 )
 
-            # Ollama models (if available)
-            # pylint: disable=too-many-nested-blocks
-            try:
-                # Get Ollama models with a short timeout to prevent hanging
-                api_base = get_ollama_api_base()
-                ollama_base = api_base.replace('/v1', '')
-                response = requests.get(
-                    f"{ollama_base}/api/tags",
-                    timeout=1
-                )
-
-                if response.status_code == 200:
-                    data = response.json()
-                    ollama_models = []
-
-                    if 'models' in data:
-                        ollama_models = data['models']
-                    else:
-                        # Fallback for older Ollama versions
-                        ollama_models = data.get('items', [])
-
-                    # Add Ollama models to the table with continuing numbers
-                    # (after predefined models + LiteLLM models in numbering)
-                    start_index = len(predefined_model_names) + len(litellm_model_names) + 1
-                    for i, model in enumerate(ollama_models, start_index):
-                        model_name = model.get('name', '')
-                        model_size = model.get('size', 0)
-                        # Convert size to human-readable format
-                        size_str = ""
-                        if model_size:
-                            size_mb = model_size / (1024 * 1024)
-                            if model_size < 1024 * 1024 * 1024:
-                                size_str = f"{size_mb:.1f} MB"
-                            else:
-                                size_gb = size_mb / 1024
-                                size_str = f"{size_gb:.1f} GB"
-
-                        # Ollama models are free to use locally
-                        model_description = "Local model"
-                        if size_str:
-                            model_description += f" ({size_str})"
-
-                        model_table.add_row(
-                            str(i),
-                            model_name,
-                            "Ollama",
-                            "Local",
-                            "Free",
-                            "Free",
-                            model_description
-                        )
-                        # Add to cached models for numeric selection
-                        self.cached_models.append(model_name)
-                        self.cached_model_numbers[str(i)] = model_name
-            except Exception:  # pylint: disable=broad-except
+            # Ollama models (display from already loaded data)
+            if ollama_models_data:
+                start_index = len(predefined_model_names) + len(litellm_model_names) + 1
+                for i, model in enumerate(ollama_models_data, start_index):
+                    model_name = model.get('name', '')
+                    model_size = model.get('size', 0)
+                    size_str = ""
+                    if model_size:
+                        size_mb = model_size / (1024 * 1024)
+                        if model_size < 1024 * 1024 * 1024:
+                            size_str = f"{size_mb:.1f} MB"
+                        else:
+                            size_gb = size_mb / 1024
+                            size_str = f"{size_gb:.1f} GB"
+                    
+                    model_description = "Local model"
+                    if size_str:
+                        model_description += f" ({size_str})"
+                    
+                    model_table.add_row(
+                        str(i),
+                        model_name,
+                        "Ollama",
+                        "Local",
+                        "Free",
+                        "Free",
+                        model_description
+                    )
+            else:  # pylint: disable=broad-except
                 # Add a note about Ollama if we couldn't fetch models
                 start_index = len(predefined_model_names) + len(litellm_model_names) + 1
                 model_table.add_row(
@@ -436,6 +484,15 @@ class ModelShowCommand(Command):
             if args:  # If there are still args left, use as search term
                 search_term = args[0].lower()
 
+        # Load all models and update global cache for consistent numbering with /model
+        global _GLOBAL_MODEL_CACHE, _GLOBAL_MODEL_NUMBERS
+        all_model_names, ollama_models_data = load_all_available_models()
+        _GLOBAL_MODEL_CACHE = all_model_names
+        _GLOBAL_MODEL_NUMBERS = {
+            str(i): model_name
+            for i, model_name in enumerate(_GLOBAL_MODEL_CACHE, 1)
+        }
+        
         # Fetch model pricing data from LiteLLM GitHub repository
         try:
             with console.status(
@@ -482,10 +539,53 @@ class ModelShowCommand(Command):
             # Count models for summary
             total_models = 0
             displayed_models = 0
-            model_index = 1
 
-            # Process and display models
+            # First, add predefined models (Alias, Claude, OpenAI, DeepSeek, Ollama Cloud)
+            predefined_models = get_all_predefined_models()
+            for model in predefined_models:
+                model_name = model["name"]
+                
+                # Skip if search term provided and not in model name
+                if search_term and search_term not in model_name.lower():
+                    continue
+                
+                displayed_models += 1
+                total_models += 1
+                
+                # Find index from global cache
+                try:
+                    model_index = _GLOBAL_MODEL_CACHE.index(model_name) + 1
+                except ValueError:
+                    continue
+                
+                # Format pricing info
+                input_cost_str = (
+                    f"${model['input_cost']:.2f}"
+                    if model['input_cost'] is not None else "Unknown"
+                )
+                output_cost_str = (
+                    f"${model['output_cost']:.2f}"
+                    if model['output_cost'] is not None else "Unknown"
+                )
+                
+                # Add row to table
+                model_table.add_row(
+                    str(model_index),
+                    model_name,
+                    model["provider"],
+                    "N/A",  # max_tokens
+                    input_cost_str,
+                    output_cost_str,
+                    model.get("description", "")
+                )
+
+            # Process and display LiteLLM models (use global cache for numbering)
             for model_name, model_info in sorted(model_data.items()):
+                # Find the model index from global cache
+                try:
+                    model_index = _GLOBAL_MODEL_CACHE.index(model_name) + 1
+                except ValueError:
+                    continue  # Model not in cache, skip
                 total_models += 1
 
                 # Skip if showing only supported models and no function calling
@@ -569,71 +669,46 @@ class ModelShowCommand(Command):
                     features_str
                 )
 
-                model_index += 1
-
-            # Now add Ollama models if available
-            try:
-                # Get Ollama models with a short timeout
-                api_base = get_ollama_api_base()
-                api_tags = f"{api_base.replace('/v1', '')}/api/tags"
-                ollama_response = requests.get(api_tags, timeout=1)
-
-                if ollama_response.status_code == 200:
-                    ollama_data = ollama_response.json()
-                    ollama_models = []
-
-                    if 'models' in ollama_data:
-                        ollama_models = ollama_data['models']
+            # Add Ollama models to the table (already loaded in global cache)
+            for model in ollama_models_data:
+                model_name = model.get('name', '')
+                
+                # Skip if search term provided and not in model name
+                if search_term and search_term not in model_name.lower():
+                    continue
+                
+                # Find index from global cache
+                try:
+                    model_index = _GLOBAL_MODEL_CACHE.index(model_name) + 1
+                except ValueError:
+                    continue
+                
+                total_models += 1
+                displayed_models += 1
+                
+                model_size = model.get('size', 0)
+                size_str = ""
+                if model_size:
+                    size_mb = model_size / (1024 * 1024)
+                    if model_size < 1024 * 1024 * 1024:
+                        size_str = f"{size_mb:.1f} MB"
                     else:
-                        # Fallback for older Ollama versions
-                        ollama_models = ollama_data.get('items', [])
-
-                    # Add Ollama models to the table
-                    for model in ollama_models:
-                        model_name = model.get('name', '')
-
-                        # Skip if search term provided and not in model name
-                        if (search_term and
-                                search_term not in model_name.lower()):
-                            continue
-
-                        total_models += 1
-                        displayed_models += 1
-
-                        model_size = model.get('size', 0)
-                        # Convert size to human-readable format
-                        size_str = ""
-                        if model_size:
-                            size_mb = model_size / (1024 * 1024)
-                            if model_size < 1024 * 1024 * 1024:
-                                size_str = f"{size_mb:.1f} MB"
-                            else:
-                                size_gb = size_mb / 1024
-                                size_str = f"{size_gb:.1f} GB"
-
-                        # Add row to table
-                        model_description = "Local model"
-                        if size_str:
-                            model_description += f" ({size_str})"
-
-                        model_table.add_row(
-                            str(model_index),
-                            model_name,
-                            "Ollama",
-                            "Varies",
-                            "Free",
-                            "Free",
-                            model_description
-                        )
-
-                        model_index += 1
-            except Exception:  # pylint: disable=broad-except
-                # Silently fail if Ollama is not available
-                # This is acceptable as Ollama is optional and we don't want to
-                # disrupt the user experience if it's not running
-                console.print(
-                    "[dim]Ollama models not available[/dim]",
-                    style="dim")
+                        size_gb = size_mb / 1024
+                        size_str = f"{size_gb:.1f} GB"
+                
+                model_description = "Local model"
+                if size_str:
+                    model_description += f" ({size_str})"
+                
+                model_table.add_row(
+                    str(model_index),
+                    model_name,
+                    "Ollama",
+                    "Varies",
+                    "Free",
+                    "Free",
+                    model_description
+                )
 
             # Display the table
             console.print(model_table)
