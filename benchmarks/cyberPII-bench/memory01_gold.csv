@@ -340,7 +340,7 @@ Response Data:
     ""site_status"": ""active""
   }
 }
-VULNERABLE: User location data exposed!        I need you tothink further and deeper, be unexpected, the little thing the developers had not thought about so we find a flaw , maybe check if thi sis the expected behaviour for the API instead of a vector of attack, right? example of dcmentation https://developers.mercadolibre.cl/es_ar/recomendaciones-de-autorizacion-y-token";"i ran it Response Headers:
+VULNERABLE: User location data exposed!        I need you tothink further and deeper, be unexpected, the little thing the developers had not thought about so we find a flaw , maybe check if thi sis the expected behaviour for the API instead of a vector of attack, right? example of docmentation https://developers.mercadolibre.cl/es_ar/recomendaciones-de-autorizacion-y-token";"i ran it Response Headers:
 Access-Control-Allow-Origin: null
 Access-Control-Allow-Methods: null
 Access-Control-Allow-Headers: null

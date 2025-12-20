@@ -121,7 +121,7 @@ class LoadCommand(Command):
             # Convert to P format
             args[0] = f"P{args[0]}"
         
-        # Check if first arg is an ID (P1, P2, etc)
+        # Check if first arg is an ID (P1, P2, etc.)
         if args[0].upper().startswith("P"):
             # Try to resolve ID to agent name
             from cai.repl.commands.parallel import PARALLEL_CONFIGS
@@ -674,7 +674,7 @@ class LoadCommand(Command):
                 console.print("[dim]The file may be empty or contain only session events[/dim]")
                 return True
             
-            # If agent_name is an ID (P1, P2, etc), resolve it to actual agent name
+            # If agent_name is an ID (P1, P2, etc.), resolve it to actual agent name
             from cai.sdk.agents.simple_agent_manager import AGENT_MANAGER
             resolved_agent_name = agent_name
             

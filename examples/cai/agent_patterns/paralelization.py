@@ -35,7 +35,7 @@ ctf_agent = Agent(
 # An agent to pick the best solution after multiple attempts
 best_solution_picker = Agent(
     name="best_solution_picker",
-    description="Agent focused on  picking the best security solutio",
+    description="Agent focused on  picking the best security solution",
     instructions="You pick the best security solution from the given attempts.",
     model=OpenAIChatCompletionsModel(
         model=os.getenv('CAI_MODEL', "qwen2.5:14b"),
