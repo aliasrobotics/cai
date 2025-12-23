@@ -1,0 +1,5176 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../research/">
+      
+      
+        <link rel="next" href="../run/">
+      
+      
+      <link rel="icon" href="../../assets/imago.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+    
+    
+      
+        <title>Agent - CAI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#agents" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="CAI" class="md-header__button md-logo" aria-label="CAI" data-md-component="logo">
+      
+  <img src="../../assets/imago.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CAI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Agent
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aliasrobotics/cai" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliasrobotics/cai
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="CAI" class="md-nav__button md-logo" aria-label="CAI" data-md-component="logo">
+      
+  <img src="../../assets/imago.png" alt="logo">
+
+    </a>
+    CAI
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aliasrobotics/cai" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliasrobotics/cai
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Welcome
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quickstart
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Professional Edition
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Professional Edition
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_pro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    🤔 Why CAI PRO?
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_pro_alias1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    ⭐ Alias1 Model
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_pro_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    🔥 Exclusive Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    ⭐ API Server (CAI PRO)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_pro_pricing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    💰 Pricing & Plans
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_pro_quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    🚀 Get Started with PRO
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_pro_contact/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    📞 Contact Sales
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    User Interfaces
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            User Interfaces
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Mobile UI (iOS)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            Mobile UI (iOS)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mui/mui_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mui/getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mui/user_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    User Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mui/gestures_shortcuts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Gestures & Shortcuts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mui/chat_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Chat Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Terminal UI (TUI)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Terminal UI (TUI)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tui/tui_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tui/getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tui/user_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    User Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tui/terminals_management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Terminals Management
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tui/teams_and_parallel_execution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Teams & Parallel Execution
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tui/sidebar_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Sidebar Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tui/keyboard_shortcuts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Keyboard Shortcuts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tui/commands_reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Commands Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tui/advanced_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Advanced Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tui/troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Command Line Interface (CLI)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            Command Line Interface (CLI)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cli_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/commands_reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Commands Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/advanced_usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Advanced Usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Core Concepts
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Core Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agents
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tools
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../handoffs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handoffs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../multi_agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Multi-Agent Systems
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Models & Providers
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Models & Providers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_list_of_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Available Models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Model Providers
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            Model Providers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../providers/openrouter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenRouter
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../providers/ollama/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Ollama
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../providers/azure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Azure OpenAI
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running_agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Running Agents
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../continue_mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Continue Mode
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working with Results
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Streaming
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tracing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tracing & Debugging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Context Management
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guardrails/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Guardrails & Security
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../council/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LLM Council
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../environment_variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Environment Variables
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Benchmarking
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Benchmarking
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarking/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarking/running_benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Running Benchmarks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarking/attack_defense/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Attack & Defense CTFs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarking/jeopardy_ctfs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jeopardy CTFs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarking/cyber_ranges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Cyber Ranges
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarking/knowledge_benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Knowledge Benchmarks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarking/privacy_benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Privacy Benchmarks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Research
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            Research
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    API Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9_1" id="__nav_9_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Agents
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9_1">
+            <span class="md-nav__icon md-icon"></span>
+            Agents
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Agent
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agent
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      agent
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.ToolsToFinalOutputFunction" class="md-nav__link">
+    <span class="md-ellipsis">
+      ToolsToFinalOutputFunction
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.ToolsToFinalOutputResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      ToolsToFinalOutputResult
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ToolsToFinalOutputResult">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.ToolsToFinalOutputResult.is_final_output" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_final_output
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.ToolsToFinalOutputResult.final_output" class="md-nav__link">
+    <span class="md-ellipsis">
+      final_output
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.StopAtTools" class="md-nav__link">
+    <span class="md-ellipsis">
+      StopAtTools
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="StopAtTools">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.StopAtTools.stop_at_tool_names" class="md-nav__link">
+    <span class="md-ellipsis">
+      stop_at_tool_names
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agent
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Agent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.name" class="md-nav__link">
+    <span class="md-ellipsis">
+      name
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.instructions" class="md-nav__link">
+    <span class="md-ellipsis">
+      instructions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.description" class="md-nav__link">
+    <span class="md-ellipsis">
+      description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.handoff_description" class="md-nav__link">
+    <span class="md-ellipsis">
+      handoff_description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.handoffs" class="md-nav__link">
+    <span class="md-ellipsis">
+      handoffs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.model" class="md-nav__link">
+    <span class="md-ellipsis">
+      model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.model_settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      model_settings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      tools
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.mcp_servers" class="md-nav__link">
+    <span class="md-ellipsis">
+      mcp_servers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.input_guardrails" class="md-nav__link">
+    <span class="md-ellipsis">
+      input_guardrails
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.output_guardrails" class="md-nav__link">
+    <span class="md-ellipsis">
+      output_guardrails
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.output_type" class="md-nav__link">
+    <span class="md-ellipsis">
+      output_type
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.hooks" class="md-nav__link">
+    <span class="md-ellipsis">
+      hooks
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.tool_use_behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      tool_use_behavior
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.reset_tool_choice" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset_tool_choice
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      clone
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.as_tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      as_tool
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.get_system_prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_system_prompt
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.get_mcp_tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_mcp_tools
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.get_all_tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_all_tools
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Runner
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tool/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tool
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../result/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Result
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stream_events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Stream Events
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../handoffs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handoffs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Lifecycle
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../items/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Items
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../run_context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Run Context
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Exceptions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guardrail/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Guardrail
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../model_settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Model Settings
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent_output/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agent Output
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../function_schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Function Schema
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_2" id="__nav_9_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Models
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_2">
+            <span class="md-nav__icon md-icon"></span>
+            Models
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/openai_chatcompletions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenAI Chat Completions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/openai_responses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenAI Responses
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_3" id="__nav_9_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Extensions
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_3">
+            <span class="md-nav__icon md-icon"></span>
+            Extensions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extensions/handoff_filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handoff Filters
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extensions/handoff_prompt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handoff Prompt
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Advanced
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Development
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Resources
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            Resources
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_find_us/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Find Us
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cai_citation_and_acknowledgments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Citation & Acknowledgments
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      agent
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.ToolsToFinalOutputFunction" class="md-nav__link">
+    <span class="md-ellipsis">
+      ToolsToFinalOutputFunction
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.ToolsToFinalOutputResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      ToolsToFinalOutputResult
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ToolsToFinalOutputResult">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.ToolsToFinalOutputResult.is_final_output" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_final_output
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.ToolsToFinalOutputResult.final_output" class="md-nav__link">
+    <span class="md-ellipsis">
+      final_output
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.StopAtTools" class="md-nav__link">
+    <span class="md-ellipsis">
+      StopAtTools
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="StopAtTools">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.StopAtTools.stop_at_tool_names" class="md-nav__link">
+    <span class="md-ellipsis">
+      stop_at_tool_names
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agent
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Agent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.name" class="md-nav__link">
+    <span class="md-ellipsis">
+      name
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.instructions" class="md-nav__link">
+    <span class="md-ellipsis">
+      instructions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.description" class="md-nav__link">
+    <span class="md-ellipsis">
+      description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.handoff_description" class="md-nav__link">
+    <span class="md-ellipsis">
+      handoff_description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.handoffs" class="md-nav__link">
+    <span class="md-ellipsis">
+      handoffs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.model" class="md-nav__link">
+    <span class="md-ellipsis">
+      model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.model_settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      model_settings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      tools
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.mcp_servers" class="md-nav__link">
+    <span class="md-ellipsis">
+      mcp_servers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.input_guardrails" class="md-nav__link">
+    <span class="md-ellipsis">
+      input_guardrails
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.output_guardrails" class="md-nav__link">
+    <span class="md-ellipsis">
+      output_guardrails
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.output_type" class="md-nav__link">
+    <span class="md-ellipsis">
+      output_type
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.hooks" class="md-nav__link">
+    <span class="md-ellipsis">
+      hooks
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.tool_use_behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      tool_use_behavior
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.reset_tool_choice" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset_tool_choice
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      clone
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.as_tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      as_tool
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.get_system_prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_system_prompt
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.get_mcp_tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_mcp_tools
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cai.sdk.agents.agent.Agent.get_all_tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_all_tools
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="agents"><code>Agents</code></h1>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="cai.sdk.agents.agent"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="cai.sdk.agents.agent.ToolsToFinalOutputFunction" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">ToolsToFinalOutputFunction</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">ToolsToFinalOutputFunction</span><span class="p">:</span> <span class="n"><span title="typing_extensions.TypeAlias">TypeAlias</span></span> <span class="o">=</span> <span class="n"><span title="typing.Callable">Callable</span></span><span class="p">[</span>
+</span><span id="__span-0-2">    <span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="RunContextWrapper
+
+
+  
+      dataclass
+   (cai.sdk.agents.run_context.RunContextWrapper)" href="../run_context/#cai.sdk.agents.run_context.RunContextWrapper">RunContextWrapper</a></span><span class="p">[</span><span class="n"><span title="cai.sdk.agents.run_context.TContext">TContext</span></span><span class="p">],</span> <span class="n"><a class="autorefs autorefs-internal" href="../../cli/commands_reference/#list">list</a></span><span class="p">[</span><span class="n"><span title="cai.sdk.agents.tool.FunctionToolResult">FunctionToolResult</span></span><span class="p">]],</span>
+</span><span id="__span-0-3">    <span class="n"><span title="cai.sdk.agents.util._types.MaybeAwaitable">MaybeAwaitable</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="ToolsToFinalOutputResult
+
+
+  
+      dataclass
+   (cai.sdk.agents.agent.ToolsToFinalOutputResult)" href="#cai.sdk.agents.agent.ToolsToFinalOutputResult">ToolsToFinalOutputResult</a></span><span class="p">],</span>
+</span><span id="__span-0-4"><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>A function that takes a run context and a list of tool results, and returns a
+<code>ToolToFinalOutputResult</code>.</p>
+
+    </div>
+
+</div>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="cai.sdk.agents.agent.ToolsToFinalOutputResult" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">ToolsToFinalOutputResult</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/cai/sdk/agents/agent.py</code></summary>
+                <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-29"><span class="nd">@dataclass</span>
+</span><span id="__span-0-30"><span class="k">class</span><span class="w"> </span><span class="nc">ToolsToFinalOutputResult</span><span class="p">:</span>
+</span><span id="__span-0-31">    <span class="n">is_final_output</span><span class="p">:</span> <span class="nb">bool</span>
+</span><span id="__span-0-32"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether this is the final output. If False, the LLM will run again and receive the tool call</span>
+</span><span id="__span-0-33"><span class="sd">    output.</span>
+</span><span id="__span-0-34"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-35">
+</span><span id="__span-0-36">    <span class="n">final_output</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-0-37"><span class="w">    </span><span class="sd">&quot;&quot;&quot;The final output. Can be None if `is_final_output` is False, otherwise must match the</span>
+</span><span id="__span-0-38"><span class="sd">    `output_type` of the agent.</span>
+</span><span id="__span-0-39"><span class="sd">    &quot;&quot;&quot;</span>
+</span></code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.ToolsToFinalOutputResult.is_final_output" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">is_final_output</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">is_final_output</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Whether this is the final output. If False, the LLM will run again and receive the tool call
+output.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.ToolsToFinalOutputResult.final_output" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">final_output</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">final_output</span><span class="p">:</span> <span class="n"><span title="typing.Any">Any</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The final output. Can be None if <code>is_final_output</code> is False, otherwise must match the
+<code>output_type</code> of the agent.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="cai.sdk.agents.agent.StopAtTools" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">StopAtTools</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing_extensions.TypedDict">TypedDict</span></code></p>
+
+
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/cai/sdk/agents/agent.py</code></summary>
+                <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-51"><span class="k">class</span><span class="w"> </span><span class="nc">StopAtTools</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+</span><span id="__span-0-52">    <span class="n">stop_at_tool_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</span><span id="__span-0-53"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A list of tool names, any of which will stop the agent from running further.&quot;&quot;&quot;</span>
+</span></code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.StopAtTools.stop_at_tool_names" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">stop_at_tool_names</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">stop_at_tool_names</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" href="../../cli/commands_reference/#list">list</a></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>A list of tool names, any of which will stop the agent from running further.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="cai.sdk.agents.agent.Agent" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Agent</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Generic">Generic</span>[<span title="cai.sdk.agents.run_context.TContext">TContext</span>]</code></p>
+
+
+        <p>An agent is an AI model configured with instructions, tools, guardrails, handoffs and more.</p>
+<p>We strongly recommend passing <code>instructions</code>, which is the "system prompt" for the agent. In
+addition, you can pass <code>handoff_description</code>, which is a human-readable description of the
+agent, used when the agent is used inside tools/handoffs.</p>
+<p>Agents are generic on the context type. The context is a (mutable) object you create. It is
+passed to tool functions, handoffs, guardrails, etc.</p>
+
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/cai/sdk/agents/agent.py</code></summary>
+                <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-56"><span class="nd">@dataclass</span>
+</span><span id="__span-0-57"><span class="k">class</span><span class="w"> </span><span class="nc">Agent</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">TContext</span><span class="p">]):</span>
+</span><span id="__span-0-58"><span class="w">    </span><span class="sd">&quot;&quot;&quot;An agent is an AI model configured with instructions, tools, guardrails, handoffs and more.</span>
+</span><span id="__span-0-59">
+</span><span id="__span-0-60"><span class="sd">    We strongly recommend passing `instructions`, which is the &quot;system prompt&quot; for the agent. In</span>
+</span><span id="__span-0-61"><span class="sd">    addition, you can pass `handoff_description`, which is a human-readable description of the</span>
+</span><span id="__span-0-62"><span class="sd">    agent, used when the agent is used inside tools/handoffs.</span>
+</span><span id="__span-0-63">
+</span><span id="__span-0-64"><span class="sd">    Agents are generic on the context type. The context is a (mutable) object you create. It is</span>
+</span><span id="__span-0-65"><span class="sd">    passed to tool functions, handoffs, guardrails, etc.</span>
+</span><span id="__span-0-66"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-67">
+</span><span id="__span-0-68">    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-0-69"><span class="w">    </span><span class="sd">&quot;&quot;&quot;The name of the agent.&quot;&quot;&quot;</span>
+</span><span id="__span-0-70">
+</span><span id="__span-0-71">    <span class="n">instructions</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="__span-0-72">        <span class="nb">str</span>
+</span><span id="__span-0-73">        <span class="o">|</span> <span class="n">Callable</span><span class="p">[</span>
+</span><span id="__span-0-74">            <span class="p">[</span><span class="n">RunContextWrapper</span><span class="p">[</span><span class="n">TContext</span><span class="p">],</span> <span class="n">Agent</span><span class="p">[</span><span class="n">TContext</span><span class="p">]],</span>
+</span><span id="__span-0-75">            <span class="n">MaybeAwaitable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="__span-0-76">        <span class="p">]</span>
+</span><span id="__span-0-77">        <span class="o">|</span> <span class="kc">None</span>
+</span><span id="__span-0-78">    <span class="p">)</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-0-79"><span class="w">    </span><span class="sd">&quot;&quot;&quot;The instructions for the agent. Will be used as the &quot;system prompt&quot; when this agent is</span>
+</span><span id="__span-0-80"><span class="sd">    invoked. Describes what the agent should do, and how it responds.</span>
+</span><span id="__span-0-81">
+</span><span id="__span-0-82"><span class="sd">    Can either be a string, or a function that dynamically generates instructions for the agent. If</span>
+</span><span id="__span-0-83"><span class="sd">    you provide a function, it will be called with the context and the agent instance. It must</span>
+</span><span id="__span-0-84"><span class="sd">    return a string.</span>
+</span><span id="__span-0-85"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-86">
+</span><span id="__span-0-87">    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-0-88"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A description of the agent. This is used in the CLI to show the agent&#39;s description.&quot;&quot;&quot;</span>
+</span><span id="__span-0-89">
+</span><span id="__span-0-90">    <span class="n">handoff_description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-0-91"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A description of the agent. This is used when the agent is used as a handoff, so that an</span>
+</span><span id="__span-0-92"><span class="sd">    LLM knows what it does and when to invoke it.</span>
+</span><span id="__span-0-93"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-94">
+</span><span id="__span-0-95">    <span class="n">handoffs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Agent</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">Handoff</span><span class="p">[</span><span class="n">TContext</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+</span><span id="__span-0-96"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Handoffs are sub-agents that the agent can delegate to. You can provide a list of handoffs,</span>
+</span><span id="__span-0-97"><span class="sd">    and the agent can choose to delegate to them if relevant. Allows for separation of concerns and</span>
+</span><span id="__span-0-98"><span class="sd">    modularity.</span>
+</span><span id="__span-0-99"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-100">
+</span><span id="__span-0-101">    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Model</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-0-102"><span class="w">    </span><span class="sd">&quot;&quot;&quot;The model implementation to use when invoking the LLM.</span>
+</span><span id="__span-0-103">
+</span><span id="__span-0-104"><span class="sd">    By default, if not set, the agent will use the default model configured in</span>
+</span><span id="__span-0-105"><span class="sd">    `model_settings.DEFAULT_MODEL`.</span>
+</span><span id="__span-0-106"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-107">
+</span><span id="__span-0-108">    <span class="n">model_settings</span><span class="p">:</span> <span class="n">ModelSettings</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">ModelSettings</span><span class="p">)</span>
+</span><span id="__span-0-109"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Configures model-specific tuning parameters (e.g. temperature, top_p).</span>
+</span><span id="__span-0-110"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-111">
+</span><span id="__span-0-112">    <span class="n">tools</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+</span><span id="__span-0-113"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A list of tools that the agent can use.&quot;&quot;&quot;</span>
+</span><span id="__span-0-114">
+</span><span id="__span-0-115">    <span class="n">mcp_servers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MCPServer</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+</span><span id="__span-0-116"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A list of [Model Context Protocol](https://modelcontextprotocol.io/) servers that</span>
+</span><span id="__span-0-117"><span class="sd">    the agent can use. Every time the agent runs, it will include tools from these servers in the</span>
+</span><span id="__span-0-118"><span class="sd">    list of available tools.</span>
+</span><span id="__span-0-119">
+</span><span id="__span-0-120"><span class="sd">    NOTE: You are expected to manage the lifecycle of these servers. Specifically, you must call</span>
+</span><span id="__span-0-121"><span class="sd">    `server.connect()` before passing it to the agent, and `server.cleanup()` when the server is no</span>
+</span><span id="__span-0-122"><span class="sd">    longer needed.</span>
+</span><span id="__span-0-123"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-124">
+</span><span id="__span-0-125">    <span class="n">input_guardrails</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">InputGuardrail</span><span class="p">[</span><span class="n">TContext</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+</span><span id="__span-0-126"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A list of checks that run in parallel to the agent&#39;s execution, before generating a</span>
+</span><span id="__span-0-127"><span class="sd">    response. Runs only if the agent is the first agent in the chain.</span>
+</span><span id="__span-0-128"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-129">
+</span><span id="__span-0-130">    <span class="n">output_guardrails</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">OutputGuardrail</span><span class="p">[</span><span class="n">TContext</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+</span><span id="__span-0-131"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A list of checks that run on the final output of the agent, after generating a response.</span>
+</span><span id="__span-0-132"><span class="sd">    Runs only if the agent produces a final output.</span>
+</span><span id="__span-0-133"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-134">
+</span><span id="__span-0-135">    <span class="n">output_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-0-136"><span class="w">    </span><span class="sd">&quot;&quot;&quot;The type of the output object. If not provided, the output will be `str`.&quot;&quot;&quot;</span>
+</span><span id="__span-0-137">
+</span><span id="__span-0-138">    <span class="n">hooks</span><span class="p">:</span> <span class="n">AgentHooks</span><span class="p">[</span><span class="n">TContext</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-0-139"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A class that receives callbacks on various lifecycle events for this agent.</span>
+</span><span id="__span-0-140"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-141">
+</span><span id="__span-0-142">    <span class="n">tool_use_behavior</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="__span-0-143">        <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;run_llm_again&quot;</span><span class="p">,</span> <span class="s2">&quot;stop_on_first_tool&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="n">StopAtTools</span> <span class="o">|</span> <span class="n">ToolsToFinalOutputFunction</span>
+</span><span id="__span-0-144">    <span class="p">)</span> <span class="o">=</span> <span class="s2">&quot;run_llm_again&quot;</span>
+</span><span id="__span-0-145"><span class="w">    </span><span class="sd">&quot;&quot;&quot;This lets you configure how tool use is handled.</span>
+</span><span id="__span-0-146"><span class="sd">    - &quot;run_llm_again&quot;: The default behavior. Tools are run, and then the LLM receives the results</span>
+</span><span id="__span-0-147"><span class="sd">        and gets to respond.</span>
+</span><span id="__span-0-148"><span class="sd">    - &quot;stop_on_first_tool&quot;: The output of the first tool call is used as the final output. This</span>
+</span><span id="__span-0-149"><span class="sd">        means that the LLM does not process the result of the tool call.</span>
+</span><span id="__span-0-150"><span class="sd">    - A list of tool names: The agent will stop running if any of the tools in the list are called.</span>
+</span><span id="__span-0-151"><span class="sd">        The final output will be the output of the first matching tool call. The LLM does not</span>
+</span><span id="__span-0-152"><span class="sd">        process the result of the tool call.</span>
+</span><span id="__span-0-153"><span class="sd">    - A function: If you pass a function, it will be called with the run context and the list of</span>
+</span><span id="__span-0-154"><span class="sd">      tool results. It must return a `ToolToFinalOutputResult`, which determines whether the tool</span>
+</span><span id="__span-0-155"><span class="sd">      calls result in a final output.</span>
+</span><span id="__span-0-156">
+</span><span id="__span-0-157"><span class="sd">      NOTE: This configuration is specific to FunctionTools. Hosted tools, such as file search,</span>
+</span><span id="__span-0-158"><span class="sd">      web search, etc are always processed by the LLM.</span>
+</span><span id="__span-0-159"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-160">
+</span><span id="__span-0-161">    <span class="n">reset_tool_choice</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="__span-0-162"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether to reset the tool choice to the default value after a tool has been called. Defaults</span>
+</span><span id="__span-0-163"><span class="sd">    to True. This ensures that the agent doesn&#39;t enter an infinite loop of tool usage.&quot;&quot;&quot;</span>
+</span><span id="__span-0-164">
+</span><span id="__span-0-165">    <span class="k">def</span><span class="w"> </span><span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Agent</span><span class="p">[</span><span class="n">TContext</span><span class="p">]:</span>
+</span><span id="__span-0-166"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Make a copy of the agent, with the given arguments changed. For example, you could do:</span>
+</span><span id="__span-0-167"><span class="sd">        ```</span>
+</span><span id="__span-0-168"><span class="sd">        new_agent = agent.clone(instructions=&quot;New instructions&quot;)</span>
+</span><span id="__span-0-169"><span class="sd">        ```</span>
+</span><span id="__span-0-170"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="__span-0-171">        <span class="k">return</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span><span id="__span-0-172">
+</span><span id="__span-0-173">    <span class="k">def</span><span class="w"> </span><span class="nf">as_tool</span><span class="p">(</span>
+</span><span id="__span-0-174">        <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-0-175">        <span class="n">tool_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-176">        <span class="n">tool_description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-177">        <span class="n">custom_output_extractor</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">RunResult</span><span class="p">],</span> <span class="n">Awaitable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-178">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tool</span><span class="p">:</span>
+</span><span id="__span-0-179"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform this agent into a tool, callable by other agents.</span>
+</span><span id="__span-0-180">
+</span><span id="__span-0-181"><span class="sd">        This is different from handoffs in two ways:</span>
+</span><span id="__span-0-182"><span class="sd">        1. In handoffs, the new agent receives the conversation history. In this tool, the new agent</span>
+</span><span id="__span-0-183"><span class="sd">           receives generated input.</span>
+</span><span id="__span-0-184"><span class="sd">        2. In handoffs, the new agent takes over the conversation. In this tool, the new agent is</span>
+</span><span id="__span-0-185"><span class="sd">           called as a tool, and the conversation is continued by the original agent.</span>
+</span><span id="__span-0-186">
+</span><span id="__span-0-187"><span class="sd">        Args:</span>
+</span><span id="__span-0-188"><span class="sd">            tool_name: The name of the tool. If not provided, the agent&#39;s name will be used.</span>
+</span><span id="__span-0-189"><span class="sd">            tool_description: The description of the tool, which should indicate what it does and</span>
+</span><span id="__span-0-190"><span class="sd">                when to use it.</span>
+</span><span id="__span-0-191"><span class="sd">            custom_output_extractor: A function that extracts the output from the agent. If not</span>
+</span><span id="__span-0-192"><span class="sd">                provided, the last message from the agent will be used.</span>
+</span><span id="__span-0-193"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="__span-0-194">
+</span><span id="__span-0-195">        <span class="nd">@function_tool</span><span class="p">(</span>
+</span><span id="__span-0-196">            <span class="n">name_override</span><span class="o">=</span><span class="n">tool_name</span> <span class="ow">or</span> <span class="n">_transforms</span><span class="o">.</span><span class="n">transform_string_function_style</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+</span><span id="__span-0-197">            <span class="n">description_override</span><span class="o">=</span><span class="n">tool_description</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+</span><span id="__span-0-198">        <span class="p">)</span>
+</span><span id="__span-0-199">        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_agent</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">RunContextWrapper</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="__span-0-200">            <span class="kn">from</span><span class="w"> </span><span class="nn">.run</span><span class="w"> </span><span class="kn">import</span> <span class="n">Runner</span>
+</span><span id="__span-0-201">
+</span><span id="__span-0-202">            <span class="n">output</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="__span-0-203">                <span class="n">starting_agent</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-0-204">                <span class="nb">input</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span>
+</span><span id="__span-0-205">                <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">context</span><span class="p">,</span>
+</span><span id="__span-0-206">            <span class="p">)</span>
+</span><span id="__span-0-207">            <span class="k">if</span> <span class="n">custom_output_extractor</span><span class="p">:</span>
+</span><span id="__span-0-208">                <span class="k">return</span> <span class="k">await</span> <span class="n">custom_output_extractor</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+</span><span id="__span-0-209">
+</span><span id="__span-0-210">            <span class="k">return</span> <span class="n">ItemHelpers</span><span class="o">.</span><span class="n">text_message_outputs</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">new_items</span><span class="p">)</span>
+</span><span id="__span-0-211">
+</span><span id="__span-0-212">        <span class="k">return</span> <span class="n">run_agent</span>
+</span><span id="__span-0-213">
+</span><span id="__span-0-214">    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_system_prompt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_context</span><span class="p">:</span> <span class="n">RunContextWrapper</span><span class="p">[</span><span class="n">TContext</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-215"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the system prompt for the agent.&quot;&quot;&quot;</span>
+</span><span id="__span-0-216">        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instructions</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="__span-0-217">            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instructions</span>
+</span><span id="__span-0-218">        <span class="k">elif</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instructions</span><span class="p">):</span>
+</span><span id="__span-0-219">            <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">iscoroutinefunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instructions</span><span class="p">):</span>
+</span><span id="__span-0-220">                <span class="k">return</span> <span class="k">await</span> <span class="n">cast</span><span class="p">(</span><span class="n">Awaitable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">instructions</span><span class="p">(</span><span class="n">run_context</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
+</span><span id="__span-0-221">            <span class="k">else</span><span class="p">:</span>
+</span><span id="__span-0-222">                <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instructions</span><span class="p">(</span><span class="n">run_context</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
+</span><span id="__span-0-223">        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">instructions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-224">            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Instructions must be a string or a function, got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">instructions</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-0-225">
+</span><span id="__span-0-226">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="__span-0-227">
+</span><span id="__span-0-228">    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_mcp_tools</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tool</span><span class="p">]:</span>
+</span><span id="__span-0-229"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetches the available tools from the MCP servers.&quot;&quot;&quot;</span>
+</span><span id="__span-0-230">        <span class="k">return</span> <span class="k">await</span> <span class="n">MCPUtil</span><span class="o">.</span><span class="n">get_all_function_tools</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mcp_servers</span><span class="p">)</span>
+</span><span id="__span-0-231">
+</span><span id="__span-0-232">    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_all_tools</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tool</span><span class="p">]:</span>
+</span><span id="__span-0-233"><span class="w">        </span><span class="sd">&quot;&quot;&quot;All agent tools, including MCP tools and function tools.&quot;&quot;&quot;</span>
+</span><span id="__span-0-234">        <span class="n">mcp_tools</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mcp_tools</span><span class="p">()</span>
+</span><span id="__span-0-235">        <span class="k">return</span> <span class="n">mcp_tools</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tools</span>
+</span></code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.Agent.name" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">name</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The name of the agent.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.Agent.instructions" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">instructions</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">instructions</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="__span-0-2">    <span class="n"><span title="str">str</span></span>
+</span><span id="__span-0-3">    <span class="o">|</span> <span class="n"><span title="typing.Callable">Callable</span></span><span class="p">[</span>
+</span><span id="__span-0-4">        <span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="RunContextWrapper
+
+
+  
+      dataclass
+   (cai.sdk.agents.run_context.RunContextWrapper)" href="../run_context/#cai.sdk.agents.run_context.RunContextWrapper">RunContextWrapper</a></span><span class="p">[</span><span class="n"><span title="cai.sdk.agents.run_context.TContext">TContext</span></span><span class="p">],</span> <span class="n"><a class="autorefs autorefs-internal" title="Agent
+
+
+  
+      dataclass
+   (cai.sdk.agents.agent.Agent)" href="#cai.sdk.agents.agent.Agent">Agent</a></span><span class="p">[</span><span class="n"><span title="cai.sdk.agents.run_context.TContext">TContext</span></span><span class="p">]],</span>
+</span><span id="__span-0-5">        <span class="n"><span title="cai.sdk.agents.util._types.MaybeAwaitable">MaybeAwaitable</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">],</span>
+</span><span id="__span-0-6">    <span class="p">]</span>
+</span><span id="__span-0-7">    <span class="o">|</span> <span class="kc">None</span>
+</span><span id="__span-0-8"><span class="p">)</span> <span class="o">=</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The instructions for the agent. Will be used as the "system prompt" when this agent is
+invoked. Describes what the agent should do, and how it responds.</p>
+<p>Can either be a string, or a function that dynamically generates instructions for the agent. If
+you provide a function, it will be called with the context and the agent instance. It must
+return a string.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.Agent.description" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">description</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">description</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>A description of the agent. This is used in the CLI to show the agent's description.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.Agent.handoff_description" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">handoff_description</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">handoff_description</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>A description of the agent. This is used when the agent is used as a handoff, so that an
+LLM knows what it does and when to invoke it.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.Agent.handoffs" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">handoffs</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">handoffs</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" href="../../cli/commands_reference/#list">list</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="Agent
+
+
+  
+      dataclass
+   (cai.sdk.agents.agent.Agent)" href="#cai.sdk.agents.agent.Agent">Agent</a></span><span class="p">[</span><span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-internal" title="Handoff
+
+
+  
+      dataclass
+   (cai.sdk.agents.handoffs.Handoff)" href="../handoffs/#cai.sdk.agents.handoffs.Handoff">Handoff</a></span><span class="p">[</span><span class="n"><span title="cai.sdk.agents.run_context.TContext">TContext</span></span><span class="p">]]</span> <span class="o">=</span> <span class="n"><span title="dataclasses.field">field</span></span><span class="p">(</span>
+</span><span id="__span-0-2">    <span class="n"><span title="dataclasses.field(default_factory)">default_factory</span></span><span class="o">=</span><span class="n"><a class="autorefs autorefs-internal" href="../../cli/commands_reference/#list">list</a></span>
+</span><span id="__span-0-3"><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Handoffs are sub-agents that the agent can delegate to. You can provide a list of handoffs,
+and the agent can choose to delegate to them if relevant. Allows for separation of concerns and
+modularity.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.Agent.model" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">model</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">model</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-internal" title="Model (cai.sdk.agents.models.interface.Model)" href="../models/interface/#cai.sdk.agents.models.interface.Model">Model</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The model implementation to use when invoking the LLM.</p>
+<p>By default, if not set, the agent will use the default model configured in
+<code>model_settings.DEFAULT_MODEL</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.Agent.model_settings" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">model_settings</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">model_settings</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="ModelSettings
+
+
+  
+      dataclass
+   (cai.sdk.agents.model_settings.ModelSettings)" href="../model_settings/#cai.sdk.agents.model_settings.ModelSettings">ModelSettings</a></span> <span class="o">=</span> <span class="n"><span title="dataclasses.field">field</span></span><span class="p">(</span>
+</span><span id="__span-0-2">    <span class="n"><span title="dataclasses.field(default_factory)">default_factory</span></span><span class="o">=</span><span class="n"><a class="autorefs autorefs-internal" title="ModelSettings
+
+
+  
+      dataclass
+   (cai.sdk.agents.model_settings.ModelSettings)" href="../model_settings/#cai.sdk.agents.model_settings.ModelSettings">ModelSettings</a></span>
+</span><span id="__span-0-3"><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Configures model-specific tuning parameters (e.g. temperature, top_p).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.Agent.tools" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">tools</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">tools</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" href="../../cli/commands_reference/#list">list</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="Tool
+
+
+  
+      module-attribute
+   (cai.sdk.agents.tool.Tool)" href="../tool/#cai.sdk.agents.tool.Tool">Tool</a></span><span class="p">]</span> <span class="o">=</span> <span class="n"><span title="dataclasses.field">field</span></span><span class="p">(</span><span class="n"><span title="dataclasses.field(default_factory)">default_factory</span></span><span class="o">=</span><span class="n"><a class="autorefs autorefs-internal" href="../../cli/commands_reference/#list">list</a></span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>A list of tools that the agent can use.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.Agent.mcp_servers" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">mcp_servers</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">mcp_servers</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" href="../../cli/commands_reference/#list">list</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="MCPServer (cai.sdk.agents.mcp.MCPServer)" href="../mcp/server/#cai.sdk.agents.mcp.server.MCPServer">MCPServer</a></span><span class="p">]</span> <span class="o">=</span> <span class="n"><span title="dataclasses.field">field</span></span><span class="p">(</span><span class="n"><span title="dataclasses.field(default_factory)">default_factory</span></span><span class="o">=</span><span class="n"><a class="autorefs autorefs-internal" href="../../cli/commands_reference/#list">list</a></span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>A list of <a href="https://modelcontextprotocol.io/">Model Context Protocol</a> servers that
+the agent can use. Every time the agent runs, it will include tools from these servers in the
+list of available tools.</p>
+<p>NOTE: You are expected to manage the lifecycle of these servers. Specifically, you must call
+<code>server.connect()</code> before passing it to the agent, and <code>server.cleanup()</code> when the server is no
+longer needed.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.Agent.input_guardrails" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">input_guardrails</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">input_guardrails</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" href="../../cli/commands_reference/#list">list</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="InputGuardrail
+
+
+  
+      dataclass
+   (cai.sdk.agents.guardrail.InputGuardrail)" href="../guardrail/#cai.sdk.agents.guardrail.InputGuardrail">InputGuardrail</a></span><span class="p">[</span><span class="n"><span title="cai.sdk.agents.run_context.TContext">TContext</span></span><span class="p">]]</span> <span class="o">=</span> <span class="n"><span title="dataclasses.field">field</span></span><span class="p">(</span>
+</span><span id="__span-0-2">    <span class="n"><span title="dataclasses.field(default_factory)">default_factory</span></span><span class="o">=</span><span class="n"><a class="autorefs autorefs-internal" href="../../cli/commands_reference/#list">list</a></span>
+</span><span id="__span-0-3"><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>A list of checks that run in parallel to the agent's execution, before generating a
+response. Runs only if the agent is the first agent in the chain.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.Agent.output_guardrails" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">output_guardrails</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">output_guardrails</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" href="../../cli/commands_reference/#list">list</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="OutputGuardrail
+
+
+  
+      dataclass
+   (cai.sdk.agents.guardrail.OutputGuardrail)" href="../guardrail/#cai.sdk.agents.guardrail.OutputGuardrail">OutputGuardrail</a></span><span class="p">[</span><span class="n"><span title="cai.sdk.agents.run_context.TContext">TContext</span></span><span class="p">]]</span> <span class="o">=</span> <span class="n"><span title="dataclasses.field">field</span></span><span class="p">(</span>
+</span><span id="__span-0-2">    <span class="n"><span title="dataclasses.field(default_factory)">default_factory</span></span><span class="o">=</span><span class="n"><a class="autorefs autorefs-internal" href="../../cli/commands_reference/#list">list</a></span>
+</span><span id="__span-0-3"><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>A list of checks that run on the final output of the agent, after generating a response.
+Runs only if the agent produces a final output.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.Agent.output_type" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">output_type</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">output_type</span><span class="p">:</span> <span class="n"><span title="type">type</span></span><span class="p">[</span><span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The type of the output object. If not provided, the output will be <code>str</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.Agent.hooks" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">hooks</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">hooks</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="AgentHooks (cai.sdk.agents.lifecycle.AgentHooks)" href="../lifecycle/#cai.sdk.agents.lifecycle.AgentHooks">AgentHooks</a></span><span class="p">[</span><span class="n"><span title="cai.sdk.agents.run_context.TContext">TContext</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>A class that receives callbacks on various lifecycle events for this agent.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.Agent.tool_use_behavior" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">tool_use_behavior</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">tool_use_behavior</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="__span-0-2">    <span class="n"><span title="typing.Literal">Literal</span></span><span class="p">[</span><span class="s2">&quot;run_llm_again&quot;</span><span class="p">,</span> <span class="s2">&quot;stop_on_first_tool&quot;</span><span class="p">]</span>
+</span><span id="__span-0-3">    <span class="o">|</span> <span class="n"><a class="autorefs autorefs-internal" title="StopAtTools (cai.sdk.agents.agent.StopAtTools)" href="#cai.sdk.agents.agent.StopAtTools">StopAtTools</a></span>
+</span><span id="__span-0-4">    <span class="o">|</span> <span class="n"><a class="autorefs autorefs-internal" title="ToolsToFinalOutputFunction
+
+
+  
+      module-attribute
+   (cai.sdk.agents.agent.ToolsToFinalOutputFunction)" href="#cai.sdk.agents.agent.ToolsToFinalOutputFunction">ToolsToFinalOutputFunction</a></span>
+</span><span id="__span-0-5"><span class="p">)</span> <span class="o">=</span> <span class="s2">&quot;run_llm_again&quot;</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>This lets you configure how tool use is handled.
+- "run_llm_again": The default behavior. Tools are run, and then the LLM receives the results
+    and gets to respond.
+- "stop_on_first_tool": The output of the first tool call is used as the final output. This
+    means that the LLM does not process the result of the tool call.
+- A list of tool names: The agent will stop running if any of the tools in the list are called.
+    The final output will be the output of the first matching tool call. The LLM does not
+    process the result of the tool call.
+- A function: If you pass a function, it will be called with the run context and the list of
+  tool results. It must return a <code>ToolToFinalOutputResult</code>, which determines whether the tool
+  calls result in a final output.</p>
+<p>NOTE: This configuration is specific to FunctionTools. Hosted tools, such as file search,
+  web search, etc are always processed by the LLM.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="cai.sdk.agents.agent.Agent.reset_tool_choice" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">reset_tool_choice</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">reset_tool_choice</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">True</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Whether to reset the tool choice to the default value after a tool has been called. Defaults
+to True. This ensures that the agent doesn't enter an infinite loop of tool usage.</p>
+
+    </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="cai.sdk.agents.agent.Agent.clone" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">clone</span>
+
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="nf">clone</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="Agent
+
+
+  
+      dataclass
+   (cai.sdk.agents.agent.Agent)" href="#cai.sdk.agents.agent.Agent">Agent</a></span><span class="p">[</span><span class="n"><span title="cai.sdk.agents.run_context.TContext">TContext</span></span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Make a copy of the agent, with the given arguments changed. For example, you could do:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1">new_agent = agent.clone(instructions=&quot;New instructions&quot;)
+</span></code></pre></div></p>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/cai/sdk/agents/agent.py</code></summary>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-165"><span class="k">def</span><span class="w"> </span><span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Agent</span><span class="p">[</span><span class="n">TContext</span><span class="p">]:</span>
+</span><span id="__span-0-166"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Make a copy of the agent, with the given arguments changed. For example, you could do:</span>
+</span><span id="__span-0-167"><span class="sd">    ```</span>
+</span><span id="__span-0-168"><span class="sd">    new_agent = agent.clone(instructions=&quot;New instructions&quot;)</span>
+</span><span id="__span-0-169"><span class="sd">    ```</span>
+</span><span id="__span-0-170"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-171">    <span class="k">return</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="cai.sdk.agents.agent.Agent.as_tool" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">as_tool</span>
+
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="nf">as_tool</span><span class="p">(</span>
+</span><span id="__span-0-2">    <span class="n">tool_name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-3">    <span class="n">tool_description</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4">    <span class="n">custom_output_extractor</span><span class="p">:</span> <span class="n"><span title="typing.Callable">Callable</span></span><span class="p">[</span>
+</span><span id="__span-0-5">        <span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="RunResult
+
+
+  
+      dataclass
+   (cai.sdk.agents.result.RunResult)" href="../result/#cai.sdk.agents.result.RunResult">RunResult</a></span><span class="p">],</span> <span class="n"><span title="collections.abc.Awaitable">Awaitable</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">]</span>
+</span><span id="__span-0-6">    <span class="p">]</span>
+</span><span id="__span-0-7">    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-8"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="Tool
+
+
+  
+      module-attribute
+   (cai.sdk.agents.tool.Tool)" href="../tool/#cai.sdk.agents.tool.Tool">Tool</a></span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Transform this agent into a tool, callable by other agents.</p>
+<p>This is different from handoffs in two ways:
+1. In handoffs, the new agent receives the conversation history. In this tool, the new agent
+   receives generated input.
+2. In handoffs, the new agent takes over the conversation. In this tool, the new agent is
+   called as a tool, and the conversation is continued by the original agent.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>tool_name</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the tool. If not provided, the agent's name will be used.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>tool_description</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The description of the tool, which should indicate what it does and
+when to use it.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>custom_output_extractor</code>
+            </td>
+            <td>
+                  <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="RunResult
+
+
+  
+      dataclass
+   (cai.sdk.agents.result.RunResult)" href="../result/#cai.sdk.agents.result.RunResult">RunResult</a>], <span title="collections.abc.Awaitable">Awaitable</span>[<span title="str">str</span>]] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A function that extracts the output from the agent. If not
+provided, the last message from the agent will be used.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/cai/sdk/agents/agent.py</code></summary>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-173"><span class="k">def</span><span class="w"> </span><span class="nf">as_tool</span><span class="p">(</span>
+</span><span id="__span-0-174">    <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-0-175">    <span class="n">tool_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-176">    <span class="n">tool_description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-177">    <span class="n">custom_output_extractor</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">RunResult</span><span class="p">],</span> <span class="n">Awaitable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-178"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tool</span><span class="p">:</span>
+</span><span id="__span-0-179"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Transform this agent into a tool, callable by other agents.</span>
+</span><span id="__span-0-180">
+</span><span id="__span-0-181"><span class="sd">    This is different from handoffs in two ways:</span>
+</span><span id="__span-0-182"><span class="sd">    1. In handoffs, the new agent receives the conversation history. In this tool, the new agent</span>
+</span><span id="__span-0-183"><span class="sd">       receives generated input.</span>
+</span><span id="__span-0-184"><span class="sd">    2. In handoffs, the new agent takes over the conversation. In this tool, the new agent is</span>
+</span><span id="__span-0-185"><span class="sd">       called as a tool, and the conversation is continued by the original agent.</span>
+</span><span id="__span-0-186">
+</span><span id="__span-0-187"><span class="sd">    Args:</span>
+</span><span id="__span-0-188"><span class="sd">        tool_name: The name of the tool. If not provided, the agent&#39;s name will be used.</span>
+</span><span id="__span-0-189"><span class="sd">        tool_description: The description of the tool, which should indicate what it does and</span>
+</span><span id="__span-0-190"><span class="sd">            when to use it.</span>
+</span><span id="__span-0-191"><span class="sd">        custom_output_extractor: A function that extracts the output from the agent. If not</span>
+</span><span id="__span-0-192"><span class="sd">            provided, the last message from the agent will be used.</span>
+</span><span id="__span-0-193"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-194">
+</span><span id="__span-0-195">    <span class="nd">@function_tool</span><span class="p">(</span>
+</span><span id="__span-0-196">        <span class="n">name_override</span><span class="o">=</span><span class="n">tool_name</span> <span class="ow">or</span> <span class="n">_transforms</span><span class="o">.</span><span class="n">transform_string_function_style</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+</span><span id="__span-0-197">        <span class="n">description_override</span><span class="o">=</span><span class="n">tool_description</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+</span><span id="__span-0-198">    <span class="p">)</span>
+</span><span id="__span-0-199">    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_agent</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">RunContextWrapper</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="__span-0-200">        <span class="kn">from</span><span class="w"> </span><span class="nn">.run</span><span class="w"> </span><span class="kn">import</span> <span class="n">Runner</span>
+</span><span id="__span-0-201">
+</span><span id="__span-0-202">        <span class="n">output</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="__span-0-203">            <span class="n">starting_agent</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-0-204">            <span class="nb">input</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span>
+</span><span id="__span-0-205">            <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">context</span><span class="p">,</span>
+</span><span id="__span-0-206">        <span class="p">)</span>
+</span><span id="__span-0-207">        <span class="k">if</span> <span class="n">custom_output_extractor</span><span class="p">:</span>
+</span><span id="__span-0-208">            <span class="k">return</span> <span class="k">await</span> <span class="n">custom_output_extractor</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+</span><span id="__span-0-209">
+</span><span id="__span-0-210">        <span class="k">return</span> <span class="n">ItemHelpers</span><span class="o">.</span><span class="n">text_message_outputs</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">new_items</span><span class="p">)</span>
+</span><span id="__span-0-211">
+</span><span id="__span-0-212">    <span class="k">return</span> <span class="n">run_agent</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="cai.sdk.agents.agent.Agent.get_system_prompt" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">get_system_prompt</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="nf">get_system_prompt</span><span class="p">(</span>
+</span><span id="__span-0-2">    <span class="n">run_context</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="RunContextWrapper
+
+
+  
+      dataclass
+   (cai.sdk.agents.run_context.RunContextWrapper)" href="../run_context/#cai.sdk.agents.run_context.RunContextWrapper">RunContextWrapper</a></span><span class="p">[</span><span class="n"><span title="cai.sdk.agents.run_context.TContext">TContext</span></span><span class="p">],</span>
+</span><span id="__span-0-3"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the system prompt for the agent.</p>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/cai/sdk/agents/agent.py</code></summary>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-214"><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_system_prompt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_context</span><span class="p">:</span> <span class="n">RunContextWrapper</span><span class="p">[</span><span class="n">TContext</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-215"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the system prompt for the agent.&quot;&quot;&quot;</span>
+</span><span id="__span-0-216">    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instructions</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="__span-0-217">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instructions</span>
+</span><span id="__span-0-218">    <span class="k">elif</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instructions</span><span class="p">):</span>
+</span><span id="__span-0-219">        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">iscoroutinefunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instructions</span><span class="p">):</span>
+</span><span id="__span-0-220">            <span class="k">return</span> <span class="k">await</span> <span class="n">cast</span><span class="p">(</span><span class="n">Awaitable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">instructions</span><span class="p">(</span><span class="n">run_context</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
+</span><span id="__span-0-221">        <span class="k">else</span><span class="p">:</span>
+</span><span id="__span-0-222">            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instructions</span><span class="p">(</span><span class="n">run_context</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
+</span><span id="__span-0-223">    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">instructions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-224">        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Instructions must be a string or a function, got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">instructions</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-0-225">
+</span><span id="__span-0-226">    <span class="k">return</span> <span class="kc">None</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="cai.sdk.agents.agent.Agent.get_mcp_tools" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">get_mcp_tools</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="nf">get_mcp_tools</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" href="../../cli/commands_reference/#list">list</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="Tool
+
+
+  
+      module-attribute
+   (cai.sdk.agents.tool.Tool)" href="../tool/#cai.sdk.agents.tool.Tool">Tool</a></span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Fetches the available tools from the MCP servers.</p>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/cai/sdk/agents/agent.py</code></summary>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-228"><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_mcp_tools</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tool</span><span class="p">]:</span>
+</span><span id="__span-0-229"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetches the available tools from the MCP servers.&quot;&quot;&quot;</span>
+</span><span id="__span-0-230">    <span class="k">return</span> <span class="k">await</span> <span class="n">MCPUtil</span><span class="o">.</span><span class="n">get_all_function_tools</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mcp_servers</span><span class="p">)</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="cai.sdk.agents.agent.Agent.get_all_tools" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">get_all_tools</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><span class="nf">get_all_tools</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" href="../../cli/commands_reference/#list">list</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="Tool
+
+
+  
+      module-attribute
+   (cai.sdk.agents.tool.Tool)" href="../tool/#cai.sdk.agents.tool.Tool">Tool</a></span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>All agent tools, including MCP tools and function tools.</p>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/cai/sdk/agents/agent.py</code></summary>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-232"><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_all_tools</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tool</span><span class="p">]:</span>
+</span><span id="__span-0-233"><span class="w">    </span><span class="sd">&quot;&quot;&quot;All agent tools, including MCP tools and function tools.&quot;&quot;&quot;</span>
+</span><span id="__span-0-234">    <span class="n">mcp_tools</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mcp_tools</span><span class="p">()</span>
+</span><span id="__span-0-235">    <span class="k">return</span> <span class="n">mcp_tools</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tools</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.copy", "content.code.select", "navigation.path", "navigation.sections", "navigation.expand", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>
