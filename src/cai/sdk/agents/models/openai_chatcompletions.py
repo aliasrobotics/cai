@@ -517,6 +517,16 @@ class OpenAIChatCompletionsModel(Model):
     def _non_null_or_not_given(self, value: Any) -> Any:
         return value if value is not None else NOT_GIVEN
 
+    def _warn_empty_response(self, content: str | None, has_tool_calls: bool, has_refusal: bool) -> None:
+        """Log warning for empty or sentinel responses (e.g., <|endoftext|>)."""
+        if has_tool_calls or has_refusal:
+            return
+        is_empty = not content or not str(content).strip()
+        is_sentinel = content and "<|endoftext|>" in str(content)
+        if is_empty or is_sentinel:
+            detail = "empty" if is_empty else f"sentinel ({str(content)[:50]})"
+            logger.warning(f"Model completed without output ({detail}). May indicate model-agent compatibility issue.")
+
     async def get_response(
         self,
         system_instructions: str | None,
@@ -1123,6 +1133,13 @@ class OpenAIChatCompletionsModel(Model):
             # Ensure cost is properly initialized
             if not hasattr(response, "cost"):
                 response.cost = None
+
+            # Warn if response is empty or contains sentinel token
+            self._warn_empty_response(
+                getattr(response.choices[0].message, "content", None),
+                bool(getattr(response.choices[0].message, "tool_calls", None)),
+                bool(getattr(response.choices[0].message, "refusal", None))
+            )
 
             return ModelResponse(
                 output=items,
@@ -2196,6 +2213,17 @@ class OpenAIChatCompletionsModel(Model):
                         and usage.prompt_tokens_details.cached_tokens
                         else 0,
                     },
+                )
+
+                # Warn if streamed response is empty or contains sentinel token
+                text_content = ""
+                if state.text_content_index_and_output:
+                    text_out = state.text_content_index_and_output[1]
+                    text_content = getattr(text_out, 'text', '') or getattr(text_out, 'content', '')
+                self._warn_empty_response(
+                    text_content,
+                    bool(state.function_calls),
+                    bool(state.refusal_content_index_and_output)
                 )
 
                 yield ResponseCompletedEvent(
