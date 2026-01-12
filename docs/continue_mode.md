@@ -321,12 +321,35 @@ These examples demonstrate:
 - Graceful interruption with Ctrl+C
 - Practical security use cases
 
+## Combining with Session Resume
+
+The `--continue` flag works seamlessly with `--resume` to continue interrupted sessions autonomously:
+
+```bash
+# Resume last session and continue working autonomously
+cai --resume --continue
+
+# Resume specific session and continue
+cai --resume abc12345 --continue
+
+# Resume from interactive selector and continue
+cai --resume list --continue
+```
+
+This powerful combination:
+1. **Restores your previous session** with full conversation history
+2. **Automatically generates a continuation prompt** based on where you left off
+3. **Continues working autonomously** without waiting for user input
+
+For more details on session resume capabilities, see the [Session Resume](session_resume.md) documentation.
+
 ## Summary
 
 The `--continue` flag transforms CAI into an autonomous cybersecurity assistant capable of:
 - Working independently on complex tasks
 - Recovering from errors intelligently
 - Maintaining context across multiple operations
+- Resuming and continuing interrupted sessions with `--resume --continue`
 - Providing entertainment with continuous jokes
 
 Whether you're conducting security audits, hunting for bugs, or just want some cybersecurity humor, continue mode keeps your agent working until the job is done.

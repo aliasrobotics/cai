@@ -6,16 +6,104 @@ This guide covers advanced features, automation, scripting, and power-user techn
 
 ## Table of Contents
 
-1. [Parallel Execution](#parallel-execution)
-2. [Queue System](#queue-system)
-3. [Automation & Scripting](#automation--scripting)
-4. [Memory Management](#memory-management)
-5. [Workspace & Virtualization](#workspace--virtualization)
-6. [CTF Workflows](#ctf-workflows)
-7. [Cost Management](#cost-management)
-8. [Configuration Management](#configuration-management)
-9. [Integration Patterns](#integration-patterns)
-10. [Troubleshooting](#troubleshooting)
+1. [CLI Startup Flags](#cli-startup-flags)
+2. [Parallel Execution](#parallel-execution)
+3. [Queue System](#queue-system)
+4. [Automation & Scripting](#automation--scripting)
+5. [Memory Management](#memory-management)
+6. [Workspace & Virtualization](#workspace--virtualization)
+7. [CTF Workflows](#ctf-workflows)
+8. [Cost Management](#cost-management)
+9. [Configuration Management](#configuration-management)
+10. [Integration Patterns](#integration-patterns)
+11. [Troubleshooting](#troubleshooting)
+
+---
+
+## CLI Startup Flags
+
+CAI provides powerful command-line flags for session management and autonomous operation.
+
+### Session Resume Flags
+
+Resume previous sessions to continue where you left off:
+
+```bash
+# Resume the last session
+cai --resume
+
+# Resume with interactive session selector
+cai --resume list
+
+# Resume a specific session by ID
+cai --resume abc12345
+
+# Resume from a specific log file
+cai --resume /path/to/session.jsonl
+
+# Resume from custom logs directory
+cai --resume list --logpath ~/custom_logs/
+```
+
+### Continue Mode Flag
+
+Enable autonomous operation where the agent continues working without waiting for user input:
+
+```bash
+# Start with continue mode
+cai --continue --prompt "perform security audit"
+
+# Short form
+cai -c --prompt "analyze vulnerabilities"
+```
+
+### Combining Resume and Continue
+
+The most powerful combination - resume a session AND continue autonomously:
+
+```bash
+# Resume last session and continue working
+cai --resume --continue
+
+# Resume specific session and continue
+cai --resume abc12345 --continue
+
+# Short form
+cai --resume -c
+```
+
+This is ideal for:
+- Resuming interrupted long-running tasks
+- Continuing security audits after a break
+- Picking up penetration tests where you left off
+
+### Other Useful Flags
+
+```bash
+# Start with initial prompt
+cai --prompt "your task here"
+cai -p "your task here"
+
+# Use specific agent type
+cai --agent redteam_agent
+cai -a bug_bounter_agent
+
+# Use specific model
+cai --model alias1
+cai -m gpt-4o
+
+# Load YAML configuration
+cai --yaml config.yaml
+
+# Check version
+cai --version
+
+# Update CAI
+cai --update
+```
+
+For detailed documentation on session resume, see [Session Resume](../session_resume.md).
+For continue mode details, see [Continue Mode](../continue_mode.md).
 
 ---
 

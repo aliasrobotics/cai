@@ -105,6 +105,7 @@ nav:
   - Guides:
       - Running Agents: running_agents.md
       - Continue Mode: continue_mode.md
+      - Session Resume: session_resume.md
       - Working with Results: results.md
       - Streaming: streaming.md
       - Tracing & Debugging: tracing.md
