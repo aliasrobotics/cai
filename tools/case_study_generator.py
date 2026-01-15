@@ -125,7 +125,7 @@ async def generate_case_study(jsonl_file: str, output_php_file: str) -> Optional
     prompt = "Generate the PHP code for a cybersecurity case study based on the template. "
     prompt += "Analyze the conversation context that has been loaded and create a comprehensive case study. "
     prompt += "Fill in all TEMPLATE-TODO sections with relevant information from the session. "
-    prompt += "Explain step by step the problem and the solution in this escenario"
+    prompt += "Explain step by step the problem and the solution in this scenario"
     prompt += "The output should be complete PHP code ready to save to a file."
     
     # Add a summary of the JSONL conversation to the prompt
