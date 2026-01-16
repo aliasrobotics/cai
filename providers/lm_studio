@@ -1,0 +1,11 @@
+# LM Studio Configuration
+
+#### [LM Studio Integration](https://lmstudio.ai/)
+For local models using LM Studio, add the following to your .env:
+
+```bash
+CAI_MODEL=deepseek-r1-0528-qwen3-8b #do not use the prefix, just the model name eg. deepseek/deepseek-r1-0528-qwen3-8b should be deepseek-r1-0528-qwen3-8b
+OLLAMA_API_BASE=http://localhost:1234/v1 # note, maybe you have a different endpoint (1234 is the default value for LM Studio)
+```
+
+Make sure that the Ollama server is running and accessible at the specified base URL. You can swap the model with any other supported by your local Ollama instance.
