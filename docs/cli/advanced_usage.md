@@ -1143,7 +1143,7 @@ burp-mcp-server --port 9876
 # In CAI
 CAI> /mcp load http://localhost:9876/sse burp
 CAI> /mcp tools burp
-CAI> /mcp add redteam_agent burp
+CAI> /mcp add burp redteam_agent
 
 # Use Burp tools
 CAI> Use Burp to scan https://target.com
@@ -1156,7 +1156,7 @@ CAI> Use Burp to scan https://target.com
 CAI> /mcp load stdio "python my_custom_tools.py" custom
 
 # Add to agent
-CAI> /mcp add bug_bounter_agent custom
+CAI> /mcp add custom bug_bounter_agent
 
 # Use custom tools
 CAI> Use custom scanner on target
