@@ -673,6 +673,10 @@ class Runner:
 
                         try:
                             output_guardrail_results = await streamed_result._output_guardrails_task
+                        except OutputGuardrailTripwireTriggered as e:
+                            # Store the guardrail exception immediately so it's checked during streaming
+                            streamed_result._stored_exception = e
+                            output_guardrail_results = []
                         except Exception:
                             # Exceptions will be checked in the stream_events loop
                             output_guardrail_results = []
