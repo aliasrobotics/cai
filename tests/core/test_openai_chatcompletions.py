@@ -361,3 +361,146 @@ async def test_interaction_counter_single_turn_with_tool_calls(monkeypatch) -> N
     
     # Counter should now be 2 (one increment per turn, not per item)
     assert model.interaction_counter == 2
+
+
+@pytest.mark.allow_call_model_methods
+@pytest.mark.asyncio
+async def test_empty_response_warning(monkeypatch, caplog) -> None:
+    """
+    When the model returns a response with empty content (no text, no tool calls, no refusal),
+    a warning should be logged indicating potential model-agent compatibility issues.
+    """
+    import logging
+    
+    # Create a response with empty content
+    msg = ChatCompletionMessage(role="assistant", content="")
+    choice = Choice(index=0, finish_reason="stop", message=msg)
+    chat = ChatCompletion(
+        id="resp-id",
+        created=0,
+        model="fake",
+        object="chat.completion",
+        choices=[choice],
+        usage=CompletionUsage(completion_tokens=0, prompt_tokens=5, total_tokens=5),
+    )
+
+    async def patched_fetch_response(self, *args, **kwargs):
+        return chat
+
+    monkeypatch.setattr(OpenAIChatCompletionsModel, "_fetch_response", patched_fetch_response)
+    model = OpenAIProvider(use_responses=False).get_model(cai_model)
+    
+    # Enable logging capture
+    with caplog.at_level(logging.WARNING, logger="openai.agents"):
+        resp: ModelResponse = await model.get_response(
+            system_instructions=None,
+            input="Test",
+            model_settings=ModelSettings(),
+            tools=[],
+            output_schema=None,
+            handoffs=[],
+            tracing=ModelTracing.DISABLED,
+        )
+    
+    # Response should still be returned (non-breaking)
+    assert isinstance(resp, ModelResponse)
+    
+    # Warning should have been logged
+    assert any("Model completed without output" in record.message for record in caplog.records)
+
+
+@pytest.mark.allow_call_model_methods
+@pytest.mark.asyncio
+async def test_sentinel_response_warning(monkeypatch, caplog) -> None:
+    """
+    When the model returns a response with sentinel token (<|endoftext|>),
+    a warning should be logged indicating potential model-agent compatibility issues.
+    """
+    import logging
+    
+    # Create a response with sentinel token
+    msg = ChatCompletionMessage(role="assistant", content="<|endoftext|>")
+    choice = Choice(index=0, finish_reason="stop", message=msg)
+    chat = ChatCompletion(
+        id="resp-id",
+        created=0,
+        model="fake",
+        object="chat.completion",
+        choices=[choice],
+        usage=CompletionUsage(completion_tokens=1, prompt_tokens=5, total_tokens=6),
+    )
+
+    async def patched_fetch_response(self, *args, **kwargs):
+        return chat
+
+    monkeypatch.setattr(OpenAIChatCompletionsModel, "_fetch_response", patched_fetch_response)
+    model = OpenAIProvider(use_responses=False).get_model(cai_model)
+    
+    # Enable logging capture
+    with caplog.at_level(logging.WARNING, logger="openai.agents"):
+        resp: ModelResponse = await model.get_response(
+            system_instructions=None,
+            input="Test",
+            model_settings=ModelSettings(),
+            tools=[],
+            output_schema=None,
+            handoffs=[],
+            tracing=ModelTracing.DISABLED,
+        )
+    
+    # Response should still be returned (non-breaking)
+    assert isinstance(resp, ModelResponse)
+    
+    # Warning should have been logged with sentinel info
+    assert any("sentinel token" in record.message for record in caplog.records)
+
+
+@pytest.mark.allow_call_model_methods
+@pytest.mark.asyncio
+async def test_no_warning_for_tool_calls(monkeypatch, caplog) -> None:
+    """
+    When the model returns a response with tool calls (even without text content),
+    no warning should be logged since this is expected behavior.
+    """
+    import logging
+    
+    # Create a response with tool calls but no text content
+    tool_call = ChatCompletionMessageToolCall(
+        id="call_123",
+        type="function",
+        function=Function(name="test_tool", arguments='{"arg": "value"}'),
+    )
+    msg = ChatCompletionMessage(role="assistant", content=None, tool_calls=[tool_call])
+    choice = Choice(index=0, finish_reason="tool_calls", message=msg)
+    chat = ChatCompletion(
+        id="resp-id",
+        created=0,
+        model="fake",
+        object="chat.completion",
+        choices=[choice],
+        usage=CompletionUsage(completion_tokens=10, prompt_tokens=5, total_tokens=15),
+    )
+
+    async def patched_fetch_response(self, *args, **kwargs):
+        return chat
+
+    monkeypatch.setattr(OpenAIChatCompletionsModel, "_fetch_response", patched_fetch_response)
+    model = OpenAIProvider(use_responses=False).get_model(cai_model)
+    
+    # Enable logging capture
+    with caplog.at_level(logging.WARNING, logger="openai.agents"):
+        resp: ModelResponse = await model.get_response(
+            system_instructions=None,
+            input="Test",
+            model_settings=ModelSettings(),
+            tools=[],
+            output_schema=None,
+            handoffs=[],
+            tracing=ModelTracing.DISABLED,
+        )
+    
+    # Response should be returned
+    assert isinstance(resp, ModelResponse)
+    
+    # No warning should be logged for tool calls
+    assert not any("Model completed without output" in record.message for record in caplog.records)
