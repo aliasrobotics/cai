@@ -1242,16 +1242,24 @@ def fix_message_list(messages):  # pylint: disable=R0914,R0915,R0912
         if msg.get("role") == "tool" and msg.get("tool_call_id"):
             tool_id = msg.get("tool_call_id")
 
-            # If this isn't the first message, check if the previous message is a matching assistant message
+            # If this isn't the first message, check if a matching assistant message
+            # precedes this tool message (possibly with other tool messages in between,
+            # which is valid for multi-tool-call assistant messages)
             if i > 0:
-                prev_msg = processed_messages[i - 1]
-
-                # Check if the previous message is an assistant message with matching tool_call_id
-                is_valid_sequence = (
-                    prev_msg.get("role") == "assistant"
-                    and prev_msg.get("tool_calls")
-                    and any(tc.get("id") == tool_id for tc in prev_msg.get("tool_calls", []))
-                )
+                # Walk backward past tool messages to find the nearest assistant message.
+                # A tool message is in valid sequence if its matching assistant message
+                # precedes it with only other tool messages in between.
+                is_valid_sequence = False
+                for k in range(i - 1, -1, -1):
+                    prev = processed_messages[k]
+                    if prev.get("role") == "assistant" and prev.get("tool_calls"):
+                        if any(tc.get("id") == tool_id for tc in prev.get("tool_calls", [])):
+                            is_valid_sequence = True
+                        break
+                    elif prev.get("role") == "tool":
+                        continue
+                    else:
+                        break
 
                 if not is_valid_sequence:
                     # Find the assistant message with this tool_call_id
