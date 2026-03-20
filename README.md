@@ -276,6 +276,7 @@ CAI is built on the following core principles:
   - **Anthropic**: `Claude 3.7`, `Claude 3.5`, `Claude 3`, `Claude 3 Opus`
   - **OpenAI**: `O1`, `O1 Mini`, `O3 Mini`, `GPT-4o`, `GPT-4.5 Preview`
   - **DeepSeek**: `DeepSeek V3`, `DeepSeek R1`
+  - **MiniMax**: `MiniMax-M2.7`, `MiniMax-M2.5`, `MiniMax-M2.5-highspeed` ([docs](docs/providers/minimax.md))
   - **Ollama**: `Qwen2.5 72B`, `Qwen2.5 14B`, etc
 
 
