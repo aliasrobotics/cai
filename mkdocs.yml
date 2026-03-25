@@ -78,6 +78,14 @@ nav:
           - Advanced Usage: cli/advanced_usage.md
 
   # ========================================
+  # SUPPORTING OTHER CLIs
+  # ========================================
+  - Supporting Other CLIs:
+      - Claude Code: other_cli/claude_code.md
+      - Codex CLI: other_cli/codex.md
+      - OpenCode: other_cli/opencode.md
+
+  # ========================================
   # CORE CONCEPTS
   # ========================================
   - Core Concepts:
