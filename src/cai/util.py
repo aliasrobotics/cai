@@ -1414,10 +1414,19 @@ def fix_message_list(messages):  # pylint: disable=R0914,R0915,R0912
     return processed_messages
 
 
-def cli_print_tool_call(tool_name="", args="", output="", prefix="  "):
-    """Print a tool call with pretty formatting"""
+def cli_print_tool_call(tool_name="", args="", output="", prefix="  ", **kwargs):
+    """Print a tool call with pretty formatting
+    Args:
+         tool_name: Name of the tool being called
+         output: Output from the tool execution
+         **kwargs: Accept additional parameters for backwards compatibility"""
     if not tool_name:
         return
+
+    if not args and 'tool_args' in kwargs:
+        args = kwargs['tool_args']
+    if not output and 'tool_output' in kwargs:
+        output = kwargs['tool_output']
 
     print(f"{prefix}{color('Tool Call:', fg='cyan')}")
     print(f"{prefix}{color('Name:', fg='cyan')} {tool_name}")
@@ -1425,7 +1434,6 @@ def cli_print_tool_call(tool_name="", args="", output="", prefix="  "):
         print(f"{prefix}{color('Args:', fg='cyan')} {args}")
     if output:
         print(f"{prefix}{color('Output:', fg='cyan')} {output}")
-
 
 def get_model_input_tokens(model):
     """
