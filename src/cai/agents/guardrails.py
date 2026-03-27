@@ -2,7 +2,7 @@
 Prompt Injection Guardrails for CAI Agents
 
 This module implements guardrails to protect against prompt injection attacks
-when agents interact with untrusted external content (web pages, server responses, etc).
+when agents interact with untrusted external content (web pages, server responses, etc.).
 """
 
 import re
