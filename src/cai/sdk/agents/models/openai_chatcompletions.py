@@ -3305,7 +3305,6 @@ class OpenAIChatCompletionsModel(Model):
         try:
             if stream:
                 # Standard LiteLLM handling for streaming
-                ret = await litellm.acompletion(**kwargs)
                 stream_obj = await litellm.acompletion(**kwargs)
 
                 response = Response(
@@ -3359,7 +3358,6 @@ class OpenAIChatCompletionsModel(Model):
                 kwargs["messages"] = messages
                 # Retry once, silently
                 if stream:
-                    ret = await litellm.acompletion(**kwargs)
                     stream_obj = await litellm.acompletion(**kwargs)
                     response = Response(
                         id=FAKE_RESPONSES_ID,
