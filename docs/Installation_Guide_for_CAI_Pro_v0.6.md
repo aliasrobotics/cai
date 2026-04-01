@@ -1,6 +1,6 @@
 # Installation Guide for CAI Pro v0.6
 
-← [Back to Installation Guide](../README.md#nut_and_bolt-install)
+← [Back to Installation Guide](cai_installation.md)
 
 ## Welcome to CAI Pro!
 
@@ -137,5 +137,5 @@ cai
 
 ---
 
-**[⬅️ Return to Main Installation Guide](../README.md#nut_and_bolt-install)**
+**[⬅️ Return to Main Installation Guide](cai_installation.md)**
 
