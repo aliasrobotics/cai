@@ -195,31 +195,32 @@ This document provides documentation for all commands available in the CAI (Cont
 ### **Parallel Execution (`parallel.py`)**
 ### **ParallelCommand**
 - **Command**: `/parallel`
-- **Purpose**: Manage parallel agent configurations
+- **Purpose**: Configure and run parallel agent workflows with isolated contexts
 - **Features**:
-  - Configure multiple agents
-  - Set different models per agent
-  - Execute agents in parallel
-  - Manage parallel configurations
+  - Add/remove/list parallel agents
+  - Queue prompts per agent or broadcast to all agents
+  - Execute queued prompts with `/parallel run`
+  - Merge results back into the main context
+  - Exit parallel mode with or without merge
 
-### **Run Parallel (`run.py`)**
-### **RunCommand**
-- **Command**: `/run`
-- **Purpose**: Execute queued prompts in parallel mode
+### **Queue Management (`queue.py`)**
+### **QueueCommand**
+- **Command**: `/queue`
+- **Purpose**: Manage sequential prompt queue independently from parallel mode
 - **Features**:
-  - Queue prompts for different agents
-  - Execute all queued prompts
-  - Manage parallel execution
-  - Collect results from multiple agents
+  - Add prompts to queue
+  - List queued prompts
+  - Run queued prompts sequentially
+  - Clear queue safely
 
 ### **Merge Histories (`merge.py`)**
 ### **MergeCommand**
 - **Command**: `/merge`
-- **Purpose**: Merge agent message histories (alias for `/parallel merge`)
+- **Purpose**: Merge parallel agent contexts into main context and exit parallel mode
 - **Features**:
   - Combine histories from multiple agents
-  - Integrate parallel conversation results
-  - Shortcut for parallel merge functionality
+  - Integrate parallel conversation results into the current main thread
+  - Automatically leave parallel mode after successful merge
 
 ---
 
@@ -343,18 +344,20 @@ cai
 ### Advanced Features
 ```bash
 # Set up parallel execution
-/parallel create agent1 --model gpt-4
-/parallel create agent2 --model claude-3
+/parallel add red_teamer
+/parallel add network_traffic_analyzer
 
-# Queue prompts
-/run queue agent1 "Analyze this code"
-/run queue agent2 "Review the analysis"
+# Add prompts (per agent or all)
+/parallel prompt all "Scan 192.168.1.0/24"
 
 # Execute in parallel
-/run execute
+/parallel run
 
-# Merge results
+# Merge all parallel contexts into main context and exit parallel mode
 /merge
+
+# Optional: exit without merging contexts
+/parallel clear
 ```
 
 ### Integration Examples
