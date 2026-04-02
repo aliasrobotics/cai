@@ -1500,6 +1500,10 @@ def run_cai_cli(
                             {"role": "assistant", "content": f"{result.final_output}"}
                         )
             else:
+                # Capture user_input before runner calls so ContextCompactedError
+                # handlers can reference it even on the very first iteration.
+                _last_user_input = user_input if isinstance(user_input, str) else ""
+
                 # Disable streaming by default, unless specifically enabled
                 cai_stream = os.getenv("CAI_STREAM", "false")
                 # Handle empty string or None values
@@ -1756,9 +1760,6 @@ def run_cai_cli(
 
                 agent.model.message_history[:] = fix_message_list(agent.model.message_history)
             turn_count += 1
-
-            # Capture user_input here so auto-compact can replay it after clearing history.
-            _last_user_input = user_input if isinstance(user_input, str) else ""
 
             # Auto-compact: when CAI_SUPPORT_MODEL + CAI_SUPPORT_INTERVAL are both set,
             # compact the conversation every N LLM *responses* (assistant messages in
