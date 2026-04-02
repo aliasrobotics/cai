@@ -442,6 +442,9 @@ def run_cai_cli(
     agent = starting_agent
     turn_count = 0
     idle_time = 0
+    # Holds a user message to replay on the next iteration without prompting
+    # the user — set by auto-compact so the agent continues its current task.
+    _post_compact_input: str | None = None
     console = Console()
     last_model = os.getenv("CAI_MODEL", "alias1")
     last_agent_type = os.getenv("CAI_AGENT_TYPE", "one_tool_agent")
@@ -690,6 +693,11 @@ def run_cai_cli(
                 if use_initial_prompt:
                     user_input = initial_prompt
                     use_initial_prompt = False  # Only use it once
+                elif _post_compact_input is not None:
+                    # Auto-compact just ran — replay the last task so the agent
+                    # continues working without waiting for human input.
+                    user_input = _post_compact_input
+                    _post_compact_input = None
                 else:
                     # Get user input with command completion and history
                     user_input = get_user_input(
@@ -1711,6 +1719,9 @@ def run_cai_cli(
                 agent.model.message_history[:] = fix_message_list(agent.model.message_history)
             turn_count += 1
 
+            # Capture user_input here so auto-compact can replay it after clearing history.
+            _last_user_input = user_input if isinstance(user_input, str) else ""
+
             # Auto-compact: when CAI_SUPPORT_MODEL + CAI_SUPPORT_INTERVAL are both set,
             # compact the conversation every N turns using the support model so the
             # main model's context window is kept small.  After compaction the
@@ -1738,9 +1749,16 @@ def run_cai_cli(
                         _reloaded = _AM.get_active_agent()
                         if _reloaded is not None:
                             agent = _reloaded
+                        # Queue the last user task to be replayed on the next
+                        # iteration so the agent continues without human input.
+                        _post_compact_input = (
+                            _last_user_input
+                            if _last_user_input.strip()
+                            else "Continue the current task."
+                        )
                         console.print(
                             "[bold green]✓ Memory summary applied to agent system prompt — "
-                            "context window reset[/bold green]\n"
+                            "context window reset — continuing task[/bold green]\n"
                         )
                 except (ValueError, Exception) as _e:
                     if os.getenv("CAI_DEBUG", "1") == "2":
