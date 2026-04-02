@@ -363,6 +363,13 @@ def count_tokens_with_tiktoken(text_or_messages):
         return 0, 0
 
 
+class ContextCompactedError(Exception):
+    """Raised inside get_response/stream_response when a CAI_SUPPORT_INTERVAL-based
+    auto-compact fires mid-runner.  The outer CLI loop catches this, sets
+    _post_compact_input, and restarts the runner with a clean context window."""
+    pass
+
+
 class OpenAIChatCompletionsModel(Model):
     """OpenAI Chat Completions Model"""
 
@@ -3475,7 +3482,67 @@ class OpenAIChatCompletionsModel(Model):
         # Check if auto-compaction is disabled
         if os.getenv("CAI_AUTO_COMPACT", "true").lower() == "false":
             return input, system_instructions, False
-            
+
+        # --- CAI_SUPPORT_INTERVAL count-based trigger ---
+        # This fires on EVERY API call (not just at the outer CLI-loop level), so it correctly
+        # handles agentic sessions where the agent makes many tool calls inside one Runner.run.
+        _support_model = os.getenv("CAI_SUPPORT_MODEL")
+        _support_interval_raw = os.getenv("CAI_SUPPORT_INTERVAL")
+        if _support_model and _support_interval_raw:
+            try:
+                _support_interval = int(_support_interval_raw)
+                if _support_interval > 0:
+                    _asst_count = sum(
+                        1 for m in self.message_history
+                        if isinstance(m, dict) and m.get("role") == "assistant"
+                    )
+                    if _asst_count >= _support_interval:
+                        from rich.console import Console as _Console
+                        _console = _Console()
+                        _console.print(
+                            f"\n[bold yellow]⟳ Auto-compact: {_asst_count} LLM responses "
+                            f"(threshold {_support_interval}) — summarising with "
+                            f"{_support_model}[/bold yellow]"
+                        )
+                        try:
+                            from cai.repl.commands.memory import (
+                                MEMORY_COMMAND_INSTANCE,
+                                COMPACTED_SUMMARIES,
+                                APPLIED_MEMORY_IDS,
+                            )
+                            from cai.repl.commands.compact import COMPACT_COMMAND_INSTANCE
+                            _orig_compact = COMPACT_COMMAND_INSTANCE.compact_model
+                            COMPACT_COMMAND_INSTANCE.compact_model = _support_model
+                            try:
+                                _summary = await MEMORY_COMMAND_INSTANCE._ai_summarize_history(
+                                    self.agent_name
+                                )
+                            finally:
+                                COMPACT_COMMAND_INSTANCE.compact_model = _orig_compact
+                            if _summary:
+                                if self.agent_name not in COMPACTED_SUMMARIES:
+                                    COMPACTED_SUMMARIES[self.agent_name] = []
+                                    APPLIED_MEMORY_IDS[self.agent_name] = []
+                                COMPACTED_SUMMARIES[self.agent_name] = [_summary]
+                                self.message_history.clear()
+                                os.environ["CAI_CONTEXT_USAGE"] = "0.0"
+                                _console.print(
+                                    "[bold green]✓ Memory summary applied — "
+                                    "context window reset — restarting task[/bold green]\n"
+                                )
+                        except Exception as _ce:
+                            _console.print(f"[red]Auto-compact error: {_ce}[/red]")
+                        # Always abort the current runner invocation so the outer loop
+                        # can restart with our freshly cleared context.
+                        raise ContextCompactedError(
+                            f"Context compacted after {_asst_count} LLM responses "
+                            f"(threshold {_support_interval})"
+                        )
+            except ContextCompactedError:
+                raise  # propagate to the outer runner / CLI loop
+            except (ValueError, Exception):
+                pass  # malformed interval — ignore silently
+
         max_tokens = self._get_model_max_tokens(str(self.model))
         threshold_percent = float(os.getenv("CAI_AUTO_COMPACT_THRESHOLD", "0.8"))
         threshold = max_tokens * threshold_percent

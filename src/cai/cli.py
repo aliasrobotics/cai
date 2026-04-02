@@ -313,6 +313,7 @@ from cai.sdk.agents.exceptions import OutputGuardrailTripwireTriggered, InputGua
 from cai.sdk.agents.models.openai_chatcompletions import (
     get_agent_message_history,
     get_all_agent_histories,
+    ContextCompactedError,
 )
 # Import handled where needed to avoid circular imports
 from cai.sdk.agents.run_to_jsonl import get_session_recorder
@@ -1576,6 +1577,9 @@ def run_cai_cli(
                                 pass
                             
                             raise e
+                        except ContextCompactedError:
+                            # Propagate so the outer try block can handle the restart.
+                            raise
                         except Exception as e:
                             # Clean up on any other exception
                             if stream_iterator is not None:
@@ -1603,6 +1607,17 @@ def run_cai_cli(
 
                     try:
                         asyncio.run(process_streamed_response(agent, conversation_input))
+                    except ContextCompactedError:
+                        # Auto-compact fired mid-runner; restart with fresh context.
+                        _post_compact_input = _last_user_input or "Continue the current task."
+                        from cai.sdk.agents.simple_agent_manager import AGENT_MANAGER as _AM
+                        _reloaded = _AM.get_active_agent()
+                        if _reloaded is not None:
+                            agent = _reloaded
+                        console.print(
+                            "[bold green]✓ Context window reset — resuming task[/bold green]\n"
+                        )
+                        continue
                     except OutputGuardrailTripwireTriggered as e:
                         # Display a user-friendly warning instead of crashing (streaming mode)
                         guardrail_name = e.guardrail_result.guardrail.get_name()
@@ -1662,6 +1677,17 @@ def run_cai_cli(
                     # Use non-streamed response
                     try:
                         response = asyncio.run(Runner.run(agent, conversation_input))
+                    except ContextCompactedError:
+                        # Auto-compact fired mid-runner; restart with fresh context.
+                        _post_compact_input = _last_user_input or "Continue the current task."
+                        from cai.sdk.agents.simple_agent_manager import AGENT_MANAGER as _AM
+                        _reloaded = _AM.get_active_agent()
+                        if _reloaded is not None:
+                            agent = _reloaded
+                        console.print(
+                            "[bold green]✓ Context window reset — resuming task[/bold green]\n"
+                        )
+                        continue
                     except InputGuardrailTripwireTriggered as e:
                         # Display a user-friendly warning for input guardrails
                         reason = "Potential security threat detected in input"
