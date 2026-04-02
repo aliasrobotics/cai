@@ -491,7 +491,7 @@ def run_cai_cli(
     if _sc_model_startup and _sc_interval_startup:
         try:
             console.print(
-                f"[bold cyan]🗜  Auto-compact enabled: every {int(_sc_interval_startup)} turns "
+                f"[bold cyan]🗜  Auto-compact enabled: every {int(_sc_interval_startup)} LLM responses "
                 f"using {_sc_model_startup}[/bold cyan]"
             )
         except ValueError:
@@ -1735,50 +1735,58 @@ def run_cai_cli(
             _last_user_input = user_input if isinstance(user_input, str) else ""
 
             # Auto-compact: when CAI_SUPPORT_MODEL + CAI_SUPPORT_INTERVAL are both set,
-            # compact the conversation every N turns using the support model so the
-            # main model's context window is kept small.  After compaction the
-            # summary is injected into the agent's system prompt and the local
-            # agent reference is refreshed so the loop uses the reloaded instance.
+            # compact the conversation every N LLM *responses* (assistant messages in
+            # history) using the support model.  Counting assistant messages rather
+            # than outer-loop turns means agentic sessions — where the agent makes
+            # many tool-call rounds per single user input — are handled correctly.
             _support_model = os.getenv("CAI_SUPPORT_MODEL")
             _support_interval_raw = os.getenv("CAI_SUPPORT_INTERVAL")
             if _support_model and _support_interval_raw:
                 try:
                     _support_interval = int(_support_interval_raw)
                     if _support_interval > 0:
-                        _turns_until = _support_interval - (turn_count % _support_interval)
-                        if _turns_until != _support_interval:  # don't show when just compacted
-                            console.print(
-                                f"[dim cyan]  ↻ auto-compact in {_turns_until} turn(s) "
-                                f"[turn {turn_count}/{_support_interval}×{turn_count // _support_interval + 1}][/dim cyan]"
-                            )
-                        if turn_count % _support_interval == 0:
-                            from cai.repl.commands.compact import COMPACT_COMMAND_INSTANCE
-                            console.print(
-                                f"\n[bold yellow]⟳ Auto-compact: turn {turn_count} "
-                                f"(every {_support_interval} turns) — "
-                                f"summarising with {_support_model}[/bold yellow]"
-                            )
-                            COMPACT_COMMAND_INSTANCE._perform_compaction(
-                                model_override=_support_model
-                            )
-                            # Re-sync the local agent reference so the loop continues
-                            # with the freshly reloaded agent (history cleared, memory
-                            # summary already injected into its system prompt).
-                            from cai.sdk.agents.simple_agent_manager import AGENT_MANAGER as _AM
-                            _reloaded = _AM.get_active_agent()
-                            if _reloaded is not None:
-                                agent = _reloaded
-                            # Queue the last user task to be replayed on the next
-                            # iteration so the agent continues without human input.
-                            _post_compact_input = (
-                                _last_user_input
-                                if _last_user_input.strip()
-                                else "Continue the current task."
-                            )
-                            console.print(
-                                "[bold green]✓ Memory summary applied to agent system prompt — "
-                                "context window reset — continuing task[/bold green]\n"
-                            )
+                        # Count assistant messages as a proxy for LLM API calls.
+                        _history = getattr(getattr(agent, 'model', None), 'message_history', [])
+                        _llm_call_count = sum(
+                            1 for m in _history
+                            if (m.get("role") if isinstance(m, dict) else getattr(m, "role", None))
+                            == "assistant"
+                        )
+                        if _llm_call_count > 0:
+                            _calls_until = max(0, _support_interval - _llm_call_count)
+                            if _calls_until > 0:
+                                console.print(
+                                    f"[dim cyan]  ↻ auto-compact in {_calls_until} LLM response(s) "
+                                    f"[{_llm_call_count}/{_support_interval}][/dim cyan]"
+                                )
+                            if _llm_call_count >= _support_interval:
+                                from cai.repl.commands.compact import COMPACT_COMMAND_INSTANCE
+                                console.print(
+                                    f"\n[bold yellow]⟳ Auto-compact: {_llm_call_count} LLM responses "
+                                    f"(threshold {_support_interval}) — "
+                                    f"summarising with {_support_model}[/bold yellow]"
+                                )
+                                COMPACT_COMMAND_INSTANCE._perform_compaction(
+                                    model_override=_support_model
+                                )
+                                # Re-sync the local agent reference so the loop continues
+                                # with the freshly reloaded agent (history cleared, memory
+                                # summary already injected into its system prompt).
+                                from cai.sdk.agents.simple_agent_manager import AGENT_MANAGER as _AM
+                                _reloaded = _AM.get_active_agent()
+                                if _reloaded is not None:
+                                    agent = _reloaded
+                                # Queue the last user task to be replayed on the next
+                                # iteration so the agent continues without human input.
+                                _post_compact_input = (
+                                    _last_user_input
+                                    if _last_user_input.strip()
+                                    else "Continue the current task."
+                                )
+                                console.print(
+                                    "[bold green]✓ Memory summary applied to agent system prompt — "
+                                    "context window reset — continuing task[/bold green]\n"
+                                )
                 except (ValueError, Exception) as _e:
                     # Always show auto-compact errors so they are never silently lost.
                     console.print(f"[red]Auto-compact error: {_e}[/red]")
