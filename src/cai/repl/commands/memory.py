@@ -1221,7 +1221,8 @@ After the analysis, provide a structured summary with these sections:
 6. **All User Messages**: Complete list of user messages in order
 7. **Pending Tasks**: What still needs to be done
 8. **Current Work**: What was being worked on when the conversation ended
-9. **Optional Next Step**: If there's a clear next action, mention it
+9. **Exhausted Approaches — DO NOT RETRY**: Every technique, command, path, or attack vector that was attempted and failed. Format each as a bullet starting with ❌. Be specific (include exact commands, URLs, usernames, ports). This section is CRITICAL — the agent will use it to avoid wasting time on dead ends.
+10. **Recommended Next Steps**: Concrete actions NOT yet tried, ordered by likelihood of success.
 
 ## Important Guidelines
 
@@ -1232,6 +1233,7 @@ After the analysis, provide a structured summary with these sections:
 - Maintain technical accuracy - don't paraphrase technical terms
 - The summary will be used as the primary context for resuming work, so completeness is crucial
 - When the conversation is resumed, it should feel like a natural continuation
+- Section 9 (Exhausted Approaches) is the most important section for offensive/hacking tasks: list every failed attempt so the agent doesn't loop.
 
 This session is being continued from a previous conversation that ran out of context. The conversation is summarized below:"""
         

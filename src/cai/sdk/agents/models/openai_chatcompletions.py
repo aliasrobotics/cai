@@ -3525,6 +3525,28 @@ class OpenAIChatCompletionsModel(Model):
                                     APPLIED_MEMORY_IDS[self.agent_name] = []
                                 COMPACTED_SUMMARIES[self.agent_name] = [_summary]
                                 self.message_history.clear()
+                                # Re-inject the summary as the first exchange so
+                                # the next Runner turn has full context and won't
+                                # repeat work that was already attempted.
+                                self.message_history.append({
+                                    "role": "user",
+                                    "content": (
+                                        "<previous_session_memory>\n"
+                                        + _summary
+                                        + "\n</previous_session_memory>\n\n"
+                                        "This is your memory from the previous context window. "
+                                        "Use it to continue your work. "
+                                        "Do NOT retry any approach already marked as failed or exhausted."
+                                    ),
+                                })
+                                self.message_history.append({
+                                    "role": "assistant",
+                                    "content": (
+                                        "Understood. I have reviewed my previous session memory. "
+                                        "I will continue the task using only new approaches "
+                                        "and will not repeat anything already attempted."
+                                    ),
+                                })
                                 os.environ["CAI_CONTEXT_USAGE"] = "0.0"
                                 _console.print(
                                     "[bold green]✓ Memory summary applied — "
