@@ -1613,7 +1613,16 @@ def run_cai_cli(
                         asyncio.run(process_streamed_response(agent, conversation_input))
                     except ContextCompactedError:
                         # Auto-compact fired mid-runner; restart with fresh context.
-                        _post_compact_input = _last_user_input or "Continue the current task."
+                        _base = _last_user_input or "Continue the current task."
+                        _post_compact_input = (
+                            f"{_base}\n\n"
+                            "IMPORTANT: Your context window was just compacted. "
+                            "Your session memory is already loaded above. "
+                            "Review the 'Exhausted Approaches' section in your memory and "
+                            "DO NOT repeat any technique, command, URL, port scan, or login "
+                            "attempt already listed there. "
+                            "Pick up exactly where you left off using only NEW approaches."
+                        )
                         from cai.sdk.agents.simple_agent_manager import AGENT_MANAGER as _AM
                         _reloaded = _AM.get_active_agent()
                         if _reloaded is not None:
@@ -1683,7 +1692,16 @@ def run_cai_cli(
                         response = asyncio.run(Runner.run(agent, conversation_input))
                     except ContextCompactedError:
                         # Auto-compact fired mid-runner; restart with fresh context.
-                        _post_compact_input = _last_user_input or "Continue the current task."
+                        _base = _last_user_input or "Continue the current task."
+                        _post_compact_input = (
+                            f"{_base}\n\n"
+                            "IMPORTANT: Your context window was just compacted. "
+                            "Your session memory is already loaded above. "
+                            "Review the 'Exhausted Approaches' section in your memory and "
+                            "DO NOT repeat any technique, command, URL, port scan, or login "
+                            "attempt already listed there. "
+                            "Pick up exactly where you left off using only NEW approaches."
+                        )
                         from cai.sdk.agents.simple_agent_manager import AGENT_MANAGER as _AM
                         _reloaded = _AM.get_active_agent()
                         if _reloaded is not None:
