@@ -485,6 +485,18 @@ def run_cai_cli(
     print("\n")
     display_quick_guide(console)
 
+    # Notify user if auto-compact is active so they can confirm the vars loaded.
+    _sc_model_startup = os.getenv("CAI_SUPPORT_MODEL")
+    _sc_interval_startup = os.getenv("CAI_SUPPORT_INTERVAL")
+    if _sc_model_startup and _sc_interval_startup:
+        try:
+            console.print(
+                f"[bold cyan]🗜  Auto-compact enabled: every {int(_sc_interval_startup)} turns "
+                f"using {_sc_model_startup}[/bold cyan]"
+            )
+        except ValueError:
+            pass
+
     # Function to get the short name of the agent for display
     def get_agent_short_name(agent):
         if hasattr(agent, "name"):
@@ -1732,37 +1744,44 @@ def run_cai_cli(
             if _support_model and _support_interval_raw:
                 try:
                     _support_interval = int(_support_interval_raw)
-                    if _support_interval > 0 and turn_count % _support_interval == 0:
-                        from cai.repl.commands.compact import COMPACT_COMMAND_INSTANCE
-                        console.print(
-                            f"\n[bold yellow]⟳ Auto-compact: turn {turn_count} "
-                            f"(every {_support_interval} turns) — "
-                            f"summarising with {_support_model}[/bold yellow]"
-                        )
-                        COMPACT_COMMAND_INSTANCE._perform_compaction(
-                            model_override=_support_model
-                        )
-                        # Re-sync the local agent reference so the loop continues
-                        # with the freshly reloaded agent (history cleared, memory
-                        # summary already injected into its system prompt).
-                        from cai.sdk.agents.simple_agent_manager import AGENT_MANAGER as _AM
-                        _reloaded = _AM.get_active_agent()
-                        if _reloaded is not None:
-                            agent = _reloaded
-                        # Queue the last user task to be replayed on the next
-                        # iteration so the agent continues without human input.
-                        _post_compact_input = (
-                            _last_user_input
-                            if _last_user_input.strip()
-                            else "Continue the current task."
-                        )
-                        console.print(
-                            "[bold green]✓ Memory summary applied to agent system prompt — "
-                            "context window reset — continuing task[/bold green]\n"
-                        )
+                    if _support_interval > 0:
+                        _turns_until = _support_interval - (turn_count % _support_interval)
+                        if _turns_until != _support_interval:  # don't show when just compacted
+                            console.print(
+                                f"[dim cyan]  ↻ auto-compact in {_turns_until} turn(s) "
+                                f"[turn {turn_count}/{_support_interval}×{turn_count // _support_interval + 1}][/dim cyan]"
+                            )
+                        if turn_count % _support_interval == 0:
+                            from cai.repl.commands.compact import COMPACT_COMMAND_INSTANCE
+                            console.print(
+                                f"\n[bold yellow]⟳ Auto-compact: turn {turn_count} "
+                                f"(every {_support_interval} turns) — "
+                                f"summarising with {_support_model}[/bold yellow]"
+                            )
+                            COMPACT_COMMAND_INSTANCE._perform_compaction(
+                                model_override=_support_model
+                            )
+                            # Re-sync the local agent reference so the loop continues
+                            # with the freshly reloaded agent (history cleared, memory
+                            # summary already injected into its system prompt).
+                            from cai.sdk.agents.simple_agent_manager import AGENT_MANAGER as _AM
+                            _reloaded = _AM.get_active_agent()
+                            if _reloaded is not None:
+                                agent = _reloaded
+                            # Queue the last user task to be replayed on the next
+                            # iteration so the agent continues without human input.
+                            _post_compact_input = (
+                                _last_user_input
+                                if _last_user_input.strip()
+                                else "Continue the current task."
+                            )
+                            console.print(
+                                "[bold green]✓ Memory summary applied to agent system prompt — "
+                                "context window reset — continuing task[/bold green]\n"
+                            )
                 except (ValueError, Exception) as _e:
-                    if os.getenv("CAI_DEBUG", "1") == "2":
-                        console.print(f"[red]Auto-compact error: {_e}[/red]")
+                    # Always show auto-compact errors so they are never silently lost.
+                    console.print(f"[red]Auto-compact error: {_e}[/red]")
 
             # Stop measuring active time and start measuring idle time again
             stop_active_timer()
