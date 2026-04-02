@@ -1711,6 +1711,41 @@ def run_cai_cli(
                 agent.model.message_history[:] = fix_message_list(agent.model.message_history)
             turn_count += 1
 
+            # Auto-compact: when CAI_SUPPORT_MODEL + CAI_SUPPORT_INTERVAL are both set,
+            # compact the conversation every N turns using the support model so the
+            # main model's context window is kept small.  After compaction the
+            # summary is injected into the agent's system prompt and the local
+            # agent reference is refreshed so the loop uses the reloaded instance.
+            _support_model = os.getenv("CAI_SUPPORT_MODEL")
+            _support_interval_raw = os.getenv("CAI_SUPPORT_INTERVAL")
+            if _support_model and _support_interval_raw:
+                try:
+                    _support_interval = int(_support_interval_raw)
+                    if _support_interval > 0 and turn_count % _support_interval == 0:
+                        from cai.repl.commands.compact import COMPACT_COMMAND_INSTANCE
+                        console.print(
+                            f"\n[bold yellow]⟳ Auto-compact: turn {turn_count} "
+                            f"(every {_support_interval} turns) — "
+                            f"summarising with {_support_model}[/bold yellow]"
+                        )
+                        COMPACT_COMMAND_INSTANCE._perform_compaction(
+                            model_override=_support_model
+                        )
+                        # Re-sync the local agent reference so the loop continues
+                        # with the freshly reloaded agent (history cleared, memory
+                        # summary already injected into its system prompt).
+                        from cai.sdk.agents.simple_agent_manager import AGENT_MANAGER as _AM
+                        _reloaded = _AM.get_active_agent()
+                        if _reloaded is not None:
+                            agent = _reloaded
+                        console.print(
+                            "[bold green]✓ Memory summary applied to agent system prompt — "
+                            "context window reset[/bold green]\n"
+                        )
+                except (ValueError, Exception) as _e:
+                    if os.getenv("CAI_DEBUG", "1") == "2":
+                        console.print(f"[red]Auto-compact error: {_e}[/red]")
+
             # Stop measuring active time and start measuring idle time again
             stop_active_timer()
             start_idle_timer()
