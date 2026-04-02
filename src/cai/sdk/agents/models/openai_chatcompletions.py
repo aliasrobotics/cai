@@ -544,20 +544,12 @@ class OpenAIChatCompletionsModel(Model):
             | {"base_url": str(self._get_client().base_url)},
             disabled=tracing.is_disabled(),
         ) as span_generation:
-            # Prepare the messages for consistent token counting
-            # IMPORTANT: Include existing message history for context
+            # Prepare the messages for consistent token counting.
+            # History is already included in `input` via cli.py's history_context mechanism
+            # (history_context = agent.model.message_history is passed as conversation_input
+            # to Runner.run, which then passes it as original_input to get_response).
+            # Prepending message_history here would double-count every message.
             converted_messages = []
-            
-            # First, add all existing messages from history
-            if self.message_history:
-                for msg in self.message_history:
-                    msg_copy = msg.copy()  # Use copy to avoid modifying original
-                    # Remove any existing cache_control to avoid exceeding the 4-block limit
-                    if "cache_control" in msg_copy:
-                        del msg_copy["cache_control"]
-                    converted_messages.append(msg_copy)
-            
-            # Then convert and add the new input
             new_messages = self._converter.items_to_messages(input, model_instance=self)
             converted_messages.extend(new_messages)
             
@@ -2545,19 +2537,12 @@ class OpenAIChatCompletionsModel(Model):
         # start by re-fetching self.is_ollama
         self.is_ollama = os.getenv("OLLAMA") is not None and os.getenv("OLLAMA").lower() == "true"
 
-        # IMPORTANT: Include existing message history for context
+        # Build the message list from `input` only.
+        # History is already included in `input` via cli.py's history_context mechanism:
+        # cli.py passes history_context (= message_history) as part of conversation_input
+        # to Runner.run, which passes it as original_input through to _fetch_response.
+        # Prepending message_history again would send every historical message twice.
         converted_messages = []
-        
-        # First, add all existing messages from history
-        if self.message_history:
-            for msg in self.message_history:
-                msg_copy = msg.copy()  # Use copy to avoid modifying original
-                # Remove any existing cache_control to avoid exceeding the 4-block limit
-                if "cache_control" in msg_copy:
-                    del msg_copy["cache_control"]
-                converted_messages.append(msg_copy)
-        
-        # Then convert and add the new input
         new_messages = self._converter.items_to_messages(input, model_instance=self)
         converted_messages.extend(new_messages)
 
