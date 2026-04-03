@@ -2830,6 +2830,16 @@ class OpenAIChatCompletionsModel(Model):
                         )
             elif "gemini" in model_str:
                 kwargs.pop("parallel_tool_calls", None)
+            elif "minimax" in model_str:
+                # MiniMax uses OpenAI-compatible API at api.minimax.io
+                litellm.drop_params = True
+                kwargs["api_base"] = str(self._get_client().base_url).rstrip("/")
+                kwargs["custom_llm_provider"] = "openai"
+                kwargs["api_key"] = self._get_client().api_key
+                kwargs.pop("store", None)
+                kwargs.pop("parallel_tool_calls", None)
+                if not converted_tools:
+                    kwargs.pop("tool_choice", None)
             elif "qwen" in model_str or ":" in model_str:
                 # Handle Ollama-served models with custom formats (e.g., alias1)
                 # These typically need the Ollama provider
