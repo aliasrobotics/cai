@@ -4,6 +4,7 @@ Manages memory storage in .cai/memory for persistent context.
 """
 
 from typing import List, Optional, Dict, Any
+import inspect
 import os
 import asyncio
 import json
@@ -1256,15 +1257,31 @@ This session is being continued from a previous conversation that ran out of con
                 input=f"Please summarize the following conversation:\n\n{conversation_text}",
                 max_turns=1
             )
-            
+
             if result.final_output:
                 return str(result.final_output)
             else:
                 return None
-                
+
         except Exception as e:
             console.print(f"[red]Error generating summary: {e}[/red]")
             return None
+        finally:
+            # Best-effort: explicitly cleanup the temporary summary/support model
+            try:
+                model_inst = getattr(summary_agent, "model", None)
+                # Some Agent constructions put the Model object directly on `agent.model`
+                # and some providers expose a cleanup coroutine.
+                if model_inst is not None and hasattr(model_inst, "cleanup"):
+                    try:
+                        coro = model_inst.cleanup()
+                        if inspect.isawaitable(coro):
+                            await coro
+                    except Exception:
+                        # best-effort cleanup — swallow any errors
+                        pass
+            except Exception:
+                pass
     
     def _format_history_for_summary(self, history: List[Dict[str, Any]]) -> str:
         """Format message history for summarization.

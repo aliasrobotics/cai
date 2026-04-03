@@ -470,6 +470,49 @@ class OpenAIChatCompletionsModel(Model):
             # Ignore any errors during cleanup
             pass
 
+    async def cleanup(self) -> None:
+        """Explicitly cleanup underlying clients and free instance registry.
+
+        This is intended to be called when a temporary model instance (for
+        example the summary/support model) is no longer needed. It will try
+        to close the HTTP/async client if available, remove the instance
+        from the legacy `ACTIVE_MODEL_INSTANCES` registry and clear the
+        in-memory message history so any backing LLM server can free slots
+        or context.
+        """
+        try:
+            client = getattr(self, "_client", None)
+            if client is not None:
+                aclose = getattr(client, "aclose", None)
+                if aclose:
+                    try:
+                        res = aclose()
+                        # Await if it's awaitable
+                        if inspect.isawaitable(res):
+                            await res
+                    except Exception:
+                        # Best-effort close
+                        pass
+                try:
+                    delattr(self, "_client")
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+        try:
+            key = (getattr(self, '_display_name', None), getattr(self, 'agent_id', None))
+            if key in ACTIVE_MODEL_INSTANCES:
+                del ACTIVE_MODEL_INSTANCES[key]
+        except Exception:
+            pass
+
+        try:
+            if hasattr(self, 'message_history') and isinstance(self.message_history, list):
+                self.message_history.clear()
+        except Exception:
+            pass
+
     def add_to_message_history(self, msg):
         """Add a message to this instance's history if it's not a duplicate.
         
