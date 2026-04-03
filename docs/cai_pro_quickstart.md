@@ -291,10 +291,9 @@ cai --version
 
 ### Issue: "Rate limit exceeded"
 
-**This shouldn't happen with CAI PRO** (unlimited tokens). If you see this:
+The client will automatically pause until the appropriate time frame has passed and then retry the iteration without interrupting the session. 
 
-1. Check for typos in your `ALIAS_API_KEY`
-2. Contact support immediately: support@aliasrobotics.com
+If this is happening frequently, consider compacting the context with `/compact`.
 
 ---
 
