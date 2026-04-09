@@ -86,6 +86,12 @@
 
 ??? question "Where can I list all the environment variables? /config"
 
+    Use **`/config`** (or **`/config list`**) to see all variables with **current values** and index numbers for `/config set`.
+    
+    For **full documentation tables** (defaults, constraints, when each applies), run **`/help`** and scroll past the quick guide, or **`/help topics`** and read to the end. For **one variable** in depth, use **`/help var VARIABLE_NAME`** (e.g. `/help var CAI_DEBUG`).
+    
+    The same topics are covered on the site in [Environment Variables](environment_variables.md).
+    
     ![cai-008-config](media/cai-008-config.png)
 
 ??? question "How to know more about the CLI? /help"
