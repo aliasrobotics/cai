@@ -94,7 +94,7 @@ Over 30 built-in commands organized by category:
 
 - **Agent Management**: `/agent`, `/parallel`, `/run`
 - **Memory & History**: `/memory`, `/history`, `/compact`, `/flush`, `/load`, `/merge`
-- **Environment & Config**: `/config`, `/env`, `/workspace`, `/virtualization`
+- **Environment & Config**: `/config`, `/env`, `/help var` (per-variable help), `/workspace`, `/virtualization`
 - **Tools & Integration**: `/mcp`, `/platform`, `/shell`
 - **Utilities**: `/model`, `/graph`, `/context`, `/cost`, `/help`
 

@@ -16,6 +16,8 @@ The OPENAI_API_KEY must not be left blank. It should contain either "sk-123" (as
 
 For a complete reference organized by use case, see [Environment Variables Reference](../../environment_variables.md).
 
+**In the REPL:** `/config` (or `/config list`) shows variables with **current values** and index numbers. **`/help`** includes the **full environment reference** (tables) after the quick guide; **`/help var NAME`** opens **long-form** help for a single variable. See also [Environment Variables — Discovering variables in the REPL](../../environment_variables.md#discovering-variables-in-the-repl).
+
 | Variable | Description | Default |
 |----------|-------------|---------|
 | CTF_NAME | Name of the CTF challenge to run (e.g. "picoctf_static_flag") | - |

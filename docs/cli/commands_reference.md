@@ -976,18 +976,26 @@ Display help information and command documentation.
 /help [command]
 /h [command]
 /? [command]
+/help var [VARIABLE_NAME...]
 ```
 
 **Examples**:
 
 ```bash
-# General help
+# General help (includes quick guide; full environment-variable tables below)
 CAI> /help
+
+# Structured overview (welcome, categories, tips) + same env tables at the end
+CAI> /help topics
 
 # Help for specific command
 CAI> /help agent
 CAI> /h parallel
 CAI> /? mcp
+
+# Long-form help for one environment variable (see also /config for live values)
+CAI> /help var
+CAI> /help var CAI_MODEL
 ```
 
 **Topics**:
@@ -995,6 +1003,7 @@ CAI> /? mcp
 - `parallel`: Parallel execution
 - `memory`: Memory management
 - `config`: Configuration
+- `var`: Environment variables — long-form help per variable (full tables appear under bare `/help` and `/help topics`)
 - `mcp`: MCP integration
 - `commands`: List all commands
 

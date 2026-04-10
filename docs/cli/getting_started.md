@@ -214,11 +214,14 @@ Here are the most important commands to know:
 ### Getting Help
 
 ```bash
-# General help
+# General help (quick guide; full environment-variable tables below)
 CAI> /help
 
 # Help for specific command
 CAI> /help agent
+
+# Long-form help for one environment variable
+CAI> /help var CAI_MODEL
 
 # Quick reference guide
 CAI> /quickstart
