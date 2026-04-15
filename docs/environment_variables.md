@@ -12,7 +12,7 @@ In current CAI releases, you can explore environment variables **from inside the
 |---------------|---------|
 | **Numbered list with live values** (what is set *now*) | `/config` or `/config list` |
 | **Full reference tables** (defaults, allowed values, when they apply, extras) | `/help` — scroll past the quick guide; or `/help topics` for the overview first, then the same tables at the end |
-| **Long-form help for one variable** (examples, `/config` index when listed, notes) | `/help var VARIABLE_NAME` (e.g. `/help var CAI_MODEL`) |
+| **Long-form help for one variable** (examples, catalog index when listed, notes) | `/help var VARIABLE_NAME` (e.g. `/help var CAI_MODEL`, `/help var CAI_AVOID_SUDO`) |
 
 Aliases such as `/h` for `/help` work the same way. This page remains the **canonical web reference**; the REPL output tracks the version you have installed.
 
@@ -185,6 +185,9 @@ CAI_GUARDRAILS="true"                 # Prevent dangerous commands
 CAI_PRICE_LIMIT="1"                   # Maximum cost in dollars
 CAI_MAX_INTERACTIONS="inf"            # Maximum allowed interactions
 
+# Shell privilege policy (generic Linux tool)
+CAI_AVOID_SUDO="true"                 # Block sudo/su/pkexec/doas (hard block; see /help var CAI_AVOID_SUDO)
+
 # Debugging & monitoring
 CAI_DEBUG="1"                         # 0: minimal, 1: verbose, 2: CLI debug
 CAI_TRACING="true"                    # Enable OpenTelemetry tracing
@@ -192,6 +195,7 @@ CAI_TRACING="true"                    # Enable OpenTelemetry tracing
 
 **Security Layers:**
 - **Guardrails**: Prompt injection detection and command validation
+- **`CAI_AVOID_SUDO`**: Blocks privilege escalation in the generic Linux shell tool; use `/help var CAI_AVOID_SUDO` for examples and session vs. launch notes
 - **Cost Limits**: Prevent runaway API usage
 - **Interaction Limits**: Control agent autonomy
 
