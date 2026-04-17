@@ -12,7 +12,7 @@ In current CAI releases, you can explore environment variables **from inside the
 |---------------|---------|
 | **Numbered list with live values** (what is set *now*) | `/config` or `/config list` |
 | **Full reference tables** (defaults, allowed values, when they apply, extras) | `/help` — scroll past the quick guide; or `/help topics` for the overview first, then the same tables at the end |
-| **Long-form help for one variable** (examples, catalog index when listed, notes) | `/help var VARIABLE_NAME` (e.g. `/help var CAI_MODEL`, `/help var CAI_AVOID_SUDO`) |
+| **Long-form help for one variable** (examples, `/config` index when listed, notes) | `/help var VARIABLE_NAME` (e.g. `/help var CAI_MODEL`, `/help var CAI_AVOID_SUDO`) |
 
 Aliases such as `/h` for `/help` work the same way. This page remains the **canonical web reference**; the REPL output tracks the version you have installed.
 
