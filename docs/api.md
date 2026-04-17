@@ -10,7 +10,7 @@ cai --api --api-host 0.0.0.0 --api-port 8080
 # the next free port and prints it in the console.
 ```
 
-CLI flags and environment variables:
+CLI flags and environment variables (API subset):
 
 | Flag | Env | Description |
 | --- | --- | --- |
@@ -19,6 +19,8 @@ CLI flags and environment variables:
 | `--api-port` | `CAI_API_PORT` | Bind port (default 8000). |
 | `--api-reload` | `CAI_API_RELOAD` | Dev autoreload. |
 | `--api-workers` | `CAI_API_WORKERS` | Worker processes (ignored with reload). |
+
+For **all** `cai` binary flags (`--tui`, `--resume`, `--yaml`, `--version`, …), see the single source of truth: [CLI commands reference — Binary `cai` CLI flags](cli/commands_reference.md#binary-cai-cli-flags).
 
 Interactive docs at `/api/docs` and OpenAPI spec at `/api/openapi.json`.
 

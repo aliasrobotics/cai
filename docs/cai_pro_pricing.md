@@ -31,7 +31,7 @@ Free for research purposes.
 - ❌ No alias1 model access
 - ❌ No Terminal UI (TUI)
 - ❌ No parallel agent swarms
-- ❌ No context monitoring
+- ❌ No PRO usage analytics and reporting
 - ❌ No commercial license
 - ⚠️ Framework updates ~6 months behind PRO
 
@@ -49,7 +49,7 @@ Leading enterprise framework for AI Security with professional support.
 - ✅ **Unlimited alias1 tokens**
 - ✅ **Terminal User Interface (TUI)**
 - ✅ **Multi-agent parallel execution** (100+ agents)
-- ✅ **Context Monitoring** (`/context` command)
+- ✅ **Usage visibility** (`/cost`, TUI cost panels)
 - ✅ **Commercial license** included
 - ✅ **Professional support** (48h SLA)
 - ✅ **GDPR & NIS2 compliant** European hosting
@@ -112,7 +112,7 @@ Custom deployment options.
 | **🖥️ User Interfaces** | | | |
 | Terminal UI (TUI) | ❌ | ✅ Multi-terminal | ✅ Multi-terminal + Custom |
 | Parallel Agent Execution | ❌ | ✅ 100+ agents | ✅ Unlimited |
-| Context Monitoring | ❌ | ✅ `/context` | ✅ + Analytics Dashboard |
+| Usage / cost visibility | ❌ | ✅ `/cost`, TUI | ✅ + Analytics Dashboard |
 | Keyboard Shortcuts | ❌ | ✅ Full Set | ✅ Full Set + Custom |
 | Team Presets | ❌ | ✅ 11 Teams | ✅ Unlimited Custom |
 | | | | |

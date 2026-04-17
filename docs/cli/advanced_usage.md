@@ -329,8 +329,8 @@ cai --prompt "/agent redteam_agent ; scan target.com ; /save results.json"
 
 ```text
 # ctf_workflow.txt
-/config CTF_NAME=hackableii
-/config CTF_CHALLENGE=web_app
+/env set CTF_NAME hackableii
+/env set CTF_CHALLENGE web_app
 /agent redteam_agent
 Analyze the CTF challenge environment
 Find and exploit vulnerabilities
@@ -343,7 +343,7 @@ Extract the flag
 ```text
 # bugbounty_recon.txt
 /agent bug_bounter_agent
-/config CAI_PRICE_LIMIT=20.0
+/env set CAI_PRICE_LIMIT 20.0
 
 # Reconnaissance
 Perform subdomain enumeration on target.com
@@ -967,10 +967,10 @@ cai
 CAI> /cost
 
 # Increase limit if needed
-CAI> /config CAI_PRICE_LIMIT=20.0
+CAI> /env set CAI_PRICE_LIMIT 20.0
 
 # Check updated limit
-CAI> /config | grep PRICE_LIMIT
+CAI> /env list | grep PRICE_LIMIT
 ```
 
 ### Cost Optimization Strategies
@@ -1115,11 +1115,11 @@ cai
 
 ```bash
 # Start with base config
-CAI> /config
+CAI> /env list
 
 # Adjust during session
-CAI> /config CAI_DEBUG=2
-CAI> /config CAI_PRICE_LIMIT=15.0
+CAI> /env set CAI_DEBUG 2
+CAI> /env set CAI_PRICE_LIMIT 15.0
 
 # Verify changes
 CAI> /env | grep CAI
@@ -1209,7 +1209,7 @@ Common issues and solutions.
 CAI> /cost
 
 # Increase limit
-CAI> /config CAI_PRICE_LIMIT=20.0
+CAI> /env set CAI_PRICE_LIMIT 20.0
 
 # Or restart with higher limit
 exit
@@ -1223,7 +1223,7 @@ CAI_PRICE_LIMIT=20.0 cai
 CAI> /env | grep MAX_INTERACTIONS
 
 # Increase limit
-CAI> /config CAI_MAX_INTERACTIONS=500
+CAI> /env set CAI_MAX_INTERACTIONS 500
 
 # Or use /flush to start fresh
 CAI> /flush
@@ -1242,14 +1242,14 @@ CAI> /agent
 CAI> /agent redteam_agent
 
 # Check configuration
-CAI> /config
+CAI> /env list
 ```
 
 ### Issue: Context Window Full
 
 ```bash
-# Check context usage (CAI PRO)
-CAI> /context
+# Review spend / token usage
+CAI> /cost
 
 # Compact conversation
 CAI> /compact
@@ -1298,7 +1298,7 @@ export CAI_DEBUG=2
 cai
 
 # Or enable during session
-CAI> /config CAI_DEBUG=2
+CAI> /env set CAI_DEBUG 2
 ```
 
 ---

@@ -25,7 +25,7 @@ cai
 
 ## Available Models
 
-View in CAI with `/model-show` under "Ollama Cloud" category:
+View in CAI with `/model show` under "Ollama Cloud" category:
 
 - `ollama_cloud/gpt-oss:120b` - General purpose 120B model
 - `ollama_cloud/llama3.3:70b` - Llama 3.3 70B
@@ -40,7 +40,7 @@ More models at [ollama.com/library](https://ollama.com/library).
 # By name
 CAI> /model ollama_cloud/gpt-oss:120b
 
-# By number (after /model-show)
+# By number (after /model show)
 CAI> /model 3
 ```
 

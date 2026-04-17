@@ -5,6 +5,9 @@
 
 ---
 
+!!! tip "Recommended: use the CLI REPL"
+    The command matrix for every `cai` binary flag and REPL slash command is maintained in the **[CLI commands reference](../cli/commands_reference.md)**. **When in doubt—especially for scripting, copy-paste examples, or comparing subcommands—use the plain CLI REPL** and the CLI reference. The TUI shares the same underlying engine; this document focuses on **multi-terminal UX**, keyboard shortcuts, palette actions, and behaviors that differ from the CLI.
+
 This comprehensive guide documents all commands available in the CAI Terminal User Interface (TUI), including command palette actions, keyboard shortcuts, and CLI-style commands.
 
 ---
@@ -23,19 +26,40 @@ CAI TUI commands are organized into the following categories:
 
 ---
 
+## CLI parity and TUI-only differences
+
+The [CLI commands reference](../cli/commands_reference.md) is the **authoritative** list for REPL slash commands. The TUI reuses the same slash commands, but a few interactions differ:
+
+
+| Situation                                  | CLI REPL                                           | TUI                                                                                                                |
+| ------------------------------------------ | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `/flush` or `/clear` with **no** arguments | Interactive menu of agents that still have history | Clears history for the **focused terminal only**                                                                   |
+| `/agent` with no arguments                 | Same as `/agent current`                           | Shows the active agent configuration across terminals where applicable                                             |
+| Screen vs history                          | N/A                                                | **Ctrl+L** / visual “clear” only affects scrollback; it does **not** replace `/flush` for wiping message history |
+
+
+For binary flags such as `--tui`, `--yaml`, or `--api`, see [Binary `cai` CLI flags](../cli/commands_reference.md#binary-cai-cli-flags).
+
+---
+
 ## Agent Management
 
 ### `/agent` or `/a`
 
 Switch between agents or list all available agents.
 
+!!! note "CLI reference vs TUI examples"
+    The CLI reference documents `/agent` with explicit subcommands (`list`, `select`, `info`, `current`, …). In the TUI you will often see the shorthand `/agent <name>`; on many builds that is equivalent to `/agent select <name>`. For exact syntax and flags, follow the **[CLI commands reference](../cli/commands_reference.md#agent-a)**.
+
 **Syntax**:
+
 ```
 /agent [agent_name]
 /a [agent_name]
 ```
 
 **Examples**:
+
 ```bash
 # List all available agents
 /agent
@@ -48,6 +72,7 @@ Switch between agents or list all available agents.
 ```
 
 **Available Agents**:
+
 - `redteam_agent` - Offensive security testing and penetration testing
 - `blueteam_agent` - Defensive security analysis and hardening
 - `bug_bounter_agent` - Bug bounty hunting and vulnerability research
@@ -72,6 +97,7 @@ Switch between agents or list all available agents.
 - `offsec_pattern` - Offensive security pattern orchestration
 
 **Notes**:
+
 - Agent changes are immediate and affect only the active terminal
 - Each terminal can run a different agent simultaneously
 - Agent context is preserved when switching between terminals
@@ -85,6 +111,7 @@ Switch between agents or list all available agents.
 CAI TUI uses model dropdowns in each terminal header for model management. Models are configured via environment variables and aliases.
 
 **Available Models**:
+
 - `alias1` - Cybersecurity focus model [Recommended]
 - `gpt-4o` - OpenAI GPT-4 Optimized
 - `gpt-4-turbo` - OpenAI GPT-4 Turbo
@@ -93,11 +120,13 @@ CAI TUI uses model dropdowns in each terminal header for model management. Model
 - `o1-preview` - OpenAI O1 Preview
 
 **How to Change Models**:
+
 1. Click the model dropdown in any terminal header
 2. Select desired model from the list
 3. Model change takes effect immediately for that terminal
 
 **Environment Variables**:
+
 ```bash
 export CAI_MODEL=gpt-4o              # Set default model
 export CAI_OPENAI_API_KEY=sk-...    # OpenAI API key
@@ -105,6 +134,7 @@ export CAI_ANTHROPIC_API_KEY=sk-... # Anthropic API key
 ```
 
 **Notes**:
+
 - Each terminal can use a different model
 - Model costs are tracked separately per terminal
 - Switching models mid-conversation preserves history
@@ -120,11 +150,13 @@ Send commands to specific terminals using either the prefix notation or the flag
 #### Method 1: Prefix Notation
 
 **Syntax**:
+
 ```
 T<terminal_number>:<command>
 ```
 
 **Examples**:
+
 ```bash
 # Switch agent in Terminal 2
 T2:/agent blueteam_agent
@@ -138,6 +170,7 @@ T1:/clear
 # Execute command in Terminal 4
 T4:scan target.com for vulnerabilities
 ```
+
 #### Method 2: Flag Notation
 
 **Syntax**:
@@ -148,6 +181,7 @@ T4:scan target.com for vulnerabilities
 ```
 
 **Examples**:
+
 ```bash
 # Switch agent in Terminal 2
 /agent blueteam_agent t2
@@ -166,6 +200,7 @@ Scan target.com for XSS vulnerabilities t2
 ```
 
 **Supported Flags**:
+
 - `t1` - Target Terminal 1
 - `t2` - Target Terminal 2
 - `t3` - Target Terminal 3
@@ -173,6 +208,7 @@ Scan target.com for XSS vulnerabilities t2
 - (Additional terminals if configured: `t5`, `t6`, etc.)
 
 **Notes**:
+
 - Both methods achieve the same result
 - Flag notation is more concise for quick commands
 - Prefix notation is clearer for complex prompts
@@ -183,6 +219,7 @@ Scan target.com for XSS vulnerabilities t2
 **Keyboard Shortcut**: Click the `[+]` button in the top bar
 
 **Notes**:
+
 - New terminals start with `redteam_agent` by default
 - Maximum recommended terminals: 4 (for optimal UX)
 - Terminals beyond 4 use scrollable layout
@@ -191,16 +228,18 @@ Scan target.com for XSS vulnerabilities t2
 
 ## History and Memory
 
-### `/history [number] [agent_name]` or `/h`
+### `/history [number] [agent_name]` or `/his`
 
-Display conversation history for the current or specified agent.
+Display conversation history for the current or specified agent. (Use `/his` — `/h` is reserved for `/help` on builds that follow the documented alias table.)
 
 **Syntax**:
+
 ```
 /history [number] [agent_name]
 ```
 
 **Examples**:
+
 ```bash
 # Show last 10 messages
 /history
@@ -212,24 +251,27 @@ Display conversation history for the current or specified agent.
 /history 10 redteam_agent
 
 # Compact syntax
-/h 5
+/his 5
 ```
 
 **Notes**:
+
 - Default shows last 10 interactions
 - History includes both user prompts and agent responses
 - History is terminal-specific
 
-### `/flush [agent_name|all]`
+### `/flush [agent_name|all]` or `/clear`
 
-Clear agent message history.
+Clear agent message history (`/clear` is an alias of `/flush` for history, not the same as clearing the screen—see below).
 
 **Syntax**:
+
 ```
 /flush [agent_name|all]
 ```
 
 **Examples**:
+
 ```bash
 # Flush current agent history
 /flush
@@ -242,15 +284,18 @@ Clear agent message history.
 ```
 
 **Notes**:
+
 - Flushing is irreversible
 - Agent context window is reset
 - Useful for starting fresh conversations
+- **TUI:** with **no** arguments, `/flush` typically affects only the **focused** terminal (see [CLI parity and TUI-only differences](#cli-parity-and-tui-only-differences)). The CLI may instead show a picker—confirm with `/help flush` on your build.
 
 ### `/memory [subcommand]` or `/mem`
 
 Advanced memory management for agents.
 
 **Syntax**:
+
 ```
 /memory <subcommand>
 /mem <subcommand>
@@ -259,55 +304,72 @@ Advanced memory management for agents.
 **Subcommands**:
 
 #### `list`
+
 Show all saved memories.
+
 ```bash
 /memory list
 ```
 
 #### `save [name]`
+
 Save current conversation as a memory.
+
 ```bash
 /memory save "Authentication bypass research"
 /mem save pentest_findings
 ```
 
 #### `apply <memory_id>`
+
 Apply a saved memory to the current agent.
+
 ```bash
 /memory apply mem_12345
 ```
 
 #### `show <memory_id>`
+
 Display the content of a specific memory.
+
 ```bash
 /memory show mem_12345
 ```
 
 #### `delete <memory_id>`
+
 Remove a memory permanently.
+
 ```bash
 /memory delete mem_12345
 ```
 
 #### `merge <id1> <id2> [name]`
+
 Combine two memories into one.
+
 ```bash
 /memory merge mem_12345 mem_67890 "Combined pentesting notes"
 ```
 
 #### `compact`
+
 AI-powered memory summarization.
+
 ```bash
 /memory compact
 ```
 
 #### `status`
+
 Show memory system status and statistics.
+
 ```bash
 /memory status
 ```
 
 **Notes**:
+
 - Memories persist across sessions
 - Useful for resuming long-term research projects
 - AI-powered summarization reduces token usage
@@ -321,15 +383,18 @@ Show memory system status and statistics.
 Save the current conversation to a file.
 
 **Syntax**:
+
 ```
 /save <filename>
 ```
 
 **Supported Formats**:
+
 - JSON (`.json`)
 - Markdown (`.md`)
 
 **Examples**:
+
 ```bash
 # Save as JSON
 /save pentest_session.json
@@ -342,6 +407,7 @@ Save the current conversation to a file.
 ```
 
 **Notes**:
+
 - Saves all terminal conversations
 - Includes agent names, models, and timestamps
 - Cost information is preserved
@@ -351,12 +417,14 @@ Save the current conversation to a file.
 Load a previously saved conversation.
 
 **Syntax**:
+
 ```
 /load <filename>
 /l <filename>
 ```
 
 **Examples**:
+
 ```bash
 # Load JSON session
 /load pentest_session.json
@@ -369,6 +437,7 @@ Load a previously saved conversation.
 ```
 
 **Notes**:
+
 - Restores agent context and history
 - Compatible with both JSON and Markdown formats
 - Loading does not affect current cost tracking
@@ -377,61 +446,20 @@ Load a previously saved conversation.
 
 ## Utility Commands
 
-### `/context [agent_name]` or `/ctx` 🚀 **CAI PRO Exclusive**
-
-> **⚡ CAI PRO Exclusive Feature**
-> The `/context` command is available exclusively in **[CAI PRO](https://aliasrobotics.com/cybersecurityai.php)**. To access this feature and unlock advanced monitoring capabilities, visit [Alias Robotics](https://aliasrobotics.com/cybersecurityai.php) for more information.
-
-Display context window usage and token statistics for the current conversation.
-
-**Syntax**:
-```
-/context [agent_name]
-/ctx [agent_name]
-```
-
-**Examples**:
-```bash
-# Show context usage for active terminal
-/context
-
-# Show context usage for specific agent
-/context redteam_agent
-
-# Compact syntax
-/ctx
-```
-
-**Output Includes**:
-- Total context usage (used/max tokens) with percentage
-- Visual grid representation with CAI logo
-- Breakdown by category:
-  - System prompt tokens
-  - Tool definitions tokens
-  - Memory files (RAG) tokens
-  - User prompts tokens
-  - Assistant responses tokens
-  - Tool calls tokens
-  - Tool results tokens
-- Free space available
-- Color-coded visualization for easy identification
-
-**Notes**:
-- Context usage helps monitor when you're approaching model limits
-- Different models have different context windows (e.g., GPT-4: 128k, Claude: 200k)
-- Use `/context` regularly during long conversations to avoid hitting limits
-- Context usage is terminal-specific in TUI mode
+For spend and token usage use **`/cost`** (and the per-terminal cost UI in the TUI). When threads grow too long, use **`/compact`**. See the [CLI commands reference](../cli/commands_reference.md) for the full command list.
 
 ### `/cost [agent_name]`
 
 Display API usage costs and token statistics.
 
 **Syntax**:
+
 ```
 /cost [agent_name]
 ```
 
 **Examples**:
+
 ```bash
 # Show costs for active terminal
 /cost
@@ -444,6 +472,7 @@ Display API usage costs and token statistics.
 ```
 
 **Output Includes**:
+
 - Total cost (USD)
 - Input tokens used
 - Output tokens used
@@ -456,12 +485,14 @@ Display API usage costs and token statistics.
 Get help for commands.
 
 **Syntax**:
+
 ```
 /help [command]
 /? [command]
 ```
 
 **Examples**:
+
 ```bash
 # General help
 /help
@@ -477,11 +508,13 @@ Get help for commands.
 Display environment variables relevant to CAI.
 
 **Syntax**:
+
 ```
 /env
 ```
 
 **Output Includes**:
+
 - `CAI_MODEL` - Default model
 - `CAI_AGENT_TYPE` - Default agent
 - `CAI_MAX_TURNS` - Maximum interaction turns
@@ -496,12 +529,14 @@ Display environment variables relevant to CAI.
 Execute shell commands directly from the TUI.
 
 **Syntax**:
+
 ```
 /shell <command>
 $<command>
 ```
 
 **Examples**:
+
 ```bash
 # List files
 /shell ls -la
@@ -514,31 +549,21 @@ $nmap -sV 192.168.1.1
 ```
 
 **Notes**:
+
 - Commands execute in the system shell
 - Output is displayed in the terminal
 - Use with caution - no sandboxing
 
-### `/kill`
+### Stopping work in the TUI
 
-Terminate the currently executing agent operation.
+Use **Ctrl+C** to cancel the **current agent turn** or tool call in the focused terminal. Partial responses may be discarded depending on the tool; message history is preserved unless you also `/flush`. To signal an external PID, use **`/shell`** or **`$`** with the usual OS tools.
 
-**Syntax**:
-```
-/kill
-```
+### `/clear` (scrollback)
 
-**Keyboard Shortcut**: `Ctrl+C`
-
-**Notes**:
-- Stops agent mid-execution
-- Partial responses are discarded
-- Agent context is preserved
-
-### `/clear`
-
-Clear the terminal output.
+Clear **visual** terminal output (scrollback) in the TUI.
 
 **Syntax**:
+
 ```
 /clear
 ```
@@ -546,16 +571,21 @@ Clear the terminal output.
 **Keyboard Shortcut**: `Ctrl+L`
 
 **Notes**:
+
 - Clears visual output only
-- Conversation history is preserved
+- **Does not** wipe conversation history—use `/flush` / `/clear` in the history sense (see above)
 - Cost tracking continues
 
+### `/exit` or `/quit` or `/q`
 
-**Keyboard Shortcut**: `Ctrl+Q`
+Leave the TUI session cleanly (telemetry flush, session teardown).
+
+**Keyboard Shortcut**: `Ctrl+Q` (depending on build; confirm in-app shortcuts)
 
 **Notes**:
-- Unsaved sessions will be lost
-- Graceful shutdown of all terminals
+
+- Unsaved work in buffers may be lost—`/save` or export logs first if needed
+- Shuts down all terminals in the layout
 
 ---
 
@@ -568,6 +598,7 @@ Access the command palette for quick command search and execution.
 **Keyboard Shortcut**: `Ctrl+P`
 
 **Features**:
+
 - Fuzzy search for commands
 - Command descriptions
 - Keyboard navigation (arrow keys, Enter)
@@ -582,7 +613,6 @@ Show or hide the sidebar.
 
 **Alternative**: Click the `[≡]` button in the top bar
 
-
 ### Clear Input
 
 Clear the prompt input field.
@@ -590,6 +620,7 @@ Clear the prompt input field.
 **Keyboard Shortcut**: `Ctrl+U`
 
 **Use Cases**:
+
 - Parallel agent execution
 - Comparing agent responses
 - Team-based workflows
@@ -599,6 +630,7 @@ Clear the prompt input field.
 Cancel running operations.
 
 **Keyboard Shortcuts**:
+
 - `Ctrl+C` - Cancel execution in focused terminal
 - `Escape` - Cancel all running agents (press twice to exit)
 
@@ -606,6 +638,7 @@ Cancel running operations.
 
 ## Next Steps
 
+- [CLI commands reference](../cli/commands_reference.md) — recommended for exact REPL syntax
 - [Terminals Management](terminals_management.md) - Advanced multi-terminal workflows
 - [Keyboard Shortcuts](keyboard_shortcuts.md) - Complete keyboard reference
 - [User Interface Guide](user_interface.md) - Visual components and layouts
@@ -614,5 +647,4 @@ For questions or issues, visit [CAI GitHub Issues](https://github.com/aliasrobot
 
 ---
 
-*Last updated: October 2025 | CAI TUI v0.6+*
-
+*TUI UX and shortcuts; authoritative slash-command tables: [CLI commands reference](../cli/commands_reference.md).*

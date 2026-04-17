@@ -480,8 +480,6 @@ Active ──[Focus Terminal]──> Focused ──[Focus Other]──> Active
 
 **Method 2**: `Escape` twice (all terminals)
 
-**Method 3**: `/kill` command
-
 #### Clearing Errors
 
 **Command**: `/clear` (clears visual errors, preserves history)

@@ -30,6 +30,7 @@ nav:
       - Welcome: index.md
       - Installation: cai_installation.md
       - Quickstart: cai_quickstart.md
+      - Commands reference: cli/commands_reference.md
 
   # ========================================
   # CAI PRO (EXPANDIDO - COMERCIAL) ⭐
@@ -119,7 +120,6 @@ nav:
       - Tracing & Debugging: tracing.md
       - Context Management: context.md
       - Guardrails & Security: guardrails.md
-      - LLM Council: council.md
       - Environment Variables: environment_variables.md
 
   # ========================================

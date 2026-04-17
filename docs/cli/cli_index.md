@@ -92,11 +92,11 @@ See the [Getting Started Guide](getting_started.md) for detailed instructions.
 
 Over 30 built-in commands organized by category:
 
-- **Agent Management**: `/agent`, `/parallel`, `/run`
-- **Memory & History**: `/memory`, `/history`, `/compact`, `/flush`, `/load`, `/merge`
-- **Environment & Config**: `/config`, `/env`, `/help var` (per-variable help), `/workspace`, `/virtualization`
-- **Tools & Integration**: `/mcp`, `/platform`, `/shell`
-- **Utilities**: `/model`, `/graph`, `/context`, `/cost`, `/help`
+- **Agent Management**: `/agent`, `/parallel`
+- **Memory & History**: `/memory`, `/history`, `/compact`, `/flush`, `/load`, `/merge`, `/save`
+- **Environment**: `/env` (catalog `list` / `get` / `set` / `default`), `/help var` (per-variable help), `/workspace`, `/virtualization`
+- **Tools & Integration**: `/mcp`, `/shell`
+- **Utilities**: `/model`, `/graph`, `/cost`, `/help`
 
 All commands support aliases for faster typing (e.g., `/a` for `/agent`, `/h` for `/help`).
 
@@ -280,7 +280,7 @@ cai --yaml agents.yaml --prompt "full reconnaissance on target.com"
 | `/agent list` | List all agents | `/agent list` |
 | `/agent <name>` | Switch agent | `/agent redteam_agent` |
 | `/model <name>` | Change model | `/model alias1` |
-| `/config` | View configuration | `/config` |
+| `/env list` | Catalog + live values | `/env list` |
 | `/help` | Show help | `/help agent` |
 | `/save <file>` | Save session | `/save session.json` |
 | `/load <file>` | Load session | `/load session.json` |
@@ -306,7 +306,7 @@ CAI CLI can be configured via:
 
 1. **Environment Variables**: `CAI_MODEL`, `CAI_AGENT_TYPE`, etc.
 2. **`.env` File**: Place in your working directory
-3. **`/config` Command**: Runtime configuration changes
+3. **`/env` command**: Runtime changes via catalog (`/env set …`, `/env default`, …)
 4. **YAML Files**: Agent and workflow definitions
 
 Example `.env`:
