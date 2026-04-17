@@ -1118,41 +1118,21 @@ Use ```/agent``` to list all the agents available.
 
 
 <details>
-<summary> Where can I list all the environment variables? /config </summary>
+<summary> Where can I list all the environment variables? /env </summary>
 
 ![cai-008-config](imgs/readme_imgs/cai-008-config.png)
 </details>
 
 <details>
-<summary> How can I monitor context usage and token consumption? /context or /ctx 🚀 CAI PRO </summary>
+<summary> How can I monitor token usage and costs? </summary>
 
-> **⚡ CAI PRO Exclusive Feature**
-> The `/context` command is available exclusively in **[CAI PRO](https://aliasrobotics.com/cybersecurityai.php)**. To access this feature and unlock advanced monitoring capabilities, visit [Alias Robotics](https://aliasrobotics.com/cybersecurityai.php) for more information.
-
-Use ```/context``` (or the short form ```/ctx```) to view your current context window usage and token statistics.
-
-This command displays:
-- Total context usage (used tokens / max tokens) with percentage
-- Visual grid representation with the CAI logo showing filled context
-- Detailed breakdown by category:
-  - System prompt tokens
-  - Tool definitions tokens
-  - Memory/RAG tokens
-  - User prompts tokens
-  - Assistant responses tokens
-  - Tool calls tokens
-  - Tool results tokens
-- Free space available
-
-**Why this matters**: Different models have different context limits (e.g., GPT-4: 128k tokens, Claude: 200k tokens). Monitoring your context usage helps you avoid hitting these limits during long conversations, which could cause errors or require conversation truncation.
+Use **`/cost`** in the REPL for session spend and token statistics, **`/compact`** when conversations grow long, and (in **TUI** mode) the per-terminal cost and model indicators in the UI.
 
 ```bash
-# Show context usage
-/context
-
-# Or use the short form
-/ctx
+CAI> /cost
 ```
+
+See the [CLI commands reference](docs/cli/commands_reference.md) for the full command list.
 </details>
 
 <details>

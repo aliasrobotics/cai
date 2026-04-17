@@ -19,39 +19,41 @@ The cybersecurity AI landscape is rapidly evolving, and professionals need tools
 - **🇪🇺 European Hosting**: GDPR and NIS2 compliant infrastructure ensuring maximum privacy and data sovereignty
 - **💬 Professional Support**: Dedicated technical support to help you maximize your security testing capabilities
 - **📱 Mobile UI (iOS)**: Native iOS app for security testing on the go - **[Join TestFlight Beta](https://testflight.apple.com/join/nXZZD4Z5)**
-- **⚡ Advanced Features**: Terminal UI (deprecated), context monitoring, and exclusive tools not available in the Community Edition
+- **⚡ Advanced Features**: Terminal UI (CLI recommended), usage and cost tooling (`/cost`, compaction), and exclusive tools not available in the Community Edition
 
 ---
 
 ## CAI FREE vs CAI PRO
 
-<div class="comparison-table" markdown>
 
-| Feature | CAI FREE | CAI PRO |
-|---------|-------------------|---------|
-| **Core Framework** | ✅ Access, ~6-months behind | ✅ Full Access |
-| **300+ AI Models** | ✅ BYO API Keys | ✅ BYO API Keys |
-| **Built-in Security Tools** | ✅ Full Suite | ✅ Full Suite |
-| **Agent Patterns** | ✅ All Patterns | ✅ All Patterns |
-| **Command Line Interface** | ✅ Yes | ✅ Yes |
-| **European Data Hosting** | ✅ **GDPR + NIS2 Compliant** | ✅ **GDPR + NIS2 Compliant** |
-| **`alias1` Model** | ❌ Not Available | ✅ **Unlimited Tokens** |
-| **Mobile UI (iOS App)** | ❌ | ✅ **Native iOS App** - [TestFlight](https://testflight.apple.com/join/nXZZD4Z5) |
-| **Terminal User Interface (TUI)** | ❌ | ✅ Multi-terminal (Deprecated) |
-| **Context Monitoring (`/context`)** | ❌ | ✅ Real-time token tracking |
-| **Advanced Reporting** | ❌ | ✅ Professional formats |
-| **Priority Support** | ❌ Community | ✅ **Professional** |
-| **Commercial Use License** | ❌ Research Only | ✅ **Full Commercial** |
-| **Custom Extensions** | ❌ | ✅ Available on request |
-| **Pricing** | **Free** (Research) | **€350/month** |
 
-</div>
+
+| Feature                             | CAI FREE                    | CAI PRO                                                                         |
+| ----------------------------------- | --------------------------- | ------------------------------------------------------------------------------- |
+| **Core Framework**                  | ✅ Access, ~6-months behind  | ✅ Full Access                                                                   |
+| **300+ AI Models**                  | ✅ BYO API Keys              | ✅ BYO API Keys                                                                  |
+| **Built-in Security Tools**         | ✅ Full Suite                | ✅ Full Suite                                                                    |
+| **Agent Patterns**                  | ✅ All Patterns              | ✅ All Patterns                                                                  |
+| **Command Line Interface**          | ✅ Yes                       | ✅ Yes                                                                           |
+| **European Data Hosting**           | ✅ **GDPR + NIS2 Compliant** | ✅ **GDPR + NIS2 Compliant**                                                     |
+| `**alias1` Model**                  | ❌ Not Available             | ✅ **Unlimited Tokens**                                                          |
+| **Mobile UI (iOS App)**             | ❌                           | ✅ **Native iOS App** - [TestFlight](https://testflight.apple.com/join/nXZZD4Z5) |
+| **Terminal User Interface (TUI)**   | ❌                           | ✅ Multi-terminal (Deprecated)                                                   |
+| **Usage & cost visibility**         | ❌                           | ✅ `/cost`, TUI cost panels, reporting workflows                                  |
+| **Advanced Reporting**              | ❌                           | ✅ Professional formats                                                          |
+| **Priority Support**                | ❌ Community                 | ✅ **Professional**                                                              |
+| **Commercial Use License**          | ❌ Research Only             | ✅ **Full Commercial**                                                           |
+| **Custom Extensions**               | ❌                           | ✅ Available on request                                                          |
+| **Pricing**                         | **Free** (Research)         | **€350/month**                                                                  |
+
+
+
 
 ---
 
 ## The `alias1` Model
 
-<div class="highlight-box" markdown>
+
 
 ### 🏆 **Beats GPT-5 in Cybersecurity Benchmarks**
 
@@ -63,11 +65,12 @@ The `alias1` model is our flagship cybersecurity AI, specifically trained for:
 - **Zero Refusals**: No ethical restrictions for authorized security testing
 
 **Performance Highlights:**
+
 - Outperforms GPT-5 in AI vs AI cybersecurity benchmarks
 - 500B-parameter architecture optimized for security workflows
 - Unrestricted responses for authorized pentesting engagements
 
-</div>
+
 
 [View Full Benchmarks →](https://aliasrobotics.com/alias1.php#benchmarking)
 
@@ -75,20 +78,16 @@ The `alias1` model is our flagship cybersecurity AI, specifically trained for:
 
 The performance of `alias1` and the CAI framework is validated through rigorous peer-reviewed research:
 
-- 📊 [**CAIBench: Cybersecurity AI Benchmark**](https://arxiv.org/pdf/2510.24317) (2025)
-  Modular meta-benchmark framework for evaluating LLM models across offensive and defensive cybersecurity domains. `alias1` demonstrates superior performance compared to general-purpose models.
-
-- 🎯 [**Evaluating Agentic Cybersecurity in Attack/Defense CTFs**](https://arxiv.org/pdf/2510.17521) (2025)
-  Real-world evaluation showing defensive agents achieved 54.3% patching success versus 28.3% offensive initial access. Validates practical effectiveness of CAI agents in live CTF environments.
-
-- 🚀 [**Cybersecurity AI (CAI) Framework**](https://arxiv.org/pdf/2504.06017) (2025)
-  Core framework paper demonstrating that CAI outperforms humans by up to **3,600× in specific security testing scenarios**, establishing a new standard for automated security assessment.
-
-- 🛡️ [**Hacking the AI Hackers via Prompt Injection**](https://arxiv.org/pdf/2508.21669) (2025)
-  Demonstrates four-layer guardrail defenses against prompt injection attacks, ensuring `alias1` remains secure even when processing adversarial inputs.
-
-- 📚 [**CAI Fluency: Educational Framework**](https://arxiv.org/pdf/2508.13588) (2025)
-  Comprehensive educational platform for democratizing cybersecurity AI knowledge and best practices.
+- 📊 **[CAIBench: Cybersecurity AI Benchmark](https://arxiv.org/pdf/2510.24317)** (2025)
+Modular meta-benchmark framework for evaluating LLM models across offensive and defensive cybersecurity domains. `alias1` demonstrates superior performance compared to general-purpose models.
+- 🎯 **[Evaluating Agentic Cybersecurity in Attack/Defense CTFs](https://arxiv.org/pdf/2510.17521)** (2025)
+Real-world evaluation showing defensive agents achieved 54.3% patching success versus 28.3% offensive initial access. Validates practical effectiveness of CAI agents in live CTF environments.
+- 🚀 **[Cybersecurity AI (CAI) Framework](https://arxiv.org/pdf/2504.06017)** (2025)
+Core framework paper demonstrating that CAI outperforms humans by up to **3,600× in specific security testing scenarios**, establishing a new standard for automated security assessment.
+- 🛡️ **[Hacking the AI Hackers via Prompt Injection](https://arxiv.org/pdf/2508.21669)** (2025)
+Demonstrates four-layer guardrail defenses against prompt injection attacks, ensuring `alias1` remains secure even when processing adversarial inputs.
+- 📚 **[CAI Fluency: Educational Framework](https://arxiv.org/pdf/2508.13588)** (2025)
+Comprehensive educational platform for democratizing cybersecurity AI knowledge and best practices.
 
 **Explore all research:** [Alias Robotics Research Library](https://aliasrobotics.com/research-security.php#papers) (24+ peer-reviewed publications)
 
@@ -128,12 +127,14 @@ Building and maintaining CAI is resource-intensive. CAI PRO enables us to:
 ### Fair Pricing
 
 **€350/month** provides:
+
 - **Unlimited `alias1` tokens** (compare: OpenAI GPT-4o costs ~$2.50 per 1M tokens)
 - **Professional support** (compare: enterprise support typically $1000+/month)
 - **Privacy guarantees** (priceless for security professionals)
 - **Commercial license** (required for security consulting businesses)
 
 Most security professionals already pay similar or higher amounts for:
+
 - **Burp Suite Professional**: $449/year ($37/month)
 - **ChatGPT Plus/Pro**: $20-200/month (with severe restrictions)
 - **Other AI security tools**: $500-2000/month (closed-source, inferior models)
@@ -155,16 +156,9 @@ Run multiple agents in parallel with an intuitive multi-terminal interface:
 
 [TUI Documentation →](tui/tui_index.md)
 
-### 📊 Context Monitoring (`/context`)
+### 📊 Usage and long threads
 
-Track token usage and optimize your conversations:
-
-- **Real-time Tracking**: Monitor context window consumption as you work
-- **Category Breakdown**: See tokens by system, tools, memory, and messages
-- **Visual Grid**: CAI logo-based visualization of context utilization
-- **Optimization Insights**: Understand when to compact or clear history
-
-[Context Command Docs →](cai/getting-started/commands.md#context-usage-monitoring-contextpy-cai-pro-exclusive)
+Track spend with **`/cost`**, use **`/compact`** when conversations grow large, and use the **TUI** cost/model indicators for per-terminal visibility.
 
 ### 📝 Advanced Reporting
 
@@ -205,11 +199,13 @@ CAI_GUARDRAILS=true
 ### 3. Launch CAI PRO
 
 #### CLI Mode (Standard)
+
 ```bash
 cai
 ```
 
 #### TUI Mode (Multi-terminal)
+
 ```bash
 cai --tui
 ```
@@ -222,10 +218,10 @@ Check that you're using CAI PRO features:
 CAI> /model
 # Should show alias1 is available
 
-CAI> /context
-# Should display context usage
+CAI> /cost
+# Should display session usage / costs
 
-CAI> --tui
+cai --tui
 # Should launch multi-terminal interface
 ```
 
@@ -237,7 +233,7 @@ CAI> --tui
 
 **CAI PRO subscribers receive:**
 
-- **Email Support**: research@aliasrobotics.com (48-hour response SLA)
+- **Email Support**: [research@aliasrobotics.com](mailto:research@aliasrobotics.com) (48-hour response SLA)
 - **Priority Discord**: Exclusive #pro-support channel
 - **Quarterly Strategy Calls**: Discuss roadmap and feature requests
 - **Custom Development**: Request tailored agents and extensions
@@ -246,7 +242,7 @@ CAI> --tui
 
 - **[TUI Guide](tui/tui_index.md)**: Complete Terminal UI documentation
 - **[Agent Reference](agents.md)**: All available agents and configurations
-- **[Command Reference](cai/getting-started/commands.md)**: Full CLI/TUI command list
+- **[Command Reference](cli/commands_reference.md)**: Full CLI/TUI command list
 - **[Benchmarks](cai_benchmark.md)**: Performance data and comparisons
 
 ### Community Resources
@@ -276,7 +272,8 @@ No. The Community Edition license restricts use to research and educational purp
 
 ### Do you offer team/enterprise pricing?
 
-Yes! Contact research@aliasrobotics.com for:
+Yes! Contact [research@aliasrobotics.com](mailto:research@aliasrobotics.com) for:
+
 - **Team plans** (5+ users): Volume discounts
 - **Enterprise plans** (20+ users): Custom pricing, on-premise deployment
 - **Academic licenses**: Special rates for universities and research institutions
@@ -284,6 +281,7 @@ Yes! Contact research@aliasrobotics.com for:
 ### Is my security testing data private?
 
 **Absolutely.** CAI PRO guarantees:
+
 - **No training on your data**: Your pentesting activities never improve our models (unless you explicitly opt in)
 - **European hosting**: All data processed in GDPR-compliant datacenters
 - **No third-party sharing**: Unlike OpenAI/Anthropic, we never send your data elsewhere
@@ -292,6 +290,7 @@ Yes! Contact research@aliasrobotics.com for:
 ### Can I switch between models?
 
 Yes! CAI PRO includes:
+
 - **Unlimited `alias1` tokens** (your PRO model)
 - **BYO API keys**: Continue using OpenAI, Anthropic, etc. with your own keys
 - **Mix and match**: Use `alias1` for exploitation, GPT-4 for reporting, etc.
@@ -299,6 +298,7 @@ Yes! CAI PRO includes:
 ### What if alias1 refuses a query?
 
 `alias1` has **zero refusals** for authorized security testing. If you encounter issues:
+
 1. Ensure your prompt includes security context (e.g., "authorized pentest of...")
 2. Check your `CAI_GUARDRAILS` setting (may block malicious patterns)
 3. Contact support—we'll investigate immediately
@@ -309,13 +309,13 @@ Yes! CAI PRO includes:
 
 **Transform your security testing workflow with CAI PRO.**
 
-<div class="cta-box" markdown>
+
 
 ### 🚀 **Ready to Upgrade?**
 
 - ✅ Unlimited `alias1` access
 - ✅ Terminal UI with parallel agents
-- ✅ Context monitoring and optimization
+- ✅ Usage and cost visibility (`/cost`, compaction, TUI)
 - ✅ Professional support
 - ✅ European data privacy
 - ✅ Commercial use license
@@ -324,11 +324,8 @@ Yes! CAI PRO includes:
 
 **[Get CAI PRO →](https://aliasrobotics.com/cybersecurityai.php)**
 
-</div>
+
 
 ---
 
-<small>
-*Have questions? Contact research@aliasrobotics.com*
-*Need a quote for your organization? [Request enterprise pricing →](mailto:research@aliasrobotics.com?subject=CAI%20PRO%20Enterprise%20Inquiry)*
-</small>
+*Have questions? Contact research@aliasrobotics.com* *Need a quote for your organization? [Request enterprise pricing →](mailto:research@aliasrobotics.com?subject=CAI%20PRO%20Enterprise%20Inquiry)*

@@ -10,9 +10,10 @@ In current CAI releases, you can explore environment variables **from inside the
 
 | What you need | Command |
 |---------------|---------|
-| **Numbered list with live values** (what is set *now*) | `/config` or `/config list` |
+| **Numbered catalog with live values** (what is set *now*) | `/env list` |
+| **Session keys only** (`CAI_*` / `CTF_*` in this process) | `/env` (no arguments) |
 | **Full reference tables** (defaults, allowed values, when they apply, extras) | `/help` — scroll past the quick guide; or `/help topics` for the overview first, then the same tables at the end |
-| **Long-form help for one variable** (examples, `/config` index when listed, notes) | `/help var VARIABLE_NAME` (e.g. `/help var CAI_MODEL`, `/help var CAI_AVOID_SUDO`) |
+| **Long-form help for one variable** (examples, catalog index when listed, notes) | `/help var VARIABLE_NAME` (e.g. `/help var CAI_MODEL`, `/help var CAI_AVOID_SUDO`) |
 
 Aliases such as `/h` for `/help` work the same way. This page remains the **canonical web reference**; the REPL output tracks the version you have installed.
 
@@ -32,11 +33,11 @@ In the REPL, **`/help var VARIABLE_NAME`** expands each variable with the same i
 **How to set (matches `/help` copy):**
 
 - Before launch: `export VAR=value` or a line in `.env`, then start CAI.
-- During a session: `/config set <number> <value>`, `/config VAR=value`, or code updating `os.environ`.
+- During a session: `/env set <#|NAME> <value…>`, `/env default`, or code updating `os.environ`.
 
 **Types (short):** *bool* — `true`/`false`, `1`/`0`, etc.; *string* — free text; *int* / *float* — numeric; ranges in **Values** are the usual bounds CAI documents; *secret* — treat like a string, never commit real keys.
 
-For **numbered `/config` index**, **extra notes**, and **copy-paste examples** per variable, use **`/help var NAME`** in the REPL — the web page keeps one compact table for browsing.
+For **numbered catalog index**, **extra notes**, and **copy-paste examples** per variable, use **`/help var NAME`** in the REPL — the web page keeps one compact table for browsing.
 
 ---
 
@@ -398,5 +399,5 @@ CAI_MODEL="gpt-4o" CAI_PRICE_LIMIT="2" cai
 
 **3. Runtime configuration**
 
-Use slash commands during a session: `/config`, `/config set …`, and the in-session help above (`/help`, `/help var …`). See [Commands Reference](cai/getting-started/commands.md) and [CLI Commands Reference](cli/commands_reference.md).
+Use slash commands during a session: `/env`, `/env list`, `/env set …`, and the in-session help above (`/help`, `/help var …`). See [Commands Reference](cai/getting-started/commands.md) and [CLI Commands Reference](cli/commands_reference.md).
 

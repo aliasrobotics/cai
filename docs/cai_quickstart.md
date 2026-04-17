@@ -106,17 +106,17 @@ CAI_PRICE_LIMIT="0.004" CAI_MODEL="qwen2.5:72b" cai
 
 #### 3. Runtime configuration
 
-After running CAI, use `/config`
+After running CAI, use **`/env`** (the catalog).
 
 ```
-  /config set <number> <value> to configure a variable # see `config.py` or type `/help`
-
+  /env set <#|NAME> <value...>   # set a catalog variable
+  /env list                      # numbered catalog + live values
+  /env default                   # restore catalog defaults
 ```
 
 ```
   cai
-  /config # It will display a panel with all the environment variables.
-        # You must pick its reference NUMBER (1st column left)
-  # `18` is the corresponding number for CAI_PRICE_LIMIT
-  /config set 18 "0.004"
+  /env list
+  # Pick the catalog index or variable name from the first column
+  /env set 18 "0.004"
 ```

@@ -35,7 +35,7 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
 - ✅ **Unlimited `alias1` tokens** - Our state-of-the-art cybersecurity model that beats GPT-5 in benchmarks
 - ✅ **Mobile User Interface (iOS)** - Native iOS app for security testing on the go - **[Join TestFlight Beta](https://testflight.apple.com/join/nXZZD4Z5)**
 - ✅ **Terminal User Interface (TUI)** - Multi-agent parallel execution with visual monitoring *(Deprecated - Use Mobile UI)*
-- ✅ **Context Monitoring** - Real-time token tracking and optimization
+- ✅ **Usage visibility** - `/cost`, compaction, and TUI cost indicators
 - ✅ **Zero Refusals** - Unrestricted AI specifically trained for offensive security
 - ✅ **European Hosting** - GDPR & NIS2 compliant with guaranteed data privacy
 - ✅ **Professional Support** - Dedicated technical assistance from security experts

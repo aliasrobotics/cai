@@ -84,9 +84,9 @@
     
     ![cai-010-agents-menu](media/cai-010-agents-menu.png)
 
-??? question "Where can I list all the environment variables? /config"
+??? question "Where can I list all the environment variables? /env"
 
-    Use **`/config`** (or **`/config list`**) to see all variables with **current values** and index numbers for `/config set`.
+    Use **`/env list`** to see the full catalog with **current values** and index numbers for **`/env set`**. Bare **`/env`** shows only `CAI_*` / `CTF_*` keys in the current session.
     
     For **full documentation tables** (defaults, constraints, when each applies), run **`/help`** and scroll past the quick guide, or **`/help topics`** and read to the end. For **one variable** in depth, use **`/help var VARIABLE_NAME`** (e.g. `/help var CAI_DEBUG`).
     

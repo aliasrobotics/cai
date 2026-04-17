@@ -71,18 +71,18 @@ export ALIAS_API_KEY="ak_live_1234567890abcdef"
 cai
 ```
 
-### Method 3: Runtime Configuration
+### Method 3: Runtime configuration
 
-After launching CAI, use the `/config` command:
+After launching CAI, use the **`/env`** catalog:
 
 ```bash
-CAI> /config CAI_MODEL=alias1
+CAI> /env set CAI_MODEL alias1
 ```
 
-To view all current configuration:
+To view the catalog with live values:
 
 ```bash
-CAI> /config
+CAI> /env list
 ```
 
 ## Step 3: Select Your Model
@@ -96,7 +96,7 @@ CAI> /model alias1
 To see all available models:
 
 ```bash
-CAI> /model-show
+CAI> /model show
 ```
 
 ### Recommended Models
@@ -190,8 +190,8 @@ The agent will:
 
 ```bash
 # Set up CTF environment
-CAI> /config CTF_NAME=hackableii
-CAI> /config CTF_CHALLENGE=web_challenge
+CAI> /env set CTF_NAME hackableii
+CAI> /env set CTF_CHALLENGE web_challenge
 
 # Start the challenge
 CAI> Analyze this CTF challenge and find the flag
@@ -249,8 +249,8 @@ CAI> /model
 # Change model
 CAI> /model gpt-4o
 
-# List all available models
-CAI> /model-show
+# List all available models (LiteLLM catalog)
+CAI> /model show
 ```
 
 ### Session Management
@@ -322,23 +322,23 @@ CAI> Run a comprehensive port scan on 192.168.1.0/24
 
 ## Step 8: Working with Configuration
 
-### View Current Configuration
+### View current configuration
 
 ```bash
-CAI> /config
+CAI> /env list
 ```
 
-This displays a panel with all environment variables and their current values.
+This shows the environment catalog with numbers and current values. Use bare **`/env`** for a compact view of `CAI_*` / `CTF_*` only.
 
-### Change Configuration at Runtime
+### Change configuration at runtime
 
 ```bash
-# Set a specific variable (use the number from /config output)
-CAI> /config set 18 "5.0"
+# Set by catalog index (from /env list)
+CAI> /env set 18 "5.0"
 
-# Or set by name
-CAI> /config CAI_PRICE_LIMIT=5.0
-CAI> /config CAI_MAX_TURNS=50
+# Or set by variable name
+CAI> /env set CAI_PRICE_LIMIT 5.0
+CAI> /env set CAI_MAX_TURNS 50
 ```
 
 ### Important Configuration Variables
@@ -483,7 +483,7 @@ CAI> /help <command_name>
 CAI> /cost
 
 # Increase limit
-CAI> /config CAI_PRICE_LIMIT=20.0
+CAI> /env set CAI_PRICE_LIMIT 20.0
 
 # Or set it before launching
 CAI_PRICE_LIMIT=20.0 cai
@@ -494,7 +494,7 @@ CAI_PRICE_LIMIT=20.0 cai
 **Solution**:
 ```bash
 # Increase turn limit
-CAI> /config CAI_MAX_TURNS=100
+CAI> /env set CAI_MAX_TURNS 100
 
 # Or flush history and start fresh
 CAI> /flush
@@ -533,7 +533,8 @@ Congratulations! You've completed the basics of CAI CLI. Here's what to explore 
 /agent list              # List all agents
 /agent <name>            # Switch agent
 /model <name>            # Change model
-/config                  # View configuration
+/model show              # LiteLLM model catalog
+/env list                # Catalog + live values
 /help                    # Get help
 /save <file>             # Save session
 /load <file>             # Load session

@@ -14,7 +14,7 @@
 |------------|----------|---------|
 | **🤖 Alias1 Model** | ❌ | ✅ **Unlimited Tokens** |
 | **🖥️ Terminal UI (TUI)** | ❌ | ✅ Multi-terminal parallel execution |
-| **📊 Context Monitoring** | ❌ | ✅ Real-time token tracking |
+| **📊 Usage / cost** | ❌ | ✅ `/cost`, TUI cost panels |
 | **⚡ Multi-Agent Swarms** | ❌ | ✅ 100+ parallel agents |
 | **💬 Professional Support** | ❌ Community | ✅ Priority (48h SLA) |
 | **🇪🇺 European Hosting** | ✅ GDPR + NIS2 | ✅ GDPR + NIS2 |
@@ -59,7 +59,7 @@
 
 #### Keyboard Control
 - **Vim-style shortcuts**: Navigate without touching your mouse
-- **Quick commands**: `/agent`, `/model`, `/context`, `/parallel`
+- **Quick commands**: `/agent`, `/model`, `/parallel`, `/cost`
 - **Terminal switching**: `Ctrl+N`/`Ctrl+B` for rapid navigation
 
 #### Real-Time Stats
@@ -83,29 +83,7 @@
 
 ---
 
-## 3. Context Monitoring (`/context`)
-
-### Optimize Your Conversations
-
-Track token usage and stay within model limits with real-time context monitoring.
-
-### Features
-
-- **Real-time tracking**: Monitor context window consumption as you work
-- **Category breakdown**: Tokens by system, tools, memory, and messages
-- **Visual indicators**: Color-coded utilization levels
-- **Optimization insights**: Know when to compact or clear history
-
-### Use Cases
-
-- **Long conversations**: Avoid hitting context limits mid-session
-- **Cost optimization**: Understand where tokens are consumed
-- **Memory management**: Balance RAG memory vs conversation space
-- **Multi-terminal coordination**: Track context across parallel agents
-
----
-
-## 4. Parallel Agent Swarms
+## 3. Parallel Agent Swarms
 
 ### 100+ Concurrent Agents
 
@@ -148,7 +126,7 @@ Chain agents for complex operations:
 
 ---
 
-## 5. Professional Support
+## 4. Professional Support
 
 ### Priority Technical Assistance
 
@@ -181,7 +159,7 @@ Request tailored solutions:
 
 ---
 
-## 6. European Data Sovereignty
+## 5. European Data Sovereignty
 
 ### GDPR & NIS2 Compliant by Design
 
@@ -207,7 +185,7 @@ Your security testing data never leaves Europe.
 
 ---
 
-## 7. Advanced Reporting
+## 6. Advanced Reporting
 
 ### Professional Security Reports
 
@@ -242,7 +220,7 @@ Generate compliance-ready reports automatically.
 
 ---
 
-## 8. Four-Layer Guardrails
+## 7. Four-Layer Guardrails
 
 ### Advanced Security Protection
 
@@ -274,7 +252,7 @@ CAI PRO includes enterprise-grade guardrails against adversarial attacks.
 
 ---
 
-## 9. Commercial Use License
+## 8. Commercial Use License
 
 ### Unrestricted Business Use
 
@@ -302,7 +280,7 @@ CAI PRO includes full commercial licensing for professional security services.
 
 ---
 
-## 10. Custom Extensions
+## 9. Custom Extensions
 
 ### Tailored Solutions for Your Organization
 
@@ -344,7 +322,7 @@ Work with the CAI team to develop specialized capabilities.
 | **300+ Models** | ✅ BYO Keys | ✅ BYO Keys | ✅ BYO Keys + Private |
 | **Alias1 Tokens** | ❌ | ✅ Unlimited | ✅ Unlimited + On-prem |
 | **TUI** | ❌ | ✅ Yes | ✅ Yes + Custom UI |
-| **Context Monitoring** | ❌ | ✅ Yes | ✅ Yes + Analytics |
+| **Usage & cost visibility** (`/cost`, TUI) | ❌ | ✅ Yes | ✅ Yes + Analytics |
 | **Parallel Agents** | ❌ | ✅ 100+ | ✅ Unlimited |
 | **Support** | Community | ✅ Priority | ✅ Dedicated + Training |
 | **Reporting** | Basic | ✅ Advanced | ✅ Custom Templates |
@@ -368,7 +346,7 @@ Work with the CAI team to develop specialized capabilities.
 
 - ✅ Unlimited alias1 tokens
 - ✅ Terminal UI with parallel agents
-- ✅ Context monitoring and optimization
+- ✅ Usage and cost visibility (`/cost`, compaction, TUI)
 - ✅ Professional support (48h SLA)
 - ✅ European data sovereignty (GDPR + NIS2)
 - ✅ Commercial use license
