@@ -42,6 +42,7 @@ from .lifecycle import AgentHooks, RunHooks
 from .model_settings import ModelSettings
 from .models.interface import Model, ModelProvider, ModelTracing
 from .models.openai_chatcompletions import OpenAIChatCompletionsModel
+from .models.minimax_provider import MiniMaxProvider
 from .models.openai_provider import OpenAIProvider
 from .models.openai_responses import OpenAIResponsesModel
 from .result import RunResult, RunResultStreaming
@@ -153,6 +154,7 @@ __all__ = [
     "ModelProvider",
     "ModelTracing",
     "ModelSettings",
+    "MiniMaxProvider",
     "OpenAIChatCompletionsModel",
     "OpenAIProvider",
     "OpenAIResponsesModel",
