@@ -2,6 +2,9 @@ FROM kalilinux/kali-rolling
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# [FIX BAD MIRROR] Use a single, reliable Kali mirror to avoid flaky mirror redirects during apt operations
+RUN printf 'deb http://kali.download/kali kali-rolling main contrib non-free non-free-firmware\n' > /etc/apt/sources.list
+
 # Fix Kali GPG Keys
 RUN apt-get update --allow-insecure-repositories && \
     apt-get install -y --no-install-recommends --allow-unauthenticated kali-archive-keyring && \
