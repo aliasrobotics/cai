@@ -1,0 +1,619 @@
+/* 
+    Root variables that apply to all color schemes.
+    Material for MkDocs automatically switches data-md-color-scheme
+    between "default" (light) and "slate" (dark) when you use the toggles.
+*/
+:root {
+    /* Font families */
+    --md-text-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --md-typeface-heading: "Playfair Display", Georgia, "Times New Roman", serif;
+
+    /* Global color variables */
+    --md-default-fg-color: #212121;
+    --md-default-bg-color: #ffffff;
+    --md-primary-fg-color: #000;
+    --md-accent-fg-color: #000;
+
+    /* Code block theming */
+    --md-code-fg-color: #333;
+    --md-code-bg-color: #f5f5f5;
+
+    /* Tables, blockquotes, etc. */
+    --md-table-row-border-color: #e0e0e0;
+    --md-admonition-bg-color: #f8f8f8;
+    --md-admonition-title-fg-color: #373737;
+    --md-default-fg-color--light: #000;
+
+    --md-typeset-a-color: #000;
+    --md-accent-fg-color: #000;
+
+    --md-code-fg-color: #000;
+}
+
+/* Add elegant font imports */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+/* Header styling - Alias green */
+.md-header {
+    background-color: #529d86 !important;
+}
+
+.md-header--shadow {
+    box-shadow: none;
+}
+
+/* Custom primary color palette */
+[data-md-color-scheme="default"] {
+    --md-primary-fg-color: #529d86;
+    --md-primary-fg-color--light: #6db09a;
+    --md-primary-fg-color--dark: #428072;
+}
+
+.md-content .md-typeset h1 {
+    color: #000;
+    font-size: 2.5rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+}
+
+.md-typeset p,
+.md-typeset li {
+    font-size: 16px;
+    line-height: 1.7;
+    letter-spacing: 0.01em;
+}
+
+.md-typeset__table p {
+    line-height: 1.5;
+}
+
+.md-nav {
+    font-size: 14px;
+}
+.md-nav__title {
+    color: #000;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4 {
+    font-weight: 600;
+}
+
+.md-typeset h2 {
+    font-size: 1.8rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
+}
+
+.md-typeset h3 {
+    font-size: 1.4rem;
+    margin-top: 1.5rem;
+    letter-spacing: -0.01em;
+}
+
+.md-typeset h1 code {
+    color: #000;
+    padding: 0;
+    background-color: transparent;
+}
+.md-footer {
+    display: none;
+}
+
+.md-header__title {
+    margin-left: 0 !important;
+}
+
+.md-typeset .admonition,
+.md-typeset details {
+    border: none;
+    outline: none;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Custom styling for question admonitions */
+.md-typeset .admonition.question,
+.md-typeset details.question {
+    border-color: #1976D2;
+}
+
+.md-typeset .question > .admonition-title,
+.md-typeset .question > summary {
+    background-color: rgba(25, 118, 210, 0.1);
+    border-color: #1976D2;
+}
+
+.md-typeset .question > .admonition-title::before,
+.md-typeset .question > summary::before {
+    background-color: #1976D2;
+}
+
+.md-typeset pre > code {
+    font-size: 14px;
+    font-family: "Fira Code", "JetBrains Mono", Consolas, monospace;
+}
+
+.md-typeset__table code {
+    font-size: 14px;
+    font-family: "Fira Code", "JetBrains Mono", Consolas, monospace;
+}
+
+/* Custom link styling */
+.md-content a {
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    transition: border-color 0.2s ease;
+}
+
+.md-content a:hover {
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.8);
+}
+
+/* Code block styling */
+.md-content .md-code__content {
+    border-radius: 8px;
+}
+
+.md-clipboard.md-icon {
+    color: #9e9e9e;
+}
+
+/* Reset scrollbar styling to browser default with high priority */
+.md-sidebar__scrollwrap {
+    scrollbar-color: auto !important;
+}
+
+/* Add monospace font for code */
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap');
+
+/* ====================
+   CAI PRO Styling
+   Aligned with aliasrobotics.com aesthetic
+   ==================== */
+
+/* CAI PRO Badge Styling - Modern, minimalist */
+.md-typeset h1 .pro-badge,
+.md-typeset h2 .pro-badge,
+.md-typeset h3 .pro-badge {
+    display: inline-block;
+    background: #529d86;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 0.65em;
+    font-weight: 700;
+    margin-left: 10px;
+    vertical-align: middle;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    box-shadow: 0 1px 3px rgba(82, 157, 134, 0.2);
+    transition: all 0.2s ease;
+}
+
+.md-typeset h1 .pro-badge:hover,
+.md-typeset h2 .pro-badge:hover,
+.md-typeset h3 .pro-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(82, 157, 134, 0.3);
+}
+
+/* Comparison Table Styling - Clean, modern approach */
+.comparison-table table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 2.5rem 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #e8e8e8;
+}
+
+.comparison-table thead th {
+    background: #2d2d2d;
+    color: white;
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.95em;
+    letter-spacing: 0.02em;
+}
+
+.comparison-table tbody td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+
+.comparison-table tbody td:first-child {
+    font-weight: 500;
+    color: #2d2d2d;
+}
+
+.comparison-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.comparison-table tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.comparison-table tbody tr:hover {
+    background-color: #f7faf9;
+    transition: background-color 0.15s ease;
+}
+
+/* Status icons in table */
+.comparison-table td:has(.status-available),
+.comparison-table td:has(.status-pro),
+.comparison-table td:has(.status-unavailable) {
+    font-weight: 500;
+}
+
+/* Highlight Box (for alias1 model) - Cleaner, card-based */
+.highlight-box {
+    background: #ffffff;
+    border: 2px solid #529d86;
+    border-radius: 8px;
+    padding: 2.5rem;
+    margin: 3rem 0;
+    box-shadow: 0 2px 8px rgba(82, 157, 134, 0.12);
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.highlight-box:hover {
+    box-shadow: 0 4px 16px rgba(82, 157, 134, 0.18);
+    transform: translateY(-2px);
+}
+
+.highlight-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #529d86;
+    border-radius: 8px 8px 0 0;
+}
+
+.highlight-box h3 {
+    color: #2d2d2d;
+    margin-top: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.highlight-box ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 1.5rem 0;
+}
+
+.highlight-box ul li {
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: flex-start;
+}
+
+.highlight-box ul li::before {
+    content: "✓";
+    color: #529d86;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+/* CTA Box Styling - Modern, clean with solid colors */
+.cta-box {
+    background: #529d86;
+    color: white;
+    border-radius: 8px;
+    padding: 3rem 2.5rem;
+    margin: 4rem 0;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(82, 157, 134, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cta-box h3 {
+    color: white !important;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.cta-box p {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin: 1rem 0;
+}
+
+.cta-box ul {
+    text-align: left;
+    display: inline-block;
+    margin: 2rem auto 2.5rem;
+    padding: 0;
+}
+
+.cta-box ul li {
+    color: white;
+    font-size: 1rem;
+    margin: 0.75rem 0;
+    padding-left: 0;
+}
+
+.cta-box a {
+    display: inline-block;
+    background: white;
+    color: #529d86 !important;
+    padding: 1rem 2.5rem;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    text-decoration: none !important;
+    border: 2px solid white !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+    letter-spacing: 0.01em;
+}
+
+.cta-box a:hover {
+    background: #f7faf9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Pro Feature Admonition - Subtle, professional */
+.md-typeset .admonition.pro,
+.md-typeset details.pro {
+    border-left: 3px solid #529d86;
+    background: #fafcfb;
+    border-radius: 4px;
+}
+
+.md-typeset .pro > .admonition-title,
+.md-typeset .pro > summary {
+    background-color: rgba(82, 157, 134, 0.08);
+    color: #2d2d2d;
+    font-weight: 600;
+    padding-left: 3rem;
+}
+
+.md-typeset .pro > .admonition-title::before,
+.md-typeset .pro > summary::before {
+    content: "🚀";
+    position: absolute;
+    left: 1rem;
+}
+
+/* Feature Grid - Card-based layout */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+}
+
+.feature-card {
+    background: white;
+    border: 1px solid #e8e8e8;
+    border-radius: 6px;
+    padding: 2rem 1.75rem;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #529d86;
+    border-radius: 6px 6px 0 0;
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+}
+
+.feature-card:hover {
+    border-color: #529d86;
+    box-shadow: 0 3px 12px rgba(82, 157, 134, 0.15);
+    transform: translateY(-3px);
+}
+
+.feature-card:hover::before {
+    transform: scaleX(1);
+}
+
+.feature-card h3 {
+    color: #2d2d2d;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.feature-card p {
+    color: #5a5a5a;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* Pricing Badge - Subtle, modern */
+.pricing-badge {
+    display: inline-block;
+    background: #f5f5f5;
+    color: #2d2d2d;
+    padding: 5px 14px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 700;
+    margin-left: 8px;
+    vertical-align: middle;
+    border: 1px solid #e0e0e0;
+}
+
+/* Status Indicators - Clean icons */
+.status-available::before {
+    content: "✅ ";
+    margin-right: 4px;
+}
+
+.status-pro::before {
+    content: "🚀 ";
+    color: #529d86;
+    margin-right: 4px;
+}
+
+.status-unavailable::before {
+    content: "❌ ";
+    margin-right: 4px;
+}
+
+/* Info boxes - for tips and notes */
+.md-typeset .admonition.tip {
+    border-left: 3px solid #529d86;
+}
+
+.md-typeset .tip > .admonition-title {
+    background-color: rgba(82, 157, 134, 0.08);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .comparison-table {
+        overflow-x: auto;
+    }
+
+    .cta-box {
+        padding: 1.5rem;
+    }
+
+    .highlight-box {
+        padding: 1.5rem;
+    }
+
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ====================
+   Enhanced Navigation Styling - Refined & Professional
+   Only affects left sidebar navigation, not TOC
+   ==================== */
+
+/* Target ONLY the primary (left) sidebar navigation */
+.md-sidebar--primary .md-sidebar__scrollwrap {
+    /* Main navigation sections - subtle but clear hierarchy */
+}
+
+/* Main sections (Getting Started, CAI PRO, User Interfaces, etc.) */
+.md-sidebar--primary .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__link {
+    color: #529d86 !important;
+    font-weight: 600 !important;
+    font-size: 0.75rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding-top: 0.6rem !important;
+    padding-bottom: 0.4rem !important;
+    margin-top: 0.3rem;
+    border-left: 2px solid transparent;
+    transition: all 0.15s ease;
+}
+
+/* Hover effect for main sections - subtle */
+.md-sidebar--primary .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__link:hover {
+    border-left-color: #529d86;
+    background-color: rgba(82, 157, 134, 0.04);
+}
+
+/* Active main section - slightly more visible */
+.md-sidebar--primary .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__link--active {
+    color: #428072 !important;
+    border-left-color: #529d86;
+    background-color: rgba(82, 157, 134, 0.06);
+    font-weight: 700 !important;
+}
+
+/* Subsections (TUI, CLI, etc.) - keep normal weight */
+.md-sidebar--primary .md-nav__item--nested > .md-nav__link {
+    font-size: 0.7rem !important;
+    font-weight: 500 !important;
+}
+
+/* Regular links - no changes to size */
+.md-sidebar--primary .md-nav__link {
+    font-size: 0.7rem;
+}
+
+/* Active page in navigation - green highlight */
+.md-sidebar--primary .md-nav__link--active {
+    color: #529d86 !important;
+    font-weight: 500;
+}
+
+/* Spacing between sections - subtle */
+.md-sidebar--primary .md-nav--primary > .md-nav__list > .md-nav__item {
+    margin-bottom: 0.2rem;
+}
+
+/* Special styling for CAI PRO section - very subtle gradient */
+.md-sidebar--primary .md-nav__item > .md-nav__link[title*="CAI PRO"],
+.md-sidebar--primary .md-nav__item > .md-nav__link[title*="🚀"] {
+    background: linear-gradient(90deg, rgba(82, 157, 134, 0.05) 0%, rgba(82, 157, 134, 0.01) 100%);
+    border-left-width: 3px;
+}
+
+/* Table of Contents (right sidebar) - Apply color scheme, keep sizes */
+.md-sidebar--secondary .md-nav__link {
+    font-size: inherit !important;
+    text-transform: none !important;
+    transition: color 0.15s ease;
+}
+
+/* TOC - Main headings (h1, h2) with green color */
+.md-sidebar--secondary .md-nav__list > .md-nav__item > .md-nav__link {
+    color: #529d86 !important;
+    font-weight: 600 !important;
+}
+
+/* TOC - Sub-headings (h3, h4) with darker gray */
+.md-sidebar--secondary .md-nav__list .md-nav__item .md-nav__item > .md-nav__link {
+    color: #5a5a5a !important;
+    font-weight: 500 !important;
+}
+
+/* TOC - Hover effect */
+.md-sidebar--secondary .md-nav__link:hover {
+    color: #428072 !important;
+}
+
+/* TOC - Active/current section */
+.md-sidebar--secondary .md-nav__link--active {
+    color: #529d86 !important;
+    font-weight: 700 !important;
+}
+
+/* Smooth transitions for better UX */
+.md-sidebar--primary .md-nav__link,
+.md-sidebar--secondary .md-nav__link {
+    transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
