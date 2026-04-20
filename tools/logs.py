@@ -19,12 +19,13 @@ Ideas for further improvements:
 import matplotlib
 matplotlib.use('Agg')
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
+from functools import wraps
 import pandas as pd
 import matplotlib.pyplot as plt
 import io
 import base64
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import folium
 import requests
@@ -32,8 +33,63 @@ import argparse
 from typing import Dict, Optional
 import numpy as np
 import re
+from collections import defaultdict
+import time
 
 app = Flask(__name__)
+
+# Rate limiting configuration
+class RateLimiter:
+    """Rate limiter to prevent DoS attacks on API endpoints."""
+    
+    def __init__(self, requests_per_minute=10, requests_per_hour=50, requests_per_day=200):
+        self.requests_per_minute = requests_per_minute
+        self.requests_per_hour = requests_per_hour
+        self.requests_per_day = requests_per_day
+        self.request_history = defaultdict(list)
+    
+    def is_rate_limited(self, client_id):
+        """Check if a client has exceeded rate limits."""
+        current_time = time.time()
+        
+        # Clean old requests
+        self.request_history[client_id] = [
+            req_time for req_time in self.request_history[client_id]
+            if current_time - req_time < 86400  # Keep last 24 hours
+        ]
+        
+        # Check minute limit (60 seconds)
+        minute_requests = [r for r in self.request_history[client_id] if current_time - r < 60]
+        if len(minute_requests) >= self.requests_per_minute:
+            return True
+        
+        # Check hour limit (3600 seconds)
+        hour_requests = [r for r in self.request_history[client_id] if current_time - r < 3600]
+        if len(hour_requests) >= self.requests_per_hour:
+            return True
+        
+        # Check day limit (86400 seconds)
+        day_requests = [r for r in self.request_history[client_id] if current_time - r < 86400]
+        if len(day_requests) >= self.requests_per_day:
+            return True
+        
+        # Record this request
+        self.request_history[client_id].append(current_time)
+        return False
+
+# Initialize rate limiter
+rate_limiter = RateLimiter(
+    requests_per_minute=10,
+    requests_per_hour=50,
+    requests_per_day=200
+)
+
+def apply_rate_limit():
+    """Apply rate limiting to the current request."""
+    client_ip = request.remote_addr
+    if rate_limiter.is_rate_limited(client_ip):
+        return "Rate limit exceeded. Please try again later.", 429
+    return None
 
 # Configuration for enabled visualizations
 class Config:
@@ -508,6 +564,11 @@ def create_pypi_plot():
 
 @app.route('/')
 def index():
+    # Apply rate limiting
+    rate_limit_response = apply_rate_limit()
+    if rate_limit_response:
+        return rate_limit_response
+    
     # Get log file path from app config
     log_file = app.config['LOG_FILE']
     
@@ -544,6 +605,11 @@ def index():
 
 @app.route('/pypi-stats')
 def pypi_stats():
+    # Apply rate limiting
+    rate_limit_response = apply_rate_limit()
+    if rate_limit_response:
+        return rate_limit_response
+    
     # Generate PyPI plot
     pypi_plot, stats = create_pypi_plot()
     
