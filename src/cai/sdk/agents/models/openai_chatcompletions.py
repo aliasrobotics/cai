@@ -363,6 +363,13 @@ def count_tokens_with_tiktoken(text_or_messages):
         return 0, 0
 
 
+class ContextCompactedError(Exception):
+    """Raised inside get_response/stream_response when a CAI_SUPPORT_INTERVAL-based
+    auto-compact fires mid-runner.  The outer CLI loop catches this, sets
+    _post_compact_input, and restarts the runner with a clean context window."""
+    pass
+
+
 class OpenAIChatCompletionsModel(Model):
     """OpenAI Chat Completions Model"""
 
@@ -463,6 +470,49 @@ class OpenAIChatCompletionsModel(Model):
             # Ignore any errors during cleanup
             pass
 
+    async def cleanup(self) -> None:
+        """Explicitly cleanup underlying clients and free instance registry.
+
+        This is intended to be called when a temporary model instance (for
+        example the summary/support model) is no longer needed. It will try
+        to close the HTTP/async client if available, remove the instance
+        from the legacy `ACTIVE_MODEL_INSTANCES` registry and clear the
+        in-memory message history so any backing LLM server can free slots
+        or context.
+        """
+        try:
+            client = getattr(self, "_client", None)
+            if client is not None:
+                aclose = getattr(client, "aclose", None)
+                if aclose:
+                    try:
+                        res = aclose()
+                        # Await if it's awaitable
+                        if inspect.isawaitable(res):
+                            await res
+                    except Exception:
+                        # Best-effort close
+                        pass
+                try:
+                    delattr(self, "_client")
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+        try:
+            key = (getattr(self, '_display_name', None), getattr(self, 'agent_id', None))
+            if key in ACTIVE_MODEL_INSTANCES:
+                del ACTIVE_MODEL_INSTANCES[key]
+        except Exception:
+            pass
+
+        try:
+            if hasattr(self, 'message_history') and isinstance(self.message_history, list):
+                self.message_history.clear()
+        except Exception:
+            pass
+
     def add_to_message_history(self, msg):
         """Add a message to this instance's history if it's not a duplicate.
         
@@ -544,20 +594,12 @@ class OpenAIChatCompletionsModel(Model):
             | {"base_url": str(self._get_client().base_url)},
             disabled=tracing.is_disabled(),
         ) as span_generation:
-            # Prepare the messages for consistent token counting
-            # IMPORTANT: Include existing message history for context
+            # Prepare the messages for consistent token counting.
+            # History is already included in `input` via cli.py's history_context mechanism
+            # (history_context = agent.model.message_history is passed as conversation_input
+            # to Runner.run, which then passes it as original_input to get_response).
+            # Prepending message_history here would double-count every message.
             converted_messages = []
-            
-            # First, add all existing messages from history
-            if self.message_history:
-                for msg in self.message_history:
-                    msg_copy = msg.copy()  # Use copy to avoid modifying original
-                    # Remove any existing cache_control to avoid exceeding the 4-block limit
-                    if "cache_control" in msg_copy:
-                        del msg_copy["cache_control"]
-                    converted_messages.append(msg_copy)
-            
-            # Then convert and add the new input
             new_messages = self._converter.items_to_messages(input, model_instance=self)
             converted_messages.extend(new_messages)
             
@@ -2545,19 +2587,12 @@ class OpenAIChatCompletionsModel(Model):
         # start by re-fetching self.is_ollama
         self.is_ollama = os.getenv("OLLAMA") is not None and os.getenv("OLLAMA").lower() == "true"
 
-        # IMPORTANT: Include existing message history for context
+        # Build the message list from `input` only.
+        # History is already included in `input` via cli.py's history_context mechanism:
+        # cli.py passes history_context (= message_history) as part of conversation_input
+        # to Runner.run, which passes it as original_input through to _fetch_response.
+        # Prepending message_history again would send every historical message twice.
         converted_messages = []
-        
-        # First, add all existing messages from history
-        if self.message_history:
-            for msg in self.message_history:
-                msg_copy = msg.copy()  # Use copy to avoid modifying original
-                # Remove any existing cache_control to avoid exceeding the 4-block limit
-                if "cache_control" in msg_copy:
-                    del msg_copy["cache_control"]
-                converted_messages.append(msg_copy)
-        
-        # Then convert and add the new input
         new_messages = self._converter.items_to_messages(input, model_instance=self)
         converted_messages.extend(new_messages)
 
@@ -3490,7 +3525,89 @@ class OpenAIChatCompletionsModel(Model):
         # Check if auto-compaction is disabled
         if os.getenv("CAI_AUTO_COMPACT", "true").lower() == "false":
             return input, system_instructions, False
-            
+
+        # --- CAI_SUPPORT_INTERVAL count-based trigger ---
+        # This fires on EVERY API call (not just at the outer CLI-loop level), so it correctly
+        # handles agentic sessions where the agent makes many tool calls inside one Runner.run.
+        _support_model = os.getenv("CAI_SUPPORT_MODEL")
+        _support_interval_raw = os.getenv("CAI_SUPPORT_INTERVAL")
+        if _support_model and _support_interval_raw:
+            try:
+                _support_interval = int(_support_interval_raw)
+                if _support_interval > 0:
+                    _asst_count = sum(
+                        1 for m in self.message_history
+                        if isinstance(m, dict) and m.get("role") == "assistant"
+                    )
+                    if _asst_count >= _support_interval:
+                        from rich.console import Console as _Console
+                        _console = _Console()
+                        _console.print(
+                            f"\n[bold yellow]⟳ Auto-compact: {_asst_count} LLM responses "
+                            f"(threshold {_support_interval}) — summarising with "
+                            f"{_support_model}[/bold yellow]"
+                        )
+                        try:
+                            from cai.repl.commands.memory import (
+                                MEMORY_COMMAND_INSTANCE,
+                                COMPACTED_SUMMARIES,
+                                APPLIED_MEMORY_IDS,
+                            )
+                            from cai.repl.commands.compact import COMPACT_COMMAND_INSTANCE
+                            _orig_compact = COMPACT_COMMAND_INSTANCE.compact_model
+                            COMPACT_COMMAND_INSTANCE.compact_model = _support_model
+                            try:
+                                _summary = await MEMORY_COMMAND_INSTANCE._ai_summarize_history(
+                                    self.agent_name
+                                )
+                            finally:
+                                COMPACT_COMMAND_INSTANCE.compact_model = _orig_compact
+                            if _summary:
+                                if self.agent_name not in COMPACTED_SUMMARIES:
+                                    COMPACTED_SUMMARIES[self.agent_name] = []
+                                    APPLIED_MEMORY_IDS[self.agent_name] = []
+                                COMPACTED_SUMMARIES[self.agent_name] = [_summary]
+                                self.message_history.clear()
+                                # Re-inject the summary as the first exchange so
+                                # the next Runner turn has full context and won't
+                                # repeat work that was already attempted.
+                                self.message_history.append({
+                                    "role": "user",
+                                    "content": (
+                                        "<previous_session_memory>\n"
+                                        + _summary
+                                        + "\n</previous_session_memory>\n\n"
+                                        "This is your memory from the previous context window. "
+                                        "Use it to continue your work. "
+                                        "Do NOT retry any approach already marked as failed or exhausted."
+                                    ),
+                                })
+                                self.message_history.append({
+                                    "role": "assistant",
+                                    "content": (
+                                        "Understood. I have reviewed my previous session memory. "
+                                        "I will continue the task using only new approaches "
+                                        "and will not repeat anything already attempted."
+                                    ),
+                                })
+                                os.environ["CAI_CONTEXT_USAGE"] = "0.0"
+                                _console.print(
+                                    "[bold green]✓ Memory summary applied — "
+                                    "context window reset — restarting task[/bold green]\n"
+                                )
+                        except Exception as _ce:
+                            _console.print(f"[red]Auto-compact error: {_ce}[/red]")
+                        # Always abort the current runner invocation so the outer loop
+                        # can restart with our freshly cleared context.
+                        raise ContextCompactedError(
+                            f"Context compacted after {_asst_count} LLM responses "
+                            f"(threshold {_support_interval})"
+                        )
+            except ContextCompactedError:
+                raise  # propagate to the outer runner / CLI loop
+            except (ValueError, Exception):
+                pass  # malformed interval — ignore silently
+
         max_tokens = self._get_model_max_tokens(str(self.model))
         threshold_percent = float(os.getenv("CAI_AUTO_COMPACT_THRESHOLD", "0.8"))
         threshold = max_tokens * threshold_percent

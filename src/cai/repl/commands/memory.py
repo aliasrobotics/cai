@@ -4,6 +4,7 @@ Manages memory storage in .cai/memory for persistent context.
 """
 
 from typing import List, Optional, Dict, Any
+import inspect
 import os
 import asyncio
 import json
@@ -1221,7 +1222,8 @@ After the analysis, provide a structured summary with these sections:
 6. **All User Messages**: Complete list of user messages in order
 7. **Pending Tasks**: What still needs to be done
 8. **Current Work**: What was being worked on when the conversation ended
-9. **Optional Next Step**: If there's a clear next action, mention it
+9. **Exhausted Approaches — DO NOT RETRY**: Every technique, command, path, or attack vector that was attempted and failed. Format each as a bullet starting with ❌. Be specific (include exact commands, URLs, usernames, ports). This section is CRITICAL — the agent will use it to avoid wasting time on dead ends.
+10. **Recommended Next Steps**: Concrete actions NOT yet tried, ordered by likelihood of success.
 
 ## Important Guidelines
 
@@ -1232,6 +1234,7 @@ After the analysis, provide a structured summary with these sections:
 - Maintain technical accuracy - don't paraphrase technical terms
 - The summary will be used as the primary context for resuming work, so completeness is crucial
 - When the conversation is resumed, it should feel like a natural continuation
+- Section 9 (Exhausted Approaches) is the most important section for offensive/hacking tasks: list every failed attempt so the agent doesn't loop.
 
 This session is being continued from a previous conversation that ran out of context. The conversation is summarized below:"""
         
@@ -1254,50 +1257,87 @@ This session is being continued from a previous conversation that ran out of con
                 input=f"Please summarize the following conversation:\n\n{conversation_text}",
                 max_turns=1
             )
-            
+
             if result.final_output:
                 return str(result.final_output)
             else:
                 return None
-                
+
         except Exception as e:
             console.print(f"[red]Error generating summary: {e}[/red]")
             return None
+        finally:
+            # Best-effort: explicitly cleanup the temporary summary/support model
+            try:
+                model_inst = getattr(summary_agent, "model", None)
+                # Some Agent constructions put the Model object directly on `agent.model`
+                # and some providers expose a cleanup coroutine.
+                if model_inst is not None and hasattr(model_inst, "cleanup"):
+                    try:
+                        coro = model_inst.cleanup()
+                        if inspect.isawaitable(coro):
+                            await coro
+                    except Exception:
+                        # best-effort cleanup — swallow any errors
+                        pass
+            except Exception:
+                pass
     
     def _format_history_for_summary(self, history: List[Dict[str, Any]]) -> str:
-        """Format message history for summarization."""
+        """Format message history for summarization.
+
+        Critical design goals:
+        - Include EVERY tool call with its exact arguments (commands run, URLs visited,
+          ports scanned) so the summary model can produce an "Exhausted Approaches" list.
+        - Include enough of each tool result to convey success/failure and key findings.
+        - Avoid blowing out the summary model's context by capping large outputs.
+        """
+        TOOL_OUTPUT_KEEP = 2000   # chars to preserve from each tool result
+        MAX_PARTS       = 200     # maximum formatted blocks to pass (covers ~100 turns)
+
         formatted_parts = []
-        
+
         for msg in history:
             role = msg.get("role", "unknown")
             content = msg.get("content", "")
-            
-            # Skip empty messages
-            if not content:
-                continue
-                
-            # Format based on role
+
             if role == "user":
-                formatted_parts.append(f"USER: {content}")
+                if content:
+                    formatted_parts.append(f"USER: {content}")
+
             elif role == "assistant":
-                # Check for tool calls
-                if "tool_calls" in msg and msg["tool_calls"]:
+                # -- tool calls: extract args from both dict-style and object-style entries --
+                tool_calls = msg.get("tool_calls") or []
+                if tool_calls:
                     tool_info = []
-                    for tc in msg["tool_calls"]:
-                        if hasattr(tc, "function"):
-                            tool_info.append(f"{tc.function.name}({tc.function.arguments})")
+                    for tc in tool_calls:
+                        if isinstance(tc, dict):
+                            fn = tc.get("function", {})
+                            name = fn.get("name", "?")
+                            args = fn.get("arguments", "")
+                            tool_info.append(f"{name}({args})")
+                        elif hasattr(tc, "function"):
+                            tool_info.append(
+                                f"{tc.function.name}({tc.function.arguments})"
+                            )
                     if tool_info:
-                        formatted_parts.append(f"ASSISTANT (tools): {', '.join(tool_info)}")
+                        formatted_parts.append(
+                            f"ASSISTANT called tools: {', '.join(tool_info)}"
+                        )
                 if content:
                     formatted_parts.append(f"ASSISTANT: {content}")
+
             elif role == "tool":
-                # Include important tool outputs
-                if len(str(content)) < 500:  # Only include short outputs
-                    formatted_parts.append(f"TOOL OUTPUT: {content}")
+                raw = str(content) if content else ""
+                if len(raw) <= TOOL_OUTPUT_KEEP:
+                    formatted_parts.append(f"TOOL OUTPUT:\n{raw}")
                 else:
-                    formatted_parts.append(f"TOOL OUTPUT: [Long output truncated]")
-                    
-        return "\n\n".join(formatted_parts[-50:])  # Limit to last 50 exchanges
+                    head = raw[:TOOL_OUTPUT_KEEP]
+                    formatted_parts.append(
+                        f"TOOL OUTPUT (truncated to {TOOL_OUTPUT_KEEP} chars):\n{head}\n[...truncated]"
+                    )
+
+        return "\n\n".join(formatted_parts[-MAX_PARTS:])
     
     def _get_current_agent_name(self) -> Optional[str]:
         """Get the name of the current active agent."""

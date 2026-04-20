@@ -313,6 +313,7 @@ from cai.sdk.agents.exceptions import OutputGuardrailTripwireTriggered, InputGua
 from cai.sdk.agents.models.openai_chatcompletions import (
     get_agent_message_history,
     get_all_agent_histories,
+    ContextCompactedError,
 )
 # Import handled where needed to avoid circular imports
 from cai.sdk.agents.run_to_jsonl import get_session_recorder
@@ -442,6 +443,9 @@ def run_cai_cli(
     agent = starting_agent
     turn_count = 0
     idle_time = 0
+    # Holds a user message to replay on the next iteration without prompting
+    # the user — set by auto-compact so the agent continues its current task.
+    _post_compact_input: str | None = None
     console = Console()
     last_model = os.getenv("CAI_MODEL", "alias1")
     last_agent_type = os.getenv("CAI_AGENT_TYPE", "one_tool_agent")
@@ -481,6 +485,18 @@ def run_cai_cli(
     display_banner(console)
     print("\n")
     display_quick_guide(console)
+
+    # Notify user if auto-compact is active so they can confirm the vars loaded.
+    _sc_model_startup = os.getenv("CAI_SUPPORT_MODEL")
+    _sc_interval_startup = os.getenv("CAI_SUPPORT_INTERVAL")
+    if _sc_model_startup and _sc_interval_startup:
+        try:
+            console.print(
+                f"[bold cyan]🗜  Auto-compact enabled: every {int(_sc_interval_startup)} LLM responses "
+                f"using {_sc_model_startup}[/bold cyan]"
+            )
+        except ValueError:
+            pass
 
     # Function to get the short name of the agent for display
     def get_agent_short_name(agent):
@@ -690,6 +706,11 @@ def run_cai_cli(
                 if use_initial_prompt:
                     user_input = initial_prompt
                     use_initial_prompt = False  # Only use it once
+                elif _post_compact_input is not None:
+                    # Auto-compact just ran — replay the last task so the agent
+                    # continues working without waiting for human input.
+                    user_input = _post_compact_input
+                    _post_compact_input = None
                 else:
                     # Get user input with command completion and history
                     user_input = get_user_input(
@@ -1479,6 +1500,10 @@ def run_cai_cli(
                             {"role": "assistant", "content": f"{result.final_output}"}
                         )
             else:
+                # Capture user_input before runner calls so ContextCompactedError
+                # handlers can reference it even on the very first iteration.
+                _last_user_input = user_input if isinstance(user_input, str) else ""
+
                 # Disable streaming by default, unless specifically enabled
                 cai_stream = os.getenv("CAI_STREAM", "false")
                 # Handle empty string or None values
@@ -1556,6 +1581,9 @@ def run_cai_cli(
                                 pass
                             
                             raise e
+                        except ContextCompactedError:
+                            # Propagate so the outer try block can handle the restart.
+                            raise
                         except Exception as e:
                             # Clean up on any other exception
                             if stream_iterator is not None:
@@ -1583,6 +1611,26 @@ def run_cai_cli(
 
                     try:
                         asyncio.run(process_streamed_response(agent, conversation_input))
+                    except ContextCompactedError:
+                        # Auto-compact fired mid-runner; restart with fresh context.
+                        _base = _last_user_input or "Continue the current task."
+                        _post_compact_input = (
+                            f"{_base}\n\n"
+                            "IMPORTANT: Your context window was just compacted. "
+                            "Your session memory is already loaded above. "
+                            "Review the 'Exhausted Approaches' section in your memory and "
+                            "DO NOT repeat any technique, command, URL, port scan, or login "
+                            "attempt already listed there. "
+                            "Pick up exactly where you left off using only NEW approaches."
+                        )
+                        from cai.sdk.agents.simple_agent_manager import AGENT_MANAGER as _AM
+                        _reloaded = _AM.get_active_agent()
+                        if _reloaded is not None:
+                            agent = _reloaded
+                        console.print(
+                            "[bold green]✓ Context window reset — resuming task[/bold green]\n"
+                        )
+                        continue
                     except OutputGuardrailTripwireTriggered as e:
                         # Display a user-friendly warning instead of crashing (streaming mode)
                         guardrail_name = e.guardrail_result.guardrail.get_name()
@@ -1642,6 +1690,26 @@ def run_cai_cli(
                     # Use non-streamed response
                     try:
                         response = asyncio.run(Runner.run(agent, conversation_input))
+                    except ContextCompactedError:
+                        # Auto-compact fired mid-runner; restart with fresh context.
+                        _base = _last_user_input or "Continue the current task."
+                        _post_compact_input = (
+                            f"{_base}\n\n"
+                            "IMPORTANT: Your context window was just compacted. "
+                            "Your session memory is already loaded above. "
+                            "Review the 'Exhausted Approaches' section in your memory and "
+                            "DO NOT repeat any technique, command, URL, port scan, or login "
+                            "attempt already listed there. "
+                            "Pick up exactly where you left off using only NEW approaches."
+                        )
+                        from cai.sdk.agents.simple_agent_manager import AGENT_MANAGER as _AM
+                        _reloaded = _AM.get_active_agent()
+                        if _reloaded is not None:
+                            agent = _reloaded
+                        console.print(
+                            "[bold green]✓ Context window reset — resuming task[/bold green]\n"
+                        )
+                        continue
                     except InputGuardrailTripwireTriggered as e:
                         # Display a user-friendly warning for input guardrails
                         reason = "Potential security threat detected in input"
@@ -1710,6 +1778,63 @@ def run_cai_cli(
 
                 agent.model.message_history[:] = fix_message_list(agent.model.message_history)
             turn_count += 1
+
+            # Auto-compact: when CAI_SUPPORT_MODEL + CAI_SUPPORT_INTERVAL are both set,
+            # compact the conversation every N LLM *responses* (assistant messages in
+            # history) using the support model.  Counting assistant messages rather
+            # than outer-loop turns means agentic sessions — where the agent makes
+            # many tool-call rounds per single user input — are handled correctly.
+            _support_model = os.getenv("CAI_SUPPORT_MODEL")
+            _support_interval_raw = os.getenv("CAI_SUPPORT_INTERVAL")
+            if _support_model and _support_interval_raw:
+                try:
+                    _support_interval = int(_support_interval_raw)
+                    if _support_interval > 0:
+                        # Count assistant messages as a proxy for LLM API calls.
+                        _history = getattr(getattr(agent, 'model', None), 'message_history', [])
+                        _llm_call_count = sum(
+                            1 for m in _history
+                            if (m.get("role") if isinstance(m, dict) else getattr(m, "role", None))
+                            == "assistant"
+                        )
+                        if _llm_call_count > 0:
+                            _calls_until = max(0, _support_interval - _llm_call_count)
+                            if _calls_until > 0:
+                                console.print(
+                                    f"[dim cyan]  ↻ auto-compact in {_calls_until} LLM response(s) "
+                                    f"[{_llm_call_count}/{_support_interval}][/dim cyan]"
+                                )
+                            if _llm_call_count >= _support_interval:
+                                from cai.repl.commands.compact import COMPACT_COMMAND_INSTANCE
+                                console.print(
+                                    f"\n[bold yellow]⟳ Auto-compact: {_llm_call_count} LLM responses "
+                                    f"(threshold {_support_interval}) — "
+                                    f"summarising with {_support_model}[/bold yellow]"
+                                )
+                                COMPACT_COMMAND_INSTANCE._perform_compaction(
+                                    model_override=_support_model
+                                )
+                                # Re-sync the local agent reference so the loop continues
+                                # with the freshly reloaded agent (history cleared, memory
+                                # summary already injected into its system prompt).
+                                from cai.sdk.agents.simple_agent_manager import AGENT_MANAGER as _AM
+                                _reloaded = _AM.get_active_agent()
+                                if _reloaded is not None:
+                                    agent = _reloaded
+                                # Queue the last user task to be replayed on the next
+                                # iteration so the agent continues without human input.
+                                _post_compact_input = (
+                                    _last_user_input
+                                    if _last_user_input.strip()
+                                    else "Continue the current task."
+                                )
+                                console.print(
+                                    "[bold green]✓ Memory summary applied to agent system prompt — "
+                                    "context window reset — continuing task[/bold green]\n"
+                                )
+                except (ValueError, Exception) as _e:
+                    # Always show auto-compact errors so they are never silently lost.
+                    console.print(f"[red]Auto-compact error: {_e}[/red]")
 
             # Stop measuring active time and start measuring idle time again
             stop_active_timer()
