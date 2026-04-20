@@ -721,6 +721,16 @@ class OpenAIChatCompletionsModel(Model):
 
                 raise
 
+            # Guard against empty choices list which can occur with some API providers
+            # (e.g. Gemini via OpenAI-compatible endpoint) due to content filtering or
+            # transient API errors. Raise a clear error instead of an obscure IndexError.
+            if not response.choices:
+                raise ValueError(
+                    f"Model '{self.model}' returned a response with no choices. "
+                    "This may be caused by content filtering, rate limiting, or an "
+                    "API compatibility issue with the provider."
+                )
+
             if _debug.DONT_LOG_MODEL_DATA:
                 logger.debug("Received model response")
             else:
