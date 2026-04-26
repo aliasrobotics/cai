@@ -43,6 +43,6 @@ wifi_security_agent = Agent(
     tools=functions,
     model=OpenAIChatCompletionsModel(
         model=os.getenv('CAI_MODEL', "alias1"),
-        openai_client=AsyncOpenAI(),
+        openai_client=AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY", "sk-placeholder")),
     )
 )

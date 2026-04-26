@@ -77,7 +77,7 @@ network_security_analyzer_agent = Agent(
                    Expert in monitoring, capturing, and analyzing network communications for security threats.""",
         model=OpenAIChatCompletionsModel(
         model=os.getenv('CAI_MODEL', "alias1"),
-        openai_client=AsyncOpenAI(),
+        openai_client=AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY", "sk-placeholder")),
     ),
     tools=tools,
     handoffs=[ # Handoff to DFIR agent for further analysis

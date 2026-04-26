@@ -69,7 +69,7 @@ replay_attack_agent = Agent(
                    Expert in packet manipulation, traffic replay, and protocol exploitation.""",
     model=OpenAIChatCompletionsModel(
         model=os.getenv('CAI_MODEL', "alias1"),
-        openai_client=AsyncOpenAI(),
+        openai_client=AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY", "sk-placeholder")),
     ),
     tools=tools,
 )
