@@ -41,7 +41,7 @@ app_logic_mapper = Agent(
     tools=tools,
     model=OpenAIChatCompletionsModel(
         model=model_name,
-        openai_client=AsyncOpenAI(),
+        openai_client=AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY", "sk-placeholder")),
     ),
 )
 
@@ -61,7 +61,7 @@ android_sast = Agent(
         ],
     model=OpenAIChatCompletionsModel(
         model=model_name,
-        openai_client=AsyncOpenAI(),
+        openai_client=AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY", "sk-placeholder")),
     ),
 )
 

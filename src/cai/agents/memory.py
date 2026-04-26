@@ -82,11 +82,13 @@ Environment Variables enabling the episodic memory store
 """
 
 import os
+from openai import AsyncOpenAI
 from cai.sdk.agents import Agent, OpenAIChatCompletionsModel
 from cai.tools.misc.rag import add_to_memory_semantic, add_to_memory_episodic
 
 # Get model from environment or use default
 model = os.getenv('CAI_MODEL', "alias1")
+model_name = model
 
 
 def get_previous_steps(query: str) -> str:
@@ -198,7 +200,7 @@ semantic_builder = Agent(
     tools=[add_to_memory_semantic],
     model=OpenAIChatCompletionsModel(
         model=model_name,
-        openai_client=AsyncOpenAI(),
+        openai_client=AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY", "sk-placeholder")),
     )
 )
 
@@ -213,7 +215,7 @@ episodic_builder = Agent(
     tools=[add_to_memory_episodic],
     model=OpenAIChatCompletionsModel(
         model=model_name,
-        openai_client=AsyncOpenAI(),
+        openai_client=AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY", "sk-placeholder")),
     )
 )
 
@@ -227,6 +229,6 @@ query_agent = Agent(
     temperature=0,
     model=OpenAIChatCompletionsModel(
         model=model_name,
-        openai_client=AsyncOpenAI(),
+        openai_client=AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY", "sk-placeholder")),
     )
 )
