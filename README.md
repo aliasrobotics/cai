@@ -530,17 +530,21 @@ CAI_MODEL="alias1"
 
 ### 🔹 Custom OpenAI Base URL Support
 
-CAI supports configuring a custom OpenAI API base URL via the `OPENAI_BASE_URL` environment variable. This allows users to redirect API calls to a custom endpoint, such as a proxy or self-hosted OpenAI-compatible service.
+CAI supports configuring a custom OpenAI-compatible API base URL via the `OPENAI_BASE_URL` environment variable. Use an `openai/` model prefix so LiteLLM routes the request through the OpenAI-compatible provider path.
 
 Example `.env` entry configuration:
 ```
-OLLAMA_API_BASE="https://custom-openai-proxy.com/v1"
+OPENAI_API_KEY="<your-api-key-or-placeholder>"
+OPENAI_BASE_URL="https://custom-openai-proxy.com/v1"
+CAI_MODEL="openai/gpt-4.1"
 ```
 
 Or directly from the command line:
 ```bash
-OLLAMA_API_BASE="https://custom-openai-proxy.com/v1" cai
+OPENAI_API_KEY="dummy-key" OPENAI_BASE_URL="http://127.0.0.1:8000/v1" CAI_MODEL="openai/<model-name>" cai
 ```
+
+For local Ollama, prefer `OLLAMA_API_BASE="http://localhost:11434/v1"` with `CAI_MODEL="ollama/<model-name>"`.
 
 
 ## :triangular_ruler: Architecture:
