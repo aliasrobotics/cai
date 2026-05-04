@@ -105,6 +105,7 @@ nav:
       - Model Providers:
           - OpenRouter: providers/openrouter.md
           - Ollama: providers/ollama.md
+          - OpenAI-Compatible: providers/openai_compatible.md
           - Azure OpenAI: providers/azure.md
 
   # ========================================
