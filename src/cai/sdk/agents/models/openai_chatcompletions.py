@@ -2706,6 +2706,28 @@ class OpenAIChatCompletionsModel(Model):
         elif "/" in model_str:
             # Handle provider/model format
             provider = model_str.split("/")[0]
+            explicit_openai_compatible_base = (
+                os.getenv("OLLAMA_API_BASE")
+                or os.getenv("OPENAI_API_BASE")
+                or os.getenv("OPENAI_BASE_URL")
+            )
+
+            # Route unknown provider/model prefixes through the user-configured
+            # OpenAI-compatible base instead of letting LiteLLM guess a provider
+            # from the left-hand side of the model id.
+            if explicit_openai_compatible_base and provider not in {
+                "ollama_cloud",
+                "deepseek",
+                "claude",
+                "gemini",
+            }:
+                litellm.drop_params = True
+                kwargs["api_base"] = get_ollama_api_base()
+                kwargs["custom_llm_provider"] = "openai"
+                kwargs.pop("parallel_tool_calls", None)
+                kwargs.pop("store", None)
+                if not converted_tools:
+                    kwargs.pop("tool_choice", None)
 
             # Apply provider-specific configurations
             if provider == "ollama_cloud":

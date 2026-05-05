@@ -4,6 +4,7 @@ from collections.abc import AsyncIterator
 from typing import Any
 
 import httpx
+import litellm
 import pytest
 from openai import NOT_GIVEN
 from openai.types.chat.chat_completion import ChatCompletion, Choice
@@ -31,6 +32,7 @@ from cai.sdk.agents import (
     generation_span,
 )
 from cai.sdk.agents.models.fake_id import FAKE_RESPONSES_ID
+from cai.util import get_ollama_api_base
 import os
 cai_model = os.getenv('CAI_MODEL', "qwen2.5:14b")
 
@@ -361,3 +363,76 @@ async def test_interaction_counter_single_turn_with_tool_calls(monkeypatch) -> N
     
     # Counter should now be 2 (one increment per turn, not per item)
     assert model.interaction_counter == 2
+
+
+def test_get_ollama_api_base_prefers_openai_compatible_env_vars(monkeypatch) -> None:
+    with monkeypatch.context() as m:
+        m.delenv("OLLAMA_API_BASE", raising=False)
+        m.setenv("OPENAI_API_BASE", "http://127.0.0.1:8080/v1")
+        m.setenv("OPENAI_BASE_URL", "https://example.invalid/v1")
+        assert get_ollama_api_base() == "http://127.0.0.1:8080/v1"
+
+    with monkeypatch.context() as m:
+        m.delenv("OLLAMA_API_BASE", raising=False)
+        m.delenv("OPENAI_API_BASE", raising=False)
+        m.setenv("OPENAI_BASE_URL", "https://gateway.example/v1")
+        assert get_ollama_api_base() == "https://gateway.example/v1"
+
+
+@pytest.mark.asyncio
+async def test_fetch_response_routes_unknown_prefixed_models_to_openai_compatible_base(
+    monkeypatch,
+) -> None:
+    class DummyCompletions:
+        def __init__(self) -> None:
+            self.kwargs: dict[str, Any] = {}
+
+        async def create(self, **kwargs: Any) -> Any:
+            self.kwargs = kwargs
+            return chat
+
+    class DummyClient:
+        def __init__(self, completions: DummyCompletions) -> None:
+            self.chat = type("_Chat", (), {"completions": completions})()
+            self.base_url = httpx.URL("http://fake")
+
+    msg = ChatCompletionMessage(role="assistant", content="gateway ok")
+    choice = Choice(index=0, finish_reason="stop", message=msg)
+    chat = ChatCompletion(
+        id="resp-id",
+        created=0,
+        model="acme/custom-1.1",
+        object="chat.completion",
+        choices=[choice],
+    )
+    completions = DummyCompletions()
+    dummy_client = DummyClient(completions)
+    captured: dict[str, Any] = {}
+
+    async def fake_acompletion(**kwargs: Any) -> Any:
+        captured.update(kwargs)
+        return chat
+
+    monkeypatch.setattr(litellm, "acompletion", fake_acompletion)
+    monkeypatch.setenv("OPENAI_API_BASE", "http://127.0.0.1:9999/v1")
+    monkeypatch.delenv("OLLAMA_API_BASE", raising=False)
+    monkeypatch.delenv("OPENAI_BASE_URL", raising=False)
+
+    model = OpenAIChatCompletionsModel(model="acme/custom-1.1", openai_client=dummy_client)  # type: ignore[arg-type]
+    with generation_span(disabled=True) as span:
+        result = await model._fetch_response(
+            system_instructions="sys",
+            input="hi",
+            model_settings=ModelSettings(),
+            tools=[],
+            output_schema=None,
+            handoffs=[],
+            span=span,
+            tracing=ModelTracing.DISABLED,
+            stream=False,
+        )
+
+    assert result is chat
+    assert captured["model"] == "acme/custom-1.1"
+    assert captured["api_base"] == "http://127.0.0.1:9999/v1"
+    assert captured["custom_llm_provider"] == "openai"
