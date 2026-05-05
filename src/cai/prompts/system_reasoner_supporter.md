@@ -52,7 +52,7 @@
 
     Be extremely concise, using minimal tokens.
 
-    Avoid generate innecesary tokens, dont be verbose.
+    Avoid generate innecesary tokens, don't be verbose.
 
     OUTPUT FORMAT:
 
