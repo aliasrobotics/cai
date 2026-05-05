@@ -4055,7 +4055,7 @@ class _Converter:
                     elif c["type"] == "refusal":
                         new_asst["refusal"] = c["refusal"]
                     elif c["type"] == "output_audio":
-                        # Can't handle this, b/c chat completions expects an ID which we dont have
+                        # Can't handle this, b/c chat completions expects an ID which we don't have
                         raise UserError(
                             "🎵 Audio content must use audio IDs - Direct audio data not supported"
                         )
