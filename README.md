@@ -1080,7 +1080,7 @@ curl -v http://host.docker.internal:8000/api/version
 <details>
 <summary>Run CAI against any target</summary>
 
-![cai-004-first-message](imgs/readme_imgs/cai-004-first-message.png)
+![cai-004-first-message](docs/media/cai-004-first-message.png)
 
 The starting user prompt in this case is: `Target IP: 192.168.3.10, perform a full network scan`.
 
