@@ -1994,10 +1994,7 @@ class OpenAIChatCompletionsModel(Model):
 
                                 # Check if model supports reasoning (Claude or DeepSeek)
                                 model_str_lower = str(self.model).lower()
-                                if (
-                                    detect_claude_thinking_in_stream(str(self.model))
-                                    or "deepseek" in model_str_lower
-                                ):
+                                if detect_claude_thinking_in_stream(str(self.model)):
                                     print_claude_reasoning_simple(
                                         reasoning_content, self.agent_name, str(self.model)
                                     )

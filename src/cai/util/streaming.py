@@ -4208,7 +4208,7 @@ def create_claude_thinking_context(agent_name, counter, model):
         context = {
             "thinking_id": thinking_id,
             "live": live,
-            "panel": panel,
+            "panel": None,
             "header": header,
             "thinking_content": thinking_content,
             "timestamp": timestamp,
@@ -4358,10 +4358,29 @@ def finish_claude_thinking_display(context):
         return False
 
 
+def _raw_reasoning_display_enabled() -> bool:
+    """Return whether raw provider reasoning text should be displayed.
+
+    DeepSeek-compatible gateways often stream ``reasoning_content`` in tiny
+    deltas. Rendering those deltas by default floods the terminal and can leak
+    model-internal scratch text. Keep it opt-in for DeepSeek via
+    ``CAI_SHOW_REASONING=true`` (or ``CAI_SHOW_THINKING=true`` for older local
+    configs).
+    """
+    raw = os.getenv("CAI_SHOW_REASONING")
+    if raw is None:
+        raw = os.getenv("CAI_SHOW_THINKING")
+    if raw is None:
+        return False
+    return raw.strip().lower() in ("1", "true", "yes", "on")
+
+
 def detect_claude_thinking_in_stream(model_name):
     """
     Detect if a model should show thinking/reasoning display.
-    Applies to Claude and DeepSeek models with reasoning capability.
+
+    Claude keeps the historical default. DeepSeek raw reasoning is opt-in
+    because providers commonly stream it token-by-token as ``reasoning_content``.
 
     Args:
         model_name: The model name to check
@@ -4389,17 +4408,10 @@ def detect_claude_thinking_in_stream(model_name):
         or "thinking" in model_str
     )
 
-    # Check for DeepSeek models with reasoning capability
-    has_deepseek_reasoning = "deepseek" in model_str and (
-        # DeepSeek reasoner models
-        "reasoner" in model_str
-        or
-        # DeepSeek chat models also support reasoning
-        "chat" in model_str
-        or
-        # Generic deepseek models likely support it
-        "/" in model_str  # e.g., deepseek/deepseek-chat
-    )
+    # DeepSeek reasoning display is intentionally opt-in. The text is still
+    # accumulated internally by the model stream handler so empty-response
+    # detection and accounting keep working; it is just not printed by default.
+    has_deepseek_reasoning = "deepseek" in model_str and _raw_reasoning_display_enabled()
 
     return has_claude_reasoning or has_deepseek_reasoning
 
