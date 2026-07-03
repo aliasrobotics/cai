@@ -8,6 +8,7 @@ Extracted from openai_chatcompletions.py [F] to reduce monolith size.
 
 from __future__ import annotations
 
+import os
 import time
 from typing import TYPE_CHECKING, Any, Literal, cast
 
@@ -26,6 +27,41 @@ if TYPE_CHECKING:
     )
     from openai import AsyncStream
     from ...model_settings import ModelSettings
+
+
+_DEFAULT_MODEL_TIMEOUT = 180.0
+
+
+def _configured_model_timeout() -> float | None:
+    """Return CAI's LiteLLM request timeout in seconds.
+
+    ``CAI_MODEL_TIMEOUT`` is the public name. ``CAI_LLM_TIMEOUT`` is accepted
+    as a compatibility alias for local configs/scripts. Values <= 0 disable the
+    injected timeout and defer entirely to LiteLLM/provider defaults.
+    """
+    raw = os.getenv("CAI_MODEL_TIMEOUT")
+    if raw is None:
+        raw = os.getenv("CAI_LLM_TIMEOUT")
+    if raw is None or raw == "":
+        return _DEFAULT_MODEL_TIMEOUT
+    try:
+        timeout = float(raw)
+    except (TypeError, ValueError):
+        return _DEFAULT_MODEL_TIMEOUT
+    if timeout <= 0:
+        return None
+    return timeout
+
+
+def _apply_litellm_timeouts(kwargs: dict, *, stream: bool) -> dict:
+    """Add bounded model request timeouts unless the caller already set them."""
+    timeout = _configured_model_timeout()
+    if timeout is None:
+        return kwargs
+    kwargs.setdefault("timeout", timeout)
+    if stream:
+        kwargs.setdefault("stream_timeout", timeout)
+    return kwargs
 
 
 def _build_response_obj(
@@ -66,6 +102,8 @@ async def fetch_response_litellm_openai(
     too long, truncate all tool_call ids in the messages to 40 characters
     and retry once silently.
     """
+    kwargs = _apply_litellm_timeouts(kwargs, stream=stream)
+
     try:
         if stream:
             stream_obj = await litellm.acompletion(**kwargs)
@@ -147,6 +185,8 @@ async def fetch_response_litellm_ollama(
     }
 
     api_base = get_ollama_api_base()
+
+    ollama_kwargs = _apply_litellm_timeouts(ollama_kwargs, stream=stream)
 
     if stream:
         response = _build_response_obj(model_name, model_settings, tool_choice, parallel_tool_calls)
