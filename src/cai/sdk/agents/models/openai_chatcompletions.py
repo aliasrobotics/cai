@@ -133,6 +133,8 @@ from .chatcompletions.litellm_adapter import (
     acompletion_with_timeout,
     fetch_response_litellm_openai as _fetch_litellm_openai_impl,
     fetch_response_litellm_ollama as _fetch_litellm_ollama_impl,
+    is_transient_litellm_provider_error,
+    provider_error_summary,
 )
 from .chatcompletions.model import (
     ACTIVE_MODEL_INSTANCES,
@@ -154,7 +156,7 @@ from cai.util.llm_api_base import (
     resolve_llm_openai_compatible_base,
     resolve_llm_openai_compatible_api_key,
 )
-from cai.errors import LLMEmptyAssistantError, LLMRateLimited, LLMTimeout
+from cai.errors import LLMEmptyAssistantError, LLMProviderUnavailable, LLMRateLimited, LLMTimeout
 from cai.util.gateway_rate_limiter import (
     COMPLETION_BUDGET_TOKENS,
     get_gateway_rate_limiter,
@@ -960,9 +962,11 @@ class OpenAIChatCompletionsModel(Model):
                 return result
 
             except (
+                litellm.exceptions.APIConnectionError,
                 litellm.exceptions.BadGatewayError,
                 litellm.exceptions.ServiceUnavailableError,
                 litellm.exceptions.InternalServerError,
+                LLMProviderUnavailable,
             ) as e:
                 # Transient server errors (502, 503, 500): retry with backoff
                 self.logger.warning(f"Server error (high-level recovery): {str(e)[:200]}")
@@ -977,8 +981,11 @@ class OpenAIChatCompletionsModel(Model):
                 if self._high_level_retry_count > 3:
                     self._high_level_retry_count = 0
                     if verbose_http_retries():
-                        print(f"\n❌ Server error after 3 recovery attempts [{self.model}]")
-                    raise
+                        print(f"\n❌ Provider error after 3 recovery attempts [{self.model}]")
+                    raise LLMProviderUnavailable(
+                        f"Provider unavailable after 3 recovery attempts "
+                        f"[{self.model}]: {provider_error_summary(e)}"
+                    ) from e
 
                 wait_secs = 10 * self._high_level_retry_count  # 10s, 20s, 30s
                 self.logger.warning(
@@ -1785,8 +1792,13 @@ class OpenAIChatCompletionsModel(Model):
 
                     # Clean retry: same input, no "continue" in history
                     async for event in self.stream_response(
-                        system_instructions, input, model_settings,
-                        tools, output_schema, handoffs, tracing,
+                        system_instructions,
+                        input,
+                        model_settings,
+                        tools,
+                        output_schema,
+                        handoffs,
+                        tracing,
                     ):
                         yield event
                     self._high_level_retry_count = 0
@@ -1814,8 +1826,58 @@ class OpenAIChatCompletionsModel(Model):
 
                     # Clean retry: same input, no "continue" in history
                     async for event in self.stream_response(
-                        system_instructions, input, model_settings,
-                        tools, output_schema, handoffs, tracing,
+                        system_instructions,
+                        input,
+                        model_settings,
+                        tools,
+                        output_schema,
+                        handoffs,
+                        tracing,
+                    ):
+                        yield event
+                    self._high_level_retry_count = 0
+                    return
+
+                except (
+                    litellm.exceptions.APIConnectionError,
+                    litellm.exceptions.BadGatewayError,
+                    litellm.exceptions.ServiceUnavailableError,
+                    litellm.exceptions.InternalServerError,
+                    LLMProviderUnavailable,
+                ) as e:
+                    await stream_wait_hints.stop()
+                    self.logger.warning(
+                        "Transient provider error in stream_response [%s]: %s",
+                        self.model,
+                        provider_error_summary(e),
+                    )
+                    stop_active_timer()
+                    start_idle_timer()
+
+                    if not hasattr(self, "_high_level_retry_count"):
+                        self._high_level_retry_count = 0
+                    self._high_level_retry_count += 1
+
+                    if self._high_level_retry_count > 3:
+                        self._high_level_retry_count = 0
+                        raise LLMProviderUnavailable(
+                            f"Provider unavailable after 3 attempts "
+                            f"[{self.model}]: {provider_error_summary(e)}"
+                        ) from e
+
+                    await self._retry_with_backoff(
+                        self._high_level_retry_count - 1, "Provider error"
+                    )
+
+                    # Clean retry: same input, no "continue" in history
+                    async for event in self.stream_response(
+                        system_instructions,
+                        input,
+                        model_settings,
+                        tools,
+                        output_schema,
+                        handoffs,
+                        tracing,
                     ):
                         yield event
                     self._high_level_retry_count = 0
@@ -3067,8 +3129,15 @@ class OpenAIChatCompletionsModel(Model):
             raise
 
         except Exception as e:
-            # Handle other exceptions
-            logger.error(f"Error in stream_response: {e}")
+            # Provider/proxy errors are already retried above; keep logs concise.
+            if isinstance(e, (LLMProviderUnavailable, LLMTimeout, LLMRateLimited)) or (
+                is_transient_litellm_provider_error(e)
+            ):
+                logger.warning(
+                    "Model provider error in stream_response: %s", provider_error_summary(e)
+                )
+            else:
+                logger.error(f"Error in stream_response: {e}")
             raise
 
         finally:

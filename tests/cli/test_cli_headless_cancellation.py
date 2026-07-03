@@ -4,9 +4,11 @@ from types import SimpleNamespace
 from unittest.mock import Mock
 
 import pytest
+import litellm
 
 from cai import cli_headless
 from cai import parallel_worker
+from cai.errors import LLMProviderUnavailable
 
 
 def test_non_streamed_cancelled_error_uses_interrupt_flow(monkeypatch):
@@ -32,6 +34,33 @@ def test_streamed_cancelled_error_uses_interrupt_flow(monkeypatch):
     monkeypatch.setattr(cli_headless.asyncio, "run", cancelled_asyncio_run)
 
     with pytest.raises(KeyboardInterrupt):
+        cli_headless._run_streamed(
+            SimpleNamespace(model=SimpleNamespace(message_history=[])),
+            "input",
+            Mock(),
+            False,
+            None,
+        )
+
+
+def test_streamed_provider_disconnect_raises_typed_provider_error(monkeypatch):
+    class DummyResult:
+        async def stream_events(self):
+            raise litellm.exceptions.InternalServerError(
+                message="DeepseekException - Server disconnected",
+                llm_provider="deepseek",
+                model="deepseek/deepseek-v4-pro",
+            )
+            yield  # pragma: no cover
+
+        def _cleanup_tasks(self):
+            pass
+
+    monkeypatch.setattr(
+        cli_headless.Runner, "run_streamed", lambda *_args, **_kwargs: DummyResult()
+    )
+
+    with pytest.raises(LLMProviderUnavailable, match="Server disconnected"):
         cli_headless._run_streamed(
             SimpleNamespace(model=SimpleNamespace(message_history=[])),
             "input",

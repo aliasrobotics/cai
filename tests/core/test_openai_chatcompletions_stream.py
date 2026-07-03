@@ -1,6 +1,7 @@
 from collections.abc import AsyncIterator
 
 import pytest
+import litellm
 from openai.types.chat.chat_completion_chunk import (
     ChatCompletionChunk,
     Choice,
@@ -119,6 +120,66 @@ async def test_stream_response_yields_events_for_text_content(monkeypatch) -> No
     assert completed_resp.usage.input_tokens == 7
     assert completed_resp.usage.output_tokens == 5
     assert completed_resp.usage.total_tokens == 12
+
+
+@pytest.mark.allow_call_model_methods
+@pytest.mark.asyncio
+async def test_stream_response_retries_transient_provider_disconnect(monkeypatch) -> None:
+    chunk = ChatCompletionChunk(
+        id="chunk-id",
+        created=1,
+        model="fake",
+        object="chat.completion.chunk",
+        choices=[Choice(index=0, delta=ChoiceDelta(content="ok"))],
+        usage=CompletionUsage(completion_tokens=1, prompt_tokens=1, total_tokens=2),
+    )
+
+    async def fake_stream() -> AsyncIterator[ChatCompletionChunk]:
+        yield chunk
+
+    calls = {"count": 0}
+
+    async def patched_fetch_response(self, *args, **kwargs):
+        calls["count"] += 1
+        if calls["count"] == 1:
+            raise litellm.exceptions.InternalServerError(
+                message="DeepseekException - Server disconnected",
+                llm_provider="deepseek",
+                model="deepseek/deepseek-v4-pro",
+            )
+        resp = Response(
+            id="resp-id",
+            created_at=0,
+            model="fake-model",
+            object="response",
+            output=[],
+            tool_choice="none",
+            tools=[],
+            parallel_tool_calls=False,
+        )
+        return resp, fake_stream()
+
+    async def no_sleep_retry(self, *_args, **_kwargs):
+        return None
+
+    monkeypatch.setattr(OpenAIChatCompletionsModel, "_fetch_response", patched_fetch_response)
+    monkeypatch.setattr(OpenAIChatCompletionsModel, "_retry_with_backoff", no_sleep_retry)
+
+    model = OpenAIProvider(use_responses=False).get_model(cai_model)
+    events = []
+    async for event in model.stream_response(
+        system_instructions=None,
+        input="",
+        model_settings=ModelSettings(),
+        tools=[],
+        output_schema=None,
+        handoffs=[],
+        tracing=ModelTracing.DISABLED,
+    ):
+        events.append(event)
+
+    assert calls["count"] == 2
+    assert any(getattr(event, "delta", None) == "ok" for event in events)
 
 
 @pytest.mark.allow_call_model_methods

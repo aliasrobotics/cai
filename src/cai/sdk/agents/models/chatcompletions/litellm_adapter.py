@@ -66,6 +66,27 @@ def apply_litellm_timeouts(kwargs: dict, *, stream: bool = False) -> dict:
     return kwargs
 
 
+def is_transient_litellm_provider_error(exc: BaseException) -> bool:
+    """Return True for provider/proxy failures that are safe to retry."""
+    return isinstance(
+        exc,
+        (
+            litellm.exceptions.APIConnectionError,
+            litellm.exceptions.BadGatewayError,
+            litellm.exceptions.InternalServerError,
+            litellm.exceptions.ServiceUnavailableError,
+        ),
+    )
+
+
+def provider_error_summary(exc: BaseException, *, limit: int = 220) -> str:
+    """Compact provider error text for user-facing typed exceptions."""
+    message = " ".join(str(exc).split())
+    if len(message) > limit:
+        message = f"{message[:limit]}..."
+    return f"{type(exc).__name__}: {message}"
+
+
 def _timeout_from_kwargs(kwargs: dict) -> float | None:
     """Return the effective numeric timeout for CAI's outer asyncio guard."""
     raw_timeout = kwargs.get("timeout", configured_model_timeout())

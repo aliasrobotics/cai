@@ -77,6 +77,10 @@ from cai.errors import (
     LLMTimeout,
 )
 from cai.sdk.agents.models.chatcompletions.httpx_client import verbose_http_retries
+from cai.sdk.agents.models.chatcompletions.litellm_adapter import (
+    is_transient_litellm_provider_error,
+    provider_error_summary,
+)
 from cai.continuation import generate_continuation_advice, should_continue_automatically
 from litellm.exceptions import RateLimitError, Timeout
 
@@ -1497,6 +1501,14 @@ def _run_streamed(agent, conversation_input, console, force_until_flag, ctf_glob
                 except Exception:
                     pass
             logger = logging.getLogger(__name__)
+            if isinstance(e, (LLMProviderUnavailable, LLMTimeout, LLMRateLimited)):
+                raise
+            if is_transient_litellm_provider_error(e):
+                summary = provider_error_summary(e)
+                logger.warning("Streaming provider error: %s", summary)
+                raise LLMProviderUnavailable(
+                    f"Model provider disconnected during streaming: {summary}"
+                ) from e
             logger.error(f"Error occurred during streaming: {str(e)}", exc_info=True)
             if _get_config().debug == 2:
                 import traceback
