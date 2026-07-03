@@ -15,7 +15,7 @@ import json
 import os
 from typing import Dict, List, Any, Optional
 from cai.agents.agent_builder import AgentBuilder
-import litellm
+from cai.sdk.agents.models.chatcompletions.litellm_adapter import acompletion_with_timeout
 
 
 class AgentCreationConfirmed(Message):
@@ -514,14 +514,18 @@ IMPORTANT: The "tools" field in your response must be exactly: {json.dumps(selec
 """
 
             # Use litellm to generate the configuration
-            response = await litellm.acompletion(
-                model=os.getenv("CAI_MODEL", "gpt-4"),
-                messages=[
+            model_name = os.getenv("CAI_MODEL", "gpt-4")
+            kwargs = {
+                "model": model_name,
+                "messages": [
                     {"role": "system", "content": "You are an AI agent configuration generator. Always respond with valid JSON only."},
                     {"role": "user", "content": meta_prompt}
                 ],
-                temperature=0.7,
-                max_tokens=2000
+                "temperature": 0.7,
+                "max_tokens": 2000,
+            }
+            response = await acompletion_with_timeout(
+                kwargs, stream=False, model_name=model_name
             )
             
             # Parse the response

@@ -19,6 +19,8 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 from rich.console import Console
 
+from cai.sdk.agents.models.chatcompletions.litellm_adapter import acompletion_with_timeout
+
 console = Console()
 
 # Global cache for digest results (per-run caching)
@@ -519,7 +521,6 @@ OUTPUT REQUIREMENTS:
 - Maximum 350 words"""
 
     # Use LiteLLM for model compatibility (handles alias1, OpenRouter, etc.)
-    import litellm
 
     model = os.getenv("CAI_CTR_DIGEST_MODEL", "alias1")
 
@@ -549,7 +550,7 @@ OUTPUT REQUIREMENTS:
         kwargs["api_key"] = os.getenv("ALIAS_API_KEY", "sk-alias-1234567890")
 
     try:
-        response = await litellm.acompletion(**kwargs)
+        response = await acompletion_with_timeout(kwargs, stream=False, model_name=model)
 
         # Extract content (handle reasoning models like alias1/o1 that use reasoning_content)
         message = response.choices[0].message

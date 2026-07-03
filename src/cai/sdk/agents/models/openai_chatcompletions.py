@@ -130,6 +130,7 @@ from .chatcompletions.httpx_client import (
     verbose_http_retries,
 )
 from .chatcompletions.litellm_adapter import (
+    acompletion_with_timeout,
     fetch_response_litellm_openai as _fetch_litellm_openai_impl,
     fetch_response_litellm_ollama as _fetch_litellm_ollama_impl,
 )
@@ -4116,10 +4117,14 @@ class OpenAIChatCompletionsModel(Model):
                                 tools=[],
                                 parallel_tool_calls=parallel_tool_calls or False,
                             )
-                            stream_obj = await litellm.acompletion(**retry_kwargs)
+                            stream_obj = await acompletion_with_timeout(
+                                retry_kwargs, stream=True, model_name=str(self.model)
+                            )
                             return response, stream_obj
                         else:
-                            ret = await litellm.acompletion(**retry_kwargs)
+                            ret = await acompletion_with_timeout(
+                                retry_kwargs, stream=False, model_name=str(self.model)
+                            )
                             return ret
                     except Exception:
                         # If retry also fails, raise the original error
@@ -4168,11 +4173,15 @@ class OpenAIChatCompletionsModel(Model):
                                         tools=[],
                                         parallel_tool_calls=parallel_tool_calls or False,
                                     )
-                                    stream_obj = await litellm.acompletion(**qwen_params)
+                                    stream_obj = await acompletion_with_timeout(
+                                        qwen_params, stream=True, model_name=str(self.model)
+                                    )
                                     return response, stream_obj
                                 else:
                                     # Non-streaming case
-                                    ret = await litellm.acompletion(**qwen_params)
+                                    ret = await acompletion_with_timeout(
+                                        qwen_params, stream=False, model_name=str(self.model)
+                                    )
                                     return ret
                             except Exception as direct_e:
                                 # All approaches failed, log and raise the original error

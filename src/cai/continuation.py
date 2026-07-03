@@ -11,6 +11,7 @@ from typing import List, Dict, Any, Optional
 from rich.console import Console
 
 from cai.config import get_config
+from cai.sdk.agents.models.chatcompletions.litellm_adapter import acompletion_with_timeout
 
 logger = logging.getLogger(__name__)
 
@@ -108,9 +109,7 @@ Generate a specific, actionable continuation prompt that:
 IMPORTANT: Respond with ONLY the continuation prompt. No explanations, no "Here's a prompt:", just the direct instruction."""
 
     try:
-        # Use litellm directly, which is how the rest of the codebase handles API calls
-        import litellm
-        
+        # Use LiteLLM through CAI's timeout wrapper.
         # Enable debug logging for litellm if in debug mode
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"Generating continuation advice with model: {model_name}")
@@ -138,7 +137,7 @@ IMPORTANT: Respond with ONLY the continuation prompt. No explanations, no "Here'
         
         # Make the API call
         logger.debug(f"Making API call with kwargs: {kwargs.get('model')}, provider: {kwargs.get('custom_llm_provider', 'default')}")
-        response = await litellm.acompletion(**kwargs)
+        response = await acompletion_with_timeout(kwargs, stream=False, model_name=model_name)
         
         # Extract content safely
         continuation_prompt = None

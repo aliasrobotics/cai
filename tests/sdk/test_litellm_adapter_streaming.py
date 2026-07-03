@@ -1,5 +1,9 @@
+import asyncio
+
 import pytest
 from openai import NOT_GIVEN
+
+from cai.errors import LLMTimeout
 
 from cai.sdk.agents.model_settings import ModelSettings
 from cai.sdk.agents.models.chatcompletions.litellm_adapter import (
@@ -143,3 +147,67 @@ async def test_litellm_model_timeout_uses_env_override(monkeypatch):
     assert response is sentinel_response
     assert calls[0]["timeout"] == 45.0
     assert "stream_timeout" not in calls[0]
+
+
+@pytest.mark.asyncio
+async def test_litellm_nonstream_times_out_when_completion_call_stalls(monkeypatch):
+    monkeypatch.setenv("CAI_MODEL_TIMEOUT", "0.01")
+
+    async def fake_acompletion(**_kwargs):
+        await asyncio.sleep(60)
+        return object()
+
+    monkeypatch.setattr(
+        "cai.sdk.agents.models.chatcompletions.litellm_adapter.litellm.acompletion",
+        fake_acompletion,
+    )
+
+    with pytest.raises(LLMTimeout, match="Timed out waiting for model response"):
+        await asyncio.wait_for(
+            fetch_response_litellm_openai(
+                kwargs={
+                    "model": "deepseek/deepseek-v4-pro",
+                    "messages": [],
+                    "stream": False,
+                },
+                model_name="deepseek/deepseek-v4-pro",
+                model_settings=ModelSettings(),
+                tool_choice=NOT_GIVEN,
+                stream=False,
+                parallel_tool_calls=False,
+            ),
+            timeout=0.2,
+        )
+
+
+@pytest.mark.asyncio
+async def test_litellm_streaming_times_out_when_next_chunk_stalls(monkeypatch):
+    monkeypatch.setenv("CAI_MODEL_TIMEOUT", "0.01")
+
+    class StalledStream:
+        def __aiter__(self):
+            return self
+
+        async def __anext__(self):
+            await asyncio.sleep(60)
+            return object()
+
+    async def fake_acompletion(**_kwargs):
+        return StalledStream()
+
+    monkeypatch.setattr(
+        "cai.sdk.agents.models.chatcompletions.litellm_adapter.litellm.acompletion",
+        fake_acompletion,
+    )
+
+    _response, stream = await fetch_response_litellm_openai(
+        kwargs={"model": "deepseek/deepseek-v4-pro", "messages": [], "stream": True},
+        model_name="deepseek/deepseek-v4-pro",
+        model_settings=ModelSettings(),
+        tool_choice=NOT_GIVEN,
+        stream=True,
+        parallel_tool_calls=False,
+    )
+
+    with pytest.raises(LLMTimeout, match="Timed out waiting for streamed model chunk"):
+        await stream.__anext__()
