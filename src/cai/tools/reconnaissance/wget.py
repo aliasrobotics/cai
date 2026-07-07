@@ -4,6 +4,7 @@
 Wget tool
 """
 
+import shlex
 from cai.tools.common import run_command  # pylint: disable=import-error
 from cai.sdk.agents import function_tool
 
@@ -19,7 +20,7 @@ def wget(url: str, args: str = "", ctf=None) -> str:
     Returns:
         str: The output of running the wget command
     """
-    command = f"wget {args} {url}"
+    command = f"wget {args} {shlex.quote(url)}"
     return run_command(command, ctf=ctf)
 
 

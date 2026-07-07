@@ -2,6 +2,7 @@
 Here are crypto tools
 """
 
+import shlex
 from cai.tools.common import run_command
 from cai.sdk.agents import function_tool
 
@@ -25,7 +26,7 @@ def strings_command(file_path: str, ctf=None) -> str:
     #     Returns:
             str: The output of running the strings command
     """
-    command = f"strings {file_path}"
+    command = f"strings {shlex.quote(file_path)}"
     return run_command(command, ctf=ctf)
 
 
@@ -41,7 +42,7 @@ def decode64(input_data: str, ctf=None) -> str:
     Returns:
         str: The decoded string
     """
-    command = f"base64 --decode {input_data}"
+    command = f"base64 --decode {shlex.quote(input_data)}"
     return run_command(command, ctf=ctf)
 
 

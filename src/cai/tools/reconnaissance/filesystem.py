@@ -2,6 +2,7 @@
 Here are the CLI tools for executing commands.
 """
 
+import shlex
 from cai.tools.common import run_command  # pylint: disable=E0401
 from cai.sdk.agents import function_tool
 
@@ -18,7 +19,7 @@ def list_dir(path: str, args: str = "", ctf=None) -> str:
     Returns:
         str: The output of running the ls command
     """
-    command = f"ls {path} {args}"
+    command = f"ls {shlex.quote(path)} {args}"
     return run_command(command, ctf=ctf)
 
 
@@ -34,7 +35,7 @@ def cat_file(file_path: str, args: str = "", ctf=None) -> str:
     Returns:
         str: The output of running the cat command
     """
-    command = f"cat {args} {file_path} "
+    command = f"cat {args} {shlex.quote(file_path)}"
     return run_command(command, ctf=ctf)
 
 
@@ -65,7 +66,7 @@ def find_file(file_path: str, args: str = "", ctf=None) -> str:
     """
     Find a file in the filesystem.
     """
-    command = f"find {file_path} {args}"
+    command = f"find {shlex.quote(file_path)} {args}"
     return run_command(command, ctf=ctf)
 
 

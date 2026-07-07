@@ -2,6 +2,7 @@
 Here are the nmap tools.
 """
 
+import shlex
 from cai.tools.common import run_command  # pylint: disable=E0401
 from cai.sdk.agents import function_tool
 
@@ -18,7 +19,7 @@ def nmap(args: str, target: str, ctf=None) -> str:
     Returns:
         str: The output of running the nmap command
     """
-    command = f"nmap {args} {target}"
+    command = f"nmap {args} {shlex.quote(target)}"
     return run_command(command, ctf=ctf, stream=True)
 
 
