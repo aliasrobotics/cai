@@ -106,6 +106,22 @@ def _int_env(name: str, default: int) -> int:
         return default
 
 
+def _unwrap_mapped_ip(
+    ip: ipaddress.IPv4Address | ipaddress.IPv6Address,
+) -> ipaddress.IPv4Address | ipaddress.IPv6Address:
+    """Return the embedded IPv4 address for IPv4-mapped IPv6 addresses.
+
+    ``::ffff:169.254.169.254`` and ``::ffff:127.0.0.1`` route to the same
+    hosts as their bare IPv4 forms, but a plain string comparison against
+    ``_METADATA_IPS`` misses them and some Python versions do not flag the
+    mapped form as private/link-local. Unwrapping to the embedded IPv4 makes
+    the metadata and private-range checks apply uniformly. Non-mapped
+    addresses are returned unchanged.
+    """
+    mapped = getattr(ip, "ipv4_mapped", None)
+    return mapped if mapped is not None else ip
+
+
 def _is_unsafe_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
     return (
         ip.is_private
@@ -149,12 +165,21 @@ def _check_ssrf(url: str, *, allow_internal: bool) -> str:
     # Literal IP path.
     try:
         ip_obj = ipaddress.ip_address(host)
+    except ValueError:
+        ip_obj = None  # not a literal IP; fall through to FQDN resolution
+
+    if ip_obj is not None:
+        # Unwrap IPv4-mapped IPv6 (e.g. ::ffff:169.254.169.254) so the checks
+        # below cannot be bypassed with the mapped form of a blocked address.
+        ip_obj = _unwrap_mapped_ip(ip_obj)
+        # Cloud metadata is ALWAYS blocked, regardless of allow_internal. The
+        # string pre-check above only matches the bare IPv4 literal, so the
+        # mapped IPv6 form is caught here.
+        if str(ip_obj) in _METADATA_IPS:
+            raise _SSRFBlocked(f"host '{host}' is a cloud-metadata endpoint")
         if not allow_internal and _is_unsafe_ip(ip_obj):
             raise _SSRFBlocked(f"host '{host}' is a private/reserved address")
         return host
-
-    except ValueError:
-        pass  # fall through to FQDN resolution
 
     # FQDN: resolve, validate every record, return the first safe IP.
     try:
@@ -167,10 +192,10 @@ def _check_ssrf(url: str, *, allow_internal: bool) -> str:
         raw_addr = info[4][0]
         ip_str = str(raw_addr)  # getaddrinfo returns int for AF_UNIX edge cases
         try:
-            ip = ipaddress.ip_address(ip_str)
+            ip = _unwrap_mapped_ip(ipaddress.ip_address(ip_str))
         except ValueError:
             continue
-        if ip_str in _METADATA_IPS:
+        if str(ip) in _METADATA_IPS:
             raise _SSRFBlocked(
                 f"host '{host}' resolves to cloud-metadata IP '{ip_str}'"
             )

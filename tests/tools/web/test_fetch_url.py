@@ -72,6 +72,17 @@ class TestSSRFGuard:
         with pytest.raises(_SSRFBlocked):
             _check_ssrf("http://metadata.google.internal/", allow_internal=True)
 
+    def test_blocks_ipv4_mapped_metadata_even_when_internal_allowed(self) -> None:
+        """The IPv4-mapped IPv6 form of the IMDS IP must not slip past the
+        cloud-metadata guard, even with CAI_FETCH_ALLOW_INTERNAL=true."""
+        for host in ("[::ffff:169.254.169.254]", "[::ffff:a9fe:a9fe]"):
+            with pytest.raises(_SSRFBlocked):
+                _check_ssrf(f"http://{host}/latest/", allow_internal=True)
+
+    def test_blocks_ipv4_mapped_loopback(self) -> None:
+        with pytest.raises(_SSRFBlocked):
+            _check_ssrf("http://[::ffff:127.0.0.1]/", allow_internal=False)
+
     def test_allows_public_ip_and_returns_it(self) -> None:
         assert _check_ssrf("https://1.1.1.1/", allow_internal=False) == "1.1.1.1"
 
