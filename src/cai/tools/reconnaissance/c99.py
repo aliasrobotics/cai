@@ -18,6 +18,7 @@ Environment:
 """
 
 import json
+import logging
 import os
 from typing import Any, Dict, List, Optional, Union, Literal
 
@@ -25,6 +26,8 @@ import requests
 from dotenv import load_dotenv
 
 from cai.sdk.agents import function_tool
+
+logger = logging.getLogger(__name__)
 
 JSONType = Union[Dict[str, Any], List[Any], str, int, float, bool, None]
 
@@ -61,16 +64,25 @@ def _call_c99_api(endpoint: str, params: Dict[str, Any]) -> Optional[JSONType]:
 
     try:
         response = requests.get(base_url, params=query_params, timeout=60)
-    except Exception:  # pylint: disable=broad-except
+        response.raise_for_status()
+    except requests.exceptions.Timeout:
+        logger.warning("C99 API request timed out for endpoint: %s", endpoint)
         return None
-
-    if response.status_code != 200:
+    except requests.exceptions.ConnectionError:
+        logger.warning("C99 API connection error for endpoint: %s", endpoint)
+        return None
+    except requests.exceptions.HTTPError as e:
+        logger.warning("C99 API HTTP error for endpoint %s: %s", endpoint, e)
+        return None
+    except requests.exceptions.RequestException as e:
+        logger.warning("C99 API request failed for endpoint %s: %s", endpoint, e)
         return None
 
     try:
         return response.json()
-    except Exception:  # pylint: disable=broad-except
+    except ValueError:
         # If JSON parsing fails, fall back to raw text.
+        logger.debug("C99 API response is not valid JSON for endpoint: %s, falling back to raw text", endpoint)
         return response.text
 
 

@@ -5,11 +5,14 @@ This module provides functions to search Shodan for information about hosts,
 services, and vulnerabilities using the Shodan API.
 """
 
+import logging
 import os
 import requests
 from typing import Dict, List, Optional, Any
 from dotenv import load_dotenv
 from cai.sdk.agents import function_tool
+
+logger = logging.getLogger(__name__)
 
 
 @function_tool
@@ -112,10 +115,8 @@ def _perform_shodan_search(query: str, limit: int = 10) -> List[Dict[str, Any]]:
     }
 
     try:
-        response = requests.get(base_url, params=params)
-
-        if response.status_code != 200:
-            return []
+        response = requests.get(base_url, params=params, timeout=30)
+        response.raise_for_status()
 
         data = response.json()
 
@@ -124,7 +125,20 @@ def _perform_shodan_search(query: str, limit: int = 10) -> List[Dict[str, Any]]:
 
         return data["matches"][:limit]
 
-    except Exception:
+    except requests.exceptions.Timeout:
+        logger.warning("Shodan API request timed out for query: %s", query)
+        return []
+    except requests.exceptions.ConnectionError:
+        logger.warning("Shodan API connection error for query: %s", query)
+        return []
+    except requests.exceptions.HTTPError as e:
+        logger.warning("Shodan API HTTP error: %s", e)
+        return []
+    except (ValueError, KeyError) as e:
+        logger.warning("Shodan API response parsing error: %s", e)
+        return []
+    except requests.exceptions.RequestException as e:
+        logger.warning("Shodan API request failed: %s", e)
         return []
 
 
@@ -149,14 +163,25 @@ def _get_shodan_host_info(ip: str) -> Optional[Dict[str, Any]]:
     params = {"key": api_key}
 
     try:
-        response = requests.get(base_url, params=params)
-
-        if response.status_code != 200:
-            return None
+        response = requests.get(base_url, params=params, timeout=30)
+        response.raise_for_status()
 
         return response.json()
 
-    except Exception:
+    except requests.exceptions.Timeout:
+        logger.warning("Shodan API request timed out for IP: %s", ip)
+        return None
+    except requests.exceptions.ConnectionError:
+        logger.warning("Shodan API connection error for IP: %s", ip)
+        return None
+    except requests.exceptions.HTTPError as e:
+        logger.warning("Shodan API HTTP error for IP %s: %s", ip, e)
+        return None
+    except ValueError as e:
+        logger.warning("Shodan API response parsing error for IP %s: %s", ip, e)
+        return None
+    except requests.exceptions.RequestException as e:
+        logger.warning("Shodan API request failed for IP %s: %s", ip, e)
         return None
 
 
