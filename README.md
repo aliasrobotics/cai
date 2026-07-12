@@ -1,15 +1,15 @@
 # Cybersecurity AI (`CAI`)
 
- 
- 
- 
- 
- 
- 
 
- 
- 
- 
+
+
+
+
+
+
+
+
+
 
 [![version](https://badge.fury.io/py/cai-framework.svg)](https://badge.fury.io/py/cai-framework)
 [![downloads](https://static.pepy.tech/badge/cai-framework)](https://pepy.tech/projects/cai-framework)
@@ -22,76 +22,76 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2506.23592-b31b1b.svg)](https://arxiv.org/pdf/2506.23592)
 [![arXiv](https://img.shields.io/badge/arXiv-2508.13588-b31b1b.svg)](https://arxiv.org/pdf/2508.13588)
 [![arXiv](https://img.shields.io/badge/arXiv-2508.21669-b31b1b.svg)](https://arxiv.org/pdf/2508.21669)
-[![arXiv](https://img.shields.io/badge/arXiv-2509.14096-b31b1b.svg)](https://arxiv.org/pdf/2509.14096) 
+[![arXiv](https://img.shields.io/badge/arXiv-2509.14096-b31b1b.svg)](https://arxiv.org/pdf/2509.14096)
 [![arXiv](https://img.shields.io/badge/arXiv-2509.14139-b31b1b.svg)](https://arxiv.org/pdf/2509.14139)
 [![arXiv](https://img.shields.io/badge/arXiv-2510.17521-b31b1b.svg)](https://arxiv.org/pdf/2510.17521)
 [![arXiv](https://img.shields.io/badge/arXiv-2510.24317-b31b1b.svg)](https://arxiv.org/pdf/2510.24317)
 
- 
 
- 
 
- 
 
- 
- 
- 
 
- Professional Edition with unlimited alias1 tokens | 📊 View Benchmarks | 🚀 Learn More 
 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
 
- 
- 
- 
- 
- 
- 🔓 Community Edition 
- Research & Learning · Perfect for Researchers & Students 
- pip install cai-framework 
- 
- ✅ Free for research 
- 🤖 300+ AI models 
- 🌍 Community driven 
- 📚 Open source 
- 🔧 Extensible framework 
- 
- 
- 
- 🚀 Professional Edition 
- Enterprise & Production · €350/month · Unlimited alias1 Tokens 
- 
- → Upgrade to PRO 
- 
- 
- ⚡ alias1 model - ∞ unlimited tokens 
- 🚫 Zero refusals - Unrestricted AI 
- 🏆 Beats GPT-5 in CTF benchmarks 
- 🛡️ Professional support included 
- 🇪🇺 European data sovereignty 
- 
- 
- 
- 
- 
- 
- 
- CAI PRO w/ alias1 model outperforms GPT-5 in AI vs AI cybersecurity benchmarks | View Full Benchmarks → 
- 
- 
- 
- 
- 
+
+
+
+
+ Professional Edition with unlimited alias1 tokens | 📊 View Benchmarks | 🚀 Learn More
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 🔓 Community Edition
+ Research & Learning · Perfect for Researchers & Students
+ pip install cai-framework
+
+ ✅ Free for research
+ 🤖 300+ AI models
+ 🌍 Community driven
+ 📚 Open source
+ 🔧 Extensible framework
+
+
+
+ 🚀 Professional Edition
+ Enterprise & Production · €350/month · Unlimited alias1 Tokens
+
+ → Upgrade to PRO
+
+
+ ⚡ alias1 model - ∞ unlimited tokens
+ 🚫 Zero refusals - Unrestricted AI
+ 🏆 Beats GPT-5 in CTF benchmarks
+ 🛡️ Professional support included
+ 🇪🇺 European data sovereignty
+
+
+
+
+
+
+
+ CAI PRO w/ alias1 model outperforms GPT-5 in AI vs AI cybersecurity benchmarks | View Full Benchmarks →
+
+
+
+
+
 -->
 
 Cybersecurity AI (CAI) is a lightweight, open-source framework that empowers security professionals to build and deploy AI-powered offensive and defensive automation. CAI is the *de facto* framework for AI Security, already used by thousands of individual users and hundreds of organizations. Whether you're a security researcher, ethical hacker, IT professional, or organization looking to enhance your security posture, CAI provides the building blocks to create specialized AI agents that can assist with mitigation, vulnerability discovery, exploitation, and security assessment.
@@ -123,7 +123,7 @@ CAI_LICENSE_OFF=1 cai
 
 **Key Features:**
 - 🤖 **300+ AI Models**: Support for OpenAI, Anthropic, DeepSeek, Ollama, and more
-- 🔧 **Built-in Security Tools**: Ready-to-use tools for reconnaissance, exploitation, and privilege escalation 
+- 🔧 **Built-in Security Tools**: Ready-to-use tools for reconnaissance, exploitation, and privilege escalation
 - 🏆 **Battle-tested**: Proven in HackTheBox CTFs, bug bounties, and real-world security [case studies](https://aliasrobotics.com/case-studies-robot-cybersecurity.php)
 - 🎯 **Agent-based Architecture**: Modular framework design to build specialized agents for different security tasks
 - 🛡️ **Guardrails Protection**: Built-in defenses against prompt injection and dangerous command execution
@@ -296,7 +296,7 @@ Cybersecurity AI is a critical field, yet many groups are misguidedly pursuing i
 - [Mindfort](www.mindfort.ai)
 - [Mindgard](https://mindgard.ai/)
 - [NDAY Security](https://ndaysecurity.com/)
-- [Penligent](https://penligent.ai/) 
+- [Penligent](https://penligent.ai/)
 - [Runsybil](https://www.runsybil.com)
 - [Selfhack](https://www.selfhack.fi)
 - [Sola Security](https://sola.security/)
@@ -304,7 +304,7 @@ Cybersecurity AI is a critical field, yet many groups are misguidedly pursuing i
 - [Staris](https://staris.tech/)
 - [Sxipher](https://www.sxipher.com/) (seems discontinued)
 - [Terra Security](https://www.terra.security)
-- [Vibeproxy](https://vibeproxy.app/) 
+- [Vibeproxy](https://vibeproxy.app/)
 - [Xint](https://xint.io/)
 - [XBOW](https://www.xbow.com)
 - [ZeroPath](https://www.zeropath.com)
@@ -313,13 +313,13 @@ Cybersecurity AI is a critical field, yet many groups are misguidedly pursuing i
 
 ## Learn - `CAI` Fluency
 
- 
- 
- 
- 
- 
- 
- 
+
+
+
+
+
+
+
 
 > [!NOTE]
 >
@@ -440,7 +440,7 @@ echo -e 'OPENAI_API_KEY="sk-1234"\nANTHROPIC_API_KEY=""\nOLLAMA=""\nOLLAMA_API_B
 cai  # first launch it can take up to 30 seconds
 ```
 
-You might run into issues running cai on ubuntu since some agents assume they are running on a Kali Instance and are not able to find the tools needed. 
+You might run into issues running cai on ubuntu since some agents assume they are running on a Kali Instance and are not able to find the tools needed.
 So as an alternative you can use the docker compose file in the dockerized folder instead. This also works from within wsl if docker is installed.
 in that case fetch the dockerized folder (no need for the whole repo) and run from within it.
 For API Keys env syntax check litellm Documentation. [LiteLLM Documentation](https://docs.litellm.ai/docs/tutorials/installation)
@@ -663,7 +663,7 @@ flag_discriminator = Agent(
     model=OpenAIChatCompletionsModel(
         model=os.getenv('CAI_MODEL', "qwen2.5:14b"),
         openai_client=AsyncOpenAI(),
-    ) 
+    )
 )
 
 ctf_agent = Agent(
@@ -676,7 +676,7 @@ ctf_agent = Agent(
     model=OpenAIChatCompletionsModel(
         model= os.getenv('CAI_MODEL', "qwen2.5:14b"),
         openai_client=AsyncOpenAI(),
-    ), 
+    ),
     handoffs = [flag_discriminator]
 )
 ```
@@ -732,7 +732,7 @@ CAI implements AI observability by adopting the OpenTelemetry standard and to do
 `Guardrails` provide a critical security layer for CAI agents, protecting against prompt injection attacks and preventing execution of dangerous commands. These guardrails run in parallel to agents, validating both input and output to ensure safe operation. The framework includes:
 
 - **Input Guardrails**: Detect and block prompt injection attempts before they reach agents, using pattern matching, Unicode homograph detection, and AI-powered analysis
-- **Output Guardrails**: Validate agent outputs before execution, preventing dangerous commands like reverse shells, fork bombs, or data exfiltration 
+- **Output Guardrails**: Validate agent outputs before execution, preventing dangerous commands like reverse shells, fork bombs, or data exfiltration
 - **Multi-layered Defense**: Protection at input, processing, and execution stages with tool-level validation
 - **Base64/Base32 Aware**: Automatically decodes and analyzes encoded payloads to detect hidden malicious commands
 - **Configurable**: Can be enabled/disabled via `CAI_GUARDRAILS` environment variable
@@ -808,8 +808,8 @@ From here on, type on `CAI` and start your security exercise. Best way to learn 
 
 ### Environment Variables
 For using private models, you are given a [`.env.example`](.env.example) file. Copy it and rename it as `.env`. Fill in your corresponding API keys, and you are ready to use CAI.
- 
- List of Environment Variables 
+
+ List of Environment Variables
 
 | Variable | Description |
 |----------|-------------|
@@ -838,7 +838,7 @@ For using private models, you are given a [`.env.example`](.env.example) file. C
 | CAI_WORKSPACE_DIR | Specifies the directory path where the workspace is located |
 | CAI_GUARDRAILS | Enable/disable guardrails for prompt injection protection (default: true) |
 
- 
+
 
 ### OpenRouter Integration
 
@@ -977,7 +977,7 @@ docker run --rm -it \
 ```
 
 ## FAQ
- OLLAMA is giving me 404 errors 
+ OLLAMA is giving me 404 errors
 
 Ollama's API in OpenAI mode uses `/v1/chat/completions` whereas the `openai` library uses `base_url` + `/chat/completions`.
 
@@ -992,20 +992,20 @@ See the following issues that treat this topic in more detail:
 - https://github.com/aliasrobotics/cai/issues/83
 - https://github.com/aliasrobotics/cai/issues/82
 
- 
 
- Where are all the caiextensions? 
+
+ Where are all the caiextensions?
 
 See [all caiextensions](https://gitlab.com/aliasrobotics/alias_research/caiextensions)
 
- 
 
- How do I install the report caiextension? 
+
+ How do I install the report caiextension?
 
 [See here](#optional-requirements-caiextensions)
- 
 
- How do I set up SSH access for Gitlab? 
+
+ How do I set up SSH access for Gitlab?
 
 Generate a new SSH key
 ```bash
@@ -1029,17 +1029,17 @@ ssh -T git@gitlab.com
 Welcome to GitLab, @vmayoral!
 ```
 
- 
 
- How do I clear Python cache? 
+
+ How do I clear Python cache?
 
 ```bash
 find . -name "*.pyc" -delete && find . -name "__pycache__" -delete
 ```
 
- 
 
- If host networking is not working with ollama check whether it has been disabled in Docker because you are not signed in 
+
+ If host networking is not working with ollama check whether it has been disabled in Docker because you are not signed in
 
 Docker in OS X behaves funny sometimes. Check if the following message has shown up:
 
@@ -1052,53 +1052,53 @@ To verify connection, from within the VSCode devcontainer:
 curl -v http://host.docker.internal:8000/api/version
 ```
 
- 
 
- 
- Run CAI against any target 
+
+
+ Run CAI against any target
 
 ![cai-004-first-message](imgs/readme_imgs/cai-004-first-message.png)
 
 The starting user prompt in this case is: `Target IP: 192.168.3.10, perform a full network scan`.
 
 The agent started performing a nmap scan. You could either interact with the agent and give it more instructions, or let it run to see what it explores next.
- 
 
- 
- How do I interact with the agent? Type twice CTRL + C 
+
+
+ How do I interact with the agent? Type twice CTRL + C
 
 ![cai-005-ctrl-c](imgs/readme_imgs/cai-005-ctrl-c.png)
 
 If you want to use the HITL mode, you can do it by presssing twice ```Ctrl + C```.
 This will allow you to interact (prompt) with the agent whenever you want. The agent will not lose the previous context, as it is stored in the `history` variable, which is passed to it and any agent that is called. This enables any agent to use the previous information and be more accurate and efficient.
- 
 
- 
- Can I change the model while CAI is running? /model 
+
+
+ Can I change the model while CAI is running? /model
 
 Use ```/model``` to change the model.
 
 ![cai-007-model-change](imgs/readme_imgs/cai-007-model-change.png)
 
- 
 
- 
- How can I list all the agents available? /agent 
+
+
+ How can I list all the agents available? /agent
 
 Use ```/agent``` to list all the agents available.
 
 ![cai-010-agents-menu](imgs/readme_imgs/cai-010-agents-menu.png)
 
- 
 
- 
- Where can I list all the environment variables? /env 
+
+
+ Where can I list all the environment variables? /env
 
 ![cai-008-config](imgs/readme_imgs/cai-008-config.png)
- 
 
- 
- How can I monitor token usage and costs? 
+
+
+ How can I monitor token usage and costs?
 
 Use **`/cost`** in the REPL for session spend and token statistics, **`/compact`** when conversations grow long, and (in **TUI** mode) the per-terminal cost and model indicators in the UI.
 
@@ -1107,25 +1107,25 @@ CAI> /cost
 ```
 
 See the [CLI commands reference](docs/cli/commands_reference.md) for the full command list.
- 
 
- 
- How to know more about the CLI? /help 
+
+
+ How to know more about the CLI? /help
 
 ![cai-006-help](imgs/readme_imgs/cai-006-help.png)
- 
 
- 
- How can I trace the whole execution? 
+
+
+ How can I trace the whole execution?
 The environment variable `CAI_TRACING` allows the user to set it to `CAI_TRACING=true` to enable tracing, or `CAI_TRACING=false` to disable it.
 When CAI is prompted by the first time, the user is provided with two paths, the execution log, and the tracing log.
 
 ![cai-009-logs](imgs/readme_imgs/cai-009-logs.png)
 
- 
 
- 
- Can I expand CAI capabilities using previous run logs? 
+
+
+ Can I expand CAI capabilities using previous run logs?
 
 Yes. Today CAI performs best by relying on In‑Context Learning (ICL). Rather than building long‑term stores, the recommended workflow is to load relevant prior logs directly into the current session so the model can reason with them in context.
 
@@ -1145,17 +1145,17 @@ CAI prints the path to the current run’s JSONL log at startup (highlighted in 
 
 Legacy notes: earlier “memory extension” mechanisms (episodic/semantic stores and offline ingestion) are retained for reference only. See [src/cai/agents/memory.py](src/cai/agents/memory.py) for background and legacy details. Our current direction prioritizes ICL over persistent memory.
 
- 
 
- 
- Can I expand CAI capabilities using scripts or extra information? 
+
+
+ Can I expand CAI capabilities using scripts or extra information?
 
 Currently, CAI supports text based information. You can add any extra information on the target you are facing by copy-pasting it directly into the system or user prompt.
 
 **How?** By adding it to the system ([`system_master_template.md`](cai/repl/templates/system_master_template.md)) or the user prompt ([`user_master_template.md`](cai/repl/templates/user_master_template.md)). You can always directly prompt the path to the model, and it will ```cat``` it.
- 
 
- How CAI licence works? 
+
+ How CAI licence works?
 
 CAI’s current license does not restrict usage for research purposes. You are free to use CAI for security assessments (pentests), to develop additional features, and to integrate it into your research activities, as long as you comply with local laws.
 
@@ -1163,13 +1163,13 @@ If you or your organization start benefiting commercially from CAI (e.g., offeri
 
 CAI itself is not a profit-seeking initiative. Our goal is to build a sustainable open-source project. We simply ask that those who profit from CAI contribute back and support our ongoing development.
 
- 
 
- I get a `Unable to locate package python3.12-venv` when installing the prerequisites on my debian based system! 
+
+ I get a `Unable to locate package python3.12-venv` when installing the prerequisites on my debian based system!
 
 The easiest way to get around this is to simply install [`python3.12`](https://www.python.org/downloads/release/python-3120/) from source.
 
- 
+
 
 ## Citation
 
@@ -1233,11 +1233,11 @@ CAI was initially developed by [Alias Robotics](https://aliasrobotics.com) and c
 ### Academic Collaborations
 CAI benefits from ongoing research collaborations with academic institutions. Researchers interested in collaborative projects, dataset access, or academic licenses should contact research@aliasrobotics.com. We provide special support for:
 - PhD research projects
-- Academic benchmarking studies 
+- Academic benchmarking studies
 - Security education initiatives
 - Open-source contributions from research labs
 
- 
+
 [^1]: Arguably, the Chain-of-Thought agentic pattern is a special case of the Hierarchical agentic pattern.
 [^2]: Kamhoua, C. A., Leslie, N. O., & Weisman, M. J. (2018). Game theoretic modeling of advanced persistent threat in internet of things. Journal of Cyber Security and Information Systems.
 [^3]: Yao, S., Zhao, J., Yu, D., Du, N., Shafran, I., Narasimhan, K., & Cao, Y. (2023, January). React: Synergizing reasoning and acting in language models. In International Conference on Learning Representations (ICLR).

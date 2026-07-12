@@ -173,7 +173,7 @@ exclude = [
     "tools/create_root_user.sh",
     "media/",
     "docs/media/",
-    "docs"    
+    "docs"
 ]
 # Explicitly include pricing data files
 artifacts = [
@@ -213,7 +213,7 @@ exclude = [
     "tools/create_root_user.sh",
     "media/",
     "docs/media/",
-    "docs"    
+    "docs"
 ]
 
 [tool.ruff]

@@ -15,12 +15,12 @@
     1️⃣*      2️⃣*      3️⃣*      4️⃣         5️⃣            │                    │
   Jeopardy   A&D     Cyber    Knowledge  Privacy         │                 Docker
     CTF      CTF     Rang      Bench     Bench           │                Containers
-     │        │       │         │          │             │ 
-  ┌──┴──┐  ┌──┴──┐ ┌──┴──┐   ┌──┴──┐    ┌──┴──┐          │ 
-    Base      A&D   Cyber    SecEval  CyberPII-Bench     │ 
-   Cybench          Ranges   CTIBench                    │ 
-    RCTF2                   CyberMetric                  │ 
-AutoPenBench                                             │               
+     │        │       │         │          │             │
+  ┌──┴──┐  ┌──┴──┐ ┌──┴──┐   ┌──┴──┐    ┌──┴──┐          │
+    Base      A&D   Cyber    SecEval  CyberPII-Bench     │
+   Cybench          Ranges   CTIBench                    │
+    RCTF2                   CyberMetric                  │
+AutoPenBench                                             │
                                   🚩───────🚩🚩───────🚩🚩🚩───────🚩🚩🚩🚩───────🚩🚩🚩🚩🚩
                                   Beginner Novice     Graduate     Professional      Elite
 
@@ -87,7 +87,7 @@ Cybersecurity AI Benchmark or `CAIBench` for short is a meta-benchmark (*benchma
 
 ```
          🏗️ CAIBench Component Architecture
-    
+
     ┌─────────────────────────────────────────────────────┐
     │                AI Agent Under Test                  │
     │              (Cybersecurity Models)                 │
@@ -95,12 +95,12 @@ Cybersecurity AI Benchmark or `CAIBench` for short is a meta-benchmark (*benchma
                       │ Evaluation Interface
                       ▼
     ┌─────────────────────────────────────────────────────┐
-    │            🧠 CAIBench Controller                   │ 
+    │            🧠 CAIBench Controller                   │
     │         (benchmarks/eval.py || Containers)          │
     └─┬─────────┬─────────┬─────────┬─────────┬───────────┘
       │         │         │         │         │
       🐳        🐳        🐳        📖        📖
-      │         │         │         │         │      
+      │         │         │         │         │
       ▼         ▼         ▼         ▼         ▼
     ┌───┐     ┌───┐     ┌───┐     ┌───┐     ┌───┐
     │🥇 │     │⚔️ │     │🏰 │     │📚 │     │🔒 │
@@ -166,9 +166,9 @@ The goal is to consolidate diverse evaluation tasks under a single framework to 
 
 ### 📊 General Summary Table
 
-| Model       | SecEval   | CyberMetric  | Total Value | 
+| Model       | SecEval   | CyberMetric  | Total Value |
 |-------------|-----------|--------------|-------------|
-| model_name  | `XX.X%`   | `XX.X%`      | `XX.X%`     | 
+| model_name  | `XX.X%`   | `XX.X%`      | `XX.X%`     |
 
 Note: The table above is a placeholder.
 
@@ -201,7 +201,7 @@ python benchmarks/eval.py --model MODEL_NAME --dataset_file INPUT_FILE --eval EV
 ```bash
 Arguments:
     -m, --model         # Specify the model to evaluate (e.g., "gpt-4", "ollama/qwen2.5:14b")
-    -d, --dataset_file  # IMPORTANT! By default: small test data of 2 samples 
+    -d, --dataset_file  # IMPORTANT! By default: small test data of 2 samples
     -B, --backend       # Backend to use: "openai", "openrouter", "ollama" (required)
     -e, --eval          # Specify the evaluation benchmark
     -s, --save_interval #(optional) Save intermediate results every X questions.
@@ -369,7 +369,7 @@ Thus, **F2 is prioritized over F1** to reflect this risk in our evaluations.
 To compute annotation quality and consistency across systems, use the provided Python script:
 
 ```bash
-python benchmarks/eval.py --model alias1 --dataset_file benchmarks/cyberPII-bench/memory01_gold.csv --eval cyberpii-bench --backend alias 
+python benchmarks/eval.py --model alias1 --dataset_file benchmarks/cyberPII-bench/memory01_gold.csv --eval cyberpii-bench --backend alias
 ```
 
 The input CSV file must contain the following columns:
