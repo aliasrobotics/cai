@@ -153,6 +153,10 @@ from cai.util.llm_api_base import (
     resolve_llm_openai_compatible_base,
     resolve_llm_openai_compatible_api_key,
 )
+from cai.util.nim_rotation import (
+    get_next_nim_key,
+    is_nim_rotation_configured,
+)
 from cai.errors import LLMEmptyAssistantError, LLMRateLimited, LLMTimeout
 from cai.util.gateway_rate_limiter import (
     COMPLETION_BUDGET_TOKENS,
@@ -2786,6 +2790,9 @@ class OpenAIChatCompletionsModel(Model):
                         and hasattr(usage.prompt_tokens_details, "cached_tokens")
                         and usage.prompt_tokens_details.cached_tokens
                         else 0,
+                        "cache_write_tokens": cache_creation
+                        if cache_creation is not None
+                        else 0,
                     },
                     cache_creation_input_tokens=cache_creation,
                     cache_read_input_tokens=cache_read,
@@ -3657,6 +3664,21 @@ class OpenAIChatCompletionsModel(Model):
                 if hasattr(model_settings, "reasoning_effort"):
                     kwargs["reasoning_effort"] = model_settings.reasoning_effort
 
+        # NIM key rotation: when multiple NVIDIA_NIM_API_KEY_N are set,
+        # round-robin through them to stay under 40 req/min per key.
+        # Only applies when no explicit api_base was routed above (alias,
+        # ollama_cloud, or a custom provider fallback): those must keep
+        # their own endpoint + key.
+        if is_nim_rotation_configured() and not kwargs.get("api_base"):
+            kwargs["api_key"] = get_next_nim_key()
+            kwargs["custom_llm_provider"] = "openai"
+            kwargs["api_base"] = (
+                resolve_llm_openai_compatible_base(
+                    str(kwargs.get("model") or os.getenv("CAI_MODEL") or "")
+                ).rstrip("/")
+                or os.getenv("OPENAI_API_BASE", "").rstrip("/")
+            )
+
         # Filter out NotGiven values to avoid JSON serialization issues
         filtered_kwargs = {}
         for key, value in kwargs.items():
@@ -3763,9 +3785,19 @@ class OpenAIChatCompletionsModel(Model):
                 request_body = {k: v for k, v in request_body.items() if v is not None}
 
                 api_url = f"{openai_api_base.rstrip('/')}/chat/completions"
+                if "api.nvidia.com" in openai_api_base.lower() and is_nim_rotation_configured():
+                    direct_api_key = get_next_nim_key() or "sk-placeholder"
+                else:
+                    direct_api_key = (
+                        get_config().openai_api_key
+                        or resolve_llm_openai_compatible_api_key(
+                            str(kwargs.get("model") or os.getenv("CAI_MODEL") or "")
+                        )
+                        or "sk-placeholder"
+                    )
                 headers = {
                     "Content-Type": "application/json",
-                    "Authorization": f"Bearer {get_config().openai_api_key or 'sk-placeholder'}",
+                    "Authorization": f"Bearer {direct_api_key}",
                 }
 
                 if stream:
