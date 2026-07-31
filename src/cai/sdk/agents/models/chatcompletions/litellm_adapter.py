@@ -68,7 +68,6 @@ async def fetch_response_litellm_openai(
     """
     try:
         if stream:
-            ret = await litellm.acompletion(**kwargs)
             stream_obj = await litellm.acompletion(**kwargs)
             return _build_response_obj(model_name, model_settings, tool_choice, parallel_tool_calls), stream_obj
         else:
@@ -102,7 +101,6 @@ async def fetch_response_litellm_openai(
             kwargs["messages"] = messages
 
             if stream:
-                ret = await litellm.acompletion(**kwargs)
                 stream_obj = await litellm.acompletion(**kwargs)
                 return _build_response_obj(model_name, model_settings, tool_choice, parallel_tool_calls), stream_obj
             else:
