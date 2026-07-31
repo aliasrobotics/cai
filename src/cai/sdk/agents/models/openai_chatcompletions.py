@@ -3677,6 +3677,7 @@ class OpenAIChatCompletionsModel(Model):
                 "llama", "nemotron", "codellama", "mixtral", "phi",
                 "qwen", "yi", "deepseek", "gemma", "stable-diffusion",
                 "sdxl", "cosxl", "proteus", "realistic-vision",
+                "z-ai",
             }
             return provider in nim_providers
 
@@ -3804,6 +3805,7 @@ class OpenAIChatCompletionsModel(Model):
                         "llama", "nemotron", "codellama", "mixtral", "phi",
                         "qwen", "yi", "deepseek", "gemma", "stable-diffusion",
                         "sdxl", "cosxl", "proteus", "realistic-vision",
+                        "z-ai",
                     }
                     return provider in nim_providers
                 if (
