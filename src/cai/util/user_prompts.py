@@ -53,6 +53,7 @@ import functools
 import getpass
 import os
 import re
+import shlex
 import signal
 import subprocess
 from typing import Any, Callable, Iterator, Tuple
@@ -1288,7 +1289,8 @@ _SENSITIVE_PATTERNS: list[tuple[str, str, str]] = [
     (r"\bdoas\b", "Command uses doas privilege escalation", "sudo"),
 
     # destructive
-    (r"rm\s+(-[^\s]*)*(r|f){2,}.*\s+/", "Recursive/forced removal from root filesystem", "destructive"),
+    # (catastrophic ``rm`` is detected by _is_catastrophic_rm() below -- a regex
+    # here would be filtered out by the "destructive" binary post-check anyway)
     (r"\bmkfs\.", "Command formats a filesystem", "destructive"),
     (r"\bdd\b.*\bof=/dev/", "Direct write to block device (dd)", "destructive"),
     (r"\bwipefs\b", "Command wipes filesystem signatures", "destructive"),
@@ -1567,6 +1569,121 @@ def _is_guard_enabled() -> bool:
     return os.getenv("CAI_SENSITIVE_GUARD", "true").lower() != "false"
 
 
+# --- Catastrophic ``rm`` detection (issue #470) ------------------------------
+# The guard prompts before dangerous operations, but its original ``rm`` regex
+# required the target to contain ``/``, so ``rm -rf .``, ``rm -rf ~`` and
+# ``rm -rf *`` -- the ordinary ways to wipe a working tree or a home directory
+# -- were never detected (a user reported CAI running ``rm -rf .`` and deleting
+# their home directory). This predicate replaces that regex.
+#
+# It is a heuristic for an *interactive confirmation*, not a sandbox. Deliberately
+# obfuscated forms are intentionally out of scope and left to other guards / the
+# model's judgement: command substitution (``$(pwd)``, backticks), wrapper
+# binaries (``env``/``xargs``/``nice`` ...), and non-``rm`` tree deleters
+# (``find ... -delete``).
+_CATASTROPHIC_RM_TARGETS: frozenset[str] = frozenset(
+    {"/", "/*", ".", "..", "~", "*", "$HOME", "$PWD"}
+)
+_CRITICAL_SYSTEM_DIRS: frozenset[str] = frozenset({
+    "/etc", "/home", "/usr", "/var", "/bin", "/sbin", "/lib", "/lib64",
+    "/boot", "/root", "/opt", "/dev", "/proc", "/sys", "/srv", "/mnt", "/media",
+})
+_RM_SEGMENT_SEPARATORS: frozenset[str] = frozenset(
+    {"&&", "||", ";", ";;", "|", "&", "(", ")", "\n"}
+)
+_RM_GLOB_LEAVES: frozenset[str] = frozenset({"*", ".*", ".[!.]*"})
+
+
+def _rm_command_segments(command: str) -> list[list[str]]:
+    """Tokenize *command* and split it into simple-command token lists on shell
+    control operators, quote-aware.
+
+    So ``rm -rf ./build && cd ~`` becomes two segments and the ``~`` from
+    ``cd ~`` is never misread as an ``rm`` target, while a file literally named
+    ``a && b`` stays a single token.
+    """
+    try:
+        lexer = shlex.shlex(command, posix=True, punctuation_chars=True)
+        lexer.whitespace_split = True
+        tokens = list(lexer)
+    except ValueError:
+        try:
+            tokens = shlex.split(command)
+        except ValueError:
+            return []
+    segments: list[list[str]] = []
+    current: list[str] = []
+    for token in tokens:
+        if token in _RM_SEGMENT_SEPARATORS:
+            if current:
+                segments.append(current)
+                current = []
+        else:
+            current.append(token)
+    if current:
+        segments.append(current)
+    return segments
+
+
+def _rm_target_is_catastrophic(target: str) -> bool:
+    """True if a single ``rm`` argument denotes a catastrophic location."""
+    norm = target.replace("${HOME}", "$HOME").replace("${PWD}", "$PWD")
+    norm = norm.rstrip("/") or "/"
+    # Peel one trailing glob leaf: ``~/*`` -> ``~``, ``/home/*`` -> ``/home``.
+    if "/" in norm:
+        head, _, leaf = norm.rpartition("/")
+        if head and leaf in _RM_GLOB_LEAVES:
+            norm = head
+    return norm in _CATASTROPHIC_RM_TARGETS or norm in _CRITICAL_SYSTEM_DIRS
+
+
+def _segment_is_catastrophic_rm(tokens: list[str]) -> bool:
+    if not tokens:
+        return False
+    index = 0
+    # Skip leading VAR=value assignments, e.g. ``FOO=bar rm -rf .``.
+    while (
+        index < len(tokens)
+        and "=" in tokens[index]
+        and not tokens[index].startswith("-")
+    ):
+        index += 1
+    if index >= len(tokens) or os.path.basename(tokens[index]) != "rm":
+        return False
+    recursive = False
+    targets: list[str] = []
+    for token in tokens[index + 1:]:
+        if token == "--":
+            continue
+        if token.startswith("--"):
+            if token == "--recursive":
+                recursive = True
+            continue
+        if token.startswith("-") and len(token) > 1:
+            if "r" in token or "R" in token:
+                recursive = True
+            continue
+        targets.append(token)
+    if not recursive:
+        return False
+    return any(_rm_target_is_catastrophic(t) for t in targets)
+
+
+def _is_catastrophic_rm(command: str) -> bool:
+    """True if *command* runs an ``rm`` that recursively/forcibly removes a
+    catastrophic target -- the root filesystem, a top-level system directory,
+    the home directory, the current/parent directory, or a glob of their
+    contents (``rm -rf .`` / ``~`` / ``*`` / ``~/*`` / ``/etc`` ...).
+
+    Deliberately obfuscated forms are out of scope (see the module note above);
+    this only has to catch the ordinary spellings the old regex missed.
+    """
+    return any(
+        _segment_is_catastrophic_rm(segment)
+        for segment in _rm_command_segments(command)
+    )
+
+
 def detect_sensitive_command(command: str) -> tuple[bool, str, str]:
     """Check whether *command* matches any sensitive pattern.
 
@@ -1604,6 +1721,19 @@ def detect_sensitive_command(command: str) -> tuple[bool, str, str]:
                 return (False, "", "")
 
         return (True, reason, category)
+
+    # Catastrophic ``rm`` (issue #470): the patterns above only match targets
+    # containing ``/``, so ``rm -rf .`` / ``~`` / ``*`` slip through. Check for
+    # them here, after the loop, so the ``sudo`` pattern still wins for
+    # ``sudo rm -rf /`` (it matches earlier and returns "sudo").
+    if _is_catastrophic_rm(command):
+        return (
+            True,
+            "Recursive/forced removal of a catastrophic target (the root "
+            "filesystem, a system directory, home, the working directory, or a "
+            "glob of their contents)",
+            "destructive",
+        )
 
     return (False, "", "")
 
