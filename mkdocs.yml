@@ -32,6 +32,7 @@ nav:
           - OpenRouter: providers/openrouter.md
           - Ollama: providers/ollama.md
           - Azure OpenAI: providers/azure.md
+          - GLM (Z.ai): providers/glm.md
 
   - '🚀 CAI PRO': cai_pro.md
 
