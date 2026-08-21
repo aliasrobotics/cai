@@ -3937,7 +3937,26 @@ class OpenAIChatCompletionsModel(Model):
                 
                 # Call Ollama Cloud using OpenAI-compatible API
                 if stream:
-                    return await ollama_client.chat.completions.create(**kwargs)
+                    # Streaming callers unpack a (Response, stream) tuple, matching
+                    # the LiteLLM paths. Returning the bare stream raises
+                    # "cannot unpack non-iterable AsyncStream object", so build the
+                    # same placeholder Response the other streaming paths do.
+                    stream_obj = await ollama_client.chat.completions.create(**kwargs)
+                    response = Response(
+                        id=FAKE_RESPONSES_ID,
+                        created_at=time.time(),
+                        model=self.model,
+                        object="response",
+                        output=[],
+                        tool_choice="auto"
+                        if tool_choice is None or tool_choice == NOT_GIVEN
+                        else cast(Literal["auto", "required", "none"], tool_choice),
+                        top_p=model_settings.top_p,
+                        temperature=model_settings.temperature,
+                        tools=[],
+                        parallel_tool_calls=parallel_tool_calls or False,
+                    )
+                    return response, stream_obj
                 else:
                     return await ollama_client.chat.completions.create(**kwargs)
                     
